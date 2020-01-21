@@ -280,6 +280,8 @@ class ServiciosController extends Controller
                     $tipo->tiempo_orden_max = $request->tiempoorden;
                     $tipo->producto_visible = $request->cbproducto;
                     $tipo->privado = 0;
+                    $tipo->prestar_motorista = 0;
+
                     $tipo->save();
 
                     $idservicio = $tipo->id;
