@@ -1191,7 +1191,7 @@
     // respuesta al agregar
     function respuestaNuevo(response){
 
-        console.log(response);
+        console.log(response); 
 
         if (response.data.success == 0) {
             toastr.error('Validacion incorrecta');
