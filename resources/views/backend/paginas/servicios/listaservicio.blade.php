@@ -1190,6 +1190,9 @@
 
     // respuesta al agregar
     function respuestaNuevo(response){
+
+        console.log(response);
+
         if (response.data.success == 0) {
             toastr.error('Validacion incorrecta');
         } else if (response.data.success == 1) {
