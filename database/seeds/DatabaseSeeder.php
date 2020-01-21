@@ -11,8 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-     // $this->call(RolesAndPermissions::class);
-     // $this->call(administradores_seeder::class);
+      $this->call(RolesAndPermissions::class);
+      $this->call(administradores_seeder::class);
     //  $this->call(ActivoTwilioSeeder::class);
       
          
