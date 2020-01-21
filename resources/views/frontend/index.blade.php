@@ -15,7 +15,7 @@
 
     <section class="" id="about">
         <div class="container">
-            <img src="{{ url('storage/listaservicios/slider1.jpg') }}" style="width:100%">
+            <img src="{{ asset('images/tatanlogo.png') }}" style="width:150px; heigh:150px">
         </div>
     </section>
 
