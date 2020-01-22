@@ -81,7 +81,7 @@ class PerfilController extends Controller
         }
     }
 
-   /*  // cambiar contraseña con id
+     // cambiar contraseña con id
      public function cambiarPassword(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
@@ -282,11 +282,11 @@ class PerfilController extends Controller
             }
         }
     }
-*/
+
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
 
-        return 'entroo11';
+        return 'entroo22';
       
         if($request->isMethod('post')){ 
             
