@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Direccion;
+use App\Zonas;
 
 class PerfilController extends Controller
 {
@@ -269,10 +270,10 @@ class PerfilController extends Controller
             if(User::where('id', $request->userid)->first()){
 
                 $direccion = DB::table('direccion_usuario AS dir')            
-            ->join('zonas AS z', 'z.id', '=', 'dir.zonas_id',)
-           // ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
-           // 'dir.telefono', 'dir.seleccionado', 'z.nombre AS nombreZona')
-           // ->where('dir.user_id', $request->userid)
+            ->join('zonas AS z', 'z.id', '=', 'dir.zonas_id')
+            ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
+            'dir.telefono', 'dir.seleccionado', 'z.nombre AS nombreZona')
+            ->where('dir.user_id', $request->userid)
             ->get();
 
                 return [
