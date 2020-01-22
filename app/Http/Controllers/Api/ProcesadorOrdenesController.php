@@ -566,7 +566,7 @@ class ProcesadorOrdenesController extends Controller
                         $icono = 1; // campana
                       
                         if(!empty($pilaPropietarios)){     
-                            return [$pilaPropietarios];                      
+                                
                             $this->envioNoticacion($titulo, $mensaje, $pilaPropietarios, $alarma, $color, $icono);                            
                         }
 
