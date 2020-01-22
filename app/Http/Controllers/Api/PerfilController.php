@@ -245,7 +245,7 @@ class PerfilController extends Controller
     }
 
     // lista de direcciones del usuario
-   /* public function verDirecciones(Request $request){
+    public function verDirecciones(Request $request){
         if($request->isMethod('post')){  
 
             $rules = array(                
@@ -267,6 +267,7 @@ class PerfilController extends Controller
             }
 
             if(User::where('id', $request->userid)->first()){
+
                 $direccion = DB::table('direccion_usuario AS dir')            
             ->join('zonas', 'zonas.id', '=', 'dir.zonas_id',)
             ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
@@ -274,16 +275,16 @@ class PerfilController extends Controller
             ->where('user_id', $request->userid)
             ->get();
 
-            return [
-                'success' => 1,
-                'direcciones' => $direccion,                
-            ];
+                return [
+                    'success' => 1,
+                    'direcciones' => $direccion,                
+                ];
             }else{
                 return ['succcess'=> 2];
             }
         }
     }
-*/
+
 
 
 
