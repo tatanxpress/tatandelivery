@@ -290,7 +290,7 @@ class PerfilController extends Controller
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
 
-        return 'entroo11';
+        return 'entroo3';
       
         if($request->isMethod('post')){ 
             
@@ -400,7 +400,7 @@ class PerfilController extends Controller
         }
     }
 
-    /*
+    
 
     // guardar direccion seleccionada
     public function seleccionarDireccion(Request $request){
@@ -507,6 +507,6 @@ class PerfilController extends Controller
         }
     }
 
-*/
+
 
 }
