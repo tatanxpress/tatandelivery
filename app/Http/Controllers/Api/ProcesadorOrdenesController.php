@@ -567,7 +567,7 @@ class ProcesadorOrdenesController extends Controller
                       
                         if(!empty($pilaPropietarios)){     
                                 
-                            $this->envioNoticacion($titulo, $mensaje, $pilaPropietarios, $alarma, $color, $icono);                            
+                            $this->envioNoticacion($titulo, $mensaje, "aa2b2d2d-d567-478f-9f56-047d17c158ad", $alarma, $color, $icono);                            
                         }
 
                     }else{
