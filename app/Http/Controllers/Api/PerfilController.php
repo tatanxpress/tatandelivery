@@ -268,12 +268,12 @@ class PerfilController extends Controller
 
             if(User::where('id', $request->userid)->first()){
 
-             /*   $direccion = DB::table('direccion_usuario AS dir')            
-            ->join('zonas', 'zonas.id', '=', 'dir.zonas_id',)
+                $direccion = DB::table('direccion_usuario AS dir')            
+            ->join('zonas AS z', 'z.id', '=', 'dir.zonas_id',)
             ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
-            'dir.telefono', 'dir.seleccionado', 'zonas.nombre AS nombreZona')
-            ->where('user_id', $request->userid)
-            ->get();*/
+            'dir.telefono', 'dir.seleccionado', 'z.nombre AS nombreZona')
+            ->where('dir.user_id', $request->userid)
+            ->get();
 
                 return [
                     'success' => 1,
@@ -284,9 +284,6 @@ class PerfilController extends Controller
             }
         }
     }
-
-
-
 
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
@@ -400,8 +397,7 @@ class PerfilController extends Controller
             }
         }
     }
-
-    
+   
 
     // guardar direccion seleccionada
     public function seleccionarDireccion(Request $request){
