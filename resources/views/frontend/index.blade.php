@@ -36,24 +36,24 @@
       <section class="section novi-bg novi-bg-img section-md-2 bg-default">
         <div class="container">
           <div class="text-center">
-            <h3>Como funciona</h3>
-            <h2>en 3 sencillos pasos</h2>
+            <h3>COMPRA LO QUE QUIERAS</h3>
+            <h2>EN 3 SENCILLOS PASOS</h2>
           </div>
           <div class="row row-50 post-classic-counter justify-content-lg-between justify-content-center">
             <div class="col-lg-4 col-sm-6">
-              <div class="post-classic novi-bg bg-secondary-1">
+              <div class="post-classic novi-bg bg-primary">
                 <h3 class="post-classic-title">Elige <br> un producto que te guste</h3>
                 <p class="post-classic-text">En más de 20 comercios afiliados</p>
               </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-              <div class="post-classic novi-bg bg-secondary-2">
+              <div class="post-classic novi-bg bg-primary">
                 <h3 class="post-classic-title">Agregalo al carrito</h3>
                 <p class="post-classic-text">ordena facil y rápido</p>
               </div>
             </div>
             <div class="col-lg-4 col-sm-6">
-              <div class="post-classic novi-bg bg-secondary-3">
+              <div class="post-classic novi-bg bg-primary">
                 <h3 class="post-classic-title">Espera la confirmación del <br> Servicio</h3>
                 <p class="post-classic-text">Tu producto llegara en el tiempo estimado</p>
               </div>
