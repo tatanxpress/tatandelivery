@@ -702,7 +702,7 @@ class ProcesadorOrdenesController extends Controller
             }
         }
     }
-
+/*
     // ver ordenes por usuario
     public function verOrdenes(Request $request){
         if($request->isMethod('post')){ 
@@ -1365,7 +1365,7 @@ class ProcesadorOrdenesController extends Controller
         }
     }
 
-
+*/
     public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono){
         OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
     }
