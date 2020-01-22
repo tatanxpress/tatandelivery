@@ -23,7 +23,10 @@ class ServiciosController extends Controller
     public function index(){
 
         // lista tipo servicios
-        $tiposervicio = TipoServicios::all();
+        $tiposervicio =  DB::table('tipo_servicios')
+        ->where('id', '!=', 3)       
+        ->get();
+
         return view('backend.paginas.servicios.listaservicio', compact('tiposervicio'));
     }
 
