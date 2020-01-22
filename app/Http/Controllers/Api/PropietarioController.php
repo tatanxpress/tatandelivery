@@ -61,7 +61,7 @@ class PropietarioController extends Controller
 
                     $id = $p->id;
                     $pro = DB::table('servicios AS s')
-                    ->join('propietarios AS p', 'p.servicios_id', '=', 's.id',)
+                    ->join('propietarios AS p', 'p.servicios_id', '=', 's.id')
                     ->select('s.nombre')
                     ->where('p.id', $id)
                     ->first();
@@ -386,7 +386,7 @@ class PropietarioController extends Controller
                 }
 
                 $pro = DB::table('servicios AS s')
-                ->join('propietarios AS p', 'p.servicios_id', '=', 's.id',)
+                ->join('propietarios AS p', 'p.servicios_id', '=', 's.id')
                 ->select('s.cerrado_emergencia', 'p.disponibilidad')
                 ->where('p.id', $request->id)
                 ->first();

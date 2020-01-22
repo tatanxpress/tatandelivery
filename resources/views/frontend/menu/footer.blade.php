@@ -1,6 +1,4 @@
-
-
-    <!-- pie de pagina -->
+ <!-- pie de pagina -->
     <footer id="colorlib-footer" class="section footer-classic">
         <div class="container">
           <div class="row row-50 justify-content-between">
@@ -19,16 +17,11 @@
               <ul class="footer-classic-list">
                 <li>
                   <ul>
-                    <li>
-                      <dl class="footer-classic-dl">
-                        <dt>Tel.</dt>
-                        <dd><a href="tel:#">7582-0000</a></dd>
-                      </dl>
-                    </li>
+                
                     <li>
                       <dl class="footer-classic-dl">
                         <dt>Co.</dt>
-                        <dd><a href="mailto:#">tatanexpress@gmail.com</a></dd>
+                        <dd><a href="mailto:#">tatanxpress@gmail.com</a></dd>
                       </dl>
                     </li>
                   </ul>
