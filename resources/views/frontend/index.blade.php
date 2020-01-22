@@ -42,20 +42,20 @@
           <div class="row row-50 post-classic-counter justify-content-lg-between justify-content-center">
             <div class="col-lg-4 col-sm-6">
               <div class="post-classic novi-bg bg-primary">
-                <h3 class="post-classic-title">Elige <br> un producto que te guste</h3>
-                <p class="post-classic-text">En más de 20 comercios afiliados</p>
+                <h3 class="post-classic-title"><font color="white">Elige <br> un producto que te guste</font></h3>
+                <p class="post-classic-text"><font color="white">Entre los diversos tipos de negocios de Emprendedores Metapanecos.</font></p>
               </div>
             </div>
             <div class="col-lg-4 col-sm-6">
               <div class="post-classic novi-bg bg-primary">
-                <h3 class="post-classic-title">Agregalo al carrito</h3>
-                <p class="post-classic-text">ordena facil y rápido</p>
+                <h3 class="post-classic-title"><font color="white">Agregalo al carrito</font></h3>
+                <p class="post-classic-text"><font color="white">Selecciona los productos y revisalos en el Carrito de Compras, donde se detallan los Productos a Adquirir y el Total de la Compra.</font></p>
               </div>
             </div>
             <div class="col-lg-4 col-sm-6">
               <div class="post-classic novi-bg bg-primary">
-                <h3 class="post-classic-title">Espera la confirmación del <br> Servicio</h3>
-                <p class="post-classic-text">Tu producto llegara en el tiempo estimado</p>
+                <h3 class="post-classic-title"><font color="white">Espera la Confirmación del <br> Servicio</font></h3>
+                <p class="post-classic-text"><font color="white">En breves instantes estaras hablanco con el propietario del Negocio, el cual te indicara el tiempo de llegada de tus productos.</font></p>
               </div>
             </div>
           </div>
