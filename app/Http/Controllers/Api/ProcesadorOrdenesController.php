@@ -186,6 +186,9 @@ class ProcesadorOrdenesController extends Controller
                         6 => 7, // sabado
                     ];
 
+
+                    return 'llegojeje';
+
                     // hora y fecha
                     $getValores = Carbon::now('America/El_Salvador');
                     $getDiaHora = $getValores->dayOfWeek;            
