@@ -266,14 +266,14 @@ class PerfilController extends Controller
                 ];
             }
 
-           /* if(User::where('id', $request->userid)->first()){
+            if(User::where('id', $request->userid)->first()){
 
-                $direccion = DB::table('direccion_usuario AS dir')            
+             /*   $direccion = DB::table('direccion_usuario AS dir')            
             ->join('zonas', 'zonas.id', '=', 'dir.zonas_id',)
             ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
             'dir.telefono', 'dir.seleccionado', 'zonas.nombre AS nombreZona')
             ->where('user_id', $request->userid)
-            ->get();
+            ->get();*/
 
                 return [
                     'success' => 1,
@@ -281,7 +281,7 @@ class PerfilController extends Controller
                 ];
             }else{
                 return ['succcess'=> 2];
-            }*/
+            }
         }
     }
 
