@@ -14,7 +14,7 @@ use App\Direccion;
 
 class PerfilController extends Controller
 {
-    /* // cambiar contraseña con correo
+     // cambiar contraseña con correo
      public function nuevaPassword(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
@@ -81,7 +81,7 @@ class PerfilController extends Controller
         }
     }
 
-     // cambiar contraseña con id
+   /*  // cambiar contraseña con id
      public function cambiarPassword(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
