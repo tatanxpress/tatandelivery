@@ -14,7 +14,7 @@ use App\Direccion;
 
 class PerfilController extends Controller
 {
-     // cambiar contraseña con correo
+    /* // cambiar contraseña con correo
      public function nuevaPassword(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
@@ -282,15 +282,15 @@ class PerfilController extends Controller
             }
         }
     }
-
+*/
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
 
-        return 'entro';
+        return 'entro'; 
 
         if($request->isMethod('post')){ 
             
-            $reglaDatos = array(                
+            $reglaDatos = array(
                 'userid' => 'required',
                 'nombre' => 'required|max:100',
                 'direccion' => 'required|max:400',
@@ -396,6 +396,8 @@ class PerfilController extends Controller
         }
     }
 
+    /*
+
     // guardar direccion seleccionada
     public function seleccionarDireccion(Request $request){
         if($request->isMethod('post')){              
@@ -500,4 +502,7 @@ class PerfilController extends Controller
             }
         }
     }
+
+*/
+
 }
