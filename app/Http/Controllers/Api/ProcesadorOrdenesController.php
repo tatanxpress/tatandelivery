@@ -187,7 +187,6 @@ class ProcesadorOrdenesController extends Controller
                     ];
 
 
-                    return 'llegojeje';
 
                     // hora y fecha
                     $getValores = Carbon::now('America/El_Salvador');
