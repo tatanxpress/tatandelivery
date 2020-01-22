@@ -266,7 +266,7 @@ class PerfilController extends Controller
                 ];
             }
 
-            if(User::where('id', $request->userid)->first()){
+           /* if(User::where('id', $request->userid)->first()){
 
                 $direccion = DB::table('direccion_usuario AS dir')            
             ->join('zonas', 'zonas.id', '=', 'dir.zonas_id',)
@@ -281,7 +281,7 @@ class PerfilController extends Controller
                 ];
             }else{
                 return ['succcess'=> 2];
-            }
+            }*/
         }
     }
 
