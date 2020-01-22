@@ -289,7 +289,6 @@ class PerfilController extends Controller
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
 
-        return 'entroo4';
       
         if($request->isMethod('post')){ 
             
