@@ -158,8 +158,6 @@ class ProcesadorOrdenesController extends Controller
                     foreach ($pilaSub as $valor){
                         $consumido=$consumido+$valor;
                     }
-
-                   
                    
                     // saver si lo consumible es mayor al minimo
                     $servicioConsumo = Servicios::where('id', $cart->servicios_id)->first();
@@ -567,7 +565,8 @@ class ProcesadorOrdenesController extends Controller
                         $color = 1; // color rojo
                         $icono = 1; // campana
                       
-                        if(!empty($pilaPropietarios)){                           
+                        if(!empty($pilaPropietarios)){     
+                            return [$pilaPropietarios];                      
                             $this->envioNoticacion($titulo, $mensaje, $pilaPropietarios, $alarma, $color, $icono);                            
                         }
 
@@ -618,7 +617,9 @@ class ProcesadorOrdenesController extends Controller
                                 $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);
                         }
                     }          
-                               
+                          
+                    
+                    return 'llego10';
 
                         // SINO HAY MOTORISTA DISPONIBLE A ESE SERVICIO, MANDAR AVISO A ADMINISTRADORES
                         
