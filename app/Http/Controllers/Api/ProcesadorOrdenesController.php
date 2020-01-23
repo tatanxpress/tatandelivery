@@ -1281,8 +1281,8 @@ class ProcesadorOrdenesController extends Controller
                 if($motoAsignado = DB::table('motorista_ordenes AS mo')
                 ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                 ->select('m.imagen', 'm.nombre', 'm.telefono', 'm.tipo_vehiculo AS vehiculo', 'm.numero_vehiculo AS placa')
-                ->where('m.activo', 1)
-                ->where('m.disponible', 1)
+                //->where('m.activo', 1)
+                //->where('m.disponible', 1)
                 ->where('mo.ordenes_id', $or->id)
                 ->first()){
                 $foto = $motoAsignado->imagen;
