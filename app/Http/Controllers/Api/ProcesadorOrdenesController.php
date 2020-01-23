@@ -621,7 +621,7 @@ class ProcesadorOrdenesController extends Controller
                     }          
                           
                     
-                    return 'llego10';
+                    
 
                         // SINO HAY MOTORISTA DISPONIBLE A ESE SERVICIO, MANDAR AVISO A ADMINISTRADORES
                         
