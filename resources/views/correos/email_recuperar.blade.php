@@ -74,13 +74,13 @@
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
-        <td bgcolor="#FFA73B" align="center">          
+        <td bgcolor="#1976d2" align="center">          
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" >
                 <tr>
                     <td align="center" valign="top" style="padding: 40px 10px 40px 10px;">
                         <div href="http://www.google.com" target="_blank">
                             <div bgcolor="#ffffff" align="center" style="color: #FFFFFF; font-family: Arial, sans-serif; font-size: 30px;" >
-                              <p style="margin: 0;">Tatan</p>
+                              <p style="margin: 0;">Tatan Express</p>
                             </div>
                         </div>
                     </td>
@@ -89,7 +89,7 @@
         </td>
     </tr>
     <tr>
-        <td bgcolor="#FFA73B" align="center" style="padding: 0px 10px 0px 10px;">           
+        <td bgcolor="#1976d2" align="center" style="padding: 0px 10px 0px 10px;">           
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" >
                 <tr>
                     <td bgcolor="#ffffff" align="center" style="padding: 20px 30px 40px 30px; color: #0D2C55; font-family: Arial, sans-serif; font-size: 18px;" >
@@ -127,25 +127,14 @@
                 <tr>
                   <td bgcolor="#FFECD1" align="center" style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;" >
                     <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Necesita ayuda?</h2>
-                    <p style="margin: 0;"><a href="http://www.google.com" target="_blank" style="color: #1976d2;">Contactanos</a></p>
+                    <p style="margin: 0;"><a href="http://www.tatanexpress.com" target="_blank" style="color: #1976d2;">Contactanos</a></p>
                   </td>
                 </tr>
             </table>            
         </td>  
     </tr>
     <tr>
-        <td bgcolor="#f4f4f4" align="center" style="padding: 0px 10px 0px 10px;">           
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;" >
-              <tr>
-                <td bgcolor="#f4f4f4" align="left" style="padding: 30px 30px 30px 30px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 18px;" >
-                  <p style="margin: 0;">
-                    <a href="http://google.com" target="_blank" style="color: #111111; font-weight: 700;">Términos y Condiciones</a> -
-                    <a href="http://google.com" target="_blank" style="color: #111111; font-weight: 700;">Preguntas Frecuentes</a>                     
-                  </p>
-                </td>
-              </tr>          
-            </table>           
-        </td>
+        
     </tr>
 </table>
     
