@@ -151,7 +151,7 @@
     }
 
     function nuevo(){
-      var id = document.getElementById('id-editar').value;
+      var id = {{ $id }};
       var nombre = document.getElementById('nombre-nuevo').value;
 
       if(nombre === ''){
