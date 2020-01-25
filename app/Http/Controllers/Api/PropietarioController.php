@@ -1422,6 +1422,7 @@ class PropietarioController extends Controller
                   
                     $o->total = number_format((float)$precio, 2, '.', '');
 
+
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimada; 
@@ -1488,8 +1489,9 @@ class PropietarioController extends Controller
                     }
 
                     $tiempoExedido = Carbon::parse($o->fecha_4);
+                    $tiempoExedido2 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $tiempoExedido->addMinute($o->hora_2)->format('H:i:s d-m-Y');
-                    $horaEstimadaFe = $tiempoExedido->addMinute($o->hora_2 - 5)->format('h:i A d-m-Y');
+                    $horaEstimadaFe = $tiempoExedido2->addMinute($o->hora_2 - 5)->format('h:i A');
                     $o->horaEstimada = $horaEstimadaFe;
                     $d3 = new DateTime($horaEstimada);
 
