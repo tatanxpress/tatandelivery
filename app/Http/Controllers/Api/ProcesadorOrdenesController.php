@@ -1275,7 +1275,7 @@ class ProcesadorOrdenesController extends Controller
                     'message' => $validarDatos->errors()->all()
                 ];
             }
-
+ 
             if($or = Ordenes::where('id', $request->ordenid)->first()){
                 
                 if($motoAsignado = DB::table('motorista_ordenes AS mo')

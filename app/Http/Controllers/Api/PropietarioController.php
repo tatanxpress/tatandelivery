@@ -1277,15 +1277,18 @@ class PropietarioController extends Controller
                 ];
             }  
             
+            
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){               
 
                 if($or->estado_4 == 0 && $or->estado_8 == 0){
 
+                   
+
                     $fecha = Carbon::now('America/El_Salvador');
 
-                    Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
-                    'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
+                  //  Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
+                   // 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
 
                    
                      // mandar notificacion al cliente
@@ -1299,39 +1302,66 @@ class PropietarioController extends Controller
                     $icono = 4;
                     if(!empty($fcm)){                       
                         // COMO ES DEL CLIENTE, AL REGISTRARSE ESTE OBTIENE SU DEVICE_ID
-                        $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono);
+                       $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono);
                     } 
 
-                    // mandar notificacion a los motoristas asignados al servicio
-                    $moto = DB::table('motoristas_asignados AS ms')
-                    ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
-                     ->select('m.activo', 'm.disponible', 'ms.servicios_id')            
+                   
+                    //MANDAR NOTIFICACION AL MOTORISTA QUE AGARRO LA ORDEN
+                    $ordenseleccionada = DB::table('motorista_ordenes AS mo')
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+                    ->select('m.device_id', 'm.activo', 'm.disponible', 'mo.ordenes_id')            
                     ->where('m.activo', 1)
                     ->where('m.disponible', 1)
-                    ->where('ms.servicios_id', $or->servicios_id)
+                    ->where('mo.ordenes_id', $or->id)
                     ->get();
 
-                     $pilaUsuarios = array();
-                    foreach($moto as $p){  
-                        if(!empty($p->device_id)){
-                            if($p->device_id != "0000"){
-                                array_push($pilaUsuarios, $p->device_id); 
-                            }                        
-                        }
-                    }
+                    if(count($ordenseleccionada) > 0){
+                        // si hay motorista seleccionado, mandar notificacion
 
-                    $titulo1 = "Solicitud Nueva";
-                    $mensaje1 = "Se necesita motorista";
-                    $alarma1 = 1;
-                    $color1 = 3;
-                    $icono1 = 2;
-                    if(!empty($pilaUsuarios)){
-                       
-                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                        $deviceid = $ordenseleccionada->device_id;
+                        
+                        $titulo = "Orden #" . $or->id . " Completada";
+                        $mensaje = "Lista para ser Entregada";
+                        $alarma1 = 1;
+                        $color1 = 3;
+                        $icono1 = 2;
+                        if(!empty($deviceid)){
+                            $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1);
+                        }
+
                     }else{
+
+                        // mandar notificacion a los motoristas asignados al servicio
+                        $moto = DB::table('motoristas_asignados AS ms')
+                        ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
+                        ->select('m.activo', 'm.disponible', 'ms.servicios_id')            
+                        ->where('m.activo', 1)
+                        ->where('m.disponible', 1)
+                        ->where('ms.servicios_id', $or->servicios_id)
+                        ->get();
+
+                        $pilaUsuarios = array();
+                        foreach($moto as $p){  
+                            if(!empty($p->device_id)){
+                                if($p->device_id != "0000"){
+                                    array_push($pilaUsuarios, $p->device_id); 
+                                }
+                            }
+                        }
+
+                        $titulo1 = "Solicitud Nueva";
+                        $mensaje1 = "Se necesita motorista";
+                        $alarma1 = 1;
+                        $color1 = 3;
+                        $icono1 = 2;
+
+                        // NOTIFICACION DE NUEVO A LOS MOTORISTAS
+                        if(!empty($pilaUsuarios)){                       
+                            $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                        }
                        
-                        // SINO HAY MOTORISTA DISPONIBLE A ESE SERVICIO, MANDAR AVISO A ADMINISTRADORES
-                        // GUARDAR REGISTROS
+                      
+                        // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
                         
                         $osp = new OrdenesPendiente;
                         $osp->ordenes_id = $request->ordenid; 
@@ -1358,17 +1388,16 @@ class PropietarioController extends Controller
 
                         //si no esta vacio
                         if(!empty($pilaAdministradores)){
-                            $titulo = "Orden sin Propietario";
-                            $mensaje = "Servicio: ".$nombreServicio;
+                            $titulo = "Orden sin MOTORISTA";
+                            $mensaje = "Se necesita un Motorista Urgente!!";
                             $alarma = 1; //sonido alarma
                             $color = 1; // color rojo
                             $icono = 1; // campana
 
-                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);
-                            
+                            $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
                         }
+                    }
 
-                    } 
                     return ['success' => 1]; // inicia preparacion
 
                 }else{
