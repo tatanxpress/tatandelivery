@@ -1624,6 +1624,8 @@ class PropietarioController extends Controller
                 ];
             }
 
+           
+
             if($o = Ordenes::where('id', $request->ordenid)->first()){
                 $fechahoy = Carbon::now('America/El_Salvador');
 
@@ -1636,14 +1638,14 @@ class PropietarioController extends Controller
                 $motoasignado = DB::table('motorista_ordenes AS m')
                 ->where('m.ordenes_id', $o->id)
                 ->get();
-                
-                // mandar notificacion
+
+                // MANDAR NOTIFICACION AL MOTORISTA QUE YA ESTA LA ORDEN Y AL ADMINISTRADOR
                 if(count($motoasignado) == 0){
                 
                     $moto = DB::table('motoristas_asignados AS ms')
-                    ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')                    
-                    ->where('m.activo', 1)
-                    ->where('m.disponible', 1)
+                    ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
+                    //->where('m.activo', 1)
+                    //->where('m.disponible', 1)
                     ->where('ms.servicios_id', $o->servicios_id)
                     ->get();
 
@@ -1655,6 +1657,7 @@ class PropietarioController extends Controller
                             }                            
                         }
                     }
+
 
                     $administradores = DB::table('administradores')
                     ->where('activo', 1)
@@ -1690,6 +1693,27 @@ class PropietarioController extends Controller
                     if(!empty($pilaUsuarios)){
                         $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
                     }    
+                }else{
+                    // MANDAR NOTIFICACION AL MOTORISTA ASIGNADO A LA ORDEN, QUE LA ORDEN YA ESTA PREPARADA
+
+                    $ordenseleccionada = DB::table('motorista_ordenes AS mo')
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+                    ->select('m.device_id', 'mo.ordenes_id')            
+                    //->where('m.activo', 1)
+                    //->where('m.disponible', 1)
+                    ->where('mo.ordenes_id', $o->id)
+                    ->first();
+                
+                    $deviceid = $ordenseleccionada->device_id;
+                    
+                    $titulo = "Orden #" . $o->id . " Completada";
+                    $mensaje = "Lista para ser Entregada";
+                    $alarma1 = 1;
+                    $color1 = 3;
+                    $icono1 = 2;
+                    if(!empty($deviceid)){
+                        $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1);
+                    }
                 }
 
                 return ['success' => 1];
