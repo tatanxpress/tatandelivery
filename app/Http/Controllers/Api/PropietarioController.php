@@ -1287,8 +1287,8 @@ class PropietarioController extends Controller
 
                     $fecha = Carbon::now('America/El_Salvador');
 
-                  //  Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
-                   // 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
+                    Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
+                    'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
 
                    
                      // mandar notificacion al cliente
