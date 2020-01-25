@@ -1283,8 +1283,6 @@ class PropietarioController extends Controller
 
                 if($or->estado_4 == 0 && $or->estado_8 == 0){
 
-                   
-
                     $fecha = Carbon::now('America/El_Salvador');
 
                     Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
@@ -1310,8 +1308,8 @@ class PropietarioController extends Controller
                     $ordenseleccionada = DB::table('motorista_ordenes AS mo')
                     ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('m.device_id', 'm.activo', 'm.disponible', 'mo.ordenes_id')            
-                    ->where('m.activo', 1)
-                    ->where('m.disponible', 1)
+                    //->where('m.activo', 1)
+                    //->where('m.disponible', 1)
                     ->where('mo.ordenes_id', $or->id)
                     ->get();
 
