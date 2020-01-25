@@ -1489,7 +1489,7 @@ class PropietarioController extends Controller
 
                     $tiempoExedido = Carbon::parse($o->fecha_4);
                     $horaEstimada = $tiempoExedido->addMinute($o->hora_2)->format('H:i:s d-m-Y');
-                    $horaEstimadaFe = $tiempoExedido->addMinute($o->hora_2)->format('h:i A d-m-Y');
+                    $horaEstimadaFe = $tiempoExedido->addMinute($o->hora_2 - 5)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimadaFe;
                     $d3 = new DateTime($horaEstimada);
 
