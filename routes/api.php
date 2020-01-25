@@ -86,7 +86,7 @@ Route::post('propietario/nueva/ordenes', 'Api\PropietarioController@nuevaOrdenes
 Route::post('propietario/ver/productos', 'Api\PropietarioController@verProductosOrden'); // ver productos de la orden
 Route::post('propietario/ver/producto/individual', 'Api\PropietarioController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('propietario/ver/orden/id', 'Api\PropietarioController@verOrdenPorID'); // ver estados orden por id
-
+ 
 // procesar ordenes
 Route::post('propietario/proceso/orden/estado-2', 'Api\PropietarioController@procesarOrdenEstado2'); // dar tiempo de espera *
 Route::post('propietario/proceso/orden/estado-4', 'Api\PropietarioController@procesarOrdenEstado4'); // iniciar preparacion, avisa a motoristas

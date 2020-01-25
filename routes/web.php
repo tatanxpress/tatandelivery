@@ -13,7 +13,6 @@
 
 
 Route::get('/', 'FrontendController@index')->name('inicio');
-Route::get('/quienes-somos', 'FrontendController@verSomos');
 Route::get('/preguntas-frecuentes', 'FrontendController@verFAQ');
  
 // Rutas administrador

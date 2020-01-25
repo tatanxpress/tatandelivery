@@ -1423,7 +1423,7 @@ class PropietarioController extends Controller
                     $o->total = number_format((float)$precio, 2, '.', '');
 
                     $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
+                    $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimada; 
                 }
 

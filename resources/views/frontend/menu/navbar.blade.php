@@ -16,9 +16,7 @@
             <a class="nav-link" href="{{ url('/') }}">Inicio</a></li>
             </a>
           </li>
-          <li class="nav-item active">
-          <a class="nav-link" href="{{ url('/quienes-somos') }}">Quienes Somos</a></li>
-          </li>
+      
           <li class="nav-item active">
           <a class="nav-link" href="#colorlib-footer" class="ancla" data-ancla="colorlib-footer">Contacto</a>
           </li>
