@@ -1277,7 +1277,6 @@ class PropietarioController extends Controller
                 ];
             }  
             
-            
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){               
 
@@ -1287,7 +1286,6 @@ class PropietarioController extends Controller
 
                     Ordenes::where('id', $request->ordenid)->update(['estado_4' => 1,
                     'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
-
                    
                      // mandar notificacion al cliente
                     $usuario = User::where('id', $or->users_id)->first();
@@ -1302,7 +1300,6 @@ class PropietarioController extends Controller
                         // COMO ES DEL CLIENTE, AL REGISTRARSE ESTE OBTIENE SU DEVICE_ID
                        $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono);
                     } 
-
                    
                     //MANDAR NOTIFICACION AL MOTORISTA QUE AGARRO LA ORDEN
                     $ordenseleccionada = DB::table('motorista_ordenes AS mo')
@@ -1316,7 +1313,11 @@ class PropietarioController extends Controller
                     if(count($ordenseleccionada) > 0){
                         // si hay motorista seleccionado, mandar notificacion
 
-                        $deviceid = $ordenseleccionada->device_id;
+                        $deviceid = "";
+
+                        foreach($ordenseleccionada as $ord){
+                            $deviceid = $ord->device_id;
+                        }
                         
                         $titulo = "Orden #" . $or->id . " Completada";
                         $mensaje = "Lista para ser Entregada";
@@ -1324,6 +1325,7 @@ class PropietarioController extends Controller
                         $color1 = 3;
                         $icono1 = 2;
                         if(!empty($deviceid)){
+
                             $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1);
                         }
 
