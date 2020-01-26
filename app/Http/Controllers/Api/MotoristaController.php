@@ -613,7 +613,7 @@ class MotoristaController extends Controller
 
                     // LIMITAR ORDEN POR TOTAL DE DINERO
 
-                    if($mo->privado == 1){
+                    if($mo->privado == 0){
                         if($suma >= $mo->limite_dinero){
                             return ['success' => 1];
                         }                        

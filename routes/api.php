@@ -54,7 +54,7 @@ Route::post('usuario/carrito/ver/proceso', 'Api\CarritoTemporalController@verPro
 // buscador
 Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // locales tipo tienda
 Route::post('usuario/productos/ver/seccion', 'Api\BuscadorController@buscarProductoSeccion'); // lista de productos "ver todos"
-
+ 
 // proceso
 Route::post('usuario/proceso/ver/ordenes', 'Api\ProcesadorOrdenesController@verOrdenes'); // ver orden hecha por mismo usuario
 Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@verOrdenPorID'); // ver orden por id
