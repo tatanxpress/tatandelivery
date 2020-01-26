@@ -469,7 +469,7 @@ class MotoristaPagoController extends Controller
         ->where('o.estado_5', 1) // orden preparada
         ->where('mo.motorista_prestado', 0) // este dinero es entregado al servicio de un solo
         ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
-        ->get();
+        ->get(); 
 
         $sincompletar = 0;
         $sum = 0.0;

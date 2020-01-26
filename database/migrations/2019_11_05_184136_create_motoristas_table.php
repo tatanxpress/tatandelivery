@@ -24,9 +24,9 @@ class CreateMotoristasTable extends Migration
             $table->string('numero_vehiculo', 50);
             $table->boolean('activo')->default(1);
             $table->boolean('disponible')->default(0);
-            $table->boolean('limite_ordenes')->default(0);
             $table->date('fecha');
             $table->string('licensia', 30);
+            $table->decimal('limite_dinero', 10, 2);
             $table->string('dui', 25);
             $table->string('imagen', 100);
             $table->string('device_id', 100);

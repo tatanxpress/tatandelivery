@@ -165,6 +165,10 @@
                                     <label>DUI</label>
                                     <input type="text" maxlength="25" class="form-control" id="dui-editar" placeholder="DUI">
                                 </div>
+                                <div class="form-group">
+                                    <label>Dinero Limite (Para entregar al Cobrador, sino no puede seleccionar mas ordenes)</label>
+                                    <input type="number" step="0.01" class="form-control" id="dinero-editar">
+                                </div>
                                 
                                 <div class="form-group">
                                     <label>Zona Pago (Motorista pueden ver donde entregar el dinero)</label>
@@ -174,11 +178,6 @@
                                 <div class="form-group">
                                     <label>Activo</label>
                                     <input type="checkbox" id="activo-editar">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Limite ordenes</label>
-                                    <input type="checkbox" id="limite-editar">
                                 </div>
 
                                 <div class="form-group">
@@ -269,7 +268,7 @@
         $('#tablaDatatable').load(ruta);
     }); 
     
- </script>
+ </script> 
 
   <script> 
 
@@ -472,18 +471,16 @@
                     $('#licensia-editar').val(response.data.motorista.licensia);
                     $('#dui-editar').val(response.data.motorista.dui);
                     $('#fecha').val(response.data.motorista.fecha);
-                    $('#img-imagen').prop("src","{{ url('storage/usuario') }}"+'/'+ response.data.motorista.imagen);
+                    
+                    $('#dinero-editar').val(response.data.motorista.limite_dinero);
 
+
+                    $('#img-imagen').prop("src","{{ url('storage/usuario') }}"+'/'+ response.data.motorista.imagen);
+ 
                     if(response.data.motorista.zona_pago == 0){
                         $("#zonapago-editar").prop("checked", false);
                     }else{
                         $("#zonapago-editar").prop("checked", true);
-                    }
-
-                    if(response.data.motorista.limite_ordenes == 0){
-                        $("#limite-editar").prop("checked", false);
-                    }else{
-                        $("#limite-editar").prop("checked", true);
                     }
 
                     if(response.data.motorista.activo == 0){
@@ -513,25 +510,22 @@
         var licensia = document.getElementById('licensia-editar').value;
         var dui = document.getElementById('dui-editar').value;
         var cbzona = document.getElementById('zonapago-editar').checked;
-        var cblimite = document.getElementById('limite-editar').checked;
+     
         var cbactivo = document.getElementById('activo-editar').checked;
         var imagen = document.getElementById('imagen-editar');
+        var dinero = document.getElementById('dinero-editar').value;
 
-        var retorno = validarEditar(nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen);
-
+        var retorno = validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen);
+ 
         if(retorno){
 
             var cbzona_1 = 0;
-            var cblimite_1 = 0;
             var cbactivo_1 = 0;
 
             if(cbzona){
                 cbzona_1 = 1;
             }
 
-            if(cblimite){
-                cblimite_1 = 1;
-            }
 
             if(cbactivo){
                 cbactivo_1 = 1;
@@ -550,8 +544,8 @@
             formData.append('dui', dui);
             formData.append('imagen', imagen.files[0]);
             formData.append('cbzona', cbzona_1);
-            formData.append('cblimite', cblimite_1);
             formData.append('cbactivo', cbactivo_1);
+            formData.append('dinero', dinero);
 
             axios.post('/admin/motoristas/editar', formData, {
             })
@@ -590,8 +584,14 @@
     } 
 
      
-    function validarEditar(nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen){
-        if(nombre === ''){
+    function validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen){
+            
+            if(dinero === ''){
+                toastr.error("Dinero limite es requerido");
+                return;
+            }
+            
+            if(nombre === ''){
                 toastr.error("nombre es requerido");
                 return;
             }

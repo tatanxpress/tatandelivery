@@ -107,13 +107,13 @@ class MotoristaController extends Controller
                 $m->activo = 1;
                 $m->identificador = $request->identi;
                 $m->disponible = 0;
-                $m->limite_ordenes = 0;
                 $m->fecha = $fecha;
                 $m->licensia = $request->licensia;
                 $m->dui = $request->dui;
                 $m->imagen = $nombreFoto;
                 $m->device_id = "0000";
                 $m->codigo_correo = "0000";
+                $m->limite_dinero = 25.00;
                 $m->zona_pago = $request->cbzona;
 
                 if($m->save()){
@@ -170,8 +170,9 @@ class MotoristaController extends Controller
                 'licensia' => 'required',
                 'dui' => 'required',
                 'cbzona' => 'required',
-                'cblimite' => 'required',
+               
                 'cbactivo' => 'required',
+                'dinero' => 'required'
             );
 
             $mensaje = array(
@@ -184,8 +185,9 @@ class MotoristaController extends Controller
                 'licensia.required' => 'licensia es requerido',
                 'dui.required' => 'dui es requerido',
                 'cbzona.required' => 'cbzona es requerido',
-                'cblimite.required' => 'cblimite es requerido',
+               
                 'cbactivo.required' => 'cbactivo es requerido',
+                'dinero.required' => 'Dinero es requerido'
                 );
 
                 $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -228,7 +230,7 @@ class MotoristaController extends Controller
                             'imagen' => $nombreFoto,
                             'dui' => $request->dui,
                             'zona_pago' => $request->cbzona,
-                            'limite_ordenes' => $request->cblimite,
+                         
                             'activo' => $request->cbactivo,
                             ]);
                             if(Storage::disk('usuario')->exists($imagenOld)){
@@ -250,10 +252,11 @@ class MotoristaController extends Controller
                         'licensia' => $request->licensia,
                         'dui' => $request->dui,
                         'zona_pago' => $request->cbzona,
-                        'limite_ordenes' => $request->cblimite,
+                     
                         'activo' => $request->cbactivo,
+                        'limite_dinero' => $request->dinero
                         ]);
-
+ 
                         return ['success' => 2];
                 }    
                  

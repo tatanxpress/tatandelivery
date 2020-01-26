@@ -549,7 +549,7 @@ class MotoristaController extends Controller
             $reglaDatos = array(
                 'ordenid' => 'required',
                 'id' => 'required'         
-            );
+            ); 
         
             $mensajeDatos = array(
                 'ordenid.required' => 'El id de la orden es requerido',
@@ -570,8 +570,53 @@ class MotoristaController extends Controller
                 if($or = Ordenes::where('id', $request->ordenid)->first()){
 
                     // verificar si motorista puede seguir agarrando ordenes
-                    if($mo->limite_ordenes == 1){
-                        return ['success' => 1];
+
+                    $idservicio = $or->servicios_id;
+                    $datosprivado = Servicios::where('id', $idservicio)->first();
+
+                    // VER ORDENES PENDIENTE SIN ENTREGAR EL MOTORISTA
+
+
+                     // sacar todos los id de ordenes revisadas
+                    $revisada = DB::table('ordenes_revisadas')
+                    ->get();
+
+                    $pilaOrdenid = array();
+                    foreach($revisada as $p){
+                        array_push($pilaOrdenid, $p->ordenes_id);
+                    }
+                        
+                    $ordenid = DB::table('motorista_ordenes AS mo')
+                    ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+                    ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
+                    'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
+                    'mo.fecha_agarrada',  'mo.motorista_prestado')
+                    ->where('mo.motoristas_id', $mo->id)
+                    ->where('o.estado_5', 1) // orden preparada
+                    ->where('mo.motorista_prestado', 0) 
+                    ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
+                    ->get(); 
+
+                    
+                    $sum = 0.0;
+                    foreach($ordenid as $o){
+                      
+                        // sumar precio
+                        $precio = $o->precio_total + $o->precio_envio;
+                        $o->total = number_format((float)$precio, 2, '.', '');
+                        $sum = $sum + $precio;
+                    }   
+
+                    $suma = number_format((float)$sum, 2, '.', '');
+
+
+                    // LIMITAR ORDEN POR TOTAL DE DINERO
+
+                    if($mo->privado == 1){
+                        if($suma >= $mo->limite_dinero){
+                            return ['success' => 1];
+                        }                        
                     }
 
                     // esta libre aun, pero esto viene alguien inicio la entrega

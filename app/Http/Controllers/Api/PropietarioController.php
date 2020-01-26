@@ -1624,8 +1624,6 @@ class PropietarioController extends Controller
                 ];
             }
 
-           
-
             if($o = Ordenes::where('id', $request->ordenid)->first()){
                 $fechahoy = Carbon::now('America/El_Salvador');
 
