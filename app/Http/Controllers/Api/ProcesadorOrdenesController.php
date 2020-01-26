@@ -737,7 +737,12 @@ class ProcesadorOrdenesController extends Controller
                     $fechaOrden = $o->fecha_orden;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;                  
+                    $o->fecha_orden = $hora . " " . $fecha;
+
+                    $total = $o->precio_total;
+                    $envio = $o->precio_envio;
+
+                    $o->precio_total = $total + $envio;
                 }
 
                 return ['success' => 1, 'ordenes' => $orden];
