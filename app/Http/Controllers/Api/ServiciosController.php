@@ -169,7 +169,7 @@ class ServiciosController extends Controller
                         ->whereTime('h.hora2', '>=', $hora)
                         ->orWhere('h.hora3', '<=', $hora)
                         ->where('h.hora4', '>=', $hora)
-                        ->take(1)
+                        //->take(1)
                         ->get();
 
                         return [$horario];
