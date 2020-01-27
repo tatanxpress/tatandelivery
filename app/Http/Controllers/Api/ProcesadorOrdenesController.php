@@ -90,10 +90,10 @@ class ProcesadorOrdenesController extends Controller
                     }
                     
                     // buscar si el servicio brinda adomicilio a esa zona
-                    if(DB::table('zonas_servicios AS z')
-                    ->where('z.zonas_id', $zonaiduser)
-                    ->where('z.servicios_id', $servicioidC)
-                    ->where('z.activo', 1)
+                    if(DB::table('zonas_servicios')
+                    ->where('zonas_id', $zonaiduser)
+                    ->where('servicios_id', $servicioidC)
+                    ->where('activo', 1)
                     ->first()){
                         $hayEnvio = 1; // el servicio adomicilio a esa zona esta activo
                     }
@@ -269,17 +269,17 @@ class ProcesadorOrdenesController extends Controller
                     }
                    
                     // sacar id de zona del carrito
-                    $zon = DB::table('zonas AS z') 
-                    ->select('z.saturacion')
-                    ->where('z.id', $cart->zonas_id)
+                    $zon = DB::table('zonas') 
+                    ->select('saturacion')
+                    ->where('id', $zonaidd)
                     ->first();
                 
                     // zona saturacion para no envio adomicilio
                     $zonaSaturacion = $zon->saturacion;    
 
                     // buscar el cerrado de emergencia
-                    $emergencia = DB::table('servicios AS c')
-                    ->where('c.id', $servicioidC)
+                    $emergencia = DB::table('servicios')
+                    ->where('id', $servicioidC)
                     ->first();
 
                     $cerradoEmergencia = 0;
@@ -290,17 +290,15 @@ class ProcesadorOrdenesController extends Controller
                     $servicionoactivo = $emergencia->activo;
                     
                     // horario delivery para esa zona
-                    $horaD = DB::table('zonas AS z')
-                    ->where('z.id', $servicioidC)
-                    ->where('z.hora_abierto_delivery', '<=', $hora)
-                    ->where('z.hora_cerrado_delivery', '>=', $hora)
+                    $horaD = DB::table('zonas')
+                    ->where('id', $zonaidd)
+                    ->where('hora_abierto_delivery', '<=', $hora)
+                    ->where('hora_cerrado_delivery', '>=', $hora)
                     ->get();
                    
                     $horarioDelivery = DB::table('zonas')
                     ->where('id', $zonaidd)   // id de la zona
                     ->first();
-
-                  
 
                     $hora1 = date("h:i A", strtotime($horarioDelivery->hora_abierto_delivery));
                     $hora2 = date("h:i A", strtotime($horarioDelivery->hora_cerrado_delivery));
