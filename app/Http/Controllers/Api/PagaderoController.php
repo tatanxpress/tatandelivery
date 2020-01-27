@@ -63,7 +63,7 @@ class PagaderoController extends Controller
 
                 if (Hash::check($request->password, $p->password)) {
 
-                    $id = $p->id;   
+                    $id = $p->id;
                   
                     return ['success' => 2, 'usuario_id' => $id]; // login correcto
                 }    else{

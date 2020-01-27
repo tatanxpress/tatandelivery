@@ -177,7 +177,7 @@ Route::post('motorista/ver/zona/pago', 'Api\MotoristaController@verZonaPago'); /
 // REVISADOR DE PAGOS
 
 Route::post('revisador/login', 'Api\PagaderoController@loginRevisador'); // login revisador
-
+ 
 // cambiar contrasena el revisador
 Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); // login revisador
 
@@ -209,5 +209,11 @@ Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // lo
 
 // cambiar contrasena el revisador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // login revisador
+
+ 
+ 
+
+// reporte de fecha a fecha, de productos vendidos
+Route::get('reportillo/{id}/{id2}/{id3}', 'AdminAppController@reporte');
 
 

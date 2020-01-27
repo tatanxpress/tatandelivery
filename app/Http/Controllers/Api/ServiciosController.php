@@ -101,6 +101,8 @@ class ServiciosController extends Controller
 
             $nombreServicio = TipoServicios::where('id', $request->tipo)->pluck('nombre')->first();
 
+                
+
             // dia        
             $numSemana = [
                 0 => 1, // domingo
@@ -110,12 +112,12 @@ class ServiciosController extends Controller
                 4 => 5, // jueves
                 5 => 6, // viernes
                 6 => 7, // sabado
-            ];
+            ]; 
 
             // hora y fecha
             $getValores = Carbon::now('America/El_Salvador');
-            $getDiaHora = $getValores->dayOfWeek;            
-            $diaSemana = $numSemana[$getDiaHora];        
+            $getDiaHora = $getValores->dayOfWeek;
+            $diaSemana = $numSemana[$getDiaHora];
             $hora = $getValores->format('H:i:s');
 
             // servicios para la zona
@@ -136,14 +138,17 @@ class ServiciosController extends Controller
                     $dato = DB::table('horario_servicio AS h')
                     ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                     ->where('h.segunda_hora', 1) // segunda hora habilitada
-                    ->where('h.servicios_id', $user->idServicio) // id servicio
-                    ->where('h.dia', $diaSemana) // dia
+                    ->where('h.servicios_id', $user->idServicio) // id servicio   1
+                    ->where('h.dia', $diaSemana) // dia   2
                     ->get();
 
                       // si verificar con la segunda hora
                     if(count($dato) >= 1){
-                   
-                        $horario = DB::table('horario_servicio AS h')
+      
+                       // return 'entro';
+
+
+                       /* $horario = DB::table('horario_servicio AS h')
                         ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                         ->where('h.segunda_hora', '1') // segunda hora habilitada
                         ->where('h.servicios_id', $user->idServicio) // id servicio                        
@@ -152,12 +157,29 @@ class ServiciosController extends Controller
                         ->where('h.hora2', '>=', $hora)
                         ->orWhere('h.hora3', '<=', $hora)
                         ->where('h.hora4', '>=', $hora)
+                        ->take(1)
+                        ->get();*/
+
+                        $horario = DB::table('horario_servicio AS h')
+                        ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
+                        ->where('h.segunda_hora', '1') // segunda hora habilitada
+                        ->where('h.servicios_id', $user->idServicio) // id servicio                        
+                        ->where('h.dia', $diaSemana) // dia                        
+                        ->whereTime('h.hora1', '<=', $hora)
+                        ->whereTime('h.hora2', '>=', $hora)
+                        ->orWhere('h.hora3', '<=', $hora)
+                        ->where('h.hora4', '>=', $hora)
+                        ->take(1)
                         ->get();
 
                         if(count($horario) >= 1){ // abierto
                             $user->horarioLocal = 0;
+                            
+                            
                         }else{
                             $user->horarioLocal = 1; //cerrado
+
+                          
                         }
 
                     }else{
@@ -188,6 +210,9 @@ class ServiciosController extends Controller
                     }                           
                 }               
           
+
+
+
             // problema para enviar a esta zona, ejemplo motoristas sin disponibilidad
             $zonaSa = DB::table('zonas AS z')
             ->select('z.saturacion')

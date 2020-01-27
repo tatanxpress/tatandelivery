@@ -22,6 +22,12 @@ use App\OrdenesPendiente;
 
 class AdminAppController extends Controller
 {
+
+    public function reporte($idservicio, $fecha1, $fecha2){
+
+        return 'llego';
+    }
+
     // login
     public function loginRevisador(Request $request){
         if($request->isMethod('post')){   
