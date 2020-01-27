@@ -161,6 +161,19 @@ class ServiciosController extends Controller
                         ->get();*/
 
                         $horario = DB::table('horario_servicio AS h')
+                            ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
+                            ->where('h.segunda_hora', '1') // segunda hora habilitada
+                            ->where('h.servicios_id', $user->idServicio) // id servicio
+                            ->where('h.dia', $diaSemana) // dia
+                            ->where(function ($query) use ($hora) {
+                                $query->where('h.hora1', '<=' , $hora)
+                                    ->where('h.hora2', '>=' , $hora)
+                                    ->orWhere('h.hora3', '<=', $hora)
+                                    ->where('h.hora4', '>=' , $hora);
+                            }) 
+                        ->get();
+
+                       /* $horario = DB::table('horario_servicio AS h')
                         ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                         ->where('h.segunda_hora', '1') // segunda hora habilitada
                         ->where('h.servicios_id', $user->idServicio) // id servicio                        
@@ -170,9 +183,9 @@ class ServiciosController extends Controller
                         ->orWhere('h.hora3', '<=', $hora)
                         ->where('h.hora4', '>=', $hora)
                         //->take(1)
-                        ->get();
+                        ->get();*/
 
-                        return [$horario];
+                        
 
                         if(count($horario) >= 1){ // abierto
                             $user->horarioLocal = 0;
