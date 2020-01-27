@@ -68,6 +68,7 @@ class ProcesadorOrdenesController extends Controller
                     $hayEnvio = 0; // para ver si mandamos de este servicio a esa zona, digamos si el servicio esta activo o inactivo
                     $coincideZona = 0; // saber si el carrito zona es igual a la direccion del usuario
                     $servicioidC = $cart->servicios_id; // id servicio que esta en el carrito
+                    $zonaidd = $cart->zonas_id; // guardar id de la zona
                     $zonaiduser = 0; // id zona donde esta el usuario selecciono su direccion
                     $limitePromocion = 0; // saver si producto es promocion, y limite por orden
 
@@ -295,11 +296,11 @@ class ProcesadorOrdenesController extends Controller
                     ->where('z.hora_cerrado_delivery', '>=', $hora)
                     ->get();
                    
-                    $horarioDelivery = DB::table('zonas AS z')
-                    ->where('z.id', $servicioidC)                    
+                    $horarioDelivery = DB::table('zonas')
+                    ->where('id', $zonaidd)   // id de la zona
                     ->first();
 
-                    return [$horarioDelivery];
+                  
 
                     $hora1 = date("h:i A", strtotime($horarioDelivery->hora_abierto_delivery));
                     $hora2 = date("h:i A", strtotime($horarioDelivery->hora_cerrado_delivery));
