@@ -172,7 +172,7 @@ class ServiciosController extends Controller
                                     ->where('h.hora4', '>=' , $hora);
                             }) 
                         ->get();
-
+ 
                        /* $horario = DB::table('horario_servicio AS h')
                         ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                         ->where('h.segunda_hora', '1') // segunda hora habilitada

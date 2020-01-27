@@ -48,8 +48,6 @@ class ProcesadorOrdenesController extends Controller
                 ];
             }
 
-           
-
             DB::beginTransaction();
            
             try {               
@@ -300,6 +298,8 @@ class ProcesadorOrdenesController extends Controller
                     $horarioDelivery = DB::table('zonas AS z')
                     ->where('z.id', $servicioidC)                    
                     ->first();
+
+                    return [$horarioDelivery];
 
                     $hora1 = date("h:i A", strtotime($horarioDelivery->hora_abierto_delivery));
                     $hora2 = date("h:i A", strtotime($horarioDelivery->hora_cerrado_delivery));
