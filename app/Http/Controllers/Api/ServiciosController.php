@@ -172,6 +172,8 @@ class ServiciosController extends Controller
                         ->take(1)
                         ->get();
 
+                        return [$horario];
+
                         if(count($horario) >= 1){ // abierto
                             $user->horarioLocal = 0;
                             
