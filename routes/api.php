@@ -65,7 +65,7 @@ Route::post('usuario/proceso/calificar/motorista', 'Api\ProcesadorOrdenesControl
   
 Route::post('usuario/proceso/orden/cancelar', 'Api\ProcesadorOrdenesController@cancelarOrden'); // cancelar orden 
 Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesController@borrarVistaOrden'); // borrar vista
-
+ 
 Route::post('usuario/proceso/cancelar/tiempo/excedio', 'Api\ProcesadorOrdenesController@cancelarOrdenTardio'); // cancelar por tiempo tardio
 
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *

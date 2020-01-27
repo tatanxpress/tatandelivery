@@ -66,6 +66,10 @@ class PropiController extends Controller
                 return ['success' => 3];
             }
 
+            if(Propietarios::where('telefono', $request->telefono)->first()){
+                return ['success' => 4];
+            } 
+
             $fecha = Carbon::now('America/El_Salvador');
 
             $p = new Propietarios();

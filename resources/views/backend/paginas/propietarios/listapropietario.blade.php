@@ -241,6 +241,8 @@
             toastr.error('No se pudo agregar');
         } else if(response.data.success == 3){
             toastr.error('El correo ya esta registrado');
+        }else if(response.data.success == 4){
+            toastr.error('El Telefono ya esta registrado');
         }
         else {
             toastr.error('Error desconocido');
