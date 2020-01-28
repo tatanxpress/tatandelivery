@@ -21,7 +21,7 @@ Route::post('usuario/codigo-correo', 'Api\Auth\LoginController@codigoCorreo'); /
 Route::post('usuario/revisar-codigo', 'Api\Auth\LoginController@revisarCodigoCorreo'); // revisar codigo del correo
 Route::post('usuario/registro', 'Api\Auth\RegisterController@registroUsuario'); // registro usuario
 Route::post('usuario/nueva-password', 'Api\PerfilController@nuevaPassword'); // cambia contraseña con correo
-
+  
 // perfil
 Route::post('usuario/informacion', 'Api\PerfilController@infoPerfil'); // cambia contraseña en perfil
 Route::post('usuario/editar-perfil', 'Api\PerfilController@editarPerfil'); // cambiar datos del perfil
