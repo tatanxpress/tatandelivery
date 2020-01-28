@@ -857,8 +857,7 @@ class PropietarioController extends Controller
                 $sumado = $unidades + $request->unidades;
                                 
                 Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
-                'unidades' => $request->unidades, 'disponibilidad' => $request->estado1,
-                'utiliza_cantidad'=>$request->estado2, 'unidades' => $sumado]);
+                'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $sumado]);
                 
                 return ['success'=> 2];
 
