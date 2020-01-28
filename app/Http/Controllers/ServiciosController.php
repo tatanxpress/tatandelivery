@@ -547,7 +547,6 @@ class ServiciosController extends Controller
                 'cbautomatica' => 'required',
                 'cbcerradoemergencia' => 'required',
                 'cbactivo' => 'required',
-                'prestado' => 'required',
                 'privado' => 'required'
             );
 
@@ -574,7 +573,6 @@ class ServiciosController extends Controller
                 'cbautomatica.required' => 'check automatico requerido',
                 'cbcerradoemergencia.required' => 'check cerrado emergencia requerido',
                 'cbactivo.required' => 'activo es requerido',
-                'prestado.required' => 'prestado es requerido',
                 'privado.required' => 'opcion privado es requerido'
                 );
 
@@ -587,7 +585,6 @@ class ServiciosController extends Controller
                     'message' => $validator->errors()->all()
                 ];
             }
-
              
             if(Servicios::where('id', '!=', $request->id)->where('identificador', $request->identificador)->first()){
                 return ['success' => 5];
@@ -719,8 +716,7 @@ class ServiciosController extends Controller
                         'orden_automatica' => $request->cbautomatica,
                         'tiempo_orden_max' => $request->tiempoorden,
                         'producto_visible' => $request->cbproducto,
-                        'privado' => $request->privado,
-                        'prestar_motorista' => $request->prestado]);
+                        'privado' => $request->privado]);
 
                     DB::commit();  
 

@@ -8,9 +8,9 @@
                 <thead>             
                 <tr>
                   <th style="width: 15%">Nombre</th>
-                  <th style="width: 15%">Teléfono</th>
-                  <th style="width: 15%">Correo</th>
-                  <th style="width: 15%">Zona actual</th>
+                  <th style="width: 10%">Teléfono</th>
+                  <th style="width: 20%">Correo</th>
+                  <th style="width: 10%">Zona actual</th>
                   <th style="width: 10%">Activo</th>
                   <th style="width: 15%">Fecha Registro</th>
                   <th style="width: 15%">Opciones</th>            

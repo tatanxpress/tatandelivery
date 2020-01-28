@@ -33,11 +33,6 @@
                     Reporte orden cancelada
           </button> 
 
-          <button type="button" onclick="modalReporte4()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Reporte Motorista prestado
-          </button> 
-
           <button type="button" onclick="modalReporte5()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Reporte Productos Vendidos

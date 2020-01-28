@@ -574,14 +574,6 @@
                                 <input type="checkbox" id="cbcerradoemergencia-editar">
                             </div>
 
-                            <div class="form-group">                   
-                             <label>Por regla, solo se presta motorista, si el servicio solo tiene motoristas propios. No importa que este marcado Envio Gratis</label>
-
-                                <label>Prestar motorista (si esta activado, el envio de la orden sera cobrada al servicio)</label>
-                                <br>
-                                <input type="checkbox" id="prestado-editar">
-                            </div>
-
                             <div class="form-group">
                                 <label>Activo</label>
                                 <br>
@@ -1633,9 +1625,7 @@
                         $('#cbautomatica-editar').prop('checked', true);
                     }
 
-                    if(response.data.servicio.prestar_motorista == 1){
-                        $('#prestado-editar').prop('checked', true);
-                    }
+                   
 
                     var tipo = document.getElementById("select-servicio-editar");
                     // limpiar select
@@ -1705,7 +1695,7 @@
         var cbautomatica = document.getElementById('cbautomatica-editar').checked;
         var cbcerradoemergencia = document.getElementById('cbcerradoemergencia-editar').checked;
         var cbactivo = document.getElementById('cbactivo-editar').checked;
-        var prestado = document.getElementById('prestado-editar').checked;
+      
         var privado = document.getElementById('cbprivado-editar').checked;
 
         var retorno = validarservicio(comision, multa, tiempo, nombre, descripcion, descripcioncorta, logo, imagen, tiposervicio,
@@ -1719,12 +1709,10 @@
         var cbautomatica_1 = 0;
         var cbcerradoemergencia_1 = 0;
         var activo = 0;
-        var prestado_1 = 0;
+      
         var privado_1 = 0;
 
-        if(prestado){
-            prestado_1 = 1;
-        }
+       
 
         if(privado){
             privado_1 = 1;
@@ -1780,7 +1768,6 @@
         formData.append('cbcerradoemergencia', cbcerradoemergencia_1);
         formData.append('cbactivo', activo);
         formData.append('tiempo', tiempo);
-        formData.append('prestado', prestado_1);
         formData.append('privado', privado_1);
 
         axios.post('/admin/servicios/editar-servicio', formData, {

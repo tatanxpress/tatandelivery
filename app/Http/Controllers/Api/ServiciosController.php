@@ -143,22 +143,7 @@ class ServiciosController extends Controller
                     ->get();
 
                       // si verificar con la segunda hora
-                    if(count($dato) >= 1){
-      
-                       // return 'entro';
-
-
-                       /* $horario = DB::table('horario_servicio AS h')
-                        ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
-                        ->where('h.segunda_hora', '1') // segunda hora habilitada
-                        ->where('h.servicios_id', $user->idServicio) // id servicio                        
-                        ->where('h.dia', $diaSemana) // dia                        
-                        ->where('h.hora1', '<=', $hora)
-                        ->where('h.hora2', '>=', $hora)
-                        ->orWhere('h.hora3', '<=', $hora)
-                        ->where('h.hora4', '>=', $hora)
-                        ->take(1)
-                        ->get();*/
+                    if(count($dato) >= 1){      
 
                         $horario = DB::table('horario_servicio AS h')
                             ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
@@ -172,20 +157,6 @@ class ServiciosController extends Controller
                                     ->where('h.hora4', '>=' , $hora);
                             }) 
                         ->get();
- 
-                       /* $horario = DB::table('horario_servicio AS h')
-                        ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
-                        ->where('h.segunda_hora', '1') // segunda hora habilitada
-                        ->where('h.servicios_id', $user->idServicio) // id servicio                        
-                        ->where('h.dia', $diaSemana) // dia                        
-                        ->whereTime('h.hora1', '<=', $hora)
-                        ->whereTime('h.hora2', '>=', $hora)
-                        ->orWhere('h.hora3', '<=', $hora)
-                        ->where('h.hora4', '>=', $hora)
-                        //->take(1)
-                        ->get();*/
-
-                        
 
                         if(count($horario) >= 1){ // abierto
                             $user->horarioLocal = 0;

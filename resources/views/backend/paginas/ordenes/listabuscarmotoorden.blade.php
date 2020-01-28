@@ -22,16 +22,6 @@
                     Filtro datos
           </button>  
 
-          <button type="button" style="margin-left:15px" onclick="modalFiltroPrestado()" class="btn btn-primary btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Filtro motorista prestado
-          </button> 
-
-          <button type="button" style="margin-left:15px" onclick="modalFiltroRegistro()" class="btn btn-primary btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Filtro Servicios a cobrar, motorista prestado
-          </button>
-
           <button type="button" style="margin-left:15px" onclick="reportePago()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Reporte pago motorista
