@@ -211,9 +211,3 @@ Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // lo
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // login revisador
 
  
- 
-
-// reporte de fecha a fecha, de productos vendidos
-Route::get('reportillo/{id}/{id2}/{id3}', 'AdminAppController@reporte');
-
-

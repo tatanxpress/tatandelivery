@@ -190,7 +190,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/motopago/tabla/lista', 'MotoristaPagoController@tablapago');
   Route::post('/registro/pago/motorista', 'MotoristaPagoController@nuevo');
   Route::post('/motopago/pago/ver', 'MotoristaPagoController@totalpagadomotorista');
-  
+   
   // pago a servicios 
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2'); 
   Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador');
@@ -198,8 +198,9 @@ Route::prefix('admin')->group(function () {
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
   Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
+  Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido');
 
-  
+   
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
   Route::get('/ordenrevisada/{id}/{id1}/{id2}', 'MotoristaPagoController@buscarOrdenRevisada');
@@ -233,6 +234,9 @@ Route::prefix('admin')->group(function () {
   Route::get('/registropromo/reporte/{id}/{id2}', 'ZonaPublicidadController@reporte');
   Route::post('/registropromo/informacion', 'ZonaPublicidadController@informacion');
   Route::post('/registropromo/editar', 'ZonaPublicidadController@editar');
+  // reporte de productos vendidos
+ 
 
-});     
-     
+
+});      
+  

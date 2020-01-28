@@ -542,6 +542,80 @@ class MotoristaPagoController extends Controller
     }
 
 
+    public function reporteproductovendido($id, $fecha1, $fecha2){
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+       
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
+
+        $orden = DB::table('ordenes AS o')
+        ->join('ordenes_descripcion AS od', 'od.ordenes_id', '=', 'o.id')
+        ->join('producto AS p', 'p.id', '=', 'od.producto_id')
+        ->select('o.id', 'o.servicios_id', 'o.estado_5', 'p.nombre', 'p.precio', 'p.id AS idproducto', 'od.cantidad', 'od.precio', 'o.fecha_orden')
+        ->where('o.servicios_id', $id)
+        ->where('o.estado_5', 1)        
+        ->whereBetween('o.fecha_orden', array($date1, $date2))
+        ->orderBy('o.id', 'ASC')  
+        ->get(); 
+
+        //return $orden;
+
+        $datos = array();
+        $totaldinero = 0;
+        
+        foreach($orden as $fororden){
+
+            $idp = $fororden->idproducto;
+            $nombre = "";
+            $cantidad = 0;
+            $dinero = 0;
+            $precio = 0;
+
+            foreach($orden as $for2){
+
+               if($for2->idproducto == $idp){
+                    $nombre = $for2->nombre;
+                    $cantidad = $cantidad + $for2->cantidad;
+                    $dinero = $dinero + $for2->precio;
+                    $precio = $for2->precio;
+               } 
+            }
+
+            $seguro = true;
+            //antes de agregar verificar, que id producto no exista el mismo            
+            for($i = 0; $i < count($datos); $i++) {
+                
+                if($idp == $datos[$i]['idproducto']){
+                    $seguro = false; 
+                }
+            }            
+
+            if($seguro == true){
+                $total = number_format((float)$dinero, 2, '.', '');
+                $totaldinero = $totaldinero + $total;
+                $datos[] = array('idproducto' => $idp, 'nombre' => $nombre, 'cantidad' => $cantidad, 'precio' => $precio, 'total' => $total);
+            }
+            
+        }
+ 
+
+        $data = Servicios::where('id', $id)->first();
+        $nombre = $data->nombre;
+
+        $totalDinero = number_format((float)$totaldinero, 2, '.', '');
+
+
+        $view =  \View::make('backend.paginas.reportes.reporteproductovendido', compact(['datos', 'totalDinero', 'nombre', 'f1', 'f2']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+ 
+        return $pdf->stream();
+
+    }
+
+
     /** REGISTRO DE PAGOS A SERVICIOS */
 
     public function index4(){
