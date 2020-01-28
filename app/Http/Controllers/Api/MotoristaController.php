@@ -898,7 +898,7 @@ class MotoristaController extends Controller
                     $usuario = User::where('id', $or->users_id)->first();
                     $device = $usuario->device_id;
 
-                    $titulo = "Orden #". $or->id ." Preprada";
+                    $titulo = "Orden #". $or->id ." Preparada";
                     $mensaje = "El motorista va encamino";
                     $alarma = 2;
                     $color = 3;
