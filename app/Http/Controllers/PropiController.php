@@ -79,7 +79,7 @@ class PropiController extends Controller
             $p->correo = $request->correo;
             $p->fecha = $fecha;
             $p->dui = $request->dui;
-            $p->disponibilidad = 0; 
+            $p->disponibilidad = 0;
             $p->device_id = "0000";
             $p->servicios_id = $request->identificador;
             $p->codigo_correo = "0000";

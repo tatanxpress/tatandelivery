@@ -848,11 +848,17 @@ class PropietarioController extends Controller
                     if($p->activo == 0){
                         return ['success'=> 1];
                     }
-                }
+                } 
+
+                // cantidad de productos que habian anteriormente
+
+                $unidades = Producto::where('id', $request->productoid)->pluck('unidades')->first();
+
+                $sumado = $unidades + $request->unidades;
                                 
                 Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
                 'unidades' => $request->unidades, 'disponibilidad' => $request->estado1,
-                'utiliza_cantidad'=>$request->estado2, 'unidades' => $request->unidades]);
+                'utiliza_cantidad'=>$request->estado2, 'unidades' => $sumado]);
                 
                 return ['success'=> 2];
 
