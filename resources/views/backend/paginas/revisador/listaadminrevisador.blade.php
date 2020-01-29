@@ -198,7 +198,7 @@
         var nombre = document.getElementById('nombre-nuevo').value;
         var telefono = document.getElementById('telefono-nuevo').value;
 
-        var retorno = validarNuevo(nombre, telefono, password);
+        var retorno = validarNuevo(nombre, telefono);
 
         if(retorno){
 
@@ -238,7 +238,7 @@
         }
     } 
 
-    function validarNuevo(nombre, telefono, password){
+    function validarNuevo(nombre, telefono){
 
         if(nombre === ''){
             toastr.error("nombre es requerido");
@@ -260,20 +260,7 @@
             return false;
         }
         
-        if(password === ''){
-            toastr.error("password es requerido");
-            return;
-        }
-
-        if(password.length < 8){
-            toastr.error("8 caracter minimo para password");
-            return false;
-        }
         
-        if(password.length > 20){
-            toastr.error("20 caracter máximo para password");
-            return false;
-        }
 
         return true;
     }
