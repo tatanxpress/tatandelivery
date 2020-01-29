@@ -1362,8 +1362,8 @@ class PropietarioController extends Controller
 
                          //si no esta vacio
                         if(!empty($pilaAdministradores)){
-                            $titulo = "Orden sin MOTORISTA";
-                            $mensaje = "Se necesita un Motorista Urgente!!";
+                            $titulo = "Orden Iniciada sin MOTORISTA";
+                            $mensaje = "Inicio preparacion y no se encuentra motoristas";
                             $alarma = 1; //sonido alarma
                             $color = 1; // color rojo
                             $icono = 1; // campana
@@ -1642,6 +1642,7 @@ class PropietarioController extends Controller
                 ->where('m.ordenes_id', $o->id)
                 ->get();
 
+                // SIGNIFICA QUE NO TIENE MOTORISTA ASIGNADO AUN LA ORDEN
                 // MANDAR NOTIFICACION AL MOTORISTA QUE YA ESTA LA ORDEN Y AL ADMINISTRADOR
                 if(count($motoasignado) == 0){
                 

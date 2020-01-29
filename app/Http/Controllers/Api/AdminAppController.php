@@ -104,13 +104,11 @@ class AdminAppController extends Controller
                 }
 
                 $orden = DB::table('ordenes_pendiente AS p')
-                ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')
-                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+                ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8', 's.privado')
+                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8')
                 ->where('p.activo', 1)
-                ->where('s.privado', 0) // solo servicios NO PRIVADOS VERE
                 ->orderBy('p.id', 'ASC')
                 ->get();
 
@@ -164,6 +162,24 @@ class AdminAppController extends Controller
                     $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
 
                     $o->direccion = $dato->direccion;
+
+                    // buscar nombre y telefono del motorista por orden pendiente
+
+                    // buscar si hay motorista asignado
+                    if($o->tipo == 5){
+                        $dato = DB::table('motorista_ordenes AS mo')
+                        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                        ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
+                        ->where('mo.ordenes_id', $o->id)
+                        ->first();
+
+                        $o->nombremoto = $dato->nombre;
+                        $o->telefonomoto = $dato->telefono;
+                    }else{
+                        $o->nombremoto = "";
+                        $o->telefonomoto = "";
+                    }
+
                 }
 
                 return ['success' => 2, 'orden' => $orden];
