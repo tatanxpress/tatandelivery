@@ -323,7 +323,9 @@ class PagaderoController extends Controller
                         ->first();
 
                         $sumado = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = $sumado;
+                        $t = number_format((float)$sumado, 2, '.', '');
+
+                        $o->precio_total = $t;
 
                         $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
                         $o->motorista = $nombre;
@@ -332,8 +334,8 @@ class PagaderoController extends Controller
                     }
 
                     // sumar ganancia de esta fecha
-                    $suma = collect($orden)->sum($total);
-                    $ganado = number_format((float)$suma, 2, '.', '');
+                
+                    $ganado = number_format((float)$total, 2, '.', '');
                     return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
                 }else{
                     return ['success' => 1, 'histoorden' => [], 'ganado' => "0.00"];
