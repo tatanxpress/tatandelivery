@@ -25,15 +25,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
          $schedule->command('ordenes:verificar')
-                  ->cron('*/2 * * * * *');
+                  ->cron('*/2 * * * *');
     }
 
-    // para dos minutos
-    public function everyTwoMinutes()
-    {
-        return $this->cron('*/2 * * * * *');
-    }
-
+   
     /**
      * Register the commands for the application.
      *
