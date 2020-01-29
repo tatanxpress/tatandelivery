@@ -59,22 +59,28 @@ class VerificarOrdenes extends Command
             // obtener cada id, de la orden que necesita motorista y enviar notificacion
             // al administrador una alerta por todas las ordenes pendientes. 
             foreach($orden as $o){
-                if(OrdenesPendiente::where('ordenes_id', $o->id)->first()){
-                    // no guardar registro.
-                }else{
-                    $seguro = true;
 
-                    $total = $total + 1;
+                // SOLO PARA SERVICIOS NO PRIVADOS
+                $valor = Servicios::where('id', $o->servicios_id)->first();
 
-                    $fecha = Carbon::now('America/El_Salvador');
-
-                    $osp = new OrdenesPendiente;
-                    $osp->ordenes_id = $o->id; 
-                    $osp->fecha = $fecha;
-                    $osp->activo = 1;
-                    $osp->tipo = 5;
-                    $osp->save();
-                }
+                if($valor->privado == 0){
+                    if(OrdenesPendiente::where('ordenes_id', $o->id)->first()){
+                        // no guardar registro.
+                    }else{
+                        $seguro = true;
+    
+                        $total = $total + 1;
+    
+                        $fecha = Carbon::now('America/El_Salvador');
+    
+                        $osp = new OrdenesPendiente;
+                        $osp->ordenes_id = $o->id; 
+                        $osp->fecha = $fecha;
+                        $osp->activo = 1;
+                        $osp->tipo = 5;
+                        $osp->save();
+                    }
+                }                
             }
 
             if($seguro){

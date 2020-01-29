@@ -105,10 +105,12 @@ class AdminAppController extends Controller
 
                 $orden = DB::table('ordenes_pendiente AS p')
                 ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')
+                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8', 's.privado')
                 ->where('p.activo', 1)
+                ->where('s.privado', 0) // solo servicios NO PRIVADOS VERE
                 ->orderBy('p.id', 'ASC')
                 ->get();
 

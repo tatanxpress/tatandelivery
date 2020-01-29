@@ -650,13 +650,13 @@ class PropietarioController extends Controller
 
                 $estado = DB::table('servicios AS o')
                 ->join('propietarios AS p', 'p.servicios_id', '=', 'o.id')
-                ->select('o.envio_gratis')
+                ->select('o.privado')
                 ->where('p.id', $p->id)
                 ->first();
 
-                $envio = $estado->envio_gratis;
+                $envio = $estado->privado;
 
-                // utilizara motorista del servicio
+                // utilizara motorista del servicio, porque es privado
                 if($envio == 1){
                     $motorista = DB::table('motoristas_asignados AS ma')
                     ->join('motoristas AS m', 'm.id', '=', 'ma.motoristas_id')

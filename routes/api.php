@@ -125,7 +125,7 @@ Route::post('propietarios/estado/adomicilio', 'Api\PropietarioController@estadoA
 Route::post('propietarios/estado/tiempo', 'Api\PropietarioController@estadoAutomatico'); // estado automatico de ordenes
 Route::post('propietario/guardar/tiempo', 'Api\PropietarioController@guardarTiempo'); // guarda tiempo para la orden automatica o no
 
-
+ 
 // productos
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // informacion cuenta
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
