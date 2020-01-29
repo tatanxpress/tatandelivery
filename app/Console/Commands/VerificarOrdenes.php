@@ -55,12 +55,14 @@ class VerificarOrdenes extends Command
         if(count($orden) > 0){
 
             $total = 0;
+            $seguro = false;
             // obtener cada id, de la orden que necesita motorista y enviar notificacion
             // al administrador una alerta por todas las ordenes pendientes. 
             foreach($orden as $o){
                 if(OrdenesPendiente::where('ordenes_id', $o->id)->first()){
                     // no guardar registro.
                 }else{
+                    $seguro = true;
 
                     $total = $total + 1;
 
@@ -75,34 +77,37 @@ class VerificarOrdenes extends Command
                 }
             }
 
-            // ENVIAR NOTIFICACIONES SOBRE TOTAL DE ORDENES PENDIENTE
-            $administradores = DB::table('administradores')
-            ->where('activo', 1)
-            ->where('disponible', 1)
-            ->get();
+            if($seguro){
 
-            $pilaAdministradores = array();
-            foreach($administradores as $p){
-                if(!empty($p->device_id)){
-                    
-                    if($p->device_id != "0000"){
-                        array_push($pilaAdministradores, $p->device_id);
-                    }                             
+                // ENVIAR NOTIFICACIONES SOBRE TOTAL DE ORDENES PENDIENTE
+                $administradores = DB::table('administradores')
+                ->where('activo', 1)
+                ->where('disponible', 1)
+                ->get();
+
+                $pilaAdministradores = array();
+                foreach($administradores as $p){
+                    if(!empty($p->device_id)){
+                        
+                        if($p->device_id != "0000"){
+                            array_push($pilaAdministradores, $p->device_id);
+                        }                             
+                    }
+                } 
+
+                //si no esta vacio
+                if(!empty($pilaAdministradores)){
+                    $titulo = "Orden Para Entrega Inmediata";
+                    $mensaje = $total . " Ordenes pendiente de Entrega";
+                    $alarma = 1; //sonido alarma 
+                    $color = 1; // color rojo
+                    $icono = 1; // campana
+
+                    $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
                 }
-            } 
-
-             //si no esta vacio
-            if(!empty($pilaAdministradores)){
-                $titulo = "Orden Para Entrega Inmediata";
-                $mensaje = $total . " Ordenes pendiente de Entrega";
-                $alarma = 1; //sonido alarma 
-                $color = 1; // color rojo
-                $icono = 1; // campana
-
-                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
             }
         }
-        echo "tarea ejecutada";
+       
     }
 
     public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono){
