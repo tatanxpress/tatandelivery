@@ -302,11 +302,13 @@ class PagaderoController extends Controller
                 
                     $orden = DB::table('ordenes_revisadas AS r')
                     ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'r.fecha')
+                    ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
                     ->where('r.revisador_id', $request->id)
                     ->whereBetween('r.fecha', [$start, $end])
                     ->orderBy('o.id', 'ASC')
                     ->get();
+
+                    $total = 0.0;
 
                     foreach($orden as $o){
                         $fechaOrden = $o->fecha;
@@ -320,12 +322,17 @@ class PagaderoController extends Controller
                         ->pluck('motoristas_id')                 
                         ->first();
 
+                        $sumado = $o->precio_total + $o->precio_envio;
+                        $o->precio_total = $sumado;
+
                         $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
-                        $o->motorista = $nombre;                        
+                        $o->motorista = $nombre;
+                      
+                        $total = $total + $sumado;
                     }
 
                     // sumar ganancia de esta fecha
-                    $suma = collect($orden)->sum('precio_total');
+                    $suma = collect($orden)->sum($total);
                     $ganado = number_format((float)$suma, 2, '.', '');
                     return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
                 }else{

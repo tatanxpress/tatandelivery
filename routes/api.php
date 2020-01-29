@@ -184,7 +184,7 @@ Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); 
  
 // ver ordenes pendiente de pago
 Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago'); // login revisador
-
+ 
 // confirmar pago
 Route::post('revisador/confirmar/pago', 'Api\PagaderoController@confirmarPago'); // confirmar revisador
 
@@ -207,7 +207,7 @@ Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgent
 // ocultar una orden
 Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // login revisador
 
-// cambiar contrasena el revisador
+// cambiar contrasena el administrador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // login revisador
 
  
