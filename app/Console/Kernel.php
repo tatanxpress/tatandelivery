@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        VerificarOrdenes::class
+        //VerificarOrdenes::class
     ];
 
     /**
@@ -24,8 +24,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+         $schedule->command('ordenes:verificar')
+                  ->cron('*/2 * * * * *');
+    }
+
+    // para dos minutos
+    public function everyTwoMinutes()
+    {
+        return $this->cron('*/2 * * * * *');
     }
 
     /**

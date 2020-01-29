@@ -12,10 +12,11 @@
           <div class="col-sm-12">
             <h1>Administradores para revision de ordenes sin motorista</h1>
           </div>
-        <!--   <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
+          
+           <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Admin revisador
-          </button>       -->
+          </button>       
       </div>
     </section>
     
