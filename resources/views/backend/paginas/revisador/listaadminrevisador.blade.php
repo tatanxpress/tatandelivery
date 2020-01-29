@@ -12,7 +12,7 @@
           <div class="col-sm-12">
             <h1>Administradores para revision de ordenes sin motorista</h1>
           </div>
-          
+
            <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Admin revisador
@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Contrasena</label>
-                                    <input type="text" maxlength="20" class="form-control" id="password-nuevo" placeholder="Contrasena">
+                                    <input type="text" disabled class="form-control" placeholder="12345678">
                                 </div>
                                
                             
@@ -197,7 +197,6 @@
     function nuevo(){
         var nombre = document.getElementById('nombre-nuevo').value;
         var telefono = document.getElementById('telefono-nuevo').value;
-        var password = document.getElementById('password-nuevo').value;
 
         var retorno = validarNuevo(nombre, telefono, password);
 
@@ -207,7 +206,6 @@
             var formData = new FormData();
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
-            formData.append('password', password);
             
             axios.post('/admin/adminrevisador/nuevo', formData, { 
                     })

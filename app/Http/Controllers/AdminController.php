@@ -39,13 +39,11 @@ class AdminController extends Controller
             $regla = array(
                 'nombre' => 'required',
                 'telefono' => 'required',
-                'password' => 'required',
             );
 
             $mensaje = array(
                 'nombre.required' => 'Nombre es requerido',
                 'telefono.required' => 'telefono es requerido',
-                'password.required' => 'Password es requerido'
                 );
                 
             $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -66,7 +64,7 @@ class AdminController extends Controller
             $m->nombre = $request->nombre;
             $m->telefono = $request->telefono;
             $m->device_id = "0000";
-            $m->password = bcrypt($request->password);
+            $m->password = bcrypt('12345678');
             $m->activo = 1;
             $m->disponible = 0;
            
