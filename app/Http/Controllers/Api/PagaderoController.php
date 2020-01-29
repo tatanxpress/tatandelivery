@@ -291,21 +291,25 @@ class PagaderoController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
                 ->select('o.id', 'o.precio_total', 'r.fecha')
                 ->where('r.revisador_id', $request->id)
-                ->whereDate('r.fecha', '>', Carbon::now('America/El_Salvador')->subDays(3))
+                ->whereDate('r.fecha', '>', Carbon::now('America/El_Salvador')->subDays(5))
                 ->get();
 
                     // encontro un historial en el tiempo permitido. filtrar por la fecha dada
                     if(count($encontro) > 0){
 
-                    $start = Carbon::parse($request->fecha1)->startOfDay(); 
-                    $end = Carbon::parse($request->fecha2)->endOfDay();
+                    //$start = Carbon::parse($request->fecha1)->startOfDay(); 
+                    //$end = Carbon::parse($request->fecha2)->endOfDay();
+
+                    $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
+                    $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d'); 
                 
                     $orden = DB::table('ordenes_revisadas AS r')
                     ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
                     ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
                     ->where('r.revisador_id', $request->id)
-                    ->whereBetween('r.fecha', [$start, $end])
-                    ->orderBy('o.id', 'ASC')
+                    //->whereBetween('r.fecha', [$start, $end]) 
+                    ->whereBetween('r.fecha', array($date1, $date2))
+                    ->orderBy('o.id', 'ASC') 
                     ->get();
 
                     $total = 0.0;
