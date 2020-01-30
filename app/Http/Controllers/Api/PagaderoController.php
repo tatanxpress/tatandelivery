@@ -163,7 +163,8 @@ class PagaderoController extends Controller
                     $suma = $o->precio_total + $o->precio_envio;
                     $total = $total + $suma;
 
-                    $o->precio_total = $suma;
+
+                    $o->precio_total = number_format((float)$suma, 2, '.', '');
                 }
 
                 // sumar ganancia de esta fecha
