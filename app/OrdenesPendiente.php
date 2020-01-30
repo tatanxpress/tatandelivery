@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrdenesPendiente extends Model
 {
-    // cuando hay una orden que llego al estado 5 y aun no tiene motorista asignado
+    // cuando hay una orden que llego al estado 4 y aun no tiene motorista asignado
     protected $table = 'ordenes_pendiente';
     public $timestamps = false;
 

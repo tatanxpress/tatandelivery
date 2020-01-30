@@ -191,7 +191,7 @@ Route::post('revisador/confirmar/pago', 'Api\PagaderoController@confirmarPago');
 // extras
 Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas'); // ver motorista
 
-// historial de una fecha a otra
+// historial de una fecha a otra 
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); // ver historial
 
 // ver fecha de recorte
@@ -201,11 +201,20 @@ Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFe
 // APP ADMINISTRADORES
 Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login revisador
 
-// ordenes urge motorista
-Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgente'); // login revisador
+// ordenes del estado 1-4
+Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgente'); 
 
-// ocultar una orden
+// ocultar una orden de ordenes_pendiente
 Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // login revisador
+ 
+// ordenes urgente, tarea programada
+Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesProgramada');
+
+
+// ocultar una orden de ordenes_urgentes
+Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgente'); // login revisador
+
+
 
 // cambiar contrasena el administrador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // login revisador

@@ -7,7 +7,8 @@ use Illuminate\Support\Facades\DB;
 use Log; 
 use Carbon\Carbon;
 use OneSignal;
-use App\OrdenesPendiente;
+use App\OrdenesUrgentes;
+use App\Servicios;
 
 class VerificarOrdenes extends Command
 {
@@ -64,7 +65,7 @@ class VerificarOrdenes extends Command
                 $valor = Servicios::where('id', $o->servicios_id)->first();
 
                 if($valor->privado == 0){
-                    if(OrdenesPendiente::where('ordenes_id', $o->id)->first()){
+                    if(OrdenesUrgentes::where('ordenes_id', $o->id)->first()){
                         // no guardar registro.
                     }else{
                         $seguro = true;
@@ -73,11 +74,11 @@ class VerificarOrdenes extends Command
     
                         $fecha = Carbon::now('America/El_Salvador');
     
-                        $osp = new OrdenesPendiente;
+                        $osp = new OrdenesUrgentes;
                         $osp->ordenes_id = $o->id; 
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
-                        $osp->tipo = 5;
+                        $osp->tipo = 1;
                         $osp->save();
                     }
                 }                
