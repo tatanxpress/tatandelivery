@@ -297,18 +297,14 @@ class PagaderoController extends Controller
                     // encontro un historial en el tiempo permitido. filtrar por la fecha dada
                     if(count($encontro) > 0){
 
-                    //$start = Carbon::parse($request->fecha1)->startOfDay(); 
-                    //$end = Carbon::parse($request->fecha2)->endOfDay();
-
-                    $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
-                    $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d'); 
+                    $start = Carbon::parse($request->fecha1)->startOfDay(); 
+                    $end = Carbon::parse($request->fecha2)->endOfDay();
                 
                     $orden = DB::table('ordenes_revisadas AS r')
                     ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
                     ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
                     ->where('r.revisador_id', $request->id)
-                    //->whereBetween('r.fecha', [$start, $end]) 
-                    ->whereBetween('r.fecha', array($date1, $date2))
+                    ->whereBetween('r.fecha', [$start, $end]) 
                     ->orderBy('o.id', 'ASC') 
                     ->get();
 

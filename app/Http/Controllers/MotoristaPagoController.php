@@ -498,8 +498,8 @@ class MotoristaPagoController extends Controller
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');
         $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d'); 
 
-        //$f1 = Carbon::parse($fecha1)->format('d-m-Y');
-       // $f2 = Carbon::parse($fecha2)->format('d-m-Y'); 
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y'); 
         
         $orden = DB::table('ordenes_revisadas AS or')
         ->join('ordenes AS o', 'o.id', '=', 'or.ordenes_id')
@@ -590,7 +590,7 @@ class MotoristaPagoController extends Controller
                 if($idp == $datos[$i]['idproducto']){
                     $seguro = false; 
                 }
-            }            
+            }             
 
             if($seguro == true){
                 $total = number_format((float)$dinero, 2, '.', '');
