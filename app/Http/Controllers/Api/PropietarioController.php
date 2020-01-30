@@ -1822,7 +1822,7 @@ class PropietarioController extends Controller
             }
 
             if($p = Propietarios::where('id', $request->id)->first()){
-              
+               
                 $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
                 $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d'); 
    

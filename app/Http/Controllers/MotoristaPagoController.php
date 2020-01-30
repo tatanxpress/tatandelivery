@@ -236,6 +236,7 @@ class MotoristaPagoController extends Controller
         return $pdf->stream();
     }
 
+    // YA NO UTILIZADO
     public function reportemotoristaprestado($idservicio, $fecha1, $fecha2){
 
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');

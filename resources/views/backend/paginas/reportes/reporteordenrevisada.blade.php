@@ -73,21 +73,25 @@
     <div class="row"> 
             <center><p class="titulo">
             REPORTE DE COBRO<br>
-            REVISADOR: {{ $nombre }} 
+            COBRADOR: {{ $nombre }} 
             </p> 
-            <p><small>De: {{ $f1 }}  Hasta: {{ $f2 }}</small></p></center>        
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>  
+         
     </div>  
 
         <table id="customers">
           <tr>
-            <th># Orden</th>           
+            <th style="width:2px;">Nro</th>
+            <th ># Orden</th>           
             <th>Fecha Orden</th>
             <th>Fecha Confirmada</th>
             <th>Total $</th>
           </tr>
-
+ 
+          {{ $i = 1 }}
           @foreach($orden as $dato)
             <tr>
+              <td>{{ $i++ }} </td>
               <td>{{ $dato->ordenes_id }}</td>             
               <td>{{ $dato->fecha_orden }}</td>
               <td>{{ $dato->fecha }}</td>
@@ -96,16 +100,11 @@
           @endforeach  
 
           
-          <tr>
-            <td>Conteo:</td>
-            <td></td>
-            <td></td>
-            <td>{{ $conteo }}</td>
-          </tr>
-        
+         
 
           <tr>
             <td>Total:</td>
+            <td></td>
             <td></td>
             <td></td>
             <td>${{ $suma }}</td>

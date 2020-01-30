@@ -285,61 +285,49 @@ class PagaderoController extends Controller
             }
 
             if(Revisador::where('id', $request->id)->first()){
-                
-                // buscar con la fecha dada. MINIMO PODRAN VER DE HOY MENOS X DIAS
-                $encontro = DB::table('ordenes_revisadas AS r')
+                    
+                $start = Carbon::parse($request->fecha1)->startOfDay(); 
+                $end = Carbon::parse($request->fecha2)->endOfDay();
+            
+                $orden = DB::table('ordenes_revisadas AS r')
                 ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
-                ->select('o.id', 'o.precio_total', 'r.fecha')
+                ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
                 ->where('r.revisador_id', $request->id)
-                ->whereDate('r.fecha', '>', Carbon::now('America/El_Salvador')->subDays(5))
+                ->whereBetween('r.fecha', [$start, $end]) 
+                ->orderBy('o.id', 'ASC') 
                 ->get();
 
-                    // encontro un historial en el tiempo permitido. filtrar por la fecha dada
-                    if(count($encontro) > 0){
+                $total = 0.0;
 
-                    $start = Carbon::parse($request->fecha1)->startOfDay(); 
-                    $end = Carbon::parse($request->fecha2)->endOfDay();
+                foreach($orden as $o){
+                    $fechaOrden = $o->fecha;
+                    $hora = date("h:i A", strtotime($fechaOrden));
+                    $fecha = date("d-m-Y", strtotime($fechaOrden));
+                    $o->fecha = $hora . " " . $fecha;
+                    
+                    // nombre motorista
+                    $idm = DB::table('motorista_ordenes AS m')                        
+                    ->where('m.ordenes_id', $o->id)
+                    ->pluck('motoristas_id')                 
+                    ->first();
+
+                    $sumado = $o->precio_total + $o->precio_envio;
+                    $t = number_format((float)$sumado, 2, '.', '');
+
+                    $o->precio_total = $t;
+
+                    $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
+                    $o->motorista = $nombre;
                 
-                    $orden = DB::table('ordenes_revisadas AS r')
-                    ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
-                    ->where('r.revisador_id', $request->id)
-                    ->whereBetween('r.fecha', [$start, $end]) 
-                    ->orderBy('o.id', 'ASC') 
-                    ->get();
+                    $total = $total + $sumado;
+                }
 
-                    $total = 0.0;
-
-                    foreach($orden as $o){
-                        $fechaOrden = $o->fecha;
-                        $hora = date("h:i A", strtotime($fechaOrden));
-                        $fecha = date("d-m-Y", strtotime($fechaOrden));
-                        $o->fecha = $hora . " " . $fecha;
-                        
-                        // nombre motorista
-                        $idm = DB::table('motorista_ordenes AS m')                        
-                        ->where('m.ordenes_id', $o->id)
-                        ->pluck('motoristas_id')                 
-                        ->first();
-
-                        $sumado = $o->precio_total + $o->precio_envio;
-                        $t = number_format((float)$sumado, 2, '.', '');
-
-                        $o->precio_total = $t;
-
-                        $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
-                        $o->motorista = $nombre;
-                      
-                        $total = $total + $sumado;
-                    }
-
-                    // sumar ganancia de esta fecha
+                        // sumar ganancia de esta fecha
                 
-                    $ganado = number_format((float)$total, 2, '.', '');
-                    return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
-                }else{
-                    return ['success' => 1, 'histoorden' => [], 'ganado' => "0.00"];
-                }                
+                $ganado = number_format((float)$total, 2, '.', '');
+                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];                             
+            }else{
+                return ['success' => 2];
             }
         }
     }

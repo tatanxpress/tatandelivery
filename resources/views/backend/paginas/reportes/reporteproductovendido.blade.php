@@ -87,7 +87,7 @@
             <th>Precio</th>
             <th>Total</th>
           </tr>
-
+  
           @for($i = 0; $i < count($datos); $i++) {
             <tr>
               <td>{{ $i }}</td>
