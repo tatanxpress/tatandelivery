@@ -144,7 +144,7 @@ class PagaderoController extends Controller
 
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.fecha_5', 
+                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
                 'o.servicios_id', 'o.estado_8')
                 ->where('mo.motoristas_id', $request->motoristaid)
                 ->where('mo.motorista_prestado', 0)
@@ -152,16 +152,22 @@ class PagaderoController extends Controller
                 ->whereNotIn('o.id', $pilaOrden)
                 ->get();
 
+                $total = 0.0;
+
                 foreach($orden as $o){
                     $fechaOrden = $o->fecha_5;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;                  
+                    $o->fecha_orden = $hora . " " . $fecha;  
+                    
+                    $suma = $o->precio_total + $o->precio_envio;
+                    $total = $total + $suma;
+
+                    $o->precio_total = $suma;
                 }
 
                 // sumar ganancia de esta fecha
-                $suma = collect($orden)->sum('precio_total');
-                $debe = number_format((float)$suma, 2, '.', '');
+                $debe = number_format((float)$total, 2, '.', '');
                 return ['success' => 1, 'orden' => $orden, 'debe' => $debe];
             }
         }
@@ -297,7 +303,7 @@ class PagaderoController extends Controller
                 ->orderBy('o.id', 'ASC') 
                 ->get();
 
-                $total = 0.0;
+                $total = 0.0; 
 
                 foreach($orden as $o){
                     $fechaOrden = $o->fecha;

@@ -284,7 +284,7 @@ class MotoristaPagoController extends Controller
         return $pdf->stream();
 
     }
-
+ 
      // reporte para ordenes canceladas
      function reporteordencancelada($idservicio, $fecha1, $fecha2){
 
