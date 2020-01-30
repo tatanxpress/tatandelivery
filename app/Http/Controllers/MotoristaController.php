@@ -283,7 +283,7 @@ class MotoristaController extends Controller
         $moto = DB::table('motoristas_asignados AS ms')
         ->join('servicios AS s', 's.id', '=', 'ms.servicios_id')
         ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
-        ->select('ms.id','s.identificador', 's.nombre', 'm.nombre AS nombreMotorista', 'm.identificador')
+        ->select('ms.id','s.identificador AS identi', 's.nombre', 'm.nombre AS nombreMotorista', 'm.identificador')
         ->get();
        
         return view('backend.paginas.motoristas.tablas.tablamotoristaservicio', compact('moto'));

@@ -17,8 +17,8 @@
                 <tbody> 
                 @foreach($moto as $dato)
        
-                <tr>
-                    <td>{{ $dato->identificador }}</td>
+                <tr> 
+                    <td>{{ $dato->identi }}</td>
                     <td>{{ $dato->nombre }}</td>
                     <td>{{ $dato->nombreMotorista }}</td>
                     <td>{{ $dato->identificador }}</td>

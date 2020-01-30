@@ -236,7 +236,7 @@ class RevisadorController extends Controller
          
         $revisador = DB::table('revisador_motoristas AS rm')
         ->join('revisador AS r', 'r.id', '=', 'rm.revisador_id')
-        ->join('motoristas AS m', 'm.id', '=', 'rm.motoristas_id')
+        ->join('motoristas AS m', 'm.id', '=', 'rm.motoristas_id')        
         ->select('rm.id', 'r.identificador', 'r.nombre', 'm.identificador AS identificadorMotorista', 'm.nombre AS nombreMotorista')
         ->get();
 

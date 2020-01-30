@@ -151,7 +151,7 @@ Route::prefix('admin')->group(function () {
   Route::post('/revisador/reseteo', 'RevisadorController@reseteo');
   Route::post('/revisador/informacion', 'RevisadorController@informacion');
   Route::post('/revisador/editar', 'RevisadorController@editar');
-  // revisador motorista
+  // revisador motorista 
   Route::get('/revisadormoto/lista', 'RevisadorController@index2');
   Route::get('/revisadormoto/tabla/lista', 'RevisadorController@revisadormototabla');
   Route::post('/revisadormoto/nuevo', 'RevisadorController@nuevomoto');
@@ -200,7 +200,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido');
 
-   
+    
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
   Route::get('/ordenrevisada/{id}/{id1}/{id2}', 'MotoristaPagoController@buscarOrdenRevisada');
