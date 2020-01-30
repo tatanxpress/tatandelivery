@@ -167,19 +167,19 @@ class AdminAppController extends Controller
                     // buscar nombre y telefono del motorista por orden pendiente
 
                     // buscar si hay motorista asignado
-                    if($o->tipo == 5){
-                        $dato = DB::table('motorista_ordenes AS mo')
-                        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
-                        ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
-                        ->where('mo.ordenes_id', $o->id)
-                        ->first();
+                    $dato = DB::table('motorista_ordenes AS mo')
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
+                    ->where('mo.ordenes_id', $o->id)
+                    ->first();
 
+                    if($dato != null){
                         $o->nombremoto = $dato->nombre;
                         $o->telefonomoto = $dato->telefono;
                     }else{
                         $o->nombremoto = "";
                         $o->telefonomoto = "";
-                    }
+                    }           
 
                 }
 
@@ -282,19 +282,19 @@ class AdminAppController extends Controller
                     // buscar nombre y telefono del motorista por orden pendiente
 
                     // buscar si hay motorista asignado
-                    if($o->tipo == 5){
-                        $dato = DB::table('motorista_ordenes AS mo')
-                        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
-                        ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
-                        ->where('mo.ordenes_id', $o->id)
-                        ->first();
+                    $dato = DB::table('motorista_ordenes AS mo')
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
+                    ->where('mo.ordenes_id', $o->id)
+                    ->first();
 
+                    if($dato != null){
                         $o->nombremoto = $dato->nombre;
                         $o->telefonomoto = $dato->telefono;
                     }else{
                         $o->nombremoto = "";
                         $o->telefonomoto = "";
-                    }
+                    }     
 
                 }
 
