@@ -133,7 +133,7 @@ Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actual
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
 
 
-// MOTORISTA
+// MOTORISTA 
 
 Route::post('motorista/login', 'Api\MotoristaController@loginMotorista'); // login motorista
 Route::post('motorista/password/recuperacion', 'Api\MotoristaController@codigoCorreo'); // enviar codigo recuperacion

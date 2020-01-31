@@ -821,7 +821,7 @@ class PropietarioController extends Controller
                 'estado1' => 'required',
                 'estado2' => 'required',
                 'precio' => 'required',
-                'unidades' => 'required'
+                'unidades' => 'required' 
             );
  
             $messages = array(                                      
@@ -854,10 +854,10 @@ class PropietarioController extends Controller
 
                 $unidades = Producto::where('id', $request->productoid)->pluck('unidades')->first();
 
-                $sumado = $unidades + $request->unidades;
+              //  $sumado = $unidades + $request->unidades;
                                 
                 Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
-                'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $sumado]);
+                'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $request->unidades]);
                 
                 return ['success'=> 2];
 
