@@ -502,7 +502,6 @@
         });
     }
    
-
     // ubicacion del cliente para la orden
     function mapa(id){        
         window.location.href="{{ url('/admin/ordenes/ubicacion/') }}/"+id;
@@ -516,5 +515,5 @@
   </script>
  
 
-
+ 
 @stop

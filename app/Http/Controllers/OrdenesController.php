@@ -14,10 +14,10 @@ use Illuminate\Support\Facades\DB;
 
 class OrdenesController extends Controller
 {
-    public function __construct()
+    /*public function __construct()
     {
         $this->middleware('auth:admin');
-    }
+    }*/
    
     // lista de ordenes
     public function index(){
@@ -119,8 +119,8 @@ class OrdenesController extends Controller
         ->join('ordenes AS o', 'o.id', '=', 'od.ordenes_id')
         ->join('producto AS p', 'p.id', '=', 'od.producto_id')
         ->select('od.id', 'p.id AS productoid', 'od.ordenes_id', 'p.nombre', 'p.descripcion', 'p.utiliza_imagen', 'p.imagen', 'od.cantidad', 'od.precio', 'od.nota') 
-        ->where('od.id', $id)
-        ->get(); 
+        ->where('o.id', $id) 
+        ->get();  
 
         foreach($producto as $o){
                 
