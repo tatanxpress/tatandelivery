@@ -225,7 +225,7 @@ class MotoristaPagoController extends Controller
 
         $suma = ($totalDinero * $comision) / 100;   // 5.47
 
-        $redondear = round($suma);
+        $redondear = round($comision);
 
         $pagarFinal = $totalDinero - $suma;
 
