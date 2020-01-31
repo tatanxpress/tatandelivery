@@ -15,18 +15,13 @@
            </div>  
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Buscar servicio
+                    Buscar Ordenes de servicio
           </button>  
 
           <button type="button" onclick="modalReporte()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Generar reporte
+                    Generar reporte de ordenes Completadas
           </button>  
-
-          <button type="button" onclick="modalReporte2()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Reporte orden tardia
-          </button> 
 
           <button type="button" onclick="modalReporte3()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>

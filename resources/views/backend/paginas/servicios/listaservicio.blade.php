@@ -62,10 +62,6 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Multa</label>
-                                            <input type="number" step="0.01" class="form-control" id="multa-nuevo">
-                                        </div>
-                                        <div class="form-group">
                                             <label>Nombre</label>
                                             <input type="text" maxlength="50" class="form-control" id="nombre-nuevo" placeholder="Nombre servicio">
                                         </div>
@@ -166,10 +162,7 @@
                                                 </select>
                                             </div>
                                         </div> 
-                                        <div class="form-group">
-                                            <label>Tiempo Orden (Tiempo para que el cliente cancele la orden)</label>
-                                            <input type="number" step="1" min="0" max="120" class="form-control" id="tiempoorden-nuevo">
-                                        </div>
+                                      
                                     </div> 
                                 </div>
                                 <div class="col-md-6">
@@ -462,10 +455,7 @@
                                 <label>Comision</label>
                                 <input type="number" step="0.01" class="form-control" id="comision-editar">
                             </div>
-                            <div class="form-group">
-                                <label>Multa</label>
-                                <input type="number" step="0.01" class="form-control" id="multa-editar">
-                            </div>
+                           
                             <div class="form-group">
                                 <label>Nombre</label>
                                 <input type="text" maxlength="50" class="form-control" id="nombre-editar" placeholder="Nombre servicio">
@@ -563,10 +553,7 @@
                                     </select>
                                 </div>
                             </div> 
-                            <div class="form-group">
-                                <label>Tiempo Orden (Tiempo para que el cliente cancele la orden)</label>
-                                <input type="number" step="1" min="0" max="120" class="form-control" id="tiempoorden-editar">
-                            </div>
+                           
 
                             <div class="form-group">
                                 <label>Cerrado emergencia</label>
@@ -889,7 +876,7 @@
 
         // parte 1
         var comision = document.getElementById('comision-nuevo').value;
-        var multa = document.getElementById('multa-nuevo').value;
+      
         var nombre = document.getElementById('nombre-nuevo').value;
         var identificador = document.getElementById('identificador-nuevo').value;
         var descripcion = document.getElementById('descripcion-nuevo').value;
@@ -902,7 +889,7 @@
         var longitud = document.getElementById('longitud-nuevo').value;
         var direccion = document.getElementById('direccion-nuevo').value;
         var tipovista = document.getElementById('select-vista').value;
-        var tiempoorden = document.getElementById('tiempoorden-nuevo').value;
+        
         var cbenviogratis = document.getElementById('cbenviogratis').checked;
         var cbminimo = document.getElementById('cbminimo').checked;
         var minimocompra = document.getElementById('minimocompra').value;
@@ -969,8 +956,8 @@
         var cbdomingosegunda = document.getElementById('cbdomingosegunda').checked;
         var cbcerradodomingo = document.getElementById('cbcerradodomingo').checked;
         
-        var retorno1 = validacionNuevo(comision, multa, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-         telefono, latitud, longitud, direccion, tiempoorden, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
+        var retorno1 = validacionNuevo(comision, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+         telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
 
         if(!retorno1){
             return;
@@ -1183,8 +1170,6 @@
     // respuesta al agregar
     function respuestaNuevo(response){
 
-        console.log(response); 
-
         if (response.data.success == 0) {
             toastr.error('Validacion incorrecta');
         } else if (response.data.success == 1) {
@@ -1205,18 +1190,15 @@
     }
  
     // validar datos a guardar
-    function validacionNuevo(comision, multa, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, tiempoorden, lunes, martes, miercoles, jueves, viernes, sabado, domingo){
+    function validacionNuevo(comision, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+     telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo){
 
         if (comision === '') {
             toastr.error('Comision es requerido');
             return false;
         }
 
-        if (multa === '') {
-            toastr.error('Multa es requerido');
-            return false;
-        }
+      
 
         if (tiempo === '') {
             toastr.error('Tiempo orden automatica es requerido');
@@ -1330,13 +1312,6 @@
 
         if(direccion.length > 300){
             toastr.error("300 caracter máximo direccion");
-            return false;
-        }
-
-        
-
-        if (tiempoorden === '') {
-            toastr.error("tiempo orden es requerido");
             return false;
         }
 
@@ -1673,7 +1648,6 @@
 
         var id = document.getElementById('id-editar').value;
         var comision = document.getElementById('comision-editar').value;
-        var multa = document.getElementById('multa-editar').value;
         var tiempo = document.getElementById('tiempo-editar').value;
         var nombre = document.getElementById('nombre-editar').value;
         var identificador = document.getElementById('identificador-editar').value;
@@ -1687,7 +1661,6 @@
         var longitud = document.getElementById('longitud-editar').value;
         var direccion = document.getElementById('direccion-editar').value;
         var tipovista = document.getElementById('select-vista-editar').value;
-        var tiempoorden = document.getElementById('tiempoorden-editar').value;
         var cbenviogratis = document.getElementById('cbenviogratis-editar').checked;
         var cbminimo = document.getElementById('cbminimo-editar').checked;
         var minimocompra = document.getElementById('minimocompra-editar').value;
@@ -1698,8 +1671,8 @@
       
         var privado = document.getElementById('cbprivado-editar').checked;
 
-        var retorno = validarservicio(comision, multa, tiempo, nombre, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, tiempoorden, minimocompra);
+        var retorno = validarservicio(comision, tiempo, nombre, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+     telefono, latitud, longitud, direccion, minimocompra);
 
      if(retorno){
 
@@ -1746,7 +1719,6 @@
         var formData = new FormData();
         formData.append('id', id);
         formData.append('comision', comision);
-        formData.append('multa', multa);
         formData.append('nombre', nombre);
         formData.append('identificador', identificador);
         formData.append('descripcion', descripcion);
@@ -1759,7 +1731,6 @@
         formData.append('longitud', longitud);
         formData.append('direccion', direccion);
         formData.append('tipovista', tipovista);
-        formData.append('tiempoorden', tiempoorden);
         formData.append('cbenviogratis', cbenviogratis_1);
         formData.append('cbminimo', cbminimo_1);
         formData.append('minimocompra', minimocompra);
@@ -1806,14 +1777,9 @@
         }
     }
 
-    function validarservicio(comision, multa, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, tiempoorden, minimocompra){
+    function validarservicio(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+     telefono, latitud, longitud, direccion, minimocompra){
         
-        if (multa === '') {
-            toastr.error("Multa es requerido");
-            return false;
-        }
-
         if (comision === '') {
             toastr.error("comision es requerido");
             return false;
@@ -1916,11 +1882,6 @@
         
         if (minimocompra === '') {
             toastr.error('Agregar minimo de compra');
-            return false;
-        }
-
-        if (tiempoorden === '') {
-            toastr.error("tiempo orden es requerido");
             return false;
         }
 

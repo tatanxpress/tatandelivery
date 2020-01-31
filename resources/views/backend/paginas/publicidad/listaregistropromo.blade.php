@@ -439,6 +439,10 @@
         $('#modalFiltro').modal('show'); 
     }
 
+    function abrirModalFiltro2(){
+        $('#modalFiltro2').modal('show'); 
+    }
+
     function filtrar(){
         var idservicio = document.getElementById('selectservicio-filtro').value;
         var tipo = document.getElementById('selecttipo-filtro').value;
@@ -452,7 +456,7 @@
         var fecha = document.getElementById('fecha').value;
         
         
-
+        window.open("{{ URL::to('admin/registropromo/reporte2') }}/" + fecha);
     }
  
    </script>

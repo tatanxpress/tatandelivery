@@ -269,7 +269,7 @@ class PagaderoController extends Controller
     public function verHistorial(Request $request){
         if($request->isMethod('post')){
             $reglaDatos = array(
-                'id' => 'required',
+                'id' => 'required', 
                 'fecha1' => 'required',
                 'fecha2' => 'required'
             );
@@ -300,7 +300,7 @@ class PagaderoController extends Controller
                 ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio')
                 ->where('r.revisador_id', $request->id)
                 ->whereBetween('r.fecha', [$start, $end]) 
-                ->orderBy('o.id', 'ASC') 
+                ->orderBy('o.id', 'ASC')
                 ->get();
 
                 $total = 0.0; 

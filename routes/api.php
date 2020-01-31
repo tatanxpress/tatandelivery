@@ -165,7 +165,7 @@ Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizar
 
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
  
- 
+  
 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
@@ -193,7 +193,7 @@ Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas');
 
 // historial de una fecha a otra 
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); // ver historial
-
+ 
 // ver fecha de recorte
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
 

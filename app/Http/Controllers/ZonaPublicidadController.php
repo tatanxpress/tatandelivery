@@ -280,6 +280,31 @@ class ZonaPublicidadController extends Controller
         return $pdf->stream();
     } 
 
+     // reporte para saver que registro va a vencer
+     public function reporte2($fecha){
+      
+        $registro = DB::table('registro_promo AS r')
+        ->join('servicios AS s', 's.id', '=', 'r.servicios_id')      
+        ->select('r.fecha2', 'r.tipo', 's.identificador')
+        ->whereDate('r.fecha2', '=', $fecha)
+        ->orderBy('r.fecha2', 'ASC')
+        ->get(); 
+
+        $conteo = 0;
+        foreach($registro as $o){
+         
+            $conteo = $conteo + 1;
+        } 
+
+      
+ 
+        $view =  \View::make('backend.paginas.reportes.reportepromovencer', compact(['registro', 'conteo']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+ 
+        return $pdf->stream();
+    } 
+
     // informacion de registro de pagos de promocion o publicidad
     public function informacion(Request $request){
         if($request->isMethod('post')){  

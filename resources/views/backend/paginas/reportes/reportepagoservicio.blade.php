@@ -62,11 +62,11 @@
 } 
 
 .oficina{
-    margin-top: 175px;
+    margin-top: 150px;
     font-size: 16px;   
-    padding-right: 75px;    
+    padding-right: 0px;    
     font-family: "Times New Roman", Times, serif;
-    text-align: center;
+    text-align: left;
 }
 
 </style>
@@ -74,9 +74,9 @@
     <div class="row"> 
             <center><p class="titulo">
             REPORTE DE PAGO<br>
-            SERVICIO {{ $nombre }}       
+            SERVICIO: {{ $nombre }}       
             </p>
-            <p><small>De: {{ $f1 }}  Hasta: {{ $f2 }}</small></p></center>           
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
     </div>  
 
         <table id="customers">
@@ -113,6 +113,12 @@
           </tr>
         
         </table>
+
+
+        <p class="oficina">
+        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
+        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
+        </p>
 
 
 </body>

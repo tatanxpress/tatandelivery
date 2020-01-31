@@ -7,13 +7,12 @@
 
 </head>
 <body>
- 
+
 <style> 
 
 .titulo{
-    text-align: center;
     font-size: 20px;
-    font-weight: bold;
+    font-weight: bold;  
     margin-top: 11px;
     font-family: "Times New Roman", Times, serif;   
 }
@@ -21,7 +20,7 @@
 @page { margin: 2cm;  }
     .firstpage { 
       position: absolute;
-      page-break-after: always; 
+      page-break-after: always;  
       top: -50px; // compensating for @page top margin
       width: 100%;
       margin: 0;
@@ -72,60 +71,33 @@
 </style>
     <!-- cabecera -->
     <div class="row"> 
-            <center><p class="titulo">
-            REPORTE DE ORDENES CANCELADAS<br>
-            SERVICIO: {{ $nombre }}
-            </p><p> <font size="3">  De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>      
+            <center><p class="titulo">          
+            REPORTE DE PROMOCIONES O PUBLICIDAD POR VENCER <br>       
+            </p>  
+      </center>
     </div>  
 
         <table id="customers">
-          <tr> 
-            <th># Orden</th>           
-            <th>Fecha orden</th>
-            <th>Cancelado cliente</th>
-            <th>Cancelado propietario</th>
-            <th>Precio orden</th>
-          </tr>
-
-          @foreach($orden as $dato)
-            <tr>
-              <td>{{ $dato->idorden }}</td>             
-              <td>{{ $dato->fecha_orden }}</td>
-              @if($dato->cancelado_cliente == 1)
-              <td>Cancelado</td>
-              @else
-              <td> - </td>
-              @endif
-
-              @if($dato->cancelado_propietario == 1)
-              <td>Cancelado</td>
-              @else
-              <td> - </td>
-              @endif
-
-              <td>{{ $dato->precioorden }}</td>
-            
-            </tr> 
-          @endforeach  
-
           <tr>
-            <td>Total:</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>${{ $totalDinero }}</td>
-          </tr>
+            <th> Num. </th>
+            <th>Identificador Servicio</th>
+            <th>Tipo</th>
           
-          <tr>
-            <td>Total ordenes:</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td> {{ $conteo }} </td>
           </tr>
+
+          @foreach($registro as $dato)
+            <tr>
+              <td> {{ $conteo }} </td>
+              <td>{{ $dato->identificador }}</td>             
+              <td>{{ $dato->tipo }}</td>
+            
+            </tr>  
+          @endforeach  
          
+        
         </table>
 
+          
         
 
 </body>

@@ -11,6 +11,7 @@
                     <th style="width: 20%">Nombre</th> 
                     <th style="width: 10%">Fecha ingreso</th>                     
                     <th style="width: 10%">Activo</th>  
+                    <th style="width: 10%">Disponible</th>  
                     <th style="width: 15%">Teléfono</th>
                     <th style="width: 15%">Opciones</th>            
                 </tr>
@@ -29,7 +30,15 @@
                       @else
                       <span class="badge bg-primary">Activo</span>
                       @endif
+                    </td> 
+                    <td> 
+                      @if($dato->disponibilidad == 0)
+                      <span class="badge bg-danger">No Disponible</span>
+                      @else
+                      <span class="badge bg-primary">Disponible</span>
+                      @endif
                     </td>
+
                     <td>{{ $dato->telefono }}</td>
                    
                     <td>

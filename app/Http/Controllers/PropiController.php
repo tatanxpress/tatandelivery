@@ -26,7 +26,7 @@ class PropiController extends Controller
     public function propitabla(){          
         $propi = DB::table('propietarios AS p')
         ->join('servicios AS s', 's.id', '=', 'p.servicios_id')
-        ->select('p.id', 's.identificador', 'p.nombre AS nombrePropi', 'p.fecha', 'p.activo', 'p.telefono')
+        ->select('p.id', 's.identificador', 'p.nombre AS nombrePropi', 'p.disponibilidad', 'p.fecha', 'p.activo', 'p.telefono')
         ->get();
 
         return view('backend.paginas.propietarios.tablas.tablapropietario', compact('propi'));

@@ -1199,13 +1199,15 @@ class MotoristaController extends Controller
     public function verHistorial(Request $request){
         if($request->isMethod('post')){ 
             $reglaDatos = array(
-                'id' => 'required',
-                'tipo' => 'required'
+                'id' => 'required', 
+                'fecha1' => 'required',
+                'fecha2' => 'required'
             );
 
             $mensajeDatos = array(                                      
                 'id.required' => 'El id motorista es requerido.',
-                'tipo.required' => 'El tipo a buscar es requerido.'
+                'fecha1.required' => 'La fecha1 es requerido.',
+                'fecha2.required' => 'La fecha2 es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
@@ -1217,97 +1219,47 @@ class MotoristaController extends Controller
                     'message' => $validarDatos->errors()->all()
                 ];
             }
-
+ 
             if($p = Motoristas::where('id', $request->id)->first()){
 
-                // buscar fecha actual
-                if($request->tipo == 0){
-                    
-                    $orden = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->whereDate('o.fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-            
-                    foreach($orden as $o){
-                        $fechaOrden = $o->fecha_orden;
-                        $hora = date("h:i A", strtotime($fechaOrden));
-                        $fecha = date("d-m-Y", strtotime($fechaOrden));
-                        $o->fecha_orden = $hora . " " . $fecha;   
-
-                        // nombre servicio
-                        $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
-                        $o->servicio = $nombreservicio;
-
-                        // sacar direccion guardada de la orden
-                        $pack = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-                        $o->direccion = $pack->direccion;
-
-                        // sacar zona de envio
-                        $zona = Zonas::where('id', $pack->zonas_id)->pluck('nombre')->first();
-                        $o->zona = $zona; 
-                    }
-
-                    // sumar ganancia de esta fecha
-                    $suma = collect($orden)->sum('ganancia_motorista');
-                    $ganado = number_format((float)$suma, 2, '.', '');
-                    return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
-                }else{
-
-                    // buscar con la fecha dada. MINIMO PODRAN VER DE HOY MENOS X DIAS
-                    $encontro = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->whereDate('o.fecha_orden', '>', Carbon::now('America/El_Salvador')->subDays(3))
-                    ->get();
-
-                    // encontro un historial en el tiempo permitido. filtrar por la fecha dada
-                    if(count($encontro) > 0){
+                $start = Carbon::parse($request->fecha1)->startOfDay(); 
+                $end = Carbon::parse($request->fecha2)->endOfDay();
                 
-                        $orden = DB::table('motorista_ordenes AS m')
-                        ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                        ->select('o.id', 'o.precio_total', 'o.fecha_orden', 
-                        'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
-                        ->where('o.estado_7', 1) // solo completadas
-                        ->where('m.motoristas_id', $request->id) // del motorista
-                        ->whereDate('o.fecha_orden', '=', Carbon::parse($request->fecha)->toDateString())
-                        ->orderBy('o.id', 'DESC')
-                        ->get();
+                $orden = DB::table('motorista_ordenes AS m')
+                ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                ->select('o.id', 'o.precio_total', 'o.fecha_orden', 
+                'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
+                ->where('o.estado_7', 1) // solo completadas
+                ->where('m.motoristas_id', $request->id) // del motorista
+                ->whereBetween('o.fecha_orden', [$start, $end]) 
+                ->orderBy('o.id', 'DESC')
+                ->get();
 
-                        foreach($orden as $o){
-                            $fechaOrden = $o->fecha_orden;
-                            $hora = date("h:i A", strtotime($fechaOrden));
-                            $fecha = date("d-m-Y", strtotime($fechaOrden));
-                            $o->fecha_orden = $hora . " " . $fecha;
-                            
-                            // nombre servicio
-                            $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
-                            $o->servicio = $nombreservicio;
+                foreach($orden as $o){
+                    $fechaOrden = $o->fecha_orden;
+                    $hora = date("h:i A", strtotime($fechaOrden));
+                    $fecha = date("d-m-Y", strtotime($fechaOrden));
+                    $o->fecha_orden = $hora . " " . $fecha;
+                    
+                    // nombre servicio
+                    $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
+                    $o->servicio = $nombreservicio;
 
-                            // sacar direccion guardada de la orden
-                            $pack = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-                            $o->direccion = $pack->direccion;
+                    // sacar direccion guardada de la orden
+                    $pack = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+                    $o->direccion = $pack->direccion;
 
-                            // sacar zona de envio
-                            $zona = Zonas::where('id', $pack->zonas_id)->pluck('descripcion')->first();
-                            $o->zona = $zona;
-                        }
-
-                        // sumar ganancia de esta fecha
-                        $suma = collect($orden)->sum('ganancia_motorista');
-                        $ganado = number_format((float)$suma, 2, '.', '');
-                        return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
-                    }else{
-                        return ['success' => 1, 'histoorden' => [], 'ganado' => "0.00"];
-                    }                  
+                    // sacar zona de envio
+                    $zona = Zonas::where('id', $pack->zonas_id)->pluck('descripcion')->first();
+                    $o->zona = $zona;
                 }
+
+                // sumar ganancia de esta fecha
+                $suma = collect($orden)->sum('ganancia_motorista');
+                $ganado = number_format((float)$suma, 2, '.', '');
+                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
+            }else{
+                return ['success' => 2];
             }
         }
     }

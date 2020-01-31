@@ -146,7 +146,7 @@ class MotoristaPagoController extends Controller
 
         $servicios = Servicios::all();
         return view('backend.paginas.pagoservicio.listapagoservicio', compact('servicios'));
-    } 
+    }  
 
     // buscador de ordenes de un servicio
     public function buscador($idservicio, $fecha1, $fecha2){
@@ -166,7 +166,7 @@ class MotoristaPagoController extends Controller
             'o.estado_7', 'o.estado_8', 'o.tardio')
             ->where('s.id', $idservicio)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
-            ->get(); 
+            ->get();  
 
             foreach($orden as $o){
                 $fechaOrden = $o->fecha_orden;
@@ -197,9 +197,7 @@ class MotoristaPagoController extends Controller
         ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
         ->select('o.id AS idorden', 'o.precio_total', 'mo.motorista_prestado', 'o.fecha_orden', 'o.estado_5', 'o.estado_8')
         ->where('o.estado_5', 1) // orden preparada por el servicio
-        ->where('o.estado_8', 0)
-        ->where('o.tardio', 0)
-        ->where('mo.motorista_prestado', 0)
+        ->where('o.estado_8', 0)    
         ->where('s.id', $idservicio)
         ->whereBetween('o.fecha_orden', array($date1, $date2))          
         ->get(); 
@@ -305,9 +303,8 @@ class MotoristaPagoController extends Controller
         ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
         ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
         'o.estado_5', 'o.estado_8', 'o.cancelado_cliente', 'o.cancelado_propietario')
-        ->where('o.estado_5', 0) // orden preparada por el servicio
-        ->where('o.estado_8', 1)
-        ->where('o.tardio', 0)
+        ->where('o.estado_5', 0) 
+        ->where('o.estado_8', 1)       
         ->where('s.id', $idservicio)
         ->whereBetween('o.fecha_orden', array($date1, $date2))
         ->get();
@@ -547,10 +544,10 @@ class MotoristaPagoController extends Controller
     }
 
 
+    // reporte de productos vendidos
     public function reporteproductovendido($id, $fecha1, $fecha2){
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');
         $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
-
        
         $f1 = Carbon::parse($fecha1)->format('d-m-Y');
         $f2 = Carbon::parse($fecha2)->format('d-m-Y');
@@ -564,11 +561,10 @@ class MotoristaPagoController extends Controller
         ->whereBetween('o.fecha_orden', array($date1, $date2))
         ->orderBy('o.id', 'ASC')  
         ->get(); 
-
-        //return $orden;
-
+      
         $datos = array();
         $totaldinero = 0;
+        $conteo = 0;
         
         foreach($orden as $fororden){
 
@@ -586,7 +582,7 @@ class MotoristaPagoController extends Controller
                     $dinero = $dinero + $for2->precio;
                     $precio = $for2->precio;
                } 
-            }
+            } 
 
             $seguro = true;
             //antes de agregar verificar, que id producto no exista el mismo            
@@ -598,26 +594,27 @@ class MotoristaPagoController extends Controller
             }             
 
             if($seguro == true){
-                $total = number_format((float)$dinero, 2, '.', '');
+
+                // multiplicar 
+                $multi = $precio * $cantidad;
+                $conteo = $conteo + 1;
+
+                $total = number_format((float)$multi, 2, '.', '');
                 $totaldinero = $totaldinero + $total;
-                $datos[] = array('idproducto' => $idp, 'nombre' => $nombre, 'cantidad' => $cantidad, 'precio' => $precio, 'total' => $total);
-            }
-            
-        }
- 
+                $datos[] = array('idproducto' => $idp, 'nombre' => $nombre, 'conteo' => $conteo, 'cantidad' => $cantidad, 'precio' => $precio, 'total' => $total);
+            }            
+        } 
 
         $data = Servicios::where('id', $id)->first();
         $nombre = $data->nombre;
 
-        $totalDinero = number_format((float)$totaldinero, 2, '.', '');
-
+        $totalDinero = number_format((float)$totaldinero, 2, '.', ''); 
 
         $view =  \View::make('backend.paginas.reportes.reporteproductovendido', compact(['datos', 'totalDinero', 'nombre', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
  
         return $pdf->stream();
-
     }
 
 

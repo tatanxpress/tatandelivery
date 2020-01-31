@@ -65,7 +65,7 @@ Route::prefix('admin')->group(function () {
   Route::post('/activosms/informacion','CodigoTemporalController@informacion');
   Route::post('/activosms/editar','CodigoTemporalController@editar');
   // servicios locales
-  Route::get('/servicios/lista', 'ServiciosController@index');
+  Route::get('/servicios/lista', 'ServiciosController@index'); 
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');
   Route::post('/servicios/nuevo', 'ServiciosController@nuevo'); 
   Route::post('/servicios/informacion/servicio', 'ServiciosController@informacionServicio');
@@ -193,13 +193,13 @@ Route::prefix('admin')->group(function () {
    
   // pago a servicios 
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2'); 
-  Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador');
+  Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador'); // buscar ordenes del servicio
   Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
   Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
-  Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido');
-
+  Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido'); // reporte de productos vendidos
+ 
      
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
@@ -232,11 +232,12 @@ Route::prefix('admin')->group(function () {
   Route::get('/registropromo/tabla/lista', 'ZonaPublicidadController@tablaregistropromo');
   Route::post('/registropromo/nuevo', 'ZonaPublicidadController@nuevoregistro');
   Route::get('/registropromo/reporte/{id}/{id2}', 'ZonaPublicidadController@reporte');
+  Route::get('/registropromo/reporte2/{id}', 'ZonaPublicidadController@reporte2'); // buscar promo por vencer
   Route::post('/registropromo/informacion', 'ZonaPublicidadController@informacion');
   Route::post('/registropromo/editar', 'ZonaPublicidadController@editar');
   // reporte de productos vendidos
  
 
 
-});      
+});       
   

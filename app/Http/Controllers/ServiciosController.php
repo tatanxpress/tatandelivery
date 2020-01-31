@@ -54,7 +54,7 @@ class ServiciosController extends Controller
         if($request->isMethod('post')){  
 
             $regla = array( 
-                'multa' => 'required',
+              
                 'comision' => 'required',
                 'nombre' => 'required',
                 'identificador' => 'required',
@@ -66,7 +66,7 @@ class ServiciosController extends Controller
                 'longitud' => 'required',
                 'direccion' => 'required',
                 'tipovista' => 'required',
-                'tiempoorden' => 'required',
+              
                 'tiempo' => 'required',
 
                 'cbenviogratis' => 'required',
@@ -135,7 +135,6 @@ class ServiciosController extends Controller
             );
 
             $mensaje = array(
-                'multa.required' => 'comision es requerido',
                 'comision.required' => 'comision es requerido',
                 'nombre.required' => 'Nombre es requerido',
                 'identificador.required' => 'identificador es requerido',
@@ -147,7 +146,6 @@ class ServiciosController extends Controller
                 'longitud.required' => 'longitud es requerido',
                 'direccion.required' => 'Direccion es requerida',
                 'tipovista.required' => 'tipo vista es requerido',
-                'tiempoorden.required' => 'tiempo orden es requerido',
                 'tiempo.required' => 'tiempo es requerido',
 
                 'cbenviogratis.required' => 'es requerido 1',
@@ -258,7 +256,7 @@ class ServiciosController extends Controller
                     $fecha = Carbon::now('America/El_Salvador');
                 
                     $tipo = new Servicios();
-                    $tipo->multa = $request->multa;
+                    $tipo->multa = 0;
                     $tipo->comision = $request->comision;
                     $tipo->nombre = $request->nombre;
                     $tipo->identificador = $request->identificador;
@@ -280,7 +278,7 @@ class ServiciosController extends Controller
                     $tipo->minimo = $request->minimocompra;
                     $tipo->utiliza_minimo = $request->cbminimo;
                     $tipo->orden_automatica = $request->cbautomatica;
-                    $tipo->tiempo_orden_max = $request->tiempoorden;
+                    $tipo->tiempo_orden_max = 0;
                     $tipo->producto_visible = $request->cbproducto;
                     $tipo->privado = 0;
                     $tipo->prestar_motorista = 0;
@@ -527,7 +525,7 @@ class ServiciosController extends Controller
             $rules = array( 
                 'id' => 'required',
                 'comision' => 'required',
-                'multa' => 'required',
+              
                 'tiempo' => 'required',
                 'nombre' => 'required',
                 'identificador' => 'required',
@@ -539,7 +537,7 @@ class ServiciosController extends Controller
                 'longitud' => 'required',
                 'direccion' => 'required',
                 'tipovista' => 'required',
-                'tiempoorden' => 'required',
+                
                 'cbenviogratis' => 'required',
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
@@ -553,7 +551,6 @@ class ServiciosController extends Controller
             $messages = array(   
                 'id.required' => 'El id es requerido',
                 'comision.required' => 'comision es requerido',
-                'multa.required' => 'multa es requerido',
                 'tiempo.required' => 'tiempo es requerido',
                 'nombre.required' => 'El nombre es requerido',
                 'identificador.required' => 'El identificador es requerido',
@@ -565,7 +562,6 @@ class ServiciosController extends Controller
                 'longitud.required' => 'longitud requerido',
                 'direccion.required' => 'direccion requerido',
                 'tipovista.required' => 'tipo vista requerida',
-                'tiempoorden.required' => 'tiempo orden requerido',
                 'cbenviogratis.required' => 'check envio gratis requerido',
                 'cbminimo.required' => 'check minimo requerido',
                 'minimocompra.required' => 'minimo compra requerido',
@@ -697,7 +693,6 @@ class ServiciosController extends Controller
                     Servicios::where('id', $request->id)->update([
                         'nombre' => $request->nombre,
                         'comision' => $request->comision,
-                        'multa' => $request->multa,
                         'identificador' => $request->identificador,
                         'descripcion' => $request->descripcion,
                         'descripcion_corta' => $request->descripcioncorta,
@@ -714,7 +709,6 @@ class ServiciosController extends Controller
                         'minimo' => $request->minimocompra,
                         'utiliza_minimo' => $request->cbminimo,
                         'orden_automatica' => $request->cbautomatica,
-                        'tiempo_orden_max' => $request->tiempoorden,
                         'producto_visible' => $request->cbproducto,
                         'privado' => $request->privado]);
 

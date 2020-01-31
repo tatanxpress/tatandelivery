@@ -73,10 +73,10 @@
     <!-- cabecera -->
     <div class="row"> 
             <center><p class="titulo">
-            REPORTE DE PRODUCTO VENDIDOS<br>
-            SERVICIO {{ $nombre }}       
+            REPORTE DE PRODUCTOS VENDIDOS<br>
+            SERVICIO: {{ $nombre }}
             </p>
-            <p><small>De: {{ $f1 }}  Hasta: {{ $f2 }}</small></p></center>           
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
     </div>  
 
         <table id="customers">
@@ -90,7 +90,7 @@
   
           @for($i = 0; $i < count($datos); $i++) {
             <tr>
-              <td>{{ $i }}</td>
+              <td>{{ $datos[$i]['conteo'] }}</td>
               <td>{{ $datos[$i]['nombre'] }}</td>             
               <td>{{ $datos[$i]['cantidad'] }}</td> 
               <td>{{ $datos[$i]['precio'] }}</td>  
@@ -110,11 +110,6 @@
         
         </table>
 
-          <!-- oficina -->
-       
-              <p class="oficina">
-                  Tatan Express
-              </p>
         
 
 </body>

@@ -14,8 +14,7 @@
                     <th style="width: 15%">Fecha orden</th> 
                     <th style="width: 15%">Identi servicio</th> 
                     <th style="width: 15%">Estado 7 (completado)</th>   
-                    <th style="width: 10%">Estado 8 (cancelado)</th>
-                    <th style="width: 15%">Tardio</th>
+                    <th style="width: 10%">Estado 8 (cancelado)</th>                 
                     <th style="width: 15%">Opciones</th>            
                 </tr> 
                 </thead>
@@ -40,14 +39,6 @@
                       <span class="badge bg-primary">No</span>
                       @else
                       <span class="badge bg-danger">Cancelado</span>
-                      @endif
-                    </td>
-
-                    <td> 
-                      @if($dato->tardio == 0)
-                      <span class="badge bg-success">No</span>
-                      @else
-                      <span class="badge bg-danger">Si</span>
                       @endif
                     </td>
 
