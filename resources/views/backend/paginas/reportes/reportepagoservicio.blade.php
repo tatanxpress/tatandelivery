@@ -101,9 +101,9 @@
           </tr>
           
           <tr>
-            <td>Comisión: {{ $comision }}</td>
+            <td>Comisión: {{ $redondear }}%</td>
             <td></td>
-            <td>{{ $suma }}</td>
+            <td>${{ $suma }}</td>
           </tr>
 
           <tr>

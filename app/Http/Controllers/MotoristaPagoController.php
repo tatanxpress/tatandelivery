@@ -225,11 +225,13 @@ class MotoristaPagoController extends Controller
 
         $suma = ($totalDinero * $comision) / 100;   // 5.47
 
+        $redondear = round($suma);
+
         $pagarFinal = $totalDinero - $suma;
 
         $pagar = number_format((float)$pagarFinal, 2, '.', ''); 
  
-        $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'suma', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
+        $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'redondear', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
  
