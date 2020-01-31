@@ -169,7 +169,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/ordenes/ubicacion/{id}', 'OrdenesController@entregaUbicacion'); 
   Route::get('/ordenes/listaproducto/{id}', 'OrdenesController@listaproducto'); 
   Route::get('/ordenes/tabla/producto/{id}', 'OrdenesController@productos'); 
-  // motorista ordenes 
+  // motorista ordenes  
   Route::get('/motoorden/lista', 'OrdenesController@index2');
   Route::get('/motoorden/tabla/lista', 'OrdenesController@tablamotoorden');
   // experiencia 
@@ -194,13 +194,13 @@ Route::prefix('admin')->group(function () {
   // pago a servicios 
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2'); 
   Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador');
-  Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte');
+  Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
   Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido');
 
-    
+     
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
   Route::get('/ordenrevisada/{id}/{id1}/{id2}', 'MotoristaPagoController@buscarOrdenRevisada');

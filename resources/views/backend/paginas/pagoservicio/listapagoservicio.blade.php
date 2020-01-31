@@ -826,12 +826,7 @@
                     $('#fecha2').val(response.data.orden.fecha_2);
                     $('#minutosespera').val(response.data.orden.hora_2);
 
-                    if(response.data.orden.estado_2 == 0){
-                        $("#estado2").prop("checked", false);
-                    }else{
-                        $("#estado2").prop("checked", true);
-                    }
-
+                
                     $('#fecha3').val(response.data.orden.fecha_3);
 
                     if(response.data.orden.estado_3 == 0){
@@ -842,7 +837,7 @@
 
                     $('#fecha4').val(response.data.orden.fecha_4);
 
-                    if(response.data.orden.estado_3 == 0){
+                    if(response.data.orden.estado_4 == 0){
                         $("#estado4").prop("checked", false);
                     }else{
                         $("#estado4").prop("checked", true);
@@ -850,7 +845,7 @@
 
                     $('#fecha5').val(response.data.orden.fecha_5);
 
-                    if(response.data.orden.estado_3 == 0){
+                    if(response.data.orden.estado_5 == 0){
                         $("#estado5").prop("checked", false);
                     }else{
                         $("#estado5").prop("checked", true);
@@ -858,7 +853,7 @@
 
                     $('#fecha6').val(response.data.orden.fecha_6);
 
-                    if(response.data.orden.estado_3 == 0){
+                    if(response.data.orden.estado_6 == 0){
                         $("#estado6").prop("checked", false);
                     }else{
                         $("#estado6").prop("checked", true);
@@ -866,7 +861,7 @@
 
                     $('#fecha7').val(response.data.orden.fecha_7);
 
-                    if(response.data.orden.estado_3 == 0){
+                    if(response.data.orden.estado_7 == 0){
                         $("#estado7").prop("checked", false);
                     }else{
                         $("#estado7").prop("checked", true);
@@ -875,7 +870,7 @@
                     $('#fecha8').val(response.data.orden.fecha_8);
                     $('#mensaje8').val(response.data.orden.mensaje_8);
 
-                    if(response.data.orden.estado_3 == 0){
+                    if(response.data.orden.estado_8 == 0){
                         $("#estado8").prop("checked", false);
                     }else{
                         $("#estado8").prop("checked", true);
@@ -886,21 +881,18 @@
                     }else{
                         $("#visible").prop("checked", true);
                     }
-
                     
                     if(response.data.orden.visible_p == 0){
                         $("#visiblep").prop("checked", false);
                     }else{
                         $("#visiblep").prop("checked", true);
                     }
-
                     
                     if(response.data.orden.visible_p2 == 0){
                         $("#visiblep2").prop("checked", false);
                     }else{
                         $("#visiblep2").prop("checked", true);
                     }
-
                     
                     if(response.data.orden.visible_p3 == 0){
                         $("#visiblep3").prop("checked", false);
