@@ -229,13 +229,13 @@ class MotoristaPagoController extends Controller
 
         $pagar = number_format((float)$pagarFinal, 2, '.', ''); 
  
-        $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
+        $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'suma', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
  
         return $pdf->stream();
     }
-
+ 
     // YA NO UTILIZADO
     public function reportemotoristaprestado($idservicio, $fecha1, $fecha2){
 
