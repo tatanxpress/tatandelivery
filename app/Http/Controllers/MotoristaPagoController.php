@@ -206,7 +206,7 @@ class MotoristaPagoController extends Controller
 
         $dinero = 0;
         foreach($orden as $o){
-
+ 
             //sumar
             $dinero = $dinero + $o->precio_total;
 
@@ -221,13 +221,13 @@ class MotoristaPagoController extends Controller
 
         $totalDinero = number_format((float)$dinero, 2, '.', '');
 
-        $comision = $data->comision;
+        $comision = $data->comision; // 10 
 
-        $suma = $totalDinero * $comision;
+        $suma = ($totalDinero * $comision) / 100;   // 5.47
 
         $pagarFinal = $totalDinero - $suma;
 
-        $pagar = number_format((float)$pagarFinal, 2, '.', '');
+        $pagar = number_format((float)$pagarFinal, 2, '.', ''); 
  
         $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
