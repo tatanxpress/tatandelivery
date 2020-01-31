@@ -103,7 +103,7 @@
           <tr>
             <td>Comisión: {{ $redondear }}%</td>
             <td></td>
-            <td>${{ $suma }}</td>
+            <td>${{ $suma2 }}</td>
           </tr>
 
           <tr>
@@ -114,12 +114,6 @@
         
         </table>
 
-          <!-- oficina -->
-       
-              <p class="oficina">
-                  Tatan Express
-              </p>
-        
 
 </body>
 </html> 
