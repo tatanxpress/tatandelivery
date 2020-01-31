@@ -1131,6 +1131,74 @@ class PropietarioController extends Controller
                         'fecha_2' => $fecha, 'hora_2' => $tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
                         'estado_4' => 1, 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
 
+ 
+                         
+                                                
+                        // mandar notificacion a los motoristas asignados al servicio
+                        $moto = DB::table('motoristas_asignados AS ms')
+                        ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
+                        ->select('m.activo', 'm.disponible', 'ms.servicios_id', 'm.device_id')            
+                        ->where('m.activo', 1)
+                        ->where('m.disponible', 1)
+                        ->where('ms.servicios_id', $or->servicios_id)
+                        ->get();
+
+                        $pilaUsuarios = array();
+                        foreach($moto as $p){  
+                            if(!empty($p->device_id)){
+                                if($p->device_id != "0000"){
+                                    array_push($pilaUsuarios, $p->device_id); 
+                                }
+                            }
+                        }
+
+                        $titulo1 = "Solicitud Nueva";
+                        $mensaje1 = "Se necesita motorista";
+                        $alarma1 = 1;
+                        $color1 = 3;
+                        $icono1 = 2;
+
+                        // NOTIFICACION A LOS MOTORISTAS
+                        if(!empty($pilaUsuarios)){                       
+                            $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                        }else{
+
+                            // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
+                                                
+                            $osp = new OrdenesPendiente;
+                            $osp->ordenes_id = $request->ordenid; 
+                            $osp->fecha = $fecha;
+                            $osp->activo = 1;
+                            $osp->tipo = 3;
+                            $osp->save();
+
+                            // ENVIAR NOTIFICACIONES SOBRE LA ORDEN QUE NO HAY NINGUN MOTORISTA DISPONIBLE
+                            $administradores = DB::table('administradores')
+                            ->where('activo', 1)
+                            ->where('disponible', 1)
+                            ->get();
+
+                            $pilaAdministradores = array();
+                            foreach($administradores as $p){
+                                if(!empty($p->device_id)){
+                                    
+                                    if($p->device_id != "0000"){
+                                        array_push($pilaAdministradores, $p->device_id);
+                                    }                             
+                                }
+                            } 
+
+                                //si no esta vacio 
+                            if(!empty($pilaAdministradores)){
+                                $titulo = "Orden Iniciada sin MOTORISTA";
+                                $mensaje = "Inicio preparacion y no se encuentra motoristas";
+                                $alarma = 1; //sonido alarma
+                                $color = 1; // color rojo
+                                $icono = 1; // campana 
+
+                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
+                            }
+                        } 
     
                     }else{
                         $titulo = "Tiempo de preparación";
