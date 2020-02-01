@@ -1063,12 +1063,9 @@
                 cbcerradodomingo_1 = 1;
             }
 
-
-
             var spinHandle = loadingOverlay().activate();             
             var formData = new FormData();
             formData.append('comision', comision);
-            formData.append('multa', multa);
             formData.append('nombre', nombre);
             formData.append('identificador', identificador);
             formData.append('descripcion', descripcion);
@@ -1684,8 +1681,6 @@
         var activo = 0;
       
         var privado_1 = 0;
-
-       
 
         if(privado){
             privado_1 = 1;
