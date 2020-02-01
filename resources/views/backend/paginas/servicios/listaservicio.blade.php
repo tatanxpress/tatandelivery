@@ -1078,7 +1078,7 @@
             formData.append('longitud', longitud);
             formData.append('direccion', direccion);
             formData.append('tipovista', tipovista);
-            formData.append('tiempoorden', tiempoorden);
+            
             formData.append('cbenviogratis', cbenviogratis_1);
             formData.append('cbminimo', cbminimo_1);
             formData.append('minimocompra', minimocompra);
@@ -1628,7 +1628,7 @@
                     $('#latitud-editar').val(response.data.servicio.latitud);
                     $('#longitud-editar').val(response.data.servicio.longitud);
                     $('#direccion-editar').val(response.data.servicio.direccion);
-                    $('#tiempoorden-editar').val(response.data.servicio.tiempo_orden_max);
+                    
 
                 }else{
                     toastr.error('Tipo servicio no encontrado');
