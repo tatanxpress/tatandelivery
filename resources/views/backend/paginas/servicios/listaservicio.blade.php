@@ -1638,7 +1638,7 @@
                 loadingOverlay().cancel(spinHandle);
                 toastr.error('Error del servidor');
         });        
-    }
+    }   
 
     // editar servicio
     function editarservicio(){
