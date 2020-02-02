@@ -121,7 +121,7 @@
 
                                 <div class="form-group">
                                     <label>Cantidad por orden</label>
-                                    <input type="number" min="0" max="100" class="form-control" id="cantidadorden-nuevo">
+                                    <input type="number" value="0" min="0" max="100" class="form-control" id="cantidadorden-nuevo">
                                 </div>
 
                                 <div class="form-group">
@@ -439,7 +439,7 @@
         }
 
         if(cantidadorden === ''){
-            toastr.error("cantidadorden es requerido"); // limite de pedir un producto por orden
+            toastr.error("cantidad orden es requerido"); // limite de pedir un producto por orden
             return;
         }
 
