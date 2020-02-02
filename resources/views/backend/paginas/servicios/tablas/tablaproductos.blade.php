@@ -7,13 +7,14 @@
             <table id="table" class="table table-bordered">
                   <thead>
                     <tr>
-                    <th style="width: 15%">ID</th>
+                    <th style="width: 10%">ID</th>
                     <th style="width: 15%">Nombre</th>
                     <th style="width: 20%">Descripcion</th>
                     <th style="width: 10%">Precio</th>
                     <th style="width: 15%">Disponibilidad</th>
                     <th style="width: 10%">Activo</th>
                     <th style="width: 15%">Usa Cantidad</th>
+                    <th style="width: 10%">Promocion</th>
                     <th style="width: 10%">Posicion</th>
                     <th style="width: 15%">Opciones</th>
                     </tr>
@@ -42,6 +43,14 @@
                     </td>
                     <td> 
                       @if($dato->utiliza_cantidad == 0)
+                      <span class="badge bg-danger">No</span>
+                      @else
+                      <span class="badge bg-success">Si</span>
+                      @endif
+                    </td>
+
+                    <td> 
+                      @if($dato->es_promocion == 0)
                       <span class="badge bg-danger">No</span>
                       @else
                       <span class="badge bg-success">Si</span>

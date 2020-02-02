@@ -38,7 +38,7 @@ class ProductoController extends Controller
         
         $producto = DB::table('producto AS p')
         ->join('servicios_tipo AS s', 's.id', '=', 'p.servicios_tipo_id')
-        ->select('p.id', 'p.nombre', 'p.descripcion', 'p.posicion', 'p.precio', 'p.disponibilidad', 'p.activo', 'p.utiliza_cantidad')
+        ->select('p.id', 'p.nombre', 'p.descripcion', 'p.posicion', 'p.precio', 'p.es_promocion', 'p.disponibilidad', 'p.activo', 'p.utiliza_cantidad')
         ->where('s.id', $id)
         ->orderBy('p.posicion', 'ASC')
         ->get();

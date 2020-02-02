@@ -180,7 +180,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Logo</label>
-                                        <p>Tamaño recomendado de:</p>
+                                        <p>Tamaño recomendado de: 100x100</p>
                                     </div>
                                     <br>
                                     <div class="col-md-10">
@@ -190,7 +190,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
-                                        <p>Tamaño recomendado de:</p>
+                                        <p>Tamaño recomendado de: 600x300</p>
                                     </div> 
                                     <br>
                                     <div class="col-md-10">
@@ -402,7 +402,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Logo</label>
-                                        <p>Tamaño recomendado de:</p>
+                                        <p>Tamaño recomendado de: 100x100</p>
                                     </div>
                                     <br>
                                     <div class="col-md-10">
@@ -420,7 +420,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
-                                        <p>Tamaño recomendado de:</p>
+                                        <p>Tamaño recomendado de: 600x300</p>
                                     </div> 
                                     <br>
                                     <div class="col-md-10">
@@ -610,7 +610,6 @@ $(function() {
     }
 
     function modalPublicidad(){
-        document.getElementById("formulario-editarpublicidad").reset();
         $('#modalAgregarPublicidad').modal('show');
     }
 
@@ -1050,6 +1049,15 @@ $(function() {
 
     function informacion(id){
         document.getElementById("formulario-publicidad").reset();
+        document.getElementById("formulario-editarpublicidad").reset();
+
+        // resetear campo imagen
+        document.getElementById("imagenlogo-editar").value = "";
+        document.getElementById("imagen-editar").value = "";
+        document.getElementById("imagenlogo-e").value = "";
+        document.getElementById("imagen-e").value = "";
+
+
         spinHandle = loadingOverlay().activate();
        
         axios.post('/admin/publicidad/informacion',{
