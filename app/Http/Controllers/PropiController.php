@@ -157,11 +157,17 @@ class PropiController extends Controller
             }
 
             if(Propietarios::where('id', $request->id)->first()){
+
+
                 if(Propietarios::where('correo', $request->correo)->where('id', '!=', $request->id)->first()){
                     return [
                         'success' => 1 //correo ya registrado
                     ]; 
                 }
+
+                if(Propietarios::where('telefono', $request->telefono)->where('id', '!=', $request->id)->first()){
+                    return ['success' => 4];
+                } 
     
                 Propietarios::where('id', $request->id)->update([
                     'nombre' => $request->nombre,

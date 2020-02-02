@@ -91,7 +91,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/zonaservicios/{id}/{id1}', 'ZonaServiciosController@filtrado');
   Route::get('/zonaservicios/tabla/{id}/{id1}', 'ZonaServiciosController@tablaFiltrado');
   Route::post('/zonaservicios/ordenar', 'ZonaServiciosController@ordenar'); 
-   
+    
   // productos
   Route::get('/productos/{id}', 'ProductoController@index');  
   Route::get('/productos/tablas/{id}', 'ProductoController@tablaProductos');

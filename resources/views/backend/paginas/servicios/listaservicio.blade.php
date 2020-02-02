@@ -90,7 +90,7 @@
                                         <div class="form-group">
                                             <div>
                                                 <label>Imagen</label>
-                                                <p>Tamaño recomendado de: 600 x -</p>
+                                                <p>Tamaño recomendado de: 600 x 300</p>
                                             </div> 
                                             <br>
                                             <div class="col-md-10">
@@ -484,8 +484,8 @@
                             </div>
                             <div class="form-group">
                                 <div>
-                                    <label>Imagen</label>
-                                    <p>Tamaño recomendado de: 600 x 600</p>
+                                    <label>Imagen</label>d
+                                    <p>Tamaño recomendado de: 600 x 300</p>
                                 </div> 
                                 <br>
                                 <div class="col-md-10">
