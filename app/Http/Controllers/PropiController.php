@@ -166,7 +166,7 @@ class PropiController extends Controller
                 }
 
                 if(Propietarios::where('telefono', $request->telefono)->where('id', '!=', $request->id)->first()){
-                    return ['success' => 4];
+                    return ['success' => 3];
                 } 
     
                 Propietarios::where('id', $request->id)->update([
@@ -180,7 +180,7 @@ class PropiController extends Controller
     
                 return ['success' => 2];
             }else{
-                return ['success' => 3];
+                return ['success' => 4];
             }
         }  
     }
