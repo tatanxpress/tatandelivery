@@ -87,7 +87,7 @@
 
                                 <div class="form-group">
                                     <label>Unidades</label>
-                                    <input type="number" min="0" max="100" class="form-control" id="unidades-nuevo">
+                                    <input type="number" value="0" min="0" max="100" class="form-control" id="unidades-nuevo">
                                 </div>
 
                                 <div class="form-group">

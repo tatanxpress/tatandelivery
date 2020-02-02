@@ -610,7 +610,7 @@ $(function() {
     }
 
     function modalPublicidad(){
-        document.getElementById("formulario-publicidad").reset();
+        document.getElementById("formulario-editarpublicidad").reset();
         $('#modalAgregarPublicidad').modal('show');
     }
 
@@ -1049,6 +1049,7 @@ $(function() {
     }
 
     function informacion(id){
+        document.getElementById("formulario-publicidad").reset();
         spinHandle = loadingOverlay().activate();
        
         axios.post('/admin/publicidad/informacion',{
