@@ -262,7 +262,10 @@ class AdminController extends Controller
         }
     }
 
-
+    // para envio de notificaciones
+    public function vistanotificacion(){
+        return view('backend.paginas.notificacion.listanotificacion'); 
+    }
    
 
 

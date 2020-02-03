@@ -957,7 +957,7 @@ class MotoristaController extends Controller
 
                     $titulo = "Orden Completada";
                     $mensaje = "Muchas gracias por su compra";
-                    $alarma = 2;
+                    $alarma = 2; 
                     $color = 2;
                     $icono = 4;
 
@@ -1304,7 +1304,7 @@ class MotoristaController extends Controller
             }
         }
     }
-
+ 
        // ordene pediente de pago
        public function pendientePago(Request $request){
         if($request->isMethod('post')){ 

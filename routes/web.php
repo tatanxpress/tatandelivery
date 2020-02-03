@@ -125,13 +125,13 @@ Route::prefix('admin')->group(function () {
   Route::post('/productopromocion/borrar', 'ProductoPublicidadController@borrar');
   Route::post('/productopromocion/revision', 'ProductoPublicidadController@revision');
   Route::post('/promo/producto/nuevo', 'ProductoPublicidadController@nuevo');
-  // propietarios
+  // propietarios 
   Route::get('/propietarios/lista', 'PropiController@index');
   Route::get('/propietarios/tabla/lista', 'PropiController@propitabla');
   Route::post('/propietarios/nuevo', 'PropiController@nuevo'); 
   Route::post('/propietarios/informacion', 'PropiController@informacion');
   Route::post('/propietarios/editar', 'PropiController@editar');
-  // motoristas
+  // motoristas 
   Route::get('/motoristas/lista', 'MotoristaController@index');
   Route::get('/motoristas/tabla/lista', 'MotoristaController@mototabla');
   Route::post('/motoristas/nuevo', 'MotoristaController@nuevo');
@@ -235,9 +235,9 @@ Route::prefix('admin')->group(function () {
   Route::get('/registropromo/reporte2/{id}', 'ZonaPublicidadController@reporte2'); // buscar promo por vencer
   Route::post('/registropromo/informacion', 'ZonaPublicidadController@informacion');
   Route::post('/registropromo/editar', 'ZonaPublicidadController@editar');
-  // reporte de productos vendidos
+  // envio de notificaciones
+  Route::get('/notificacion/vista', 'AdminController@vistanotificacion'); 
  
-
-
+ 
 });       
   

@@ -86,7 +86,7 @@ Route::post('propietario/nueva/ordenes', 'Api\PropietarioController@nuevaOrdenes
 Route::post('propietario/ver/productos', 'Api\PropietarioController@verProductosOrden'); // ver productos de la orden
 Route::post('propietario/ver/producto/individual', 'Api\PropietarioController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('propietario/ver/orden/id', 'Api\PropietarioController@verOrdenPorID'); // ver estados orden por id
-  
+   
 // procesar ordenes
 Route::post('propietario/proceso/orden/estado-2', 'Api\PropietarioController@procesarOrdenEstado2'); // dar tiempo de espera *
 Route::post('propietario/proceso/orden/estado-4', 'Api\PropietarioController@procesarOrdenEstado4'); // iniciar preparacion, avisa a motoristas
@@ -148,7 +148,7 @@ Route::post('motorista/ver/productos', 'Api\MotoristaController@verProductosOrde
 Route::post('motorista/ver/producto/individual', 'Api\MotoristaController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('motorista/obtener/orden', 'Api\MotoristaController@obtenerOrden'); // motorista obtiene la orden
 
-// orden proceso 
+// orden proceso  
 Route::post('motorista/orden/proceso', 'Api\MotoristaController@verProcesoOrdenes'); // ver orden en proce
 Route::post('motorista/orden/procesoentrega', 'Api\MotoristaController@verProcesoOrdenesEntrega'); // ver orden en proce
 
@@ -165,7 +165,7 @@ Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizar
 
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
  
-  
+   
 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago

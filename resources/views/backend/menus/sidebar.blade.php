@@ -288,7 +288,26 @@
             </ul>
           </li>
 
-         
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fa fa fa-globe"></i>
+              <p>
+                Generales
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ url('/admin/notificacion/vista') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Notificaciones Global</p>
+                </a>
+              </li>
+
+           
+                           
+            </ul>
+          </li>
 
          
         </ul>

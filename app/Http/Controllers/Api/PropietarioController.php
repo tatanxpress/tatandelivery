@@ -933,7 +933,7 @@ class PropietarioController extends Controller
             $producto = DB::table('ordenes AS o')
                         ->join('ordenes_descripcion AS od', 'od.ordenes_id', '=', 'o.id')
                         ->join('producto AS p', 'p.id', '=', 'od.producto_id')
-                        ->select('od.id AS productoID', 'p.nombre', 'p.utiliza_imagen', 'p.imagen', 'od.precio', 'od.cantidad')
+                        ->select('od.id AS productoID', 'p.nombre', 'od.nota', 'p.utiliza_imagen', 'p.imagen', 'od.precio', 'od.cantidad')
                         ->where('o.id', $request->ordenid)
                         ->get();
             
