@@ -631,7 +631,7 @@ class MotoristaController extends Controller
                             // evitar orden con motorista ya asignado
                             if(MotoristaOrdenes::where('ordenes_id', $request->ordenid)->first()){
                                 return ['success' => 3];    
-                            }
+                            } 
 
                             // ACTUALIZAR 
                             Ordenes::where('id', $request->ordenid)->update(['visible_m' => 1]);
@@ -945,7 +945,7 @@ class MotoristaController extends Controller
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){
 
-                if($or->estado_7 == 0){
+                //if($or->estado_7 == 0){
 
                     $fecha = Carbon::now('America/El_Salvador');
                     Ordenes::where('id', $request->ordenid)->update(['estado_7' => 1,
@@ -962,13 +962,14 @@ class MotoristaController extends Controller
                     $icono = 4;
 
                     if(!empty($device)){
-                        $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono); 
-                    }
+                        return $device;
+                       // $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono); 
+                    } 
 
                     return ['success' => 1]; // orden completada
-                }else{
+                /*}else{
                     return ['success' => 2]; // ya habia seteado el campo
-                }
+                }*/
             }else{
                 return ['success' => 3];
             }

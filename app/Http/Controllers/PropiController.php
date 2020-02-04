@@ -16,7 +16,7 @@ class PropiController extends Controller
         $this->middleware('auth:admin');
     }
  
-    public function index(){
+    public function index(){ 
 
         $servicios = Servicios::all();
         return view('backend.paginas.propietarios.listapropietario', compact('servicios'));

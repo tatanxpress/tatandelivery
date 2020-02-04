@@ -147,25 +147,25 @@ Route::post('motorista/ver/orden/id', 'Api\MotoristaController@verOrdenPorID'); 
 Route::post('motorista/ver/productos', 'Api\MotoristaController@verProductosOrden'); // ver productos de la orden
 Route::post('motorista/ver/producto/individual', 'Api\MotoristaController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('motorista/obtener/orden', 'Api\MotoristaController@obtenerOrden'); // motorista obtiene la orden
-
-// orden proceso  
+ 
+// orden proceso
 Route::post('motorista/orden/proceso', 'Api\MotoristaController@verProcesoOrdenes'); // ver orden en proce
 Route::post('motorista/orden/procesoentrega', 'Api\MotoristaController@verProcesoOrdenesEntrega'); // ver orden en proce
-
+ 
 Route::post('motorista/ver/orden/proceso/id', 'Api\MotoristaController@verOrdenProcesoPorID'); // ver estados orden proceso por id
 Route::post('motorista/iniciar/entrega', 'Api\MotoristaController@iniciarEntrega'); // iniciar entrega de la orden
 Route::post('motorista/finalizar/entrega', 'Api\MotoristaController@finalizarEntrega'); // finalizar entrega de la orden
 Route::post('motorista/borrar/orden/cancelada', 'Api\MotoristaController@borrarOrdenCancelada'); // borrar orden cancelada
-
+  
 Route::post('motorista/info/cuenta', 'Api\MotoristaController@informacionCuenta'); // informacion cuenta
 Route::post('motorista/info/disponibilidad', 'Api\MotoristaController@informacionDisponibilidad'); // informacion de disponibilidad
 Route::post('motorista/cambiar/correo', 'Api\MotoristaController@cambiarCorreo'); // cambiar correo cuenta
 Route::post('motorista/guadar/configuracion', 'Api\MotoristaController@modificarDisponibilidad'); // guarda configuracion
 Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizarPassword'); // actualizar contraseña
-
+ 
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
  
-   
+    
 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
