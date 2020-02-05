@@ -27,11 +27,9 @@ class Servicios extends Model
         'minimo', 
         'utiliza_minimo', 
         'orden_automatica', 
-        'tiempo',
-        'tiempo_orden_max',
+        'tiempo',     
         'producto_visible',
-        'comision',
-        'prestar_motorista'
+        'comision'      
     ];
 }
  

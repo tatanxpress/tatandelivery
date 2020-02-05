@@ -60,10 +60,10 @@ Route::prefix('admin')->group(function () {
   Route::post('/cliente/direcciones/informacion','ClientesController@infoDireccion');
   Route::get('/cliente/ubicacion/{id}', 'ClientesController@clienteUbicacion');
  // codigo temporal
-  Route::get('/codigotemporal/lista', 'CodigoTemporalController@index');
-  Route::get('/codigotemporal/tabla/codigo', 'CodigoTemporalController@codigotabla');
-  Route::post('/activosms/informacion','CodigoTemporalController@informacion');
-  Route::post('/activosms/editar','CodigoTemporalController@editar');
+  //Route::get('/codigotemporal/lista', 'CodigoTemporalController@index');
+  //Route::get('/codigotemporal/tabla/codigo', 'CodigoTemporalController@codigotabla');
+  //Route::post('/activosms/informacion','CodigoTemporalController@informacion');
+ // Route::post('/activosms/editar','CodigoTemporalController@editar');
   // servicios locales
   Route::get('/servicios/lista', 'ServiciosController@index'); 
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');

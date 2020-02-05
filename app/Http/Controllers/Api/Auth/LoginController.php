@@ -13,7 +13,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Hash;
-use App\ActivoSms;
+
 
 class LoginController extends Controller
 {

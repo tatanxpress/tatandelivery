@@ -256,7 +256,7 @@ class ServiciosController extends Controller
                     $fecha = Carbon::now('America/El_Salvador');
                 
                     $tipo = new Servicios();
-                    $tipo->multa = 0;
+                 
                     $tipo->comision = $request->comision;
                     $tipo->nombre = $request->nombre;
                     $tipo->identificador = $request->identificador;
@@ -281,7 +281,7 @@ class ServiciosController extends Controller
                     $tipo->tiempo_orden_max = 0;
                     $tipo->producto_visible = $request->cbproducto;
                     $tipo->privado = 0;
-                    $tipo->prestar_motorista = 0;
+                   
 
                     $tipo->save();
 

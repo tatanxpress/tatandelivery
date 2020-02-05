@@ -98,7 +98,7 @@
 <script> 
 
     // ver disponibilidad de envio sms
-    function verInformacion(){
+    /*function verInformacion(){
         spinHandle = loadingOverlay().activate();
         
         axios.post('/admin/activosms/informacion',{
@@ -122,10 +122,10 @@
                 loadingOverlay().cancel(spinHandle); 
                 toastr.error('Error del servidor');    
         });
-    }
+    }*/
  
     // editar tipo activo sms api
-    function editar(){
+   /* function editar(){
             
         var toggleactivo = document.getElementById('toggle-activo').checked;
 
@@ -148,7 +148,7 @@
             loadingOverlay().cancel(spinHandle); 
             toastr.error('Error');             
         });        
-    }
+    }*/
 
     // respuesta al editar 
     function respuestaEditar(response){
