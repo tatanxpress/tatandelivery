@@ -45,9 +45,9 @@ class DashboardController extends Controller
         ->where('activo', 1)
         ->count();
 
-        $totalordentardio = DB::table('ordenes')
+        /*$totalordentardio = DB::table('ordenes')
         ->where('tardio', 1)
-        ->count();
+        ->count();*/
 
         $totalordencanceladacliente = DB::table('ordenes')
         ->where('cancelado_cliente', 1)

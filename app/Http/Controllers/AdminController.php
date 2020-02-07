@@ -55,10 +55,10 @@ class AdminController extends Controller
                     'message' => $validar->errors()->all()
                 ]; 
             }  
-
+ 
             if(Administradores::where('telefono', $request->telefono)->first()){
                 return ['success' => 2];
-            }
+            } 
  
             $m = new Administradores();
             $m->nombre = $request->nombre;
@@ -66,7 +66,7 @@ class AdminController extends Controller
             $m->device_id = "0000";
             $m->password = bcrypt('12345678');
             $m->activo = 1;
-            $m->disponible = 0;
+            $m->disponible = 1;
            
             if($m->save()){ 
 
@@ -136,7 +136,6 @@ class AdminController extends Controller
                     'message' => $validar->errors()->all()
                 ]; 
             }  
- 
            
             if($a = Administradores::where('id', $request->id)->first()){
 

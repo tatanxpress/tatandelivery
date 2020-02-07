@@ -253,7 +253,7 @@ class MotoristaController extends Controller
     // ver nuevas ordenes, cuando inicia la preparacion
     public function nuevaOrdenes(Request $request){
         if($request->isMethod('post')){   
-            $rules = array(                
+            $rules = array( 
                 'id' => 'required',
             );
 
@@ -591,10 +591,9 @@ class MotoristaController extends Controller
                     ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
                     'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
-                    'mo.fecha_agarrada',  'mo.motorista_prestado')
+                    'mo.fecha_agarrada', )
                     ->where('mo.motoristas_id', $mo->id)
-                    ->where('o.estado_5', 1) // orden preparada
-                    ->where('mo.motorista_prestado', 0) 
+                    ->where('o.estado_5', 1) // orden preparada                   
                     ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
                     ->get(); 
 
@@ -638,13 +637,13 @@ class MotoristaController extends Controller
 
                             $fecha = Carbon::now('America/El_Salvador');
 
-                            $datos = Servicios::where('id', $or->servicios_id)->first();
+                           
                             
                             $nueva = new MotoristaOrdenes;
                             $nueva->ordenes_id = $or->id;
                             $nueva->motoristas_id = $request->id;
                             $nueva->fecha_agarrada = $fecha;
-                            $nueva->motorista_prestado = $datos->prestar_motorista;
+                            
 
                             $nueva->save();
 
@@ -888,8 +887,8 @@ class MotoristaController extends Controller
                 }
 
                 // orden ya fue preparada por el propietario
-                if($or->estado_5 == 1){
-
+                if($or->estado_5 == 1 && $or->estado_6 == 0){
+ 
                     $fecha = Carbon::now('America/El_Salvador');
                     Ordenes::where('id', $request->ordenid)->update(['estado_6' => 1,
                     'fecha_6' => $fecha]);
@@ -902,11 +901,12 @@ class MotoristaController extends Controller
                     $mensaje = "El motorista va encamino";
                     $alarma = 2;
                     $color = 3;
-                    $icono = 2;
+                    $icono = 2; 
+                    $tipo = 2;
 
                     // CLIENTE SIEMPRE TENDRA DEVICE_ID
                     if(!empty($device)){
-                    $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono); 
+                        $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono, $tipo); 
                     }
 
                     return ['success' => 1]; //orden va en camino
@@ -945,7 +945,7 @@ class MotoristaController extends Controller
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){
 
-                //if($or->estado_7 == 0){
+                if($or->estado_7 == 0){ 
 
                     $fecha = Carbon::now('America/El_Salvador');
                     Ordenes::where('id', $request->ordenid)->update(['estado_7' => 1,
@@ -960,16 +960,16 @@ class MotoristaController extends Controller
                     $alarma = 2; 
                     $color = 2;
                     $icono = 4;
+                    $tipo = 2; //cliente 
 
                     if(!empty($device)){
-                        return $device;
-                       // $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono); 
+                        $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono, $tipo); 
                     } 
 
                     return ['success' => 1]; // orden completada
-                /*}else{
+                }else{ 
                     return ['success' => 2]; // ya habia seteado el campo
-                }*/
+                }
             }else{
                 return ['success' => 3];
             }
@@ -1343,7 +1343,7 @@ class MotoristaController extends Controller
                 ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'mo.fecha_agarrada', 
                 'o.servicios_id', 'o.estado_8')
                 ->where('mo.motoristas_id', $request->id)
-                ->where('mo.motorista_prestado', 0)
+               
                 ->where('o.estado_8', 0)
                 ->whereNotIn('o.id', $pilaOrden)
                 ->get();
@@ -1376,7 +1376,7 @@ class MotoristaController extends Controller
     } 
 
 
-    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono){
-        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
+    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
+        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
     }
 } 

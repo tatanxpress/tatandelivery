@@ -79,14 +79,15 @@ class MotoristaPagoController extends Controller
                     'success' => 0, 
                     'message' => $validar->errors()->all()
                 ];
-            }  
+            }   
 
-           // return $request->all();
+            $fecha = Carbon::now('America/El_Salvador');
 
             $m = new MotoristaPago();
             $m->motorista_id = $request->id;
             $m->fecha1 = $request->fecha1;
             $m->fecha2 = $request->fecha2;
+            $m->fecha = $fecha;
             $m->pago = $request->pago;
             
             if($m->save()){
@@ -95,7 +96,7 @@ class MotoristaPagoController extends Controller
                 return ['success' => 2];
             }                    
         }        
-    }
+    } 
 
     // ver cuanto se le ha pagado a un servicio en total
     public function totalpagadomotorista(Request $request){
@@ -148,7 +149,7 @@ class MotoristaPagoController extends Controller
         return view('backend.paginas.pagoservicio.listapagoservicio', compact('servicios'));
     }  
 
-    // buscador de ordenes de un servicio
+    // buscador de ordenes completas de un servicio
     public function buscador($idservicio, $fecha1, $fecha2){
     
         if(Servicios::where('id', $idservicio)->first()){
@@ -162,9 +163,10 @@ class MotoristaPagoController extends Controller
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
             ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
             ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
-            's.identificador AS identiservicio', 
-            'o.estado_7', 'o.estado_8', 'o.tardio')
+            's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5')
             ->where('s.id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
             ->get();  
 
@@ -181,7 +183,7 @@ class MotoristaPagoController extends Controller
         }
     }
          
-    // reporte para pagar a servicios
+    // reporte de ordenes completadas para pagar a servicios
     function reporte($idservicio, $fecha1, $fecha2){
 
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');
@@ -195,7 +197,7 @@ class MotoristaPagoController extends Controller
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
         ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-        ->select('o.id AS idorden', 'o.precio_total', 'mo.motorista_prestado', 'o.fecha_orden', 'o.estado_5', 'o.estado_8')
+        ->select('o.id AS idorden', 'o.precio_total',  'o.fecha_orden', 'o.estado_5', 'o.estado_8')
         ->where('o.estado_5', 1) // orden preparada por el servicio
         ->where('o.estado_8', 0)    
         ->where('s.id', $idservicio)
@@ -236,55 +238,6 @@ class MotoristaPagoController extends Controller
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
  
         return $pdf->stream();
-    }
- 
-    // YA NO UTILIZADO
-    public function reportemotoristaprestado($idservicio, $fecha1, $fecha2){
-
-        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
-        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
-
-        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
-        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
-
-        $orden = DB::table('motorista_ordenes AS mo')
-        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-        ->select('o.id AS idorden', 'o.precio_total', 'mo.motorista_prestado',
-        'o.fecha_orden', 'o.estado_5', 'o.estado_8', 'm.nombre', 'o.precio_envio')
-        ->where('o.estado_5', 1) // orden preparada por el servicio
-        ->where('o.estado_8', 0)
-        ->where('o.tardio', 0)
-        ->where('mo.motorista_prestado', 1)
-        ->where('s.id', $idservicio)
-        ->whereBetween('o.fecha_orden', array($date1, $date2))          
-        ->get(); 
-
-        $dinero = 0;
-        foreach($orden as $o){
-
-            //sumar
-            $dinero = $dinero + $o->precio_envio;
-
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $fecha1 . " " . $hora1;            
-        }
-
-        $totalDinero = number_format((float)$dinero, 2, '.', '');
-
-        $data = Servicios::where('id', $idservicio)->first();
-        $nombre = $data->nombre;
- 
-        $view =  \View::make('backend.paginas.reportes.reportemotoristaprestado', compact(['orden', 'nombre', 'totalDinero', 'f1', 'f2']))->render();
-        $pdf = \App::make('dompdf.wrapper');
-        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
-  
-        return $pdf->stream();
-
     }
  
      // reporte para ordenes canceladas
@@ -335,71 +288,6 @@ class MotoristaPagoController extends Controller
  
         return $pdf->stream();
     }
-
-    // pdf para ordenes tardias
-    function reporte2($idservicio, $fecha1, $fecha2){
-
-        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
-        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
-
-        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
-        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
-
-        $orden = DB::table('motorista_ordenes AS mo')
-        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-        ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 'o.estado_5',
-                'o.hora_2', 'fecha_4', 'o.fecha_tardio')
-        ->where('o.estado_5', 1) // orden preparada por el servicio
-        ->where('s.id', $idservicio)
-        ->where('o.tardio', 1) 
-        ->whereBetween('o.fecha_orden', array($date1, $date2))          
-        ->get(); 
-        
-        $conteo = 0;
-        $dinero = 0;
-        foreach($orden as $o){
-
-            $conteo = $conteo + 1;
-            //sumar
-            $dinero = $dinero + $o->precio_total;
-
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $fecha1 . " " . $hora1;  
-
-            $fechatardio = $o->fecha_tardio;
-            $horat = date("h:i A", strtotime($fechatardio));
-            $fechat = date("d-m-Y", strtotime($fechatardio));
-            $o->fecha_tardio = $fechat . " " . $horat; 
-
-            $time1 = Carbon::parse($o->fecha_4);
-            $horaEstimada = $time1->addMinute($o->hora_2)->format('d-m-Y h:i A ');
-            $o->horaEstimada = $horaEstimada; 
-        } 
-
-        $data = Servicios::where('id', $idservicio)->first();
-        $nombre = $data->nombre;
-
-        $totalDinero = number_format((float)$dinero, 2, '.', '');
-
-        $multa = $data->multa;
-
-        $pagarFinal = $conteo * $multa;
-
-        $pagar = number_format((float)$pagarFinal, 2, '.', '');
-
-
-        $view =  \View::make('backend.paginas.reportes.reporteordentardia', compact(['orden', 'conteo', 'totalDinero', 'nombre', 'pagar', 'multa', 'f1', 'f2']))->render();
-        $pdf = \App::make('dompdf.wrapper');
-        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
- 
-        return $pdf->stream();
-    }
-
 
     //** REVISAR ORDENES REVISADAS POR RECOLECTORES DE DINERO */
 
@@ -465,11 +353,9 @@ class MotoristaPagoController extends Controller
         ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
         ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
-         'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
-         'mo.fecha_agarrada',  'mo.motorista_prestado')
+         'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 'mo.fecha_agarrada')
         ->where('mo.motoristas_id', $id)
-        ->where('o.estado_5', 1) // orden preparada
-        ->where('mo.motorista_prestado', 0) // este dinero es entregado al servicio de un solo
+        ->where('o.estado_5', 1) // orden preparada        
         ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
         ->get(); 
 
@@ -477,7 +363,7 @@ class MotoristaPagoController extends Controller
         $sum = 0.0;
         foreach($ordenid as $o){
             $fechaagarrada = $o->fecha_agarrada;
-            $hora = date("h:i A", strtotime($fechaagarrada));
+            $hora = date("h:i A", strtotime($fechaagarrada)); 
             $fecha = date("d-m-Y", strtotime($fechaagarrada));
             $o->fecha_agarrada = $fecha . " " . $hora;  
  

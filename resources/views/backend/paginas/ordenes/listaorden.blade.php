@@ -256,17 +256,7 @@
 
                                   <!-- -->
 
-                                  <div class="form-group">
-                                    <label>Orden tardia (cliente cancelo por tardio)</label>
-                                    <br>
-                                    <input type="checkbox" id="ordentardia" disabled>
-                                </div>
 
-                                <div class="form-group">
-                                    <label>Fecha tardio (hora de cancelado por tardio)</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fechatardio" disabled>
-                                </div>
 
                                   <!-- -->
 
@@ -470,7 +460,7 @@
                         $("#canceladopropietario").prop("checked", true);
                     }
 
-                    $('#fechatardio').val(response.data.orden.fecha_tardio);
+                  
                     
                     if(response.data.orden.envio_gratis == 0){
                         $("#marcadogratis").prop("checked", false);

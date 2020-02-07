@@ -146,8 +146,7 @@ class PagaderoController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
                 'o.servicios_id', 'o.estado_8')
-                ->where('mo.motoristas_id', $request->motoristaid)
-                ->where('mo.motorista_prestado', 0)
+                ->where('mo.motoristas_id', $request->motoristaid)               
                 ->where('o.estado_8', 0)
                 ->whereNotIn('o.id', $pilaOrden)
                 ->get();

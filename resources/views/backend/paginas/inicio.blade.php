@@ -45,7 +45,6 @@
             <p>Total servicios agregados: <strong>{{ $totalservicio }}</strong></p>
             <p>Total servicios inactivos: <strong>{{ $totalservicioinactivo }}</strong></p>
             <p>Total motorista agregados: <strong>{{ $totalmotorista }}</strong></p>
-            <p>Total ordenes tardia: <strong>{{ $totalordentardio }}</strong></p>
             <p>Total ordenes cancelada por cliente: <strong>{{ $totalordencanceladacliente }}</strong></p>
             <p>Total ordenes cancelada por propietario: <strong>{{ $totalordencanceladapropietario }}</strong></p>
             <p>Producto mas vendido: <strong>{{ $nombre }}</strong></p>

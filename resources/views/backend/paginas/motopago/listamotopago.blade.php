@@ -16,7 +16,7 @@
            <button type="button" onclick="modalRegistro()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo registro
-          </button>
+          </button> 
 
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
@@ -76,7 +76,7 @@
                                     <label>Fecha desde</label>
                                     <input type="date" class="form-control" id="fechadesde">
                                 </div>
-
+ 
                                 <div class="form-group">
                                     <label>Fecha hasta</label>
                                     <input type="date" class="form-control" id="fechahasta">
@@ -259,7 +259,7 @@
             formData.append('fecha1', fechadesde);
             formData.append('fecha2', fechahasta);
             formData.append('pago', pago);
-                
+                 
             axios.post('/admin/registro/pago/motorista',formData,{
                 })
                 .then((response) => {

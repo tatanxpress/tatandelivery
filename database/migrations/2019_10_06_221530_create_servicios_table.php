@@ -34,12 +34,9 @@ class CreateServiciosTable extends Migration
             $table->decimal('minimo', 5,2);
             $table->boolean('utiliza_minimo');
             $table->boolean('orden_automatica');
-            $table->integer('tiempo_orden_max');
             $table->boolean('producto_visible'); 
             $table->decimal('comision', 5,2);
-            $table->decimal('multa',5,2);
             $table->integer('tiempo'); // tiempo espera para contestacion automatica
-            $table->boolean('prestar_motorista'); 
             $table->boolean('privado'); 
             
             $table->foreign('tipo_servicios_id')->references('id')->on('tipo_servicios')->onUpdate('cascade');

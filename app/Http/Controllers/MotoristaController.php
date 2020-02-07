@@ -25,7 +25,7 @@ class MotoristaController extends Controller
 
         return view('backend.paginas.motoristas.listamotorista');
     } 
-
+ 
     // tabla 
     public function mototabla(){ 
          
@@ -47,8 +47,7 @@ class MotoristaController extends Controller
                 'correo' => 'required',
                 'tipovehiculo' => 'required',
                 'numerovehiculo' => 'required',
-                'licensia' => 'required',
-                'dui' => 'required',
+               
                 'cbzona' => 'required',
             );
 
@@ -59,8 +58,7 @@ class MotoristaController extends Controller
                 'correo.required' => 'correo inicio es requerido',
                 'tipovehiculo.required' => 'tipo vehiculo es requerido',
                 'numerovehiculo.required' => 'numero vehiculo es requerido',
-                'licensia.required' => 'licensia es requerido',
-                'dui.required' => 'dui es requerido',
+               
                 'cbzona.required' => 'cbzona es requerido',
                 );
 
@@ -81,6 +79,10 @@ class MotoristaController extends Controller
 
             if(Motoristas::where('correo', $request->correo)->first()){
                 return ['success' => 1];
+            }
+
+            if(Motoristas::where('telefono', $request->telefono)->first()){
+                return ['success' => 5];  
             }
 
             $cadena = Str::random(15);
@@ -108,8 +110,6 @@ class MotoristaController extends Controller
                 $m->identificador = $request->identi;
                 $m->disponible = 0;
                 $m->fecha = $fecha;
-                $m->licensia = $request->licensia;
-                $m->dui = $request->dui;
                 $m->imagen = $nombreFoto;
                 $m->device_id = "0000";
                 $m->codigo_correo = "0000";
@@ -167,8 +167,7 @@ class MotoristaController extends Controller
                 'correo' => 'required',
                 'tipovehiculo' => 'required',
                 'numerovehiculo' => 'required',
-                'licensia' => 'required',
-                'dui' => 'required',
+                
                 'cbzona' => 'required',
                
                 'cbactivo' => 'required',
@@ -182,8 +181,7 @@ class MotoristaController extends Controller
                 'correo.required' => 'correo inicio es requerido',
                 'tipovehiculo.required' => 'tipo vehiculo es requerido',
                 'numerovehiculo.required' => 'numero vehiculo es requerido',
-                'licensia.required' => 'licensia es requerido',
-                'dui.required' => 'dui es requerido',
+               
                 'cbzona.required' => 'cbzona es requerido',
                
                 'cbactivo.required' => 'cbactivo es requerido',
@@ -202,8 +200,13 @@ class MotoristaController extends Controller
 
 
             if($po = Motoristas::where('id', $request->id)->first()){
+                
                 if(Motoristas::where('correo', $request->correo)->where('id', '!=', $request->id)->first()){
                     return ['success' => 1];  
+                }
+
+                if(Motoristas::where('telefono', $request->telefono)->where('id', '!=', $request->id)->first()){
+                    return ['success' => 5];  
                 }
 
                 if($request->hasFile('imagen')){
@@ -226,9 +229,7 @@ class MotoristaController extends Controller
                             'correo' => $request->correo,
                             'tipo_vehiculo' => $request->tipovehiculo,
                             'numero_vehiculo' => $request->numerovehiculo,
-                            'licensia' => $request->licensia,
                             'imagen' => $nombreFoto,
-                            'dui' => $request->dui,
                             'zona_pago' => $request->cbzona,
                          
                             'activo' => $request->cbactivo,
@@ -249,10 +250,8 @@ class MotoristaController extends Controller
                         'correo' => $request->correo,
                         'tipo_vehiculo' => $request->tipovehiculo,
                         'numero_vehiculo' => $request->numerovehiculo,
-                        'licensia' => $request->licensia,
-                        'dui' => $request->dui,
+                      
                         'zona_pago' => $request->cbzona,
-                     
                         'activo' => $request->cbactivo,
                         'limite_dinero' => $request->dinero
                         ]);

@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 class CreateZonasTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Zonas en general
      *
      * @return void
      */

@@ -60,7 +60,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
-                                        <p>Tamaño recomendado de: 600 x -</p>
+                                        <p>Tamaño recomendado de: 250 x -</p>
                                     </div> 
                                     <br>
                                     <div class="col-md-10">
@@ -244,7 +244,7 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
-                                        <p>Tamaño recomendado de: 600 x -</p>
+                                        <p>Tamaño recomendado de: 250 x -</p>
                                     </div> 
                                     <br>
                                     <div class="col-md-10">
@@ -371,7 +371,7 @@
             var spinHandle = loadingOverlay().activate();
             var formData = new FormData();
  
-            formData.append('idcategoria', id);
+            formData.append('idcategoria', id); 
             formData.append('nombre', nombre);
             formData.append('imagen', imagen.files[0]);
             formData.append('descripcion', descripcion);
@@ -468,6 +468,12 @@
     } 
     
     function informacion(id){
+        document.getElementById("formulario-nuevo").reset();
+        document.getElementById("formulario-editar").reset();
+
+    
+
+
         spinHandle = loadingOverlay().activate();
 
         axios.post('/admin/productos/informacion',{

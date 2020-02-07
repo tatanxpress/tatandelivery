@@ -15,7 +15,7 @@
            </div>  
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Buscar Ordenes de servicio
+                    Buscar Ordenes Completadas de servicio
           </button>  
 
           <button type="button" onclick="modalReporte()" class="btn btn-success btn-sm">
@@ -59,7 +59,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Buscar ordenes de servicio</h4>
+                <h4 class="modal-title">Buscar ordenes COMPLETADAS del servicio</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -582,17 +582,7 @@
 
                                   <!-- -->
 
-                                  <div class="form-group">
-                                    <label>Orden tardia (cliente cancelo por tardio)</label>
-                                    <br>
-                                    <input type="checkbox" id="ordentardia" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha tardio (hora de cancelado por tardio)</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fechatardio" >
-                                </div>
+                        
 
                                   <!-- -->
 
@@ -697,7 +687,7 @@
         if(retorno){
 
             var ruta = "{{ url('/admin/buscarservicio') }}/"+servicioid+"/"+fechadesde+"/"+fechahasta;
-            $('#tablaDatatable').load(ruta);
+            $('#tablaDatatable').load(ruta); 
         }
     }
  
@@ -915,7 +905,7 @@
                         $("#canceladopropietario").prop("checked", true);
                     }
 
-                    $('#fechatardio').val(response.data.orden.fecha_tardio);
+                    
                     
                     if(response.data.orden.envio_gratis == 0){
                         $("#marcadogratis").prop("checked", false);

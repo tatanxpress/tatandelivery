@@ -4,7 +4,6 @@
         <div class="col-12">
           <div class="card">         
             <div class="card-body">
-            <label>No se toma en cuenta, las ordenes que se presto el motorista</label>
              <p>Total ordenes sin completar: <strong>{{ $sincompletar }} </strong></p>
              <p>Total dinero sin entregar: <strong> ${{ $suma }} </p>
           </div>

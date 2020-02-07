@@ -42,10 +42,10 @@ class CreateOrdenesTable extends Migration
             $table->boolean('visible_p')->default(0);
             $table->boolean('visible_p2')->default(0);
             $table->boolean('visible_p3')->default(0); 
-            $table->boolean('tardio')->default(0);
+           
             $table->boolean('cancelado_cliente')->default(0);
             $table->boolean('cancelado_propietario')->default(0);
-            $table->dateTime('fecha_tardio')->nullable();
+          
             $table->boolean('envio_gratis')->default(0);
             $table->boolean('visible_m')->default(0);
             $table->decimal('ganancia_motorista', 5,2);

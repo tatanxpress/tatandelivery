@@ -66,7 +66,7 @@
                                             @endforeach
                                         </select>
                                     </div>  
-                                </div> 
+                                </div>  
  
                                  <div class="form-group">
                                      <label>Nombre</label>
@@ -84,11 +84,7 @@
                                      <label>Correo</label>
                                      <input type="text" maxlength="100" class="form-control" id="correo-nuevo" placeholder="Correo">
                                  </div>
-                                 <div class="form-group">
-                                     <label>DUI</label>
-                                     <input type="text" maxlength="25" class="form-control" id="dui-nuevo" placeholder="DUI">
-                                 </div>
-                               
+                                                             
                              </div>
                          </div>
                      </div>
@@ -140,11 +136,7 @@
                                      <label>Correo</label>
                                      <input type="text" maxlength="100" class="form-control" id="correo-editar" placeholder="Correo">
                                  </div>
-                                 <div class="form-group">
-                                     <label>DUI</label>
-                                     <input type="text" maxlength="25" class="form-control" id="dui-editar" placeholder="DUI">
-                                 </div>
-
+                              
                                  <div class="form-group">
                                     <label>Activo</label>
                                     <input type="checkbox" id="activo-editar">
@@ -201,9 +193,8 @@
         var nombre = document.getElementById('nombre-nuevo').value;
         var telefono = document.getElementById('telefono-nuevo').value;
         var correo = document.getElementById('correo-nuevo').value; 
-        var dui = document.getElementById('dui-nuevo').value;
 
-        var retorno = validarNuevo(nombre, telefono, correo, dui);
+        var retorno = validarNuevo(nombre, telefono, correo);
 
         if(retorno){
 
@@ -213,7 +204,6 @@
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
             formData.append('correo', correo);
-            formData.append('dui', dui);
         
             axios.post('/admin/propietarios/nuevo', formData, { 
                     })
@@ -249,7 +239,7 @@
         }
     } 
 
-    function validarNuevo(nombre, telefono, correo, dui){
+    function validarNuevo(nombre, telefono, correo){
         
         if(nombre === ''){
             toastr.error("nombre es requerido");
@@ -288,15 +278,6 @@
         return false;
     }
 
-        if(dui === ''){
-            toastr.error("dui es requerido");
-            return;
-        }
-        
-        if(dui.length > 25){
-            toastr.error("25 caracter máximo dui");
-            return false;
-        }
 
         return true;
     }
@@ -329,7 +310,6 @@
                     $('#nombre-editar').val(response.data.propietario.nombre);
                     $('#correo-editar').val(response.data.propietario.correo);
                     $('#telefono-editar').val(response.data.propietario.telefono);
-                    $('#dui-editar').val(response.data.propietario.dui);
                     if(response.data.propietario.activo == 0){
                         $("#activo-editar").prop("checked", false);
                     }else{
@@ -355,10 +335,9 @@
         var nombre = document.getElementById('nombre-editar').value;
         var telefono = document.getElementById('telefono-editar').value;
         var correo = document.getElementById('correo-editar').value; 
-        var dui = document.getElementById('dui-editar').value;
         var activo = document.getElementById('activo-editar').checked;
 
-        var retorno = validarNuevo(nombre, telefono, correo, dui);
+        var retorno = validarNuevo(nombre, telefono, correo);
 
         if(retorno){
             var activo_1 = 0;
@@ -373,7 +352,6 @@
             formData.append('nombre', nombre);
             formData.append('telefono', telefono);
             formData.append('correo', correo);
-            formData.append('dui', dui);
             formData.append('activo', activo_1);
         
             axios.post('/admin/propietarios/editar', formData, { 

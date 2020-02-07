@@ -73,7 +73,11 @@ class RevisadorController extends Controller
 
             if(Revisador::where('identificador', $request->identi)->first()){
                 return ['success' => 1];
-            }
+            } 
+
+            if(Revisador::where('telefono', $request->telefono)->first()){
+                return ['success' => 4];
+            } 
 
             $fecha = Carbon::now('America/El_Salvador');
 
@@ -176,7 +180,7 @@ class RevisadorController extends Controller
                 'cbactivo' => 'required',
                 'cbdisponible' => 'required'
             );
-
+ 
             $mensaje = array(
                 'id.required' => 'id es requerido',
                 'nombre.required' => 'Nombre es requerido',
@@ -198,7 +202,10 @@ class RevisadorController extends Controller
                     'message' => $validar->errors()->all()
                 ];
             }  
-
+ 
+            if(Revisador::where('telefono', $request->telefono)->where('id', '!=', $request->id)->first()){
+                return ['success' => 3];
+            } 
 
             if($po = Revisador::where('id', $request->id)->first()){
                

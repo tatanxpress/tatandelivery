@@ -278,11 +278,9 @@ class ServiciosController extends Controller
                     $tipo->minimo = $request->minimocompra;
                     $tipo->utiliza_minimo = $request->cbminimo;
                     $tipo->orden_automatica = $request->cbautomatica;
-                    $tipo->tiempo_orden_max = 0;
                     $tipo->producto_visible = $request->cbproducto;
                     $tipo->privado = 0;
-                   
-
+                    
                     $tipo->save();
 
                     $idservicio = $tipo->id;

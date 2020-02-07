@@ -14,7 +14,7 @@
     text-align: center;
     font-size: 20px;
     font-weight: bold;
-    padding-right: 85px;
+   
     margin-top: 11px;
     font-family: "Times New Roman", Times, serif;   
 }
@@ -102,11 +102,7 @@
         
         </table>
 
-          <!-- oficina -->
-       
-              <p class="oficina">
-                  Tatan Express
-              </p>
+          
         
 
 </body>

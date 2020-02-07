@@ -17,7 +17,6 @@
                     <th style="width: 15%">Estado orden</th>   
                     <th style="width: 10%">Precio envio</th>
                     <th style="width: 15%">Ganancia</th>
-                    <th style="width: 10%">Moto prestado</th>
                     <th style="width: 10%">Envio gratis</th>
                     <th style="width: 15%">Opciones</th>            
                 </tr> 
@@ -40,14 +39,7 @@
                     <td>${{ $dato->precio_envio }}</td>
                     <td>${{ $dato->ganancia_motorista }}</td>
 
-                    <td> 
-                      @if($dato->motorista_prestado == 0)
-                      <span class="badge bg-primary">No</span>
-                      @else
-                      <span class="badge bg-danger">Si</span>
-                      @endif
-                    </td>
-
+                  
                     <td> 
                       @if($dato->envio_gratis == 0)
                       <span class="badge bg-success">No</span>

@@ -20,7 +20,6 @@ class CreatePropietariosTable extends Migration
             $table->string('password', 255);
             $table->string('correo', 100)->unique();
             $table->date('fecha');
-            $table->string('dui', 25);
             $table->boolean('disponibilidad');
             $table->string('device_id',100);
             $table->bigInteger('servicios_id')->unsigned();

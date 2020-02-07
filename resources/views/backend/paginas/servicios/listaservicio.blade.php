@@ -873,6 +873,7 @@
 
     //nuevo servicio
     function nuevo(){
+        
 
         // parte 1
         var comision = document.getElementById('comision-nuevo').value;
@@ -895,8 +896,7 @@
         var minimocompra = document.getElementById('minimocompra').value;
         var cbproducto = document.getElementById('cbproducto').checked;
         var cbautomatica = document.getElementById('cbautomatica').checked;
-        var tiempo = document.getElementById('tiempo-nuevo').value;
-
+        var tiempo = document.getElementById('tiempo-nuevo').value; // tiempo espera cuando orden es automatica
 
         //parte 2
         var lunes = document.getElementById('lunes-nuevo').value;
@@ -951,12 +951,12 @@
 
         var horadomingo1 = document.getElementById('horadomingo1').value;
         var horadomingo2 = document.getElementById('horadomingo2').value;
-        var horadomingo3 = document.getElementById('horadomingo3').value;
+        var horadomingo3 = document.getElementById('horadomingo3').value; 
         var horadomingo4 = document.getElementById('horadomingo4').value;
         var cbdomingosegunda = document.getElementById('cbdomingosegunda').checked;
         var cbcerradodomingo = document.getElementById('cbcerradodomingo').checked;
         
-        var retorno1 = validacionNuevo(comision, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+        var retorno1 = validacionNuevo(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
          telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
 
         if(!retorno1){
@@ -972,7 +972,7 @@
             var cbenviogratis_1 = 0;
             var cbminimo_1 = 0;
             var cbproducto_1 = 0;
-            var cbautomatica_1 = 0;
+            var cbautomatica_1 = 0; 
             
             var cblunessegunda_1 = 0;           
             var cbcerradolunes_1 = 0;
@@ -988,6 +988,14 @@
             var cbcerradosabado_1 = 0;
             var cbdomingosegunda_1 = 0;           
             var cbcerradodomingo_1 = 0;
+
+            if(tiempo === ''){
+                tiempo = 15;
+            }
+
+            if(minimocompra === ''){
+                minimocompra = 0;
+            }
 
             if(cbenviogratis){
                 cbenviogratis_1 = 1;
@@ -1187,23 +1195,11 @@
     }
  
     // validar datos a guardar
-    function validacionNuevo(comision, tiempo, minimocompra, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
+    function validacionNuevo(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
      telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo){
 
         if (comision === '') {
             toastr.error('Comision es requerido');
-            return false;
-        }
-
-      
-
-        if (tiempo === '') {
-            toastr.error('Tiempo orden automatica es requerido');
-            return false;
-        }
-
-        if (minimocompra === '') {
-            toastr.error('Agregar minimo de compra');
             return false;
         }
         

@@ -32,13 +32,13 @@ Route::post('usuario/nueva/direccion', 'Api\PerfilController@guardarDireccion');
 Route::post('usuario/seleccionar/direccion', 'Api\PerfilController@seleccionarDireccion'); // seleccionar direccion
 Route::post('usuario/eliminar/direccion', 'Api\PerfilController@eliminarDireccion'); // eliminar una direccion
      
-// servicios
+// servicios 
 Route::post('usuario/servicios/lista', 'Api\ServiciosController@getServiciosZona'); // lista de tipo servicio por zona
 Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoServicios'); // locales tipo cualquiera
 Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoProductoVistaComida'); // menu de local tipo comida
 Route::post('usuario/servicios/info/producto', 'Api\ServiciosController@getProductoIndividual'); // informacion de producto individual
 Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPublicidad'); // ver promocionales
- 
+  
 // vista tipo tienda
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
   
@@ -50,7 +50,7 @@ Route::post('usuario/carrito/ver/producto', 'Api\CarritoTemporalController@verPr
 Route::post('usuario/carrito/borrar/orden', 'Api\CarritoTemporalController@eliminarCarritoCompras'); // eliminar carrito de compras
 Route::post('usuario/carrito/cambiar/cantidad', 'Api\CarritoTemporalController@cambiarCantidad'); // cambiar cantidad de este producto
 Route::post('usuario/carrito/ver/proceso', 'Api\CarritoTemporalController@verProcesarOrden'); // ver info para procesar la orden
-
+ 
 // buscador
 Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // locales tipo tienda
 Route::post('usuario/productos/ver/seccion', 'Api\BuscadorController@buscarProductoSeccion'); // lista de productos "ver todos"
@@ -66,36 +66,35 @@ Route::post('usuario/proceso/calificar/motorista', 'Api\ProcesadorOrdenesControl
 Route::post('usuario/proceso/orden/cancelar', 'Api\ProcesadorOrdenesController@cancelarOrden'); // cancelar orden 
 Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesController@borrarVistaOrden'); // borrar vista
  
-Route::post('usuario/proceso/cancelar/tiempo/excedio', 'Api\ProcesadorOrdenesController@cancelarOrdenTardio'); // cancelar por tiempo tardio
 
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
  
-  
+    
 
 // PROPIETARIOS
-
+ 
 Route::post('propietario/login', 'Api\PropietarioController@loginPropietario'); // login propietario 
 Route::post('propietario/password/recuperacion', 'Api\PropietarioController@codigoCorreo'); // enviar codigo recuperacion
 Route::post('propietario/revisar/codigo', 'Api\PropietarioController@revisarCodigoCorreo'); // revisar codigo correo
 Route::post('propietario/cambiar/password', 'Api\PropietarioController@nuevaPassword'); // cambio de contraseña
 Route::post('propietario/buscar/telefono', 'Api\PropietarioController@buscarTelefono'); // buscar telefono
  
-// nuevas ordenes
+// nuevas ordenes 
 Route::post('propietario/nueva/ordenes', 'Api\PropietarioController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('propietario/ver/productos', 'Api\PropietarioController@verProductosOrden'); // ver productos de la orden
 Route::post('propietario/ver/producto/individual', 'Api\PropietarioController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('propietario/ver/orden/id', 'Api\PropietarioController@verOrdenPorID'); // ver estados orden por id
    
-// procesar ordenes
+// procesar ordenes 
 Route::post('propietario/proceso/orden/estado-2', 'Api\PropietarioController@procesarOrdenEstado2'); // dar tiempo de espera *
 Route::post('propietario/proceso/orden/estado-4', 'Api\PropietarioController@procesarOrdenEstado4'); // iniciar preparacion, avisa a motoristas
- 
+  
 // ordenes en proceso
 Route::post('propietario/preparando/ordenes', 'Api\PropietarioController@preparandoOrdenes'); // ver nuevas ordenes de prepracion
 Route::post('propietario/ver/preparando/orden/id', 'Api\PropietarioController@verOrdenPreparandoPorID'); // ver estados orden preparando por id
 Route::post('propietario/finalizar/orden', 'Api\PropietarioController@finalizarOrdenFinal'); // finalizar orden propietario
-
+ 
 // cancelacion de ordenes
 Route::post('propietario/cancelar/orden', 'Api\PropietarioController@cancelarOrden'); // cancelar orden
 Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden'); // borrar vista
@@ -126,22 +125,22 @@ Route::post('propietarios/estado/tiempo', 'Api\PropietarioController@estadoAutom
 Route::post('propietario/guardar/tiempo', 'Api\PropietarioController@guardarTiempo'); // guarda tiempo para la orden automatica o no
 
  
-// productos
+// productos 
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // informacion cuenta
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
+ 
 
-
-// MOTORISTA 
+// MOTORISTA  
 
 Route::post('motorista/login', 'Api\MotoristaController@loginMotorista'); // login motorista
 Route::post('motorista/password/recuperacion', 'Api\MotoristaController@codigoCorreo'); // enviar codigo recuperacion
 Route::post('motorista/revisar/codigo', 'Api\MotoristaController@revisarCodigoCorreo'); // revisar codigo correo
 Route::post('motorista/cambiar/password', 'Api\MotoristaController@nuevaPassword'); // cambio de contraseña
 Route::post('motorista/buscar/telefono', 'Api\MotoristaController@buscarTelefono'); // buscar telefono
- 
-// nueva ordenes
+  
+// nueva ordenes 
 Route::post('motorista/nueva/ordenes', 'Api\MotoristaController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('motorista/ver/orden/id', 'Api\MotoristaController@verOrdenPorID'); // ver estados orden por id
 Route::post('motorista/ver/productos', 'Api\MotoristaController@verProductosOrden'); // ver productos de la orden
@@ -151,7 +150,7 @@ Route::post('motorista/obtener/orden', 'Api\MotoristaController@obtenerOrden'); 
 // orden proceso
 Route::post('motorista/orden/proceso', 'Api\MotoristaController@verProcesoOrdenes'); // ver orden en proce
 Route::post('motorista/orden/procesoentrega', 'Api\MotoristaController@verProcesoOrdenesEntrega'); // ver orden en proce
- 
+  
 Route::post('motorista/ver/orden/proceso/id', 'Api\MotoristaController@verOrdenProcesoPorID'); // ver estados orden proceso por id
 Route::post('motorista/iniciar/entrega', 'Api\MotoristaController@iniciarEntrega'); // iniciar entrega de la orden
 Route::post('motorista/finalizar/entrega', 'Api\MotoristaController@finalizarEntrega'); // finalizar entrega de la orden

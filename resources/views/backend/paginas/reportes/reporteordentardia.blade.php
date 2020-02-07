@@ -83,7 +83,7 @@
             <th># Orden</th>           
             <th>Fecha orden</th>
             <th>Hora entrega</th>
-            <th>Fecha Exedido</th>
+           
             <th>Precio orden</th>
           </tr>
 
@@ -92,7 +92,7 @@
               <td>{{ $dato->idorden }}</td>             
               <td>{{ $dato->fecha_orden }}</td>
               <td>{{ $dato->horaEstimada }}</td>
-              <td>{{ $dato->fecha_tardio }}</td>
+            
               <td>${{ $dato->precio_total }}</td>
             </tr> 
           @endforeach  

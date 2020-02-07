@@ -127,10 +127,9 @@ class ServiciosController extends Controller
                     's.descripcion', 's.imagen', 's.logo', 's.tipo_vista', 's.cerrado_emergencia')
             ->where('z.zonas_id', $idzona)
             ->where('s.tipo_servicios_id', $request->tipo) 
-            ->where('s.activo', 1) 
+            ->where('z.activo', 1) 
             ->get();
-
-          
+           
                // verificar si esta agregado a favoritos
                foreach ($servicios as $user) {
 

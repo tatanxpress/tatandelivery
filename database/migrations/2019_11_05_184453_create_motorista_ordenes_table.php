@@ -18,7 +18,6 @@ class CreateMotoristaOrdenesTable extends Migration
             $table->bigInteger('ordenes_id')->unsigned();
             $table->bigInteger('motoristas_id')->unsigned();
             $table->dateTime('fecha_agarrada');
-            $table->boolean('motorista_prestado');
         
             $table->foreign('ordenes_id')->references('id')->on('ordenes');
             $table->foreign('motoristas_id')->references('id')->on('motoristas');

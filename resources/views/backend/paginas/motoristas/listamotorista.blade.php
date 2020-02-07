@@ -82,14 +82,7 @@
                                     <label>Numero vehiculo</label>
                                     <input type="text" maxlength="50" class="form-control" id="numerovehiculo-nuevo" placeholder="Numero de vehiculo">
                                 </div>
-                                <div class="form-group">
-                                    <label>licensia</label>
-                                    <input type="text" maxlength="30" class="form-control" id="licensia-nuevo" placeholder="Licensia">
-                                </div>
-                                <div class="form-group">
-                                    <label>DUI</label>
-                                    <input type="text" maxlength="25" class="form-control" id="dui-nuevo" placeholder="DUI">
-                                </div>
+                    
                                 
                                 <div class="form-group">
                                     <label>Zona Pago (Motorista pueden ver donde entregar el dinero)</label>
@@ -157,14 +150,8 @@
                                     <label>Numero vehiculo</label>
                                     <input type="text" maxlength="50" class="form-control" id="numerovehiculo-editar" placeholder="Numero de vehiculo">
                                 </div>
-                                <div class="form-group">
-                                    <label>licensia</label>
-                                    <input type="text" maxlength="30" class="form-control" id="licensia-editar" placeholder="Licensia">
-                                </div>
-                                <div class="form-group">
-                                    <label>DUI</label>
-                                    <input type="text" maxlength="25" class="form-control" id="dui-editar" placeholder="DUI">
-                                </div>
+                         
+                                
                                 <div class="form-group">
                                     <label>Dinero Limite (Para entregar al Cobrador, sino no puede seleccionar mas ordenes)</label>
                                     <input type="number" step="0.01" class="form-control" id="dinero-editar">
@@ -284,13 +271,11 @@
         var correo = document.getElementById('correo-nuevo').value;
         var tipovehiculo = document.getElementById('tipovehiculo-nuevo').value;
         var numerovehiculo = document.getElementById('numerovehiculo-nuevo').value;
-        var licensia = document.getElementById('licensia-nuevo').value;
-        var dui = document.getElementById('dui-nuevo').value;
         var cbzona = document.getElementById('zonapago-nuevo').checked;
 
         var imagen = document.getElementById('imagen-nuevo');
 
-        var retorno = validarNuevo(identi, nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen);
+        var retorno = validarNuevo(identi, nombre, telefono, correo, tipovehiculo, numerovehiculo,  imagen);
 
         if(retorno){
 
@@ -307,8 +292,6 @@
             formData.append('correo', correo);
             formData.append('tipovehiculo', tipovehiculo);
             formData.append('numerovehiculo', numerovehiculo);
-            formData.append('licensia', licensia);
-            formData.append('dui', dui);
             formData.append('imagen', imagen.files[0]);
             formData.append('cbzona', cbzona_1);
 
@@ -340,15 +323,17 @@
             
         } else if(response.data.success == 3){
             toastr.error('Error al agregar');
-        } else if(response.data.success == 4){
+        } else if(response.data.success == 4){ 
             toastr.error('El identificador ya existe');
+        } else if(response.data.success == 5){
+            toastr.error('El Telefono ya existe');
         } 
-        else {
+        else { 
             toastr.error('Error desconocido');
         }
     } 
 
-    function validarNuevo(identi ,nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen){
+    function validarNuevo(identi ,nombre, telefono, correo, tipovehiculo, numerovehiculo, imagen){
 
         if(identi === ''){
             toastr.error("identificador es requerido");
@@ -417,25 +402,6 @@
             return false;
         }
 
-        if(licensia === ''){
-            toastr.error("licensia es requerido");
-            return;
-        }
-        
-        if(licensia.length > 30){
-            toastr.error("30 caracter máximo licensia");
-            return false;
-        }
-
-        if(dui === ''){
-            toastr.error("dui es requerido");
-            return;
-        }
-        
-        if(dui.length > 25){
-            toastr.error("25 caracter máximo dui");
-            return false;
-        }
       
         if(imagen.files && imagen.files[0]){ // si trae imagen
             if (!imagen.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
@@ -468,8 +434,7 @@
                     $('#correo-editar').val(response.data.motorista.correo);
                     $('#tipovehiculo-editar').val(response.data.motorista.tipo_vehiculo);
                     $('#numerovehiculo-editar').val(response.data.motorista.numero_vehiculo);
-                    $('#licensia-editar').val(response.data.motorista.licensia);
-                    $('#dui-editar').val(response.data.motorista.dui);
+                   
                     $('#fecha').val(response.data.motorista.fecha);
                     
                     $('#dinero-editar').val(response.data.motorista.limite_dinero);
@@ -507,15 +472,14 @@
         var correo = document.getElementById('correo-editar').value;
         var tipovehiculo = document.getElementById('tipovehiculo-editar').value;
         var numerovehiculo = document.getElementById('numerovehiculo-editar').value;
-        var licensia = document.getElementById('licensia-editar').value;
-        var dui = document.getElementById('dui-editar').value;
+       
         var cbzona = document.getElementById('zonapago-editar').checked;
      
         var cbactivo = document.getElementById('activo-editar').checked;
         var imagen = document.getElementById('imagen-editar');
         var dinero = document.getElementById('dinero-editar').value;
 
-        var retorno = validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen);
+        var retorno = validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, imagen);
  
         if(retorno){
 
@@ -540,8 +504,6 @@
             formData.append('correo', correo);
             formData.append('tipovehiculo', tipovehiculo);
             formData.append('numerovehiculo', numerovehiculo);
-            formData.append('licensia', licensia);
-            formData.append('dui', dui);
             formData.append('imagen', imagen.files[0]);
             formData.append('cbzona', cbzona_1);
             formData.append('cbactivo', cbactivo_1);
@@ -577,14 +539,16 @@
             toastr.error('imagen no subida');
         } else if(response.data.success == 4){
             toastr.error('ID no encontrado');
-        }
+        } else if(response.data.success == 5){
+            toastr.error('El Telefono ya existe');
+        } 
         else {
             toastr.error('Error desconocido');
         }
     } 
 
      
-    function validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, licensia, dui, imagen){
+    function validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, imagen){
             
             if(dinero === ''){
                 toastr.error("Dinero limite es requerido");
@@ -647,43 +611,17 @@
                 toastr.error("50 caracter máximo numero vehiculo");
                 return false;
             }
-
-            if(licensia === ''){
-                toastr.error("licensia es requerido");
-                return;
-            }
-            
-            if(licensia.length > 30){
-                toastr.error("30 caracter máximo licensia");
-                return false;
-            }
-
-            if(dui === ''){
-                toastr.error("dui es requerido");
-                return;
-            }
-            
-            if(dui.length > 25){
-                toastr.error("25 caracter máximo dui");
-                return false;
-            }
         
             if(imagen.files && imagen.files[0]){ // si trae imagen
                 if (!imagen.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
                     toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
                     return false;       
-                } 
+                }
             }
 
             return true;
     }
   
-
-    function modalPromedio(id){
-        
-    }
-
-
     function modalPromedio(id){
         spinHandle = loadingOverlay().activate();
         document.getElementById("formulario-promedio").reset();
@@ -714,47 +652,6 @@
         });
     }
 
-    function promedioPorFecha(){
-        var id = document.getElementById('id-editar').value;
-        var fecha1 = document.getElementById('fecha1').value;
-        var fecha2 = document.getElementById('fecha2').value;
-
-        if(fecha1 === ''){
-            toastr.error('Fecha desde es requerido');
-            return;
-        }
-
-        if(fecha2 === ''){
-            toastr.error('Fecha hasta es requerido');
-            return;   
-        }
-
-        var spinHandle = loadingOverlay().activate();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('fecha1', fecha1);
-            formData.append('fecha2', fecha2);
-
-            axios.post('/admin/motoristas/promediofecha', formData, {
-            })
-            .then((response) => {
-                loadingOverlay().cancel(spinHandle);
-               // respuestaPromedioFecha(response);
-                 console.log(response);
-            })
-            .catch((error) => {
-                loadingOverlay().cancel(spinHandle);
-                toastr.error('Error');
-            });
-    }
-
-    function respuestaPromedioFecha(response){
-        console.log(response);
-    }
-
-    function promedioTotal(){
-      
-    }
 
   </script>
  

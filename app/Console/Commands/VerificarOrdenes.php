@@ -19,7 +19,7 @@ class VerificarOrdenes extends Command
      */
     protected $signature = 'ordenes:verificar';
 
-    /**
+    /** 
      * The console command description.
      *
      * @var string

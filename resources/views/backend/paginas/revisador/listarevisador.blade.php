@@ -300,7 +300,10 @@
             $('#tablaDatatable').load(ruta);
             $('#modalAgregar').modal('hide');  
             
-        } else if(response.data.success == 3){
+        } else if(response.data.success == 4){ 
+            toastr.error('Telefono ya registrado');
+        } 
+        else if(response.data.success == 3){ 
             toastr.error('Error al agregar');
         } 
         else {
@@ -516,6 +519,10 @@
             var ruta = "{{ url('/admin/revisador/tabla/lista') }}";
             $('#tablaDatatable').load(ruta);
             $('#modalEditar').modal('hide');
+            
+        }
+        else if(response.data.success == 3){
+            toastr.error('Telefono ya registrado');
             
         }
         else {

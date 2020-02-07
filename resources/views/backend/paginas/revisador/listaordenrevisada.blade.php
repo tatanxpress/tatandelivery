@@ -620,7 +620,7 @@
                         $("#canceladopropietario").prop("checked", true);
                     }
 
-                    $('#fechatardio').val(response.data.orden.fecha_tardio);
+                   
                     
                     if(response.data.orden.envio_gratis == 0){
                         $("#marcadogratis").prop("checked", false);

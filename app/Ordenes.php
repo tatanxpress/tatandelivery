@@ -38,7 +38,7 @@ class Ordenes extends Model
         'tardio',
         'cancelado_cliente',
         'cancelado_propietario',
-        'fecha_tardio',
+       
         'visible_p3'
     ];
 

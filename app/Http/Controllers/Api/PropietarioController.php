@@ -850,15 +850,17 @@ class PropietarioController extends Controller
                     }
                 } 
 
-                // cantidad de productos que habian anteriormente
-
-                $unidades = Producto::where('id', $request->productoid)->pluck('unidades')->first();
-
-              //  $sumado = $unidades + $request->unidades;
-                                
-                Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
-                'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $request->unidades]);
-                
+                // SI ES -1, ENTONCES SIGNIFICA QUE NO TOCARA LAS UNIDADES
+                if($request->unidades == "-1"){
+                    // significa que no actualizara unidades
+                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
+                    'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2]);
+                    
+                }else{
+                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
+                    'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $request->unidades]);                    
+                }
+           
                 return ['success'=> 2];
 
             }else{
@@ -1080,7 +1082,7 @@ class PropietarioController extends Controller
                 'tiempo' => 'required',
                 'tipo' => 'required' // seguridad para elegir bien la hora
             );
-        
+         
             $mensajeDatos = array(                                      
                 'ordenid.required' => 'El id de la orden es requerido',
                 'tiempo.required' => 'El tiempo es requerido',
@@ -1098,6 +1100,8 @@ class PropietarioController extends Controller
             }  
             
             if($or = Ordenes::where('id', $request->ordenid)->first()){
+
+ 
 
                 // aun no se ha establecido tiempo de espera
                 if($or->estado_2 == 0){
@@ -1125,15 +1129,15 @@ class PropietarioController extends Controller
 
                     // contestacion hasta estado 4
                     if($datosServicio->orden_automatica == 1){
+
                         $titulo = "Orden iniciada";
                         $mensaje = "Seguir el estado de su orden";
+ 
                         Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
                         'fecha_2' => $fecha, 'hora_2' => $tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
                         'estado_4' => 1, 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
 
- 
-                         
-                                                
+                                                 
                         // mandar notificacion a los motoristas asignados al servicio
                         $moto = DB::table('motoristas_asignados AS ms')
                         ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
@@ -1157,10 +1161,11 @@ class PropietarioController extends Controller
                         $alarma1 = 1;
                         $color1 = 3;
                         $icono1 = 2;
+                        $tipo = 3; // motoristas
 
                         // NOTIFICACION A LOS MOTORISTAS
                         if(!empty($pilaUsuarios)){                       
-                            $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                            $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
                         }else{
 
                             // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
@@ -1195,14 +1200,16 @@ class PropietarioController extends Controller
                                 $alarma = 1; //sonido alarma
                                 $color = 1; // color rojo
                                 $icono = 1; // campana 
+                                $tipo = 4; // administrador
 
-                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
+                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);                            
                             }
                         } 
     
                     }else{
                         $titulo = "Tiempo de preparación";
                         $mensaje = "Revisar tiempo de espera";
+
                         Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
                         'fecha_2' => $fecha, 'hora_2' => $tiempo]);
                     }
@@ -1210,20 +1217,21 @@ class PropietarioController extends Controller
                     // mandar notificacion al cliente
                     $usuario = User::where('id', $or->users_id)->first();
                     $pilaUsuarios = $usuario->device_id;
-                    
-                    $alarma = 2;
+                     
+                    $alarma = 2; 
                     $color = 3;
                     $icono = 3;
+                    $tipo = 2; // tipo cliente
 
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
-                    }
+                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                    } 
 
                     return ['success' => 2]; 
                 }else{
                     return ['success'=> 3];
                 }
-            }else{
+            }else{ 
                 return ['success'=> 4];
             }
         }
@@ -1275,9 +1283,11 @@ class PropietarioController extends Controller
                     $mensaje = "Lo sentimos, su orden fue cancelada";
                     $alarma = 2;
                     $color = 1;
-                    $icono = 5;                
+                    $icono = 5;  
+                    $tipo = 2; //cliente
+
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
+                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
                     }
             
                     return ['success' => 1];
@@ -1369,9 +1379,11 @@ class PropietarioController extends Controller
                     $alarma = 2;
                     $color = 3;
                     $icono = 4;
+                    $tipo = 2; //cliente
+
                     if(!empty($fcm)){                       
                         // COMO ES DEL CLIENTE, AL REGISTRARSE ESTE OBTIENE SU DEVICE_ID
-                       $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono);
+                       $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono, $tipo);
                     } 
 
                     // mandar notificacion a los motoristas asignados al servicio
@@ -1397,10 +1409,11 @@ class PropietarioController extends Controller
                     $alarma1 = 1;
                     $color1 = 3;
                     $icono1 = 2;
+                    $tipo = 3; // motoristas
 
                     // NOTIFICACION A LOS MOTORISTAS
                     if(!empty($pilaUsuarios)){                       
-                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
                     }else{
 
                         // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
@@ -1426,7 +1439,7 @@ class PropietarioController extends Controller
                                     array_push($pilaAdministradores, $p->device_id);
                                 }                             
                             }
-                        } 
+                        }  
 
                          //si no esta vacio
                         if(!empty($pilaAdministradores)){
@@ -1435,8 +1448,9 @@ class PropietarioController extends Controller
                             $alarma = 1; //sonido alarma
                             $color = 1; // color rojo
                             $icono = 1; // campana
+                            $tipo = 4; //administrador
 
-                            $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono);                            
+                            $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);                            
                         }
                     }  
 
@@ -1532,7 +1546,7 @@ class PropietarioController extends Controller
             if(Ordenes::where('id', $request->ordenid)->first()){
             
                 $orden = DB::table('ordenes AS o')                    
-                    ->select('o.id', 'o.fecha_4', 'o.hora_2', 'o.tardio', 'o.fecha_tardio')
+                    ->select('o.id', 'o.fecha_4', 'o.hora_2')
                     ->where('o.id', $request->ordenid)
                     ->get();
                                
@@ -1552,13 +1566,7 @@ class PropietarioController extends Controller
                          $o->excedido = 0; // ya no puede cancelar la orden
                      }
 
-                    if($o->tardio == 1){
-                    $fechat = $o->fecha_tardio;
-                    $horat = date("h:i A", strtotime($fechat));
-                    $fechat = date("d-m-Y", strtotime($fechat));
-                    $o->fecha_tardio = $horat . " " . $fechat;
-                    }
-
+               
                     $tiempoExedido = Carbon::parse($o->fecha_4);
                     $tiempoExedido2 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $tiempoExedido->addMinute($o->hora_2)->format('H:i:s d-m-Y');
@@ -1607,8 +1615,7 @@ class PropietarioController extends Controller
             if(Ordenes::where('id', $request->ordenid)->first()){
                
                 $orden = DB::table('ordenes AS o')                    
-                ->select('o.id', 'o.fecha_4', 'o.hora_2', 'o.estado_5', 'o.estado_8', 
-                'o.tardio', 'o.fecha_tardio', 'users_id')
+                ->select('o.id', 'o.fecha_4', 'o.hora_2', 'o.estado_5', 'o.estado_8', 'users_id')
                 ->where('o.id', $request->ordenid)
                 ->first();
 
@@ -1658,9 +1665,10 @@ class PropietarioController extends Controller
                         $alarma = 2;
                         $color = 3;
                         $icono = 3;
+                        $tipo = 2;
     
                         if(!empty($pilaUsuarios)){
-                            $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
+                            $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
                         }
 
                         return ['success' => 1]; // cancelado
@@ -1709,15 +1717,15 @@ class PropietarioController extends Controller
                 $motoasignado = DB::table('motorista_ordenes AS m')
                 ->where('m.ordenes_id', $o->id)
                 ->get();
-
+ 
                 // SIGNIFICA QUE NO TIENE MOTORISTA ASIGNADO AUN LA ORDEN
                 // MANDAR NOTIFICACION AL MOTORISTA QUE YA ESTA LA ORDEN Y AL ADMINISTRADOR
                 if(count($motoasignado) == 0){
-                
+                 
                     $moto = DB::table('motoristas_asignados AS ms')
                     ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
-                    //->where('m.activo', 1)
-                    //->where('m.disponible', 1)
+                    ->where('m.activo', 1)
+                    ->where('m.disponible', 1)
                     ->where('ms.servicios_id', $o->servicios_id)
                     ->get();
 
@@ -1761,9 +1769,10 @@ class PropietarioController extends Controller
                     $alarma1 = 1;
                     $color1 = 3;
                     $icono1 = 2;
+                    $tipo = 4; // administrador
 
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1);
+                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
                     }    
                 }else{
                     // MANDAR NOTIFICACION AL MOTORISTA ASIGNADO A LA ORDEN, QUE LA ORDEN YA ESTA PREPARADA
@@ -1783,8 +1792,10 @@ class PropietarioController extends Controller
                     $alarma1 = 1;
                     $color1 = 3;
                     $icono1 = 2;
+                    $tipo = 3; // motoristas
+
                     if(!empty($deviceid)){
-                        $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1);
+                        $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1, $tipo);
                     }
                 }
 
@@ -1825,7 +1836,7 @@ class PropietarioController extends Controller
                     
                     $orden = DB::table('ordenes AS o')
                     ->select('o.id', 'o.precio_total', 'o.nota_orden', 
-                    'o.fecha_orden', 'o.estado_8', 'o.tardio', 'o.estado_7')
+                    'o.fecha_orden', 'o.estado_8', 'o.estado_7')
                     ->where('o.servicios_id', $p->servicios_id)
                     ->whereDate('o.fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
                     ->orderBy('o.id', 'DESC')
@@ -1844,7 +1855,7 @@ class PropietarioController extends Controller
                     // buscar con la fecha dada
                     $orden = DB::table('ordenes AS o')
                     ->select('o.id', 'o.precio_total', 'o.nota_orden', 
-                    'o.fecha_orden', 'o.estado_8', 'o.tardio', 'o.estado_7')
+                    'o.fecha_orden', 'o.estado_8','o.estado_7')
                     ->where('o.servicios_id', $p->servicios_id)
                     ->whereDate('o.fecha_orden', '=', Carbon::parse($request->fecha)->toDateString())
                     ->orderBy('o.id', 'DESC')
@@ -1896,7 +1907,7 @@ class PropietarioController extends Controller
    
                 $orden = DB::table('ordenes')
                 ->select('id', 'servicios_id', 'nota_orden', 'fecha_orden', 'precio_total', 'estado_5',
-                        'estado_8', 'tardio', 'fecha_tardio', 'fecha_4', 'hora_2', 'cancelado_cliente', 'cancelado_propietario')
+                        'estado_8', 'fecha_4', 'hora_2', 'cancelado_cliente', 'cancelado_propietario')
                 ->where('estado_5', 1) // orden completada
                 ->where('servicios_id', $p->servicios_id)
                 ->whereBetween('fecha_orden', array($date1, $date2))
@@ -1957,7 +1968,7 @@ class PropietarioController extends Controller
    
                 $orden = DB::table('ordenes')
                 ->select('id', 'servicios_id', 'nota_orden', 'fecha_orden', 'precio_total', 'estado_5',
-                        'estado_8', 'tardio', 'fecha_tardio', 'fecha_4', 'hora_2', 'cancelado_cliente', 'cancelado_propietario')
+                        'estado_8', 'fecha_4', 'hora_2', 'cancelado_cliente', 'cancelado_propietario')
                 ->where('estado_8', 1) // orden cancelada
                 ->where('servicios_id', $p->servicios_id)
                 ->whereBetween('fecha_orden', array($date1, $date2))
@@ -1982,71 +1993,7 @@ class PropietarioController extends Controller
         }
     }
 
-    //ORDENES TARDIA
-    public function verPagosTardio(Request $request){
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(
-                'id' => 'required',
-                'fecha1' => 'required',
-                'fecha2' => 'required'               
-            );
-
-            $mensajeDatos = array(                                      
-                'id.required' => 'El id propiestrio es requerido.',
-                'fecha1.required' => 'Fecha1 es requerido.',
-                'fecha2.required' => 'Fecha2 es requerido'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            if($p = Propietarios::where('id', $request->id)->first()){
-              
-                $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
-                $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d'); 
-   
-                $orden = DB::table('ordenes')
-                ->select('id', 'servicios_id', 'nota_orden', 'fecha_orden', 'precio_total', 'estado_5',
-                        'estado_8', 'tardio', 'fecha_tardio', 'fecha_4', 'hora_2', 'cancelado_cliente', 'cancelado_propietario')
-                ->where('tardio', 1) // orden tarde
-                ->where('servicios_id', $p->servicios_id)
-                ->whereBetween('fecha_orden', array($date1, $date2))
-                ->get();
-
-                $dinero = 0;
-                foreach($orden as $o){
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
-
-                    $fechaOrden1 = $o->fecha_tardio;
-                    $hora1 = date("h:i A", strtotime($fechaOrden1));
-                    $fecha1 = date("d-m-Y", strtotime($fechaOrden1));
-                    $o->fecha_tardio = $hora1 . " " . $fecha1;
-
-                    $dinero = $dinero + $o->precio_total;
-
-                    $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
-                    $o->horaEstimada = $horaEstimada; 
-                }
-
-                $dineroTotal = number_format((float)$dinero, 2, '.', '');
-                    
-                return ['success' => 1, 'orden' => $orden, 'dinero' => $dineroTotal];                
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }
+    
 
 
     public function ocultarPago(Request $request){
@@ -2077,10 +2024,10 @@ class PropietarioController extends Controller
             else {
                 return ['success' => 2];
             }
-        }
+        } 
     }
 
-    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono){
-        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono);
+    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
+        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
     }
 }

@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 class CreateServiciosTipoTable extends Migration
 {
     /**
-     * Run the migrations.
+     * Esta son las categorias
      *
      * @return void
      */

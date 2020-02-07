@@ -40,7 +40,6 @@ class PropiController extends Controller
                 'identificador' => 'required',
                 'telefono' => 'required',
                 'correo' => 'required',
-                'dui' => 'required',
             );
 
             $mensaje = array(
@@ -48,7 +47,6 @@ class PropiController extends Controller
                 'identificador.required' => 'Identificador es requerido',
                 'telefono.required' => 'telefono es requerida',
                 'correo.required' => 'correo inicio es requerido',
-                'dui.required' => 'dui fin es requerida'
                 );
 
 
@@ -78,7 +76,6 @@ class PropiController extends Controller
             $p->password = bcrypt('12345678');
             $p->correo = $request->correo;
             $p->fecha = $fecha;
-            $p->dui = $request->dui;
             $p->disponibilidad = 0;
             $p->device_id = "0000";
             $p->servicios_id = $request->identificador;
@@ -132,7 +129,6 @@ class PropiController extends Controller
                 'identificador' => 'required',
                 'telefono' => 'required',
                 'correo' => 'required',
-                'dui' => 'required',
                 'activo' => 'required'            
             );
 
@@ -142,7 +138,6 @@ class PropiController extends Controller
                 'identificador.required' => 'Identificador es requerido',
                 'telefono.required' => 'telefono es requerida',
                 'correo.required' => 'correo inicio es requerido',
-                'dui.required' => 'dui fin es requerida',
                 'activo.required' => 'activo es requerido'
                 );
 
@@ -173,7 +168,6 @@ class PropiController extends Controller
                     'nombre' => $request->nombre,
                     'telefono' => $request->telefono,
                     'correo' => $request->correo,
-                    'dui' => $request->dui,
                     'servicios_id' => $request->identificador,
                     'activo' => $request->activo,
                     ]);

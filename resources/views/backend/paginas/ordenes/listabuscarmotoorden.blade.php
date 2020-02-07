@@ -184,10 +184,7 @@
                                     <input type="text" disabled class="form-control" id="totalcanceladas">
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Total tardio</label>
-                                    <input type="text" disabled class="form-control" id="totaltardio">
-                                </div>
+                               
 
 
                                 <div class="form-group">
@@ -201,28 +198,7 @@
                                     <input type="text" disabled class="form-control" id="totalganancia">
                                 </div>
 
-                                <!-- datos de motorista prestado -->
-
-                                <div class="form-group">
-                                    <label>Veces de motorista prestado</label>
-                                    <input type="text" disabled class="form-control" id="motoprestado">
-                                </div>
-
-
-                                <div class="form-group">
-                                    <label>Numero de servicios, que se presto el motorista</label>
-                                    <input type="text" disabled class="form-control" id="totalservicio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Total a cobrar a los servicios por el prestado</label>
-                                    <input type="text" disabled class="form-control" id="totalprecioenvio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Total ganancia de motorista por el prestado</label>
-                                    <input type="text" disabled class="form-control" id="totalgananciamoto">
-                                </div>
+                              
 
                               
                             </div>
@@ -612,18 +588,6 @@
 
                                   <!-- -->
 
-                                  <div class="form-group">
-                                    <label>Orden tardia (cliente cancelo por tardio)</label>
-                                    <br>
-                                    <input type="checkbox" id="ordentardia" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha tardio (hora de cancelado por tardio)</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fechatardio" disabled>
-                                </div>
-
                                   <!-- -->
 
                                   <div class="form-group">
@@ -742,7 +706,7 @@
         
         var retorno = validarNuevo(fechadesde, fechahasta);
 
-        if(retorno){
+        if(retorno){ 
 
             var ruta = "{{ url('/admin/buscar/moor') }}/"+idmoto+"/"+fechadesde+"/"+fechahasta;
             $('#tablaDatatable').load(ruta);
@@ -779,7 +743,7 @@
         if(retorno){
 
             spinHandle = loadingOverlay().activate();
-
+ 
             var formData = new FormData();
             formData.append('id', id);
             formData.append('fecha1', fechadesde);
@@ -798,10 +762,7 @@
                     $('#totaltardio').val(response.data.totaltardio);
                     $('#totalgratis').val(response.data.totalmarcagratis);
                     $('#totalganancia').val(response.data.totalganancia);
-                    $('#motoprestado').val(response.data.motoprestado);
-                    $('#totalservicio').val(response.data.totalservicio); 
-                    $('#totalprecioenvio').val(response.data.totalprecioenvio);
-                    $('#totalgananciamoto').val(response.data.totalgananciamoto);
+                   
               
                 }else{
                     toastr.error('ID no encontrado'); 
@@ -1008,13 +969,7 @@
                         $("#visiblep3").prop("checked", true);
                     }
 
-                    
-                    if(response.data.orden.tardio == 0){
-                        $("#ordentardia").prop("checked", false);
-                    }else{
-                        $("#ordentardia").prop("checked", true);
-                    }
-
+                  
                     if(response.data.orden.cancelado_cliente == 0){
                         $("#canceladocliente").prop("checked", false);
                     }else{
@@ -1028,7 +983,7 @@
                         $("#canceladopropietario").prop("checked", true);
                     }
 
-                    $('#fechatardio').val(response.data.orden.fecha_tardio);
+                
                     
                     if(response.data.orden.envio_gratis == 0){
                         $("#marcadogratis").prop("checked", false);

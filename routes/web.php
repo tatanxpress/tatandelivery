@@ -59,11 +59,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/cliente/tablas/direccion/{id}', 'ClientesController@direccionesTabla'); 
   Route::post('/cliente/direcciones/informacion','ClientesController@infoDireccion');
   Route::get('/cliente/ubicacion/{id}', 'ClientesController@clienteUbicacion');
- // codigo temporal
-  //Route::get('/codigotemporal/lista', 'CodigoTemporalController@index');
-  //Route::get('/codigotemporal/tabla/codigo', 'CodigoTemporalController@codigotabla');
-  //Route::post('/activosms/informacion','CodigoTemporalController@informacion');
- // Route::post('/activosms/editar','CodigoTemporalController@editar');
+
   // servicios locales
   Route::get('/servicios/lista', 'ServiciosController@index'); 
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');
@@ -131,14 +127,14 @@ Route::prefix('admin')->group(function () {
   Route::post('/propietarios/nuevo', 'PropiController@nuevo'); 
   Route::post('/propietarios/informacion', 'PropiController@informacion');
   Route::post('/propietarios/editar', 'PropiController@editar');
-  // motoristas 
+  // motoristas   
   Route::get('/motoristas/lista', 'MotoristaController@index');
   Route::get('/motoristas/tabla/lista', 'MotoristaController@mototabla');
   Route::post('/motoristas/nuevo', 'MotoristaController@nuevo');
   Route::post('/motoristas/informacion', 'MotoristaController@informacion');
   Route::post('/motoristas/editar', 'MotoristaController@editar');
   Route::post('/motoristas/promedio', 'MotoristaController@promedio');
-
+ 
   // motorista servicios
   Route::get('/motoristasservicio/lista', 'MotoristaController@index2');
   Route::get('/motoristasservicio/tabla/lista', 'MotoristaController@motoserviciotabla');
@@ -147,7 +143,7 @@ Route::prefix('admin')->group(function () {
   // revisadores de ordenes 
   Route::get('/revisador/lista', 'RevisadorController@index');
   Route::get('/revisador/tabla/lista', 'RevisadorController@revisadortabla');
-  Route::post('/revisador/nuevo', 'RevisadorController@nuevo');
+  Route::post('/revisador/nuevo', 'RevisadorController@nuevo'); 
   Route::post('/revisador/reseteo', 'RevisadorController@reseteo');
   Route::post('/revisador/informacion', 'RevisadorController@informacion');
   Route::post('/revisador/editar', 'RevisadorController@editar');
@@ -177,7 +173,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/motoexpe/tabla/lista', 'OrdenesController@tablamotoexpe');
   // buscador ordenes de un motorista especifico
   Route::get('/buscar/moto/ordenes', 'OrdenesController@index4');
-  Route::get('/buscar/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador');
+  Route::get('/buscar/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador'); 
   Route::get('/buscar2/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador2');
   Route::post('/buscar3/orden/servicio', 'OrdenesController@buscador3');
   Route::post('/buscar/orden/informacion', 'OrdenesController@infoordenbuscada');
@@ -191,9 +187,9 @@ Route::prefix('admin')->group(function () {
   Route::post('/registro/pago/motorista', 'MotoristaPagoController@nuevo');
   Route::post('/motopago/pago/ver', 'MotoristaPagoController@totalpagadomotorista');
    
-  // pago a servicios 
+  // pago a servicios  
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2'); 
-  Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador'); // buscar ordenes del servicio
+  Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador'); // buscar ordenes completas del servicio
   Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
@@ -216,7 +212,7 @@ Route::prefix('admin')->group(function () {
   Route::post('/registro/pago/servicio', 'MotoristaPagoController@nuevopagoservicio');
   Route::post('/registro/pago/ver', 'MotoristaPagoController@totalpagadoservicio'); 
   
-  // agregar administradores para revision de ordenes sin motorista
+  // agregar administradores para revision de ordenes
   Route::get('/adminrevisador/lista', 'AdminController@index3'); 
   Route::get('/adminrevisador/tabla/lista', 'AdminController@tablaadminrevisador');
   Route::post('/adminrevisador/informacion', 'AdminController@informacion');

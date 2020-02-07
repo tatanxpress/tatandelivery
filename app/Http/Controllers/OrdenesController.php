@@ -78,8 +78,8 @@ class OrdenesController extends Controller
              'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.fecha_5',
              'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
              'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
-             'o.visible_p3', 'o.tardio', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.fecha_tardio', 'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
+             'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
+             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
             ->where('o.id', $request->id)
             ->first(); 
 
@@ -145,7 +145,7 @@ class OrdenesController extends Controller
 
         $orden = DB::table('motorista_ordenes AS mo')
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-        ->select('mo.ordenes_id', 'm.identificador', 'm.nombre', 'mo.fecha_agarrada', 'mo.motorista_prestado')
+        ->select('mo.ordenes_id', 'm.identificador', 'm.nombre', 'mo.fecha_agarrada')
         ->get(); 
 
         foreach($orden as $o){
@@ -204,10 +204,10 @@ class OrdenesController extends Controller
             ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
             ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->select('o.id AS idorden', 'o.envio_gratis', 'mo.motorista_prestado', 
+            ->select('o.id AS idorden', 'o.envio_gratis',
             'o.precio_envio', 'mo.motoristas_id', 'm.identificador', 'o.fecha_orden', 
             'o.ganancia_motorista', 's.identificador AS identiservicio', 
-            'o.estado_7', 'o.tardio')
+            'o.estado_7')
             ->where('mo.motoristas_id', $id)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
             ->get(); 
@@ -217,8 +217,7 @@ class OrdenesController extends Controller
                 $hora1 = date("h:i A", strtotime($fechaOrden));
                 $fecha1 = date("d-m-Y", strtotime($fechaOrden));
                 $o->fecha_orden = $fecha1 . " " . $hora1;  
-            }
-          
+            }           
  
             return view('backend.paginas.ordenes.tablas.tablabuscarmotoorden', compact('orden'));
         }else{
@@ -226,75 +225,6 @@ class OrdenesController extends Controller
         }
     }
 
-    // filtrar solo ordenes de motorista prestado
-    public function buscador2($id, $fecha1, $fecha2){
-    
-        if(Motoristas::where('id', $id)->first()){
-
-            $date1 = Carbon::parse($fecha1)->format('Y-m-d');
-            $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
-            
-            $orden = DB::table('motorista_ordenes AS mo')
-            ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-            ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->select('o.id AS idorden', 'mo.motorista_prestado', 'o.precio_envio',
-             'mo.motoristas_id', 'm.identificador', 'o.envio_gratis', 'o.fecha_orden', 'o.ganancia_motorista', 
-             's.identificador AS identiservicio', 'o.estado_7', 'o.tardio')
-            ->where('mo.motoristas_id', $id)
-            ->where('mo.motorista_prestado', 1)
-            ->whereBetween('o.fecha_orden', array($date1, $date2))          
-            ->get(); 
-
-            foreach($orden as $o){
-                $fechaOrden = $o->fecha_orden;
-                $hora1 = date("h:i A", strtotime($fechaOrden));
-                $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-                $o->fecha_orden = $fecha1 . " " . $hora1;  
-            }          
-
-            return view('backend.paginas.ordenes.tablas.tablabuscarmotoorden', compact('orden'));
-        }else{
-            return ['success' => 2];
-        }
-    }
-
-    // filtrar y obtener id del los servicios que se cobrara
-    public function buscador3(Request $request){
-    
-        if(Motoristas::where('id', $request->id)->first()){
-
-            $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
-            $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d');
-            
-            // conocer total de servicios al qie se 
-            $ordenAgrupado = DB::table('motorista_ordenes AS mo')
-            ->select('s.id')
-            ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-            ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->where('mo.motorista_prestado', 1)
-            ->whereBetween('o.fecha_orden', array($date1, $date2))
-            ->groupBy('s.id')         
-            ->get();
-
-            // obtener sus identificadores
-            foreach($ordenAgrupado as $o){
-                $servicio = DB::table('servicios')
-                ->where('id', $o->id)
-                ->first();
-
-                $o->identificador = $servicio->identificador;
-            }
-
-            return ['success' => 1, 'agrupado' => $ordenAgrupado];
-
-        }else{
-            return ['success' => 2];
-        }
-    } 
 
     // informacion de orden buscada
     public function infoordenbuscada(Request $request){
@@ -331,8 +261,8 @@ class OrdenesController extends Controller
              'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.fecha_5',
              'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
              'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
-             'o.visible_p3', 'o.tardio', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.fecha_tardio', 'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
+             'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
+             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
             ->where('o.id', $request->id)
             ->first(); 
 
@@ -371,20 +301,6 @@ class OrdenesController extends Controller
             
           if(Motoristas::where('id', $request->id)->first()){
 
-            // total de ordenes agarradas
-
-            // ordenes completadas con estado 7
-
-            // total de ordenes canceladas 
-
-            // total de ordenes tardio
-
-            // total de ordenes marcadas como envio gratis
-
-            // total ganancia motorista
-
-            // motorista prestado
-
             $date1 = Carbon::parse($request->fecha1)->format('Y-m-d');
             $date2 = Carbon::parse($request->fecha2)->addDays(1)->format('Y-m-d');
             
@@ -393,17 +309,10 @@ class OrdenesController extends Controller
             ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
             ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->select('mo.motoristas_id', 'o.estado_7', 'mo.motorista_prestado', 'o.estado_8', 'o.tardio', 'o.envio_gratis', 'o.ganancia_motorista')
+            ->select('mo.motoristas_id', 'o.estado_7', 'o.estado_8', 'o.envio_gratis', 'o.ganancia_motorista')
             ->where('mo.motoristas_id', $request->id)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
             ->get();
-
-            $motoprestado=0;
-            foreach ($orden as $valor){
-                if($valor->motorista_prestado == 1){
-                    $motoprestado = $motoprestado + 1;
-                }                
-            }
  
             $totalagarradas=0;
             foreach ($orden as $valor){
@@ -424,13 +333,7 @@ class OrdenesController extends Controller
                 }
             }
 
-            $totaltardio=0;
-            foreach ($orden as $valor){
-                if($valor->tardio == 1){
-                    $totaltardio = $totaltardio + 1;
-                }
-            }
-
+            
             $totalmarcagratis=0;
             foreach ($orden as $valor){
                 if($valor->envio_gratis == 1){
@@ -446,75 +349,11 @@ class OrdenesController extends Controller
                 }
             }
 
-            //otros datos
-
-            $ordenFiltro = DB::table('motorista_ordenes AS mo')
-            ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-            ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
-            ->select('o.id AS idorden', 'mo.motorista_prestado', 'o.precio_envio',
-             'mo.motoristas_id', 'm.identificador', 'o.envio_gratis', 'o.fecha_orden', 'o.ganancia_motorista', 
-             's.identificador AS identiservicio', 'od.zonas_id AS idzona', 's.id AS idservicio', 'o.estado_7', 'o.estado_8')
-            ->where('mo.motoristas_id', $request->id)
-            ->where('mo.motorista_prestado', 1)
-            ->whereBetween('o.fecha_orden', array($date1, $date2))          
-            ->get();
-
-            // conocer total de servicios al qie se 
-            $ordenAgrupado = DB::table('motorista_ordenes AS mo')
-            ->select('s.id')
-            ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-            ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->where('mo.motorista_prestado', 1)
-            ->whereBetween('o.fecha_orden', array($date1, $date2))   
-            ->groupBy('s.id')         
-            ->get();
-
-            // total de servicios prestado
-            $totalservicio=0;
-            foreach ($ordenAgrupado as $valor){
-                $totalservicio = $totalservicio + 1;
-            }
-
-            // sacar total a cobrar de todos los servicios al que se presto
-            $totalprecioenvio = 0;
-            foreach ($ordenFiltro as $valor){
-                 
-                $dato = DB::table('zonas_servicios')
-                ->where('zonas_id', $valor->idzona)
-                ->where('servicios_id', $valor->idservicio)
-                ->first();
-
-                if($valor->estado_8 == 0 && $valor->estado_7 == 1){
-                    $totalprecioenvio = $totalprecioenvio + $dato->precio_envio;
-                }
-            }
-
-            $totalcobro = number_format((float)$totalprecioenvio, 2, '.', '');
-
-            $totalgananciamotorista = 0;
-            foreach ($ordenFiltro as $valor){
-            
-                if($valor->estado_8 == 0 && $valor->estado_7 == 1){
-                    $totalgananciamotorista = $totalgananciamotorista + $dato->ganancia_motorista;
-                }
-            }
-         
-            $totalgananciaprestado = number_format((float)$totalgananciamotorista, 2, '.', '');
-
-
-
             return ['success' => 1, 'totalagarradas' => $totalagarradas,
-                    'totalcompletada' => $totalcompletas, 'totalcancelada' => $totalcanceladas, 'totaltardio' => $totaltardio,
-                    'totalmarcagratis' => $totalmarcagratis, 'totalganancia' => $totalganancia, 
-                    'motoprestado' => $motoprestado, 'totalservicio' => $totalservicio, 'totalprecioenvio' => $totalcobro,
-                    'totalgananciamoto' => $totalgananciaprestado]; 
+                    'totalcompletada' => $totalcompletas, 'totalcancelada' => $totalcanceladas, 
+                    'totalmarcagratis' => $totalmarcagratis, 'totalganancia' => $totalganancia]; 
           }else{
-            return ['success' => 2];
+            return ['success' => 2]; 
           }
         }
     }
@@ -532,9 +371,8 @@ class OrdenesController extends Controller
         ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
         ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
         ->select('o.id', 'o.precio_total', 'o.fecha_orden', 's.id AS idservicio', 'mo.motoristas_id',
-                 'mo.motorista_prestado', 'od.zonas_id AS idzona')
-        ->where('mo.motoristas_id', $idmoto)
-        ->where('mo.motorista_prestado', 1)
+                'od.zonas_id AS idzona')
+        ->where('mo.motoristas_id', $idmoto)      
         ->whereBetween('o.fecha_orden', array($date1, $date2))          
         ->get();
 

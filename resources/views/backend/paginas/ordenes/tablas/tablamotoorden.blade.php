@@ -13,7 +13,6 @@
                     <th style="width: 15%">Identificador motorista</th> 
                     <th style="width: 15%">Nombre</th> 
                     <th style="width: 15%">Fecha</th>   
-                    <th style="width: 15%">Motorista prestado?</th>                    
            
                 </tr> 
                 </thead>
@@ -25,12 +24,7 @@
                     <td>{{ $dato->nombre }}</td>
                     <td>{{ $dato->fecha_agarrada }}</td>
 
-                    @if($dato->motorista_prestado == 0)
-                    <td> <span class="badge bg-success">No</span></td>
-                    @else
-                    <td> <span class="badge bg-warning">Si</span></td>
-                    @endif
-
+                
                 </tr>            
      
                 @endforeach            

@@ -62,13 +62,8 @@
                   <i class="far fa-circle nav-icon"></i>
                   <p>Ver Clientes</p>
                 </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/admin/codigotemporal/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Código Temporales</p>
-                </a>
-              </li>             
+              </li> 
+                   
             </ul>
           </li>
 
@@ -167,7 +162,7 @@
                 Motoristas
                 <i class="right fas fa-angle-left"></i>
               </p>
-            </a>
+            </a> 
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{{ url('/admin/motoristas/lista') }}" target="frameprincipal" class="nav-link">
@@ -277,16 +272,9 @@
                   <p>Buscador Orden Motorista</p>
                 </a>
               </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/ordenpendite/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Orden Pendiente motorista</p>
-                </a>
-              </li>
-                           
-            </ul>
-          </li>
+   
+            </ul> 
+          </li> 
 
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
@@ -304,7 +292,7 @@
                 </a>
               </li>
 
-           
+            
                            
             </ul>
           </li>
