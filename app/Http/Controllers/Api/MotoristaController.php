@@ -76,7 +76,7 @@ class MotoristaController extends Controller
             }
         }
     }
-/*
+
     // verificar si existe el telefono
     public function buscarTelefono(Request $request){
         if($request->isMethod('post')){   
@@ -385,7 +385,7 @@ class MotoristaController extends Controller
     }
 
     // ver productos de la orden
-    public function verProductosOrden(Request $request){
+   /* public function verProductosOrden(Request $request){
         // validaciones para los datos
         $reglaDatos = array(
             'ordenid' => 'required'               
