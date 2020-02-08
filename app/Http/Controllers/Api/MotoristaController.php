@@ -540,9 +540,10 @@ class MotoristaController extends Controller
             }
         }
     }
-/*
+
     // el motorista recoge la orden 
     public function obtenerOrden(Request $request){
+        
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
@@ -567,6 +568,7 @@ class MotoristaController extends Controller
             }
 
             if($mo = Motoristas::where('id', $request->id)->first()){
+                
                 if($or = Ordenes::where('id', $request->ordenid)->first()){
 
                     // verificar si motorista puede seguir agarrando ordenes
@@ -591,12 +593,11 @@ class MotoristaController extends Controller
                     ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
                     'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
-                    'mo.fecha_agarrada', )
+                    'mo.fecha_agarrada')
                     ->where('mo.motoristas_id', $mo->id)
                     ->where('o.estado_5', 1) // orden preparada                   
                     ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
                     ->get(); 
-
                     
                     $sum = 0.0;
                     foreach($ordenid as $o){
@@ -636,14 +637,11 @@ class MotoristaController extends Controller
                             Ordenes::where('id', $request->ordenid)->update(['visible_m' => 1]);
 
                             $fecha = Carbon::now('America/El_Salvador');
-
-                           
                             
                             $nueva = new MotoristaOrdenes;
                             $nueva->ordenes_id = $or->id;
                             $nueva->motoristas_id = $request->id;
                             $nueva->fecha_agarrada = $fecha;
-                            
 
                             $nueva->save();
 
@@ -668,7 +666,7 @@ class MotoristaController extends Controller
             }
         }
     }
-*/
+
     // ordenes en proceso
     public function verProcesoOrdenes(Request $request){
         if($request->isMethod('post')){ 
