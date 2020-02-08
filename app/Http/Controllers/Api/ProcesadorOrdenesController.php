@@ -790,7 +790,13 @@ class ProcesadorOrdenesController extends Controller
 
                 // obtener fecha orden y sumarle tiempo si estado es igual a 2
                 foreach($orden as $o){
-                    
+
+                    // sumar precio de envio + producto
+                    $sumado = $o->precio_total + $o->precio_envio;
+                    $total = number_format((float)$sumado, 2, '.', '');
+
+                    $o->precio_total = $total;
+                     
                     if($o->estado_2 == 1){ // propietario da el tiempo de espera
                         
                         $fechaE2 = $o->fecha_2;

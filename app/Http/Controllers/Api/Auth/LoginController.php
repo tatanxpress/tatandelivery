@@ -80,7 +80,7 @@ class LoginController extends Controller
 
                 if($u->activo == 0){
                     return ['success' => 3]; // usuario desactivado
-                }
+                } 
                 
                 if (Hash::check($request->password, $u->password)) {
                     
@@ -92,7 +92,7 @@ class LoginController extends Controller
                     }
                     
                     return ['success'=>1,'usuario_id' => $id];
-                    
+                     
                 }else{
                     return ['success' => 2]; // contraseña incorrecta
                 }
