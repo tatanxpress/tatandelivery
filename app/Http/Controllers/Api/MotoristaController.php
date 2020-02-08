@@ -385,7 +385,7 @@ class MotoristaController extends Controller
     }
 
     // ver productos de la orden
-    public function verProductosOrden(Request $request){
+     public function verProductosOrden(Request $request){
         // validaciones para los datos
         $reglaDatos = array(
             'ordenid' => 'required'               
@@ -466,7 +466,7 @@ class MotoristaController extends Controller
     }
 
     // saver coordenadas del cliente 
-    public function coordenadascliente(Request $request){
+  /*  public function coordenadascliente(Request $request){
         $reglaDatos = array(
             'ordenid' => 'required'               
         );
@@ -856,9 +856,9 @@ class MotoristaController extends Controller
             }
         }
     }
-
+*/
     // iniciar entrega de la orden 
-   /* public function iniciarEntrega(Request $request){
+    public function iniciarEntrega(Request $request){
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
@@ -1374,7 +1374,7 @@ class MotoristaController extends Controller
             }
         }
     } 
-*/
+
 
     public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
         OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
