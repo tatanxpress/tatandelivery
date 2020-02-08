@@ -28,44 +28,6 @@ class PropietarioController extends Controller
 {
     // login para propietario
     public function loginPropietario(Request $request){
-
-
-        $propietarios = DB::table('propietarios AS p')
-        ->where('p.servicios_id', 1)
-        ->where('p.disponibilidad', 1)
-        ->where('p.activo', 1)
-        ->get(); 
-      
-        // unir todos los identificadores para el envio de notificaciones
-        $pilaPropietarios = array();
-            foreach($propietarios as $m){
-                if(!empty($m->device_id)){
-                    //EVITAR LOS NUEVOS REGISTRADOS
-                    if($m->device_id != "0000"){                                   
-                        array_push($pilaPropietarios, $m->device_id); 
-                    }
-                }
-            } 
-
-         
-
-        // NOTIFICACIONES A PROPIETARIOS, DISPONIBLES
-        if(!empty($pilaPropietarios)){
-            $titulo = "Nueva Orden #";
-            $mensaje = "Ver orden nueva!";
-            $alarma = 1; //sonido alarma
-            $color = 1; // color rojo
-            $icono = 1; // campana
-            $tipo = 1; // es propietario
-           
-            if(!empty($pilaPropietarios)){     
-                    
-                $this->envioNoticacion($titulo, $mensaje, $pilaPropietarios, $alarma, $color, $icono, $tipo);                            
-            }
-
-        }
-
-        return 'llego';
  
         if($request->isMethod('post')){   
             $rules = array(                
