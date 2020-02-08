@@ -466,7 +466,7 @@ class MotoristaController extends Controller
     }
 
     // saver coordenadas del cliente 
-  /*  public function coordenadascliente(Request $request){
+    public function coordenadascliente(Request $request){
         $reglaDatos = array(
             'ordenid' => 'required'               
         );
@@ -670,7 +670,7 @@ class MotoristaController extends Controller
     }
 
     // ordenes en proceso
-    public function verProcesoOrdenes(Request $request){
+   /* public function verProcesoOrdenes(Request $request){
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
