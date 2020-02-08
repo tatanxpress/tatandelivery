@@ -866,7 +866,7 @@ class MotoristaController extends Controller
                 'ordenid' => 'required'               
             );
         
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(                                       
                 'ordenid.required' => 'El id de la orden es requerido'
                 );
 
