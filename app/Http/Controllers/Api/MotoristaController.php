@@ -901,7 +901,7 @@ class MotoristaController extends Controller
                     $mensaje = "El motorista va encamino";
                     $alarma = 2;
                     $color = 3;
-                    $icono = 2; 
+                    $icono = 2;  
                     $tipo = 2;
 
                     // CLIENTE SIEMPRE TENDRA DEVICE_ID

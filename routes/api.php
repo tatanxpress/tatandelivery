@@ -101,7 +101,7 @@ Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden')
 
 // cancelar orden extraordinariamente
 Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@cancelarOrdenExtraordinariamente'); // cancelar orden extraordinariamente
-
+ 
 // historial
 Route::post('propietario/ver/historial', 'Api\PropietarioController@verHistorial'); // ver historial
 

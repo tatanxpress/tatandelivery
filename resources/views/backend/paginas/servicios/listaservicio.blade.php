@@ -109,7 +109,7 @@
                                         <div class="form-group">
                                         <br>
                                             <label>Mínimo $ compra</label>
-                                            <input type="number" step="any" id="minimocompra">
+                                            <input type="number" value="0" step="any" id="minimocompra">
                                         </div>
                                         <div class="form-group">
                                             <label>Producto visible al Motorista</label>
@@ -122,7 +122,7 @@
                                         <div class="form-group">
                                         <br>
                                             <label>Tiempo de espera (cuando respuesta es automatica)</label>
-                                            <input type="number" step="any" id="tiempo-nuevo">
+                                            <input type="number" value="5" step="any" id="tiempo-nuevo">
                                         </div>
                                         <div class="form-group">
                                             <label style="color:#191818">Tipo Servicio</label>
