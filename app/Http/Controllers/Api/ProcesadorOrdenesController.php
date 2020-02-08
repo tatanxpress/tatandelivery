@@ -809,7 +809,7 @@ class ProcesadorOrdenesController extends Controller
                 
                     if($o->estado_4 == 1){ // orden en ppreparacion
                         $time1 = Carbon::parse($o->fecha_4);
-                        //$time2 = Carbon::parse($o->fecha_4);
+                        
                         $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                         $o->horaEstimada = $horaEstimada;
 

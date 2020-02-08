@@ -28,6 +28,7 @@ class PropietarioController extends Controller
 {
     // login para propietario
     public function loginPropietario(Request $request){
+ 
         if($request->isMethod('post')){   
             $rules = array(                
                 'phone' => 'required',
@@ -1623,8 +1624,8 @@ class PropietarioController extends Controller
                 $excedido = 0;
 
                 $inicio = Carbon::parse($fecha4);
-                // 10 MINUTOS MAXIMOS PARA PODER CANCELAR LA ORDEN    
-                $sumado = $inicio->addMinute(10)->format('Y-m-d H:i:s');                    
+                // 5 MINUTOS MAXIMOS PARA PODER CANCELAR LA ORDEN    
+                $sumado = $inicio->addMinute(5)->format('Y-m-d H:i:s');                    
                 $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
                                 
                 $d1 = new DateTime($sumado);
