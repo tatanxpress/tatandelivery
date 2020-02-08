@@ -28,25 +28,7 @@ class PropietarioController extends Controller
 {
     // login para propietario
     public function loginPropietario(Request $request){
-
-        $usuario = User::where('id', 2)->first();
-        $pilaUsuarios = $usuario->device_id;
-         
-        $titulo = "aa";
-        $mensaje = "dd";
-        $alarma = 2; 
-        $color = 3;
-        $icono = 3;
-        $tipo = 2; // tipo cliente
-
-        if(!empty($pilaUsuarios)){
-            $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
-        } 
-
-
-
-        return 'llego abajo';
- 
+  
         if($request->isMethod('post')){   
             $rules = array(                
                 'phone' => 'required',

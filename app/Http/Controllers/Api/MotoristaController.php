@@ -298,7 +298,7 @@ class MotoristaController extends Controller
                 $orden = DB::table('ordenes AS o')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4', 
-                'o.estado_8', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 'o.estado_6')
+                'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 'o.hora_2', 'o.estado_6')
                 ->where('o.estado_6', 0) // nadie a seteado este
                 ->where('o.estado_4', 1) // inicia la orden
                 ->where('o.estado_8', 0) // orden no cancelada
@@ -307,6 +307,11 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
+
+                    $sumado = $o->precio_total + $o->precio_envio;
+                    $total = number_format((float)$sumado, 2, '.', '');
+
+                    $o->precio_total = $total;
 
                     $servicio = DB::table('zonas AS z')
                     ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
