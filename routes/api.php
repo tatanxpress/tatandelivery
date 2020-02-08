@@ -70,7 +70,7 @@ Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesControll
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
  
-    
+     
 
 // PROPIETARIOS
  
@@ -108,10 +108,6 @@ Route::post('propietario/ver/historial', 'Api\PropietarioController@verHistorial
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes canceladas
 Route::post('propietario/ver/pago/tardia', 'Api\PropietarioController@verPagosTardio'); // ver ordenes canceladas
-
-
-
-//Route::post('propietario/ocultar/pago', 'Api\PropietarioController@ocultarPago'); // ocultar vista de un pago
  
 // configuraciones
 Route::post('propietario/horarios', 'Api\PropietarioController@verHorarios'); // ver horarios 
