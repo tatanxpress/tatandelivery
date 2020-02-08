@@ -76,7 +76,7 @@ class MotoristaController extends Controller
             }
         }
     }
-
+/*
     // verificar si existe el telefono
     public function buscarTelefono(Request $request){
         if($request->isMethod('post')){   
@@ -884,7 +884,7 @@ class MotoristaController extends Controller
 
                 if($or->estado_8 == 1){
                     return ['success' => 3]; 
-                }
+                } 
 
                 // orden ya fue preparada por el propietario
                 if($or->estado_5 == 1 && $or->estado_6 == 0){
@@ -1374,7 +1374,7 @@ class MotoristaController extends Controller
             }
         }
     } 
-
+*/
 
     public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
         OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
