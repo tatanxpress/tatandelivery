@@ -172,15 +172,21 @@ Route::prefix('admin')->group(function () {
   Route::get('/motoexpe/lista', 'OrdenesController@index3');
   Route::get('/motoexpe/tabla/lista', 'OrdenesController@tablamotoexpe');
   // buscador ordenes de un motorista especifico
-  Route::get('/buscar/moto/ordenes', 'OrdenesController@index4');
-  Route::get('/buscar/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador'); 
+  Route::get('/buscar/moto/ordenes', 'OrdenesController@index4'); 
+  Route::get('/buscar/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador');  // buscar ordenes motorista
   Route::get('/buscar2/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador2');
+ 
+
+  // buscar numero de orden
+  Route::get('/buscar/numero/orden', 'OrdenesController@index6');
+  Route::get('/buscar/num/orden/{id}', 'OrdenesController@buscarNumOrden');
+
   Route::post('/buscar3/orden/servicio', 'OrdenesController@buscador3');
   Route::post('/buscar/orden/informacion', 'OrdenesController@infoordenbuscada');
   Route::post('/buscar/orden/filtraje', 'OrdenesController@filtro');
   // reporte de servicio por motorista prestado 
-  Route::get('/generar/reporte1/{id}/{id2}/{id3}/{id4}', 'OrdenesController@reporte');
-  Route::get('/generar/reporte2/{id}/{id2}/{id3}', 'OrdenesController@reporte1');
+  //Route::get('/generar/reporte1/{id}/{id2}/{id3}/{id4}', 'OrdenesController@reporte');
+  Route::get('/generar/reporte2/{id}/{id2}/{id3}', 'OrdenesController@reporte1'); // reporte de pago a motoristas
   // guardar registro de pago motorista
   Route::get('/motopago/lista', 'MotoristaPagoController@index');
   Route::get('/motopago/tabla/lista', 'MotoristaPagoController@tablapago');
@@ -188,12 +194,12 @@ Route::prefix('admin')->group(function () {
   Route::post('/motopago/pago/ver', 'MotoristaPagoController@totalpagadomotorista');
    
   // pago a servicios  
-  Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2'); 
+  Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2');  
   Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador'); // buscar ordenes completas del servicio
   Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
-  Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
+  //Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido'); // reporte de productos vendidos
  
      

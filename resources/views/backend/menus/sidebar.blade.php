@@ -16,16 +16,15 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
      
-        <li class="nav-item has-treeview">
-            @can('completo')
+        @can('completo')
+        <li class="nav-item has-treeview">           
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
               <p>
                 Mapa Zonas
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            @endcan
+                <i class="right fas fa-angle-left"></i> 
+              </p> 
+            </a>            
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{{ url('/admin/zona/mapa/zona') }}" target="frameprincipal" class="nav-link">
@@ -47,7 +46,9 @@
               </li>
             </ul>
           </li>
-          
+        @endcan 
+        
+       
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
@@ -66,15 +67,17 @@
                    
             </ul>
           </li>
-
+        
+         
           <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Servicios
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa fa-globe"></i>
+                <p>
+                  Servicios
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a>
+
             <ul class="nav nav-treeview">
               <li class="nav-item">
                 <a href="{{ url('/admin/servicios/lista') }}" target="frameprincipal" class="nav-link">
@@ -82,15 +85,14 @@
                   <p>Lista Servicios</p>
                 </a>
               </li>
-
+              @can('completo')
               <li class="nav-item">
                 <a href="{{ url('/admin/zonaservicios/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Zona Servicios</p>
                 </a>
               </li>
-
-              
+              @endcan 
               <li class="nav-item">
                 <a href="{{ url('/admin/propietarios/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -101,20 +103,22 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/pagoservicios/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Pago a servicios</p>
+                  <p>Reporte Pago a servicios</p>
                 </a>
               </li>
-
+           
               <li class="nav-item">
                 <a href="{{ url('/admin/serviciopago/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Registro pagos</p>
+                  <p>Registro pagos a Servicios</p>
                 </a>
               </li>
-                           
             </ul>
           </li>
 
+         
+
+          @can('completo')
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
@@ -148,46 +152,49 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/registropromo/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Registro</p>
+                  <p>Registro de Pago Publicidad</p>
                 </a>
               </li>
                            
             </ul>
           </li>
-        
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Motoristas
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a> 
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ url('/admin/motoristas/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Motorista</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/admin/motoristasservicio/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Motorista asignados</p>
-                </a>
-              </li>
+          @endcan
 
-              <li class="nav-item">
-                <a href="{{ url('/admin/motopago/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Registro de pagos</p>
-                </a>
-              </li>
-             
-                           
-            </ul>
-          </li>
+         
+            <li class="nav-item has-treeview">
+              <a href="#" class="nav-link">
+                <i class="nav-icon fa fa fa-globe"></i>
+                <p>
+                  Motoristas
+                  <i class="right fas fa-angle-left"></i>
+                </p>
+              </a> 
+              <ul class="nav nav-treeview">
+                <li class="nav-item">
+                  <a href="{{ url('/admin/motoristas/lista') }}" target="frameprincipal" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Motorista</p> 
+                  </a>
+                </li>
+                @can('completo')
+                <li class="nav-item">
+                  <a href="{{ url('/admin/motoristasservicio/lista') }}" target="frameprincipal" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Motorista asignados</p>
+                  </a>
+                </li>
+                @endcan
+                <li class="nav-item">
+                  <a href="{{ url('/admin/motopago/lista') }}" target="frameprincipal" class="nav-link">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Registro de pagos</p>
+                  </a>
+                </li>    
+              </ul>
+            </li>
+          
 
+          @can('completo')
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
@@ -234,8 +241,10 @@
                            
             </ul>
           </li>
-
-          <li class="nav-item has-treeview">
+        @endcan
+ 
+      
+        <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
               <p>
@@ -247,14 +256,21 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/ordenes/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Orden</p>
+                  <p>Todas las Ordenes</p>
+                </a>
+              </li>
+  
+              <li class="nav-item">
+                <a href="{{ url('/admin/buscar/numero/orden') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Buscar # Orden</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="{{ url('/admin/motoorden/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Motorista ordenes</p>
+                  <p>Motorista ordenes Agarradas</p>
                 </a>
               </li>
 
@@ -264,7 +280,6 @@
                   <p>Motorista calificaciones</p>
                 </a>
               </li>
-
               
               <li class="nav-item">
                 <a href="{{ url('/admin/buscar/moto/ordenes') }}" target="frameprincipal" class="nav-link">
@@ -275,28 +290,8 @@
    
             </ul> 
           </li> 
-
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Generales
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ url('/admin/notificacion/vista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Notificaciones Global</p>
-                </a>
-              </li>
-
-            
-                           
-            </ul>
-          </li>
-
+      
+        
          
         </ul>
       </nav>

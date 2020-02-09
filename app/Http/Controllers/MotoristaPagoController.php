@@ -155,13 +155,10 @@ class MotoristaPagoController extends Controller
         if(Servicios::where('id', $idservicio)->first()){
  
             $date1 = Carbon::parse($fecha1)->format('Y-m-d');
-            $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+            $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d'); 
             
-            $orden = DB::table('motorista_ordenes AS mo')
-            ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-            ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+            $orden = DB::table('ordenes AS o')
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
             ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
             's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5')
             ->where('s.id', $idservicio)
@@ -192,17 +189,15 @@ class MotoristaPagoController extends Controller
         $f1 = Carbon::parse($fecha1)->format('d-m-Y');
         $f2 = Carbon::parse($fecha2)->format('d-m-Y');
 
-        $orden = DB::table('motorista_ordenes AS mo')
-        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-        ->select('o.id AS idorden', 'o.precio_total',  'o.fecha_orden', 'o.estado_5', 'o.estado_8')
-        ->where('o.estado_5', 1) // orden preparada por el servicio
-        ->where('o.estado_8', 0)    
-        ->where('s.id', $idservicio)
-        ->whereBetween('o.fecha_orden', array($date1, $date2))          
-        ->get(); 
+        $orden = DB::table('ordenes AS o')
+            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+            ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
+            's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5')
+            ->where('s.id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get(); 
 
         $dinero = 0;
         foreach($orden as $o){
@@ -232,7 +227,7 @@ class MotoristaPagoController extends Controller
         $pagar = number_format((float)$pagarFinal, 2, '.', ''); 
 
         $suma2 = number_format((float)$suma, 2, '.', ''); 
- 
+  
         $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'redondear', 'suma2', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
@@ -249,18 +244,14 @@ class MotoristaPagoController extends Controller
         $f1 = Carbon::parse($fecha1)->format('d-m-Y');
         $f2 = Carbon::parse($fecha2)->format('d-m-Y');
 
-        $orden = DB::table('motorista_ordenes AS mo')
-        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+        $orden = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
         ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
-        'o.estado_5', 'o.estado_8', 'o.cancelado_cliente', 'o.cancelado_propietario')
-        ->where('o.estado_5', 0) 
-        ->where('o.estado_8', 1)       
+        's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5', 'o.cancelado_cliente', 'o.cancelado_propietario')
         ->where('s.id', $idservicio)
-        ->whereBetween('o.fecha_orden', array($date1, $date2))
-        ->get();
+        ->where('o.estado_8', 1) //canceladas
+        ->whereBetween('o.fecha_orden', array($date1, $date2))          
+        ->get();  
 
         $conteo = 0;
         $dinero = 0;

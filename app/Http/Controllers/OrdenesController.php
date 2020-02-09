@@ -190,12 +190,12 @@ class OrdenesController extends Controller
 
         return view('backend.paginas.ordenes.listabuscarmotoorden', compact('moto'));
     }
-   
+    
     // buscador de motorista ordenes agarradas por fecha
     public function buscador($id, $fecha1, $fecha2){
     
         if(Motoristas::where('id', $id)->first()){
-
+ 
             $date1 = Carbon::parse($fecha1)->format('Y-m-d');
             $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
             
@@ -218,13 +218,38 @@ class OrdenesController extends Controller
                 $fecha1 = date("d-m-Y", strtotime($fechaOrden));
                 $o->fecha_orden = $fecha1 . " " . $hora1;  
             }           
- 
+  
             return view('backend.paginas.ordenes.tablas.tablabuscarmotoorden', compact('orden'));
         }else{
             return ['success' => 2];
         }
     }
 
+    // buscar por numero de orden
+    public function buscarNumOrden($id){
+            
+        $orden = DB::table('ordenes AS o')
+        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+        ->select('o.id', 's.identificador', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden')
+        ->where('o.id', $id)
+        ->get(); 
+
+        foreach($orden as $o){
+
+            $sumado = $o->precio_total + $o->precio_envio;
+            $total = number_format((float)$sumado, 2, '.', '');
+
+            $o->precio_total = $total;
+ 
+            $fechaOrden = $o->fecha_orden;
+            $hora1 = date("h:i A", strtotime($fechaOrden));
+            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
+            $o->fecha_orden = $hora1 . " " . $fecha1;  
+        } 
+
+        return view('backend.paginas.ordenes.tablas.tablaorden2', compact('orden'));
+    }
+    
 
     // informacion de orden buscada
     public function infoordenbuscada(Request $request){
@@ -264,16 +289,26 @@ class OrdenesController extends Controller
              'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
              'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
             ->where('o.id', $request->id)
-            ->first(); 
+            ->first();
 
-            return ['success' => 1, 'orden' => $orden]; 
+            $estimada = "";
+            if($orden->estado_4 == 1){ 
+                $time1 = Carbon::parse($orden->fecha_4);
+                $horaEstimada = $time1->addMinute($orden->hora_2)->format('h:i A d-m-Y');
+                $estimada = $horaEstimada; 
+            }
+
+            $sumado = $orden->precio_total + $orden->precio_envio;
+            $total = number_format((float)$sumado, 2, '.', '');
+
+            return ['success' => 1, 'orden' => $orden, 'estimada' => $estimada, 'total' => $total]; 
           }else{
             return ['success' => 2];
           }
         }
     }
 
-    // filtro para obtener algunos datos basicos
+    // filtro para obtener algunos datos basicos del motorista
     public function filtro(Request $request){
         if($request->isMethod('post')){  
 
@@ -349,9 +384,11 @@ class OrdenesController extends Controller
                 }
             }
 
+            $total = number_format((float)$totalganancia, 2, '.', '');
+
             return ['success' => 1, 'totalagarradas' => $totalagarradas,
                     'totalcompletada' => $totalcompletas, 'totalcancelada' => $totalcanceladas, 
-                    'totalmarcagratis' => $totalmarcagratis, 'totalganancia' => $totalganancia]; 
+                    'totalmarcagratis' => $totalmarcagratis, 'totalganancia' => $total]; 
           }else{
             return ['success' => 2]; 
           }
@@ -359,7 +396,7 @@ class OrdenesController extends Controller
     }
 
     // reporte de servicio para cobrar por motorista prestado
-    function reporte($idmoto, $idservicio, $fecha1, $fecha2){
+   /* function reporte($idmoto, $idservicio, $fecha1, $fecha2){
 
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');
         $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
@@ -393,7 +430,7 @@ class OrdenesController extends Controller
             $hora1 = date("h:i A", strtotime($fechaOrden));
             $fecha1 = date("d-m-Y", strtotime($fechaOrden));
             $o->fecha_orden = $fecha1 . " " . $hora1;  
-        }
+        } 
         
         $totalDinero = number_format((float)$dinero, 2, '.', '');
 
@@ -402,7 +439,7 @@ class OrdenesController extends Controller
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
 
         return $pdf->stream();
-    }
+    }*/
 
     // reporte para pago del motorista, SOLO ORDENES NO CANCELADAS, Y ORDENES COMPLETADAS
     function reporte1($idmoto, $fecha1, $fecha2){
@@ -487,6 +524,16 @@ class OrdenesController extends Controller
  
         return view('backend.paginas.ordenes.tablas.tablapendienteorden', compact('orden'));
     } 
+
+
+    
+    // vista para buscar un # orden
+    public function index6(){
+
+        return view('backend.paginas.ordenes.listavistanumeroorden');
+    }
+
+
 
     // ocultar una orden pendiente de motorista
     function ocultarordenpendiente(Request $request){

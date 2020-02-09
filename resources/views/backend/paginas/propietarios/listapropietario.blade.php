@@ -12,11 +12,13 @@
        <div class="container-fluid">
            <div class="col-sm-12">
              <h1>Propietarios</h1>
-           </div>    
+           </div> 
+           @can('completo')   
            <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                  <i class="fas fa-pencil-alt"></i>
                      Nuevo propietario
            </button>    
+           @endcan
        </div>
      </section>
      
@@ -149,7 +151,9 @@
              </div>
              <div class="modal-footer justify-content-between">
                  <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                 <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                 @can('completo')
+                    <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                 @endcan
              </div>          
          </div>        
      </div>      
@@ -215,7 +219,7 @@
                         loadingOverlay().cancel(spinHandle);
                         toastr.error('Error');
                     });
-        }
+        } 
     }
 
     function respuestaNuevo(response){

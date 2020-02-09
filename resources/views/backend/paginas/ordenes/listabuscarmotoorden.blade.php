@@ -14,12 +14,12 @@
            </div>  
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Filtro para ordenes
+                    Filtro para ordenes del Motorista
           </button>  
 
           <button type="button" style="margin-left:15px" onclick="modalFiltro()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Filtro datos
+                    Filtro para Datos Basicos
           </button>  
 
           <button type="button" style="margin-left:15px" onclick="reportePago()" class="btn btn-primary btn-sm">
@@ -46,7 +46,7 @@
            </div>
        </div>
      </section>
-
+ 
 <!-- modal buscar -->
 <div class="modal fade" id="modalBuscar">
     <div class="modal-dialog">
@@ -324,7 +324,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Generar reporte</h4>
+                <h4 class="modal-title">Generar reporte de ordenes completadas</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -750,7 +750,7 @@
             formData.append('fecha2', fechahasta);
                   
             axios.post('/admin/buscar/orden/filtraje',formData,{
-                })
+                }) 
                 .then((response) => {
                     loadingOverlay().cancel(spinHandle);
 
@@ -758,8 +758,7 @@
                     $('#modalDato').modal('show');
                     $('#totalagarradas').val(response.data.totalagarradas);
                     $('#totalcompletadas').val(response.data.totalcompletada);
-                    $('#totalcanceladas').val(response.data.totalcancelada);
-                    $('#totaltardio').val(response.data.totaltardio);
+                    $('#totalcanceladas').val(response.data.totalcancelada);                  
                     $('#totalgratis').val(response.data.totalmarcagratis);
                     $('#totalganancia').val(response.data.totalganancia);
                    

@@ -34,7 +34,7 @@ class administradores_seeder extends Seeder
             'password' => bcrypt('12345678')]); 
             
         $user2->assignRole('editor');
-
+ 
        /* $moderador = Admin::insert([
             [ 'nombre' => 'Moderador', 
               'email' => 'moderador@gmail.com',

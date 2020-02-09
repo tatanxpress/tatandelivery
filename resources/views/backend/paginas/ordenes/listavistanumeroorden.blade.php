@@ -1,37 +1,75 @@
 @extends('backend.menus.superior')
  
-@section('content-admin-css')
-    <link href="{{ asset('css/backend/adminlte.min.css') }}" type="text/css" rel="stylesheet" /> 
-    <link href="{{ asset('css/backend/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" /> 
-    <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
-    
-@stop  
-
-<section class="content-header">
-      <div class="container-fluid">
-          <div class="col-sm-12">
-            <h1>Ordenes</h1>
-          </div>  
-      </div>
-    </section>
+ @section('content-admin-css')
+     <link href="{{ asset('css/backend/adminlte.min.css') }}" type="text/css" rel="stylesheet" /> 
+     <link href="{{ asset('css/backend/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" /> 
+     <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
+ 
+ @stop  
+ 
+ <section class="content-header">
+       <div class="container-fluid">
+           <div class="col-sm-12">
+             <h1>Buscador de # Orden</h1>
+           </div>  
+           <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Buscar # Orden
+          </button>  
+         
+       </div>
+     </section>
      
-  <!-- seccion frame -->
-  <section class="content">
-    <div class="container-fluid">
-      <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Tabla de ordenes</h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                <div id="tablaDatatable"></div>
-              </div>
+   <!-- seccion frame -->
+   <section class="content">
+     <div class="container-fluid">
+       <div class="card card-primary">
+           <div class="card-header">
+             <h3 class="card-title">Tabla de registros</h3>
+           </div>
+           <div class="card-body">
+             <div class="row">
+                 <div class="col-md-12">
+                 <div id="tablaDatatable"></div>
+               </div>
+             </div>
+           </div>
+           </div>
+       </div>
+     </section>
+
+<!-- modal buscar -->
+<div class="modal fade" id="modalBuscar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Buscador de ordenes</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-          </div>
-		  </div>
-	  </div>
-	</section>
+            <div class="modal-body">
+                <form id="formulario-buscar">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                                <div class="form-group">                                   
+                                    <input type="number" class="form-control" id="orden">
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="buscar()">Buscar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
 
 
 <!-- modal informacion-->
@@ -94,7 +132,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Precio total</label>
+                                    <label>Precio Producto + Envio</label>
                                     <input type="text" disabled class="form-control" id="preciototal">
                                 </div>
 
@@ -155,10 +193,9 @@
                                     <input type="text" disabled class="form-control" id="fecha4">
                                 </div>
 
-                                
                                 <div class="form-group">
-                                    <label>Hora estimada de Entrega</label>
-                                    <input type="text" disabled class="form-control" id="horaestimada">
+                                    <label>Hora Estimada Entrega al Cliente</label>
+                                    <input type="text" disabled class="form-control" id="estimada">
                                 </div>
 
                                  <!-- -->
@@ -256,8 +293,6 @@
 
                                   <!-- -->
 
-
-
                                   <!-- -->
 
                                   <div class="form-group">
@@ -306,39 +341,60 @@
         </div>        
     </div>      
 </div>
+                           
+ 
+ @extends('backend.menus.inferior')
+ 
+ @section('content-admin-js')
+ 
+     <script src="{{ asset('js/backend/jquery.dataTables.js') }}" type="text/javascript"></script>
+     <script src="{{ asset('js/backend/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
+     <script src="{{ asset('js/frontend/toastr.min.js') }}" type="text/javascript"></script>
+     <script src="{{ asset('js/frontend/axios.min.js') }}" type="text/javascript"></script>
+     <script src="{{ asset('js/frontend/loadingOverlay.js') }}" type="text/javascript"></script>
+ 
+   <script>
 
-@extends('backend.menus.inferior')
+    function modalBuscar(){
+        document.getElementById("formulario-buscar").reset();
+        $('#modalBuscar').modal('show');
+    }
+ 
+    function buscar(){
+        var orden = document.getElementById('orden').value;
 
-@section('content-admin-js')
+        if(orden === ''){
+            toastr.error('# Orden es Requerida'); 
+            return;
+        }
 
-    <script src="{{ asset('js/backend/jquery.dataTables.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/backend/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/frontend/toastr.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/frontend/axios.min.js') }}" type="text/javascript"></script>
-    <script src="{{ asset('js/frontend/loadingOverlay.js') }}" type="text/javascript"></script>
+        var ruta = "{{ url('/admin/buscar/num/orden') }}/"+orden;
+        $('#tablaDatatable').load(ruta);        
+    }
 
- <!-- incluir tabla --> 
-  <script type="text/javascript">	 
-    $(document).ready(function(){       
-        var ruta = "{{ URL::to('admin/ordenes/tabla/lista') }}";
-        $('#tablaDatatable').load(ruta);
-    });  
-    
- </script>
-
-  <script>
+   
 
     function informacion(id){
         document.getElementById("formulario-info").reset();
         spinHandle = loadingOverlay().activate();
        
-        axios.post('/admin/ordenes/informacion',{
+        axios.post('/admin/buscar/orden/informacion',{
         'id': id 
             })
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
- 
+             
                 if(response.data.success == 1){
+
+                    const options = {
+                    timeZone:"America/El_Salvador",
+                    hour12 : true,
+                    hour:  "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit"
+                    }
+
+
                     $('#modalInfo').modal('show');
                     $('#nombreservicio').val(response.data.orden.nombreServicio);
                     $('#nombrecliente').val(response.data.orden.nombreCliente);
@@ -348,11 +404,14 @@
                     $('#puntoreferencia').val(response.data.orden.punto_referencia);
                     $('#telefono').val(response.data.orden.telefono);
                     $('#notaorden').val(response.data.orden.nota_orden);
-                    $('#preciototal').val(response.data.orden.precio_total);
+                    $('#preciototal').val(response.data.total);
                     $('#precioenvio').val(response.data.orden.precio_envio);
-                    $('#fechaorden').val(response.data.orden.fecha_orden);
+
+                    var FormatoFecha1 = response.data.orden.fecha_orden;
+                    var fecha1 = new Date(FormatoFecha1);
+                    var convertido1 = fecha1.toLocaleDateString('es-ES', options);
+                    $('#fechaorden').val(convertido1);
                     $('#cambiovuelto').val(response.data.orden.cambio);
-                    $('#horaestimada').val(response.data.horaestimada);
                    
                     if(response.data.orden.estado_2 == 0){
                         $("#estado2").prop("checked", false);
@@ -360,57 +419,86 @@
                         $("#estado2").prop("checked", true);
                     }
 
-                    $('#fecha2').val(response.data.orden.fecha_2);
+                    
+                    var FormatoFecha2 = response.data.orden.fecha_2;
+                    var fecha2 = new Date(FormatoFecha2);
+                    var convertido2 = fecha2.toLocaleDateString('es-ES', options);
+                    $('#fecha2').val(convertido2);
                     $('#minutosespera').val(response.data.orden.hora_2);
-                   
 
-                    $('#fecha3').val(response.data.orden.fecha_3);
-
+ 
                     if(response.data.orden.estado_3 == 0){
                         $("#estado3").prop("checked", false);
                     }else{
                         $("#estado3").prop("checked", true);
-                    }
 
-                    $('#fecha4').val(response.data.orden.fecha_4);
+                        var FormatoFecha3 = response.data.orden.fecha_3;
+                        var fecha3 = new Date(FormatoFecha3);
+                        var convertido3 = fecha3.toLocaleDateString('es-ES', options);
+                        $('#fecha3').val(convertido3);
+                    }
 
                     if(response.data.orden.estado_4 == 0){
                         $("#estado4").prop("checked", false);
                     }else{
                         $("#estado4").prop("checked", true);
+ 
+                        $('#estimada').val(response.data.estimada);
+
+                        var FormatoFecha4 = response.data.orden.fecha_4;
+                        var fecha4 = new Date(FormatoFecha4);
+                        var convertido4 = fecha4.toLocaleDateString('es-ES', options);
+                        $('#fecha4').val(convertido4);
                     }
 
-                    $('#fecha5').val(response.data.orden.fecha_5);
+                   
 
                     if(response.data.orden.estado_5 == 0){
                         $("#estado5").prop("checked", false);
                     }else{
                         $("#estado5").prop("checked", true);
-                    }
 
-                    $('#fecha6').val(response.data.orden.fecha_6);
+                        var FormatoFecha5 = response.data.orden.fecha_5;
+                        var fecha5 = new Date(FormatoFecha5);
+                        var convertido5 = fecha5.toLocaleDateString('es-ES', options);
+                        $('#fecha5').val(convertido5);
+                    }
 
                     if(response.data.orden.estado_6 == 0){
                         $("#estado6").prop("checked", false);
                     }else{
                         $("#estado6").prop("checked", true);
+
+                        var FormatoFecha6 = response.data.orden.fecha_6;
+                        var fecha6 = new Date(FormatoFecha6);
+                        var convertido6 = fecha6.toLocaleDateString('es-ES', options);
+                        $('#fecha6').val(convertido6);
                     }
 
-                    $('#fecha7').val(response.data.orden.fecha_7);
+                   
 
                     if(response.data.orden.estado_7 == 0){
                         $("#estado7").prop("checked", false);
                     }else{
                         $("#estado7").prop("checked", true);
-                    }
 
-                    $('#fecha8').val(response.data.orden.fecha_8);
+                        var FormatoFecha7 = response.data.orden.fecha_7;
+                        var fecha7 = new Date(FormatoFecha7);
+                        var convertido7 = fecha7.toLocaleDateString('es-ES', options);
+                        $('#fecha7').val(convertido7);
+                    }
+                    
                     $('#mensaje8').val(response.data.orden.mensaje_8);
 
                     if(response.data.orden.estado_8 == 0){
                         $("#estado8").prop("checked", false);
                     }else{
                         $("#estado8").prop("checked", true);
+
+                        var FormatoFecha8 = response.data.orden.fecha_8;
+                        var fecha8 = new Date(FormatoFecha8);
+                        var convertido8 = fecha8.toLocaleDateString('es-ES', options);
+                        $('#fecha8').val(convertido8);
                     }
 
                     if(response.data.orden.visible == 0){
@@ -440,13 +528,7 @@
                         $("#visiblep3").prop("checked", true);
                     }
 
-                    
-                    if(response.data.orden.tardio == 0){
-                        $("#ordentardia").prop("checked", false);
-                    }else{
-                        $("#ordentardia").prop("checked", true);
-                    }
-
+                  
                     if(response.data.orden.cancelado_cliente == 0){
                         $("#canceladocliente").prop("checked", false);
                     }else{
@@ -460,7 +542,7 @@
                         $("#canceladopropietario").prop("checked", true);
                     }
 
-                  
+                
                     
                     if(response.data.orden.envio_gratis == 0){
                         $("#marcadogratis").prop("checked", false);
@@ -486,9 +568,10 @@
                 toastr.error('Error del servidor');    
         });
     }
-   
-    // ubicacion del cliente para la orden
-    function mapa(id){        
+
+
+ // ubicacion del cliente para la orden
+ function mapa(id){        
         window.location.href="{{ url('/admin/ordenes/ubicacion/') }}/"+id;
     }
  
@@ -496,9 +579,9 @@
     function producto(id){
         window.location.href="{{ url('/admin/ordenes/listaproducto') }}/"+id;
     }
-
-  </script>
  
-
+   </script>
+  
  
-@stop
+ 
+ @stop

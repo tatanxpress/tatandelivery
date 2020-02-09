@@ -13,10 +13,12 @@
           <div class="col-sm-12">
             <h1>Motoristas</h1>
           </div>    
+          @can('completo')
           <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Motorista
           </button>    
+          @endcan
       </div>
     </section>
     
@@ -197,7 +199,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                @can('completo')
                 <button type="button" class="btn btn-primary" onclick="editar()">Guardar</button>
+                @endcan
             </div>          
         </div>        
     </div>      

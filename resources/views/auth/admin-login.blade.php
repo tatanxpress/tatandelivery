@@ -9,7 +9,7 @@
 
 					
 						<div class="col-md-12">
-							<img src="{{ asset('images/tatanlogo.png') }}" width="100" height="20px" srcset="">
+							<img src="{{ asset('images/tatanlogo.jpg') }}" width="100" height="20px" srcset="">
 						</div>
 					
 					<h3 style="position: relative; margin-top:10px">ADMINISTRADOR</h3>

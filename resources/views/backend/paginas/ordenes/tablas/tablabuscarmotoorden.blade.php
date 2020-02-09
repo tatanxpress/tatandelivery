@@ -5,7 +5,8 @@
 
       <div class="row">
         <div class="col-12">
-          <div class="card">         
+          <div class="card">  
+          <p>La fecha es cuando ingreso la ORDEN</p>
             <div class="card-body">
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             

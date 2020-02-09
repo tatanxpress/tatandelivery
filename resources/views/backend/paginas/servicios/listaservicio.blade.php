@@ -13,10 +13,12 @@
           <h1>Lista Servicios</h1>
           </div>
           <div style="margin-top:15px; margin-left:15px">
+          @can('completo')
             <button type="button" onclick="modalNuevo()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Servicio
             </button>
+          @endcan
           </div>
         </div>
       </div>
@@ -123,7 +125,7 @@
                                         <br>
                                             <label>Tiempo de espera (cuando respuesta es automatica)</label>
                                             <input type="number" value="5" step="any" id="tiempo-nuevo">
-                                        </div>
+                                        </div> 
                                         <div class="form-group">
                                             <label style="color:#191818">Tipo Servicio</label>
                                             <br>
@@ -578,7 +580,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarservicio()">Guardar</button>
+                @can('completo')
+                    <button type="button" class="btn btn-primary" onclick="editarservicio()">Guardar</button>
+                @endcan
             </div>          
         </div>        
     </div>      
@@ -634,7 +638,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarTiempo()">Guardar</button>
+                @can('completo')
+                    <button type="button" class="btn btn-primary" onclick="editarTiempo()">Guardar</button>
+                @endcan
             </div>          
         </div>        
     </div>      
@@ -838,7 +844,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarHoras()">Guardar</button>
+                @can('completo')
+                    <button type="button" class="btn btn-primary" onclick="editarHoras()">Guardar</button>
+                @endcan
             </div>          
         </div>        
     </div>      

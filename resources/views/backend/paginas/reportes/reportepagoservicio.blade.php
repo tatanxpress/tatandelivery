@@ -88,9 +88,9 @@
 
           @foreach($orden as $dato)
             <tr>
-              <td>{{ $dato->idorden }}</td>             
-              <td>{{ $dato->fecha_orden }}</td>
-              <td>${{ $dato->precio_total }}</td>
+              <td>{{$dato->idorden }}</td>             
+              <td>{{$dato->fecha_orden}}</td>
+              <td>${{$dato->precio_total}}</td>
             </tr> 
           @endforeach  
 

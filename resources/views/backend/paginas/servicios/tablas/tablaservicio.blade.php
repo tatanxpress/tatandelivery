@@ -44,15 +44,15 @@
                     <button type="button" class="btn btn-primary btn-xs" onclick="verModales({{ $dato->id }})">
                     <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
                     </button>
+                    @can('completo')
+                      <button type="button" class="btn btn-primary btn-xs" onclick="verMapa({{ $dato->id }})">
+                      <i class="fas fa-eye" title="Mapa"></i>&nbsp; Mapa
+                      </button> 
 
-                    <button type="button" class="btn btn-primary btn-xs" onclick="verMapa({{ $dato->id }})">
-                    <i class="fas fa-eye" title="Mapa"></i>&nbsp; Mapa
-                    </button>
-
-                    <button type="button" class="btn btn-primary btn-xs" onclick="verCategorias({{ $dato->id }})">
-                    <i class="fas fa-eye" title="Mapa"></i>&nbsp; Categorias
-                    </button>
-                    
+                      <button type="button" class="btn btn-primary btn-xs" onclick="verCategorias({{ $dato->id }})">
+                      <i class="fas fa-eye" title="Mapa"></i>&nbsp; Categorias
+                      </button>
+                    @endcan
 
                   </td> 
                 </tr>
