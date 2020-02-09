@@ -56,7 +56,7 @@
                             <div class="card-header p-2" id="headingThree2">
                                 <h5 class="mb-0">
                                     <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree2" aria-expanded="false" aria-controls="collapseThree2">
-                                    Como me puedo afiliar para tener mi negocio en la aplicación TATAN EXPRESS¬¬¬
+                                    Como me puedo afiliar para tener mi negocio en la aplicación TATAN EXPRESS
                                     </button>
                                 </h5>
                             </div>
@@ -96,22 +96,13 @@ Con el nombre del negocio, ubicación y nombre de quien solicita unirse además 
                                 Escribe a nuestro correo tatanxpress@gmail.com y bríndanos tus datos personales para contactarnos y así solicitar la demás información como solvencia policial, numero de licencia de motocicleta, DUI, etc.                                </div>
                             </div>
                         </div>
-
+ 
                     </div>
                 </div>
             </div>
         </div>
-    
-
-  
-
-
-    
-   
    
     @include("frontend.menu.footer")
-
-  
   
   </body>
 </html>
