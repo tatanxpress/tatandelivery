@@ -42,7 +42,7 @@
             <div class="col-xl-2 col-md-6">
               <p class="footer-classic-title">Información</p>
               <ul class="footer-classic-nav">
-                <li><a href="#">Preguntas frecuentes</a></li>
+                <li><a href="{{ url('/preguntas-frecuentes') }}">Preguntas frecuentes</a></li>
               </ul>
             </div>
         
