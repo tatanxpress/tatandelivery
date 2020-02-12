@@ -1,0 +1,10 @@
+[2020-02-12 05:02:57] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+ (SQL: select * from `administradores` where `telefono` = 75825072 limit 1) null 
+[2020-02-12 05:03:00] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+ (SQL: select * from `administradores` where `telefono` = 75825072 limit 1) null 
+[2020-02-12 05:03:03] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+ (SQL: select * from `administradores` where `telefono` = 75825072 limit 1) null 
+[2020-02-12 05:03:06] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+ (SQL: select * from `administradores` where `telefono` = 75825072 limit 1) null 
+[2020-02-12 05:03:09] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
+ (SQL: select * from `administradores` where `telefono` = 75825072 limit 1) null 

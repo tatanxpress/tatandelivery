@@ -206,13 +206,18 @@ Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // lo
 // ordenes urgente, tarea programada
 Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesProgramada');
 
-
 // ocultar una orden de ordenes_urgentes
-Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgente'); // login revisador
+Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgente');
+ 
+ 
+// ordenes sin contestacion, tarea programada
+Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion');
 
+// ocultar una orden de ordenes sin contestacion
+Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');
 
 
 // cambiar contrasena el administrador
-Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // login revisador
+Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); 
 
  

@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use App\Administradores;
 use App\OrdenesPendiente;
 use App\OrdenesUrgentes;
+use App\OrdenesPendienteContestar;
 
 class AdminAppController extends Controller
 {
@@ -191,7 +192,7 @@ class AdminAppController extends Controller
         }
     }
 
-
+    // ordenes urgentes
     public function verOrdenesProgramada(Request $request){
 
         if($request->isMethod('post')){   
@@ -411,5 +412,98 @@ class AdminAppController extends Controller
         }  
     }
 
+    // ordenes sin contestacion al cliente
+    public function verOrdenesSinContestacion(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'                
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id es requerido.'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+        
+            if($p = Administradores::where('id', $request->id)->first()){
+                
+                $orden = DB::table('orden_pendiente_contestar AS p')
+                ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')             
+                ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
+                        'o.fecha_orden', 'o.estado_2', 'o.estado_8')
+                ->where('p.activo', 1)
+                ->orderBy('p.id', 'ASC')
+                ->get();
+
+                foreach($orden as $o){
+
+                    // ingreso la orden
+                    $fechaOrden = $o->fecha_orden;
+                    $horaO = date("h:i A", strtotime($fechaOrden));
+                    $fechaO = date("d-m-Y", strtotime($fechaOrden));
+                    $o->fecha_orden = $horaO . " " . $fechaO;
+        
+                  
+                    $datos = Servicios::where('id', $o->servicios_id)->first();
+                    $o->nombre = $datos->nombre;
+                    $o->telefono = $datos->telefono;
+                    $o->identificador = $datos->identificador;
+                    $o->privado = $datos->privado;
+
+                    // info de la direccion
+                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+
+                    $o->direccion = $dato->direccion;
+                }
+
+                return ['success' => 1, 'orden' => $orden];
+
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    // ocultar de tabla ordenes_urgentes
+    public function ocultarOrdenSinContestacion(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'                
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id es requerido.'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+         
+            if(OrdenesPendienteContestar::where('ordenes_id', $request->id)->first()){
+
+                OrdenesPendienteContestar::where('ordenes_id', $request->id)->update(['activo' => 0]);
+ 
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+
+        }
+    }
 
 }
