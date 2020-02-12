@@ -13,12 +13,13 @@
           <div class="col-sm-3">
           <h1>Lista de Zonas</h1>
           </div>
-          <div class="col-sm-2">
-          <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
-          <i class="fas fa-pencil-alt"></i>
-            Nueva Zona
-        </button>
-          </div>
+            <p>Para evitar recibir ORDENES, hay que activar estado SATURACION</p>
+            <br>
+            <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
+            <i class="fas fa-pencil-alt"></i>
+                Nueva Zona
+            </button>
+          
         </div>
       </div>
 </section>
