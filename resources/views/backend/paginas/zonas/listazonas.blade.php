@@ -8,21 +8,19 @@
 @stop
 
 <section class="content-header">
-      <div class="container-fluid">
-        <div class="row mb-2">
-          <div class="col-sm-3">
-          <h1>Lista de Zonas</h1>
-          </div>
-            <p>Para evitar recibir ORDENES, hay que activar estado SATURACION</p>
-            <br>
+       <div class="container-fluid">
+           <div class="col-sm-12">
+           <h1>Lista de Zonas</h1>  
+           </div>  
+           <p>Para evitar recibir ORDENES, hay que activar estado SATURACION</p>
+          
             <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
             <i class="fas fa-pencil-alt"></i>
                 Nueva Zona
             </button>
-          
-        </div>
-      </div>
-</section>
+
+       </div>
+     </section>
 
 <section class="content">
     <div class="container-fluid">
@@ -56,7 +54,7 @@
                 <form id="formulario-nuevo">
                     <div class="card-body">
                         <div class="row">  
-                            <div class="col-md-6"> 
+                            <div class="col-md-12"> 
                                 <div class="form-group">
                                     <label>Nombre</label>
                                     <input type="hidden" id="id-actualizar">
@@ -79,16 +77,7 @@
                                     <input type="time" class="form-control" id="horacerrado-nuevo">
                                 </div>                  
                             </div>
-                            <div class="col-md-6">                             
-                                <div class="form-group">
-                                    <label>Latitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="latitud-nuevo" placeholder="Ingresar Latitud">
-                                </div>
-                                <div class="form-group">
-                                    <label>Longitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="longitud-nuevo" placeholder="Ingresar Longitud">
-                                </div>
-                            </div>
+                          
                         </div>
                     </div>  
                 </form>
@@ -139,14 +128,7 @@
                                 </div>                  
                             </div>
                             <div class="col-md-6">                             
-                                <div class="form-group">
-                                    <label>Latitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="latitud-editar" placeholder="Ingresar Latitud">
-                                </div>
-                                <div class="form-group">
-                                    <label>Longitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="longitud-editar" placeholder="Ingresar Longitud">
-                                </div>
+                               
                                 <div class="form-group" style="margin-left:20px">
                                     <label>Zona Problema de envío</label><br>
                                     <label class="switch" style="margin-top:10px">
@@ -286,8 +268,7 @@
                     $('#descripcion-editar').val(response.data.zona.descripcion);
                     $('#horaabierto-editar').val(response.data.zona.hora_abierto_delivery);
                     $('#horacerrado-editar').val(response.data.zona.hora_cerrado_delivery);
-                    $('#latitud-editar').val(response.data.zona.latitud);
-                    $('#longitud-editar').val(response.data.zona.longitud);
+                  
                     if(response.data.zona.saturacion == 0){
                         $("#toggle-problema").prop("checked", false);
                     }else{
@@ -316,10 +297,8 @@
         var identificador = document.getElementById('identificador-nuevo').value;
         var horaabierto = document.getElementById('horaabierto-nuevo').value;
         var horacerrado = document.getElementById('horacerrado-nuevo').value;
-        var latitud = document.getElementById('latitud-nuevo').value;
-        var longitud = document.getElementById('longitud-nuevo').value;
                 
-        var retorno = validacion_nuevo(nombre, descripcion, horaabierto, horacerrado, latitud, longitud, identificador);
+        var retorno = validacion_nuevo(nombre, descripcion, horaabierto, horacerrado, identificador);
 
         if (retorno) {
            
@@ -329,8 +308,7 @@
             formData.append('descripcion', descripcion);
             formData.append('horaabierto', horaabierto);
             formData.append('horacerrado', horacerrado);
-            formData.append('latitud', latitud);
-            formData.append('longitud', longitud);
+            
             formData.append('identificador', identificador);
 
             var spinHandle = loadingOverlay().activate();
@@ -368,7 +346,7 @@
     }
 
     // validar nueva zona
-    function validacion_nuevo(nombre, descripcion, horaabierto, horacerrado, latitud, longitud, identificador){
+    function validacion_nuevo(nombre, descripcion, horaabierto, horacerrado, identificador){
      
         if (nombre === '') {
             toastr.error("Nombre es requerido");
@@ -400,26 +378,6 @@
             return false;
         }
 
-        if(latitud === ''){
-            toastr.error("Latitud es requerido");
-            return false;
-        }
-
-        if(latitud.length > 50){
-            toastr.error("50 caracter máximo latitud");
-            return false;
-        }
-
-        if(longitud === ''){
-            toastr.error("Longitud es requerida");
-            return false;
-        }
-
-        if(longitud.length > 50){
-            toastr.error("50 caracter máximo longitud");
-            return false;
-        }
-
         if(identificador === ''){
             toastr.error("Identificador es requerido");
             return false;
@@ -441,12 +399,11 @@
         var identificador = document.getElementById('identificador-editar').value;
         var horaabierto = document.getElementById('horaabierto-editar').value;
         var horacerrado = document.getElementById('horacerrado-editar').value;
-        var latitud = document.getElementById('latitud-editar').value;
-        var longitud = document.getElementById('longitud-editar').value;
+      
         var toggleproblema = document.getElementById('toggle-problema').checked;
         var toggleactivo = document.getElementById('toggle-activo').checked;
                 
-        var retorno = validacion_editar(nombre, descripcion, horaabierto, horacerrado, latitud, longitud, identificador);
+        var retorno = validacion_editar(nombre, descripcion, horaabierto, horacerrado, identificador);
 
         if (retorno) {
             
@@ -468,8 +425,6 @@
             formData.append('identificador', identificador);
             formData.append('horaabierto', horaabierto);
             formData.append('horacerrado', horacerrado);
-            formData.append('latitud', latitud);
-            formData.append('longitud', longitud);
             formData.append('togglep', togglep);
             formData.append('togglea', togglea);
 
@@ -507,7 +462,7 @@
     }
 
     // validacion
-    function validacion_editar(nombre, descripcion, horaabierto, horacerrado, latitud, longitud, identificador){
+    function validacion_editar(nombre, descripcion, horaabierto, horacerrado, identificador){
      
         if (nombre === '') {
             toastr.error("Nombre es requerido");
@@ -539,25 +494,6 @@
             return false;
         }
 
-        if(latitud === ''){
-            toastr.error("Latitud es requerido");
-            return false;
-        }
-
-        if(latitud.length > 50){
-            toastr.error("50 caracter máximo latitud");
-            return false;
-        }
-
-        if(longitud === ''){
-            toastr.error("Longitud es requerida");
-            return false;
-        }
-
-        if(longitud.length > 50){
-            toastr.error("50 caracter máximo longitud");
-            return false;
-        }
 
         if(identificador === ''){
             toastr.error("Identificador es requerida");

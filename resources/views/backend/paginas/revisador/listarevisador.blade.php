@@ -69,14 +69,6 @@
                                     <label>Telefono</label>
                                     <input type="text" maxlength="20" class="form-control" id="telefono-nuevo" placeholder="Telefono">
                                 </div>
-                                <div class="form-group">
-                                    <label>Latitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="latitud-nuevo" placeholder="Latitud">
-                                </div>
-                                <div class="form-group">
-                                    <label>Longitud</label>
-                                    <input type="text" maxlength="50" class="form-control" id="longitud-nuevo" placeholder="Longitud">
-                                </div>
                            
                                 <div class="form-group">
                                     <label>Contraseña</label>
@@ -135,15 +127,7 @@
                                 <label>Telefono</label>
                                 <input type="text" maxlength="20" class="form-control" id="telefono-editar" placeholder="Telefono">
                             </div>
-                            <div class="form-group">
-                                <label>Latitud</label>
-                                <input type="text" maxlength="50" class="form-control" id="latitud-editar" placeholder="Latitud">
-                            </div>
-                            <div class="form-group">
-                                <label>Longitud</label>
-                                <input type="text" maxlength="50" class="form-control" id="longitud-editar" placeholder="Longitud">
-                            </div>
-                                              
+                                    
                             <div class="form-group">
                                 <label>Activo</label>
                                 <input type="checkbox" id="activo-editar">
@@ -247,13 +231,12 @@
         var nombre = document.getElementById('nombre-nuevo').value;
         var direccion = document.getElementById('direccion-nuevo').value;
         var telefono = document.getElementById('telefono-nuevo').value;
-        var latitud = document.getElementById('latitud-nuevo').value;
-        var longitud = document.getElementById('longitud-nuevo').value;
+        
         var codigo = document.getElementById('codigo-nuevo').value;
         var cbactivo = document.getElementById('activo-nuevo').checked;
         
 
-        var retorno = validarNuevo(identi, nombre, direccion, telefono, latitud, longitud, codigo);
+        var retorno = validarNuevo(identi, nombre, direccion, telefono, codigo);
 
         if(retorno){
 
@@ -268,8 +251,7 @@
             formData.append('nombre', nombre);
             formData.append('direccion', direccion);
             formData.append('telefono', telefono);
-            formData.append('latitud', latitud);
-            formData.append('longitud', longitud);
+    
             formData.append('codigo', codigo);
             formData.append('cbactivo', cbactivo_1);
 
@@ -311,7 +293,7 @@
         }
     } 
 
-    function validarNuevo(identi, nombre, direccion, telefono, latitud, longitud, codigo){
+    function validarNuevo(identi, nombre, direccion, telefono, codigo){
 
         if(identi === ''){
             toastr.error("identificador es requerido");
@@ -353,26 +335,6 @@
             return false;
         }
 
-        if(latitud === ''){
-            toastr.error("latitud es requerido");
-            return;
-        }
-        
-        if(latitud.length > 50){
-            toastr.error("50 caracter máximo latitud");
-            return false;
-        }
-
-        if(longitud === ''){
-            toastr.error("longitud es requerido");
-            return;
-        }
-        
-        if(longitud.length > 50){
-            toastr.error("50 caracter máximo longitud");
-            return false;
-        }
-
         if(codigo === ''){
             toastr.error("codigo es requerido");
             return;
@@ -402,8 +364,7 @@
                     $('#nombre-editar').val(response.data.revisador.nombre);
                     $('#direccion-editar').val(response.data.revisador.direccion);
                     $('#telefono-editar').val(response.data.revisador.telefono);
-                    $('#latitud-editar').val(response.data.revisador.latitud);
-                    $('#longitud-editar').val(response.data.revisador.longitud);
+                   
                     $('#codigo-editar').val(response.data.revisador.codigo);
                     $('#fecha-editar').val(response.data.revisador.fecha);
 
@@ -465,13 +426,12 @@
         var nombre = document.getElementById('nombre-editar').value;
         var direccion = document.getElementById('direccion-editar').value;
         var telefono = document.getElementById('telefono-editar').value;
-        var latitud = document.getElementById('latitud-editar').value;
-        var longitud = document.getElementById('longitud-editar').value;
+      
         var codigo = document.getElementById('codigo-editar').value;
         var cbactivo = document.getElementById('activo-editar').checked;
         var cbdisponible = document.getElementById('disponible-editar').checked;
 
-        var retorno = validarEditar(nombre, direccion, telefono, latitud, longitud, codigo);
+        var retorno = validarEditar(nombre, direccion, telefono, codigo);
 
         if(retorno){
 
@@ -491,8 +451,7 @@
             formData.append('nombre', nombre);
             formData.append('direccion', direccion);
             formData.append('telefono', telefono);
-            formData.append('latitud', latitud);
-            formData.append('longitud', longitud);
+         
             formData.append('codigo', codigo);
             formData.append('cbactivo', cbactivo_1);
             formData.append('cbdisponible', cbdisponible_1);
@@ -531,7 +490,7 @@
     } 
 
     
-    function validarEditar(nombre, direccion, telefono, latitud, longitud, codigo){
+    function validarEditar(nombre, direccion, telefono, codigo){
     
         if(nombre === ''){
             toastr.error("nombre es requerido");
@@ -562,27 +521,7 @@
             toastr.error("20 caracter máximo telefono");
             return false;
         }
-
-        if(latitud === ''){
-            toastr.error("latitud es requerido");
-            return;
-        }
-        
-        if(latitud.length > 50){
-            toastr.error("50 caracter máximo latitud");
-            return false;
-        }
-
-        if(longitud === ''){
-            toastr.error("longitud es requerido");
-            return;
-        }
-        
-        if(longitud.length > 50){
-            toastr.error("50 caracter máximo longitud");
-            return false;
-        }
-
+      
         if(codigo === ''){
             toastr.error("codigo es requerido");
             return;

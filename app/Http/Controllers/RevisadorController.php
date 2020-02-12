@@ -44,8 +44,7 @@ class RevisadorController extends Controller
                 'nombre' => 'required',
                 'direccion' => 'required',
                 'telefono' => 'required',
-                'latitud' => 'required',
-                'longitud' => 'required',
+               
                 'codigo' => 'required',
                 'cbactivo' => 'required'
             );
@@ -55,8 +54,7 @@ class RevisadorController extends Controller
                 'nombre.required' => 'Nombre es requerido',
                 'direccion.required' => 'Direccion es requerido',
                 'telefono.required' => 'telefono es requerida',
-                'latitud.required' => 'latitud es requerido',
-                'longitud.required' => 'longitud es requerido',
+                
                 'codigo.required' => 'Codigo es requerido',
                 'cbactivo.required' => 'Activo es requerido',
                 );
@@ -85,8 +83,8 @@ class RevisadorController extends Controller
             $m->nombre = $request->nombre;
             $m->direccion = $request->direccion;
             $m->telefono = $request->telefono;
-            $m->latitud = $request->latitud;
-            $m->longitud = $request->longitud;
+            $m->latitud = "1";
+            $m->longitud = "1";
             $m->password = bcrypt('12345678');
             $m->disponible = 0;
             $m->activo = $request->cbactivo;
@@ -174,8 +172,7 @@ class RevisadorController extends Controller
                 'nombre' => 'required',
                 'direccion' => 'required',
                 'telefono' => 'required',
-                'latitud' => 'required',
-                'longitud' => 'required',
+            
                 'codigo' => 'required',
                 'cbactivo' => 'required',
                 'cbdisponible' => 'required'
@@ -186,8 +183,7 @@ class RevisadorController extends Controller
                 'nombre.required' => 'Nombre es requerido',
                 'direccion.required' => 'Direccion es requerido',
                 'telefono.required' => 'telefono es requerida',
-                'latitud.required' => 'latitud es requerido',
-                'longitud.required' => 'longitud es requerido',
+              
                 'codigo.required' => 'Codigo es requerido',
                 'cbactivo.required' => 'Activo es requerido',
                 'cbdisponible.required' => 'Disponible cb es requerido',
@@ -212,9 +208,7 @@ class RevisadorController extends Controller
                 Revisador::where('id', $request->id)->update([
                         'nombre' => $request->nombre,
                         'direccion' => $request->direccion,
-                        'telefono' => $request->telefono,
-                        'latitud' => $request->latitud,
-                        'longitud' => $request->longitud,
+                        'telefono' => $request->telefono,                       
                         'disponible' => $request->cbdisponible,
                         'activo' => $request->cbactivo,
                         'codigo' => $request->codigo,

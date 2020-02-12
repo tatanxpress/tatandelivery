@@ -47,7 +47,7 @@
       
         var AreaCoords = new Array();
         $.each( sites, function( key, val ){  
-            console.log(val.longitud);              
+                     
             AreaCoords.push({lat: parseFloat(val.latitud), lng: parseFloat(val.longitud)});
         });
     

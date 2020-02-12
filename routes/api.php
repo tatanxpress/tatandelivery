@@ -208,7 +208,7 @@ Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesPro
 
 // ocultar una orden de ordenes_urgentes
 Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgente');
- 
+  
  
 // ordenes sin contestacion, tarea programada
 Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion');

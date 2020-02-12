@@ -30,12 +30,11 @@ class PropietarioController extends Controller
     // login para propietario
     public function loginPropietario(Request $request){
 
-
         if($request->isMethod('post')){   
             $rules = array(                
                 'phone' => 'required',
                 'password' => 'required|max:16',
-            );      
+            ); 
 
             $messages = array(                                      
                 'phone.required' => 'El telefono es requerido.',

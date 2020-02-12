@@ -223,7 +223,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/adminrevisador/tabla/lista', 'AdminController@tablaadminrevisador');
   Route::post('/adminrevisador/informacion', 'AdminController@informacion');
   Route::post('/adminrevisador/nuevo', 'AdminController@nuevoadmin');
-  Route::post('/adminrevisador/editar', 'AdminController@editar');
+  Route::post('/adminrevisador/editar', 'AdminController@editar');  
   Route::post('/adminrevisador/reseteo', 'AdminController@reseteo'); 
   // editar datos de administrador
   Route::get('/editarinfo', 'AdminController@index4'); 

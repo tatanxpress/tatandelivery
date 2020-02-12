@@ -40,9 +40,7 @@ class MapaZonaController extends Controller
                 'nombre' => 'required',
                 'descripcion' => 'required',
                 'horaabierto' => 'required',
-                'horacerrado' => 'required',
-                'latitud' => 'required',
-                'longitud' => 'required',
+                'horacerrado' => 'required',               
                 'identificador' => 'required'
             );    
 
@@ -50,9 +48,7 @@ class MapaZonaController extends Controller
                 'nombre.required' => 'El nombre es requerido.',
                 'descripcion.required' => 'la descripcion es requerido.',
                 'horaabierto.required' => 'El horario abierto requerido.',
-                'horacerrado.required' => 'El horario cerrado requerido.',
-                'latitud.required' => 'Latitud es requerido.',
-                'longitud.required' => 'Longitud requerido.',
+                'horacerrado.required' => 'El horario cerrado requerido.',               
                 'identificador.required' => 'Identificador requerido.',
                 );
 
@@ -78,8 +74,8 @@ class MapaZonaController extends Controller
             $zona->nombre = $request->nombre;
             $zona->descripcion = $request->descripcion;
             $zona->identificador = $identificador;
-            $zona->latitud = $request->latitud;
-            $zona->longitud = $request->longitud;
+            $zona->latitud = "1";
+            $zona->longitud = "1";
             $zona->saturacion = 0;
             $zona->hora_abierto_delivery = $request->horaabierto;
             $zona->hora_cerrado_delivery = $request->horacerrado;
@@ -132,8 +128,7 @@ class MapaZonaController extends Controller
                 'descripcion' => 'required',
                 'horaabierto' => 'required',
                 'horacerrado' => 'required',
-                'latitud' => 'required',
-                'longitud' => 'required',
+                
                 'togglep' => 'required',
                 'togglea' => 'required',
                 'identificador' => 'required'
@@ -145,8 +140,7 @@ class MapaZonaController extends Controller
                 'descripcion.required' => 'la descripcion es requerido.',
                 'horaabierto.required' => 'El horario abierto requerido.',
                 'horacerrado.required' => 'El horario cerrado requerido.',
-                'latitud.required' => 'Latitud es requerido.',
-                'longitud.required' => 'Longitud requerido.',
+               
                 'togglep.required' => 'El valor toggle saturacion requerido.',  
                 'togglea.required' => 'El valor toggle activo requerido.',
                 'identificador.required' => 'El identificador es requerido.',
@@ -172,8 +166,7 @@ class MapaZonaController extends Controller
                 
                 Zonas::where('id', $request->id)->update(['nombre' => $request->nombre,
                 'descripcion'=> $request->descripcion, 'hora_abierto_delivery' => $request->horaabierto, 
-                'hora_cerrado_delivery' => $request->horacerrado, 'latitud' => $request->latitud,
-                'longitud' => $request->longitud, 'identificador' => $identificador, 'saturacion' => $request->togglep, 'activo' => $request->togglea]);
+                'hora_cerrado_delivery' => $request->horacerrado, 'identificador' => $identificador, 'saturacion' => $request->togglep, 'activo' => $request->togglea]);
                 
                 return ['success' => 1];
             }else{
