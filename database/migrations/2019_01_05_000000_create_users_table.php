@@ -20,7 +20,7 @@ class CreateUsersTable extends Migration
             $table->string('email', 100)->unique()->default('');
             $table->string('password', 255);
             $table->string('codigo_correo',10)->default('');
-            $table->string('device_id', 100)->default('');
+            $table->string('device_id', 300)->default('');
             $table->bigInteger('zonas_id')->unsigned();
             $table->dateTime('fecha');
             $table->boolean('activo')->default(1);

@@ -67,6 +67,9 @@ class MotoristaController extends Controller
                         Motoristas::where('id', $p->id)->update(['device_id' => $request->device_id]);
                     }
 
+                    // disponible
+                    Motoristas::where('id', $p->id)->update(['disponible' => 1]);
+
                     return ['success' => 2, 'usuario_id' => $id]; // login correcto
                 }    else{
                     return ['success' => 3]; // contraseña incorrecta
@@ -902,14 +905,11 @@ class MotoristaController extends Controller
 
                     $titulo = "Orden #". $or->id ." Preparada";
                     $mensaje = "El motorista va encamino";
-                    $alarma = 2;
-                    $color = 3;
-                    $icono = 2;  
-                    $tipo = 2;
-
-                    // CLIENTE SIEMPRE TENDRA DEVICE_ID
+                     
                     if(!empty($device)){
-                        $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono, $tipo); 
+                        if($device != "0000"){ // evitar id malos
+                            $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                        }                        
                     }
 
                     return ['success' => 1]; //orden va en camino
@@ -960,13 +960,11 @@ class MotoristaController extends Controller
 
                     $titulo = "Orden Completada";
                     $mensaje = "Muchas gracias por su compra";
-                    $alarma = 2; 
-                    $color = 2;
-                    $icono = 4;
-                    $tipo = 2; //cliente 
-
+                  
                     if(!empty($device)){
-                        $this->envioNoticacion($titulo, $mensaje, $device, $alarma, $color, $icono, $tipo); 
+                        if($device != "0000"){
+                            $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                        }                        
                     } 
 
                     return ['success' => 1]; // orden completada
@@ -1379,7 +1377,7 @@ class MotoristaController extends Controller
     } 
 
 
-    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
-        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
     }
 } 

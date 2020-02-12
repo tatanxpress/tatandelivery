@@ -211,7 +211,7 @@ class AdminAppController extends Controller
                     'success' => 0, 
                     'message' => $validator->errors()->all()
                 ];
-            }
+            } 
          
             if($p = Administradores::where('id', $request->id)->first()){
                 

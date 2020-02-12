@@ -24,16 +24,18 @@ use Exception;
 use OneSignal;
 use App\OrdenesPendiente;
 
+
 class PropietarioController extends Controller
 {
     // login para propietario
     public function loginPropietario(Request $request){
-  
+
+
         if($request->isMethod('post')){   
             $rules = array(                
                 'phone' => 'required',
                 'password' => 'required|max:16',
-            );    
+            );      
 
             $messages = array(                                      
                 'phone.required' => 'El telefono es requerido.',
@@ -50,7 +52,7 @@ class PropietarioController extends Controller
                     'success' => 0, 
                     'message' => $validator->errors()->all()
                 ];
-            }
+            } 
          
             if($p = Propietarios::where('telefono', $request->phone)->first()){
 
@@ -72,7 +74,9 @@ class PropietarioController extends Controller
                     if($request->device_id != null){
                         Propietarios::where('id', $p->id)->update(['device_id' => $request->device_id]);
                     }
-                    
+
+                    // activar notificaciones
+                    Propietarios::where('id', $p->id)->update(['disponibilidad' => 1]);
 
                     return ['success' => 2, 'usuario_id' => $id, 'nombreservicio' => $nombre]; // login correcto
                 }    else{
@@ -1112,7 +1116,7 @@ class PropietarioController extends Controller
                     // verificar si sera orden automatica, iniciar preparacion de orden
                     $servicioid = $or->servicios_id;
                     $datosServicio = Servicios::where('id', $servicioid)->first();
-
+ 
                     // el tipo de orden automatica o no, cambio al momento de agregar la hora
                     if($request->tipo != $datosServicio->orden_automatica){
                         return ['success' => 1];
@@ -1159,14 +1163,10 @@ class PropietarioController extends Controller
 
                         $titulo1 = "Solicitud Nueva";
                         $mensaje1 = "Se necesita motorista";
-                        $alarma1 = 1;
-                        $color1 = 3;
-                        $icono1 = 2;
-                        $tipo = 3; // motoristas
-
+                  
                         // NOTIFICACION A LOS MOTORISTAS
                         if(!empty($pilaUsuarios)){                       
-                            $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
+                            $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);
                         }else{
 
                             // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
@@ -1198,12 +1198,8 @@ class PropietarioController extends Controller
                             if(!empty($pilaAdministradores)){
                                 $titulo = "Orden Iniciada sin MOTORISTA";
                                 $mensaje = "Inicio preparacion y no se encuentra motoristas";
-                                $alarma = 1; //sonido alarma
-                                $color = 1; // color rojo
-                                $icono = 1; // campana 
-                                $tipo = 4; // administrador
-
-                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);                            
+                          
+                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);                            
                             }
                         } 
     
@@ -1218,14 +1214,11 @@ class PropietarioController extends Controller
                     // mandar notificacion al cliente
                     $usuario = User::where('id', $or->users_id)->first();
                     $pilaUsuarios = $usuario->device_id;
-                     
-                    $alarma = 2; 
-                    $color = 3;
-                    $icono = 3;
-                    $tipo = 2; // tipo cliente
-
+                                       
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                        if($pilaUsuarios != "0000"){
+                            $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                        }                        
                     } 
 
                     return ['success' => 2]; 
@@ -1288,7 +1281,9 @@ class PropietarioController extends Controller
                     $tipo = 2; //cliente
 
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                        if($pilaUsuarios != "0000"){
+                            $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                        }                        
                     }
             
                     return ['success' => 1];
@@ -1377,14 +1372,11 @@ class PropietarioController extends Controller
 
                     $titulo = "Orden iniciada";
                     $mensaje = "Su orden empieza a prepararse";
-                    $alarma = 2;
-                    $color = 3;
-                    $icono = 4;
-                    $tipo = 2; //cliente
-
+                   
                     if(!empty($fcm)){                       
-                        // COMO ES DEL CLIENTE, AL REGISTRARSE ESTE OBTIENE SU DEVICE_ID
-                       $this->envioNoticacion($titulo, $mensaje, $fcm, $alarma, $color, $icono, $tipo);
+                        if($fcm != "0000"){
+                            $this->envioNoticacionCliente($titulo, $mensaje, $fcm);
+                        }                       
                     } 
 
                     // mandar notificacion a los motoristas asignados al servicio
@@ -1407,16 +1399,12 @@ class PropietarioController extends Controller
 
                     $titulo1 = "Solicitud Nueva";
                     $mensaje1 = "Se necesita motorista";
-                    $alarma1 = 1;
-                    $color1 = 3;
-                    $icono1 = 2;
-                    $tipo = 3; // motoristas
-
+                 
                     // NOTIFICACION A LOS MOTORISTAS
                     if(!empty($pilaUsuarios)){                       
-                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
+                        $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);
                     }else{
-
+ 
                         // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
                                             
                         $osp = new OrdenesPendiente;
@@ -1446,12 +1434,8 @@ class PropietarioController extends Controller
                         if(!empty($pilaAdministradores)){
                             $titulo = "Orden Iniciada sin MOTORISTA";
                             $mensaje = "Inicio preparacion y no se encuentra motoristas";
-                            $alarma = 1; //sonido alarma
-                            $color = 1; // color rojo
-                            $icono = 1; // campana
-                            $tipo = 4; //administrador
-
-                            $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);                            
+                      
+                            $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);                            
                         }
                     }  
 
@@ -1663,13 +1647,11 @@ class PropietarioController extends Controller
 
                         $titulo = "Orden cancelada";
                         $mensaje = "El servicio cancelo su orden";
-                        $alarma = 2;
-                        $color = 3;
-                        $icono = 3;
-                        $tipo = 2;
-    
+                         
                         if(!empty($pilaUsuarios)){
-                            $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                            if($pilaUsuarios != "0000"){
+                                $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                            } 
                         }
 
                         return ['success' => 1]; // cancelado
@@ -1767,22 +1749,16 @@ class PropietarioController extends Controller
 
                     $titulo1 = "MOTORISTA URGENTE";
                     $mensaje1 = $texto;
-                    $alarma1 = 1;
-                    $color1 = 3;
-                    $icono1 = 2;
-                    $tipo = 4; // administrador
-
-                    if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo1, $mensaje1, $pilaUsuarios, $alarma1, $color1, $icono1, $tipo);
+                   
+                    if(!empty($pilaUsuarios)){ 
+                        $this->envioNoticacionAdministrador($titulo1, $mensaje1, $pilaUsuarios);
                     }    
                 }else{
                     // MANDAR NOTIFICACION AL MOTORISTA ASIGNADO A LA ORDEN, QUE LA ORDEN YA ESTA PREPARADA
 
                     $ordenseleccionada = DB::table('motorista_ordenes AS mo')
                     ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-                    ->select('m.device_id', 'mo.ordenes_id')            
-                    //->where('m.activo', 1)
-                    //->where('m.disponible', 1)
+                    ->select('m.device_id', 'mo.ordenes_id') 
                     ->where('mo.ordenes_id', $o->id)
                     ->first();
                 
@@ -1790,13 +1766,9 @@ class PropietarioController extends Controller
                     
                     $titulo = "Orden #" . $o->id . " Completada";
                     $mensaje = "Lista para ser Entregada";
-                    $alarma1 = 1;
-                    $color1 = 3;
-                    $icono1 = 2;
-                    $tipo = 3; // motoristas
-
+              
                     if(!empty($deviceid)){
-                        $this->envioNoticacion($titulo, $mensaje, $deviceid, $alarma1, $color1, $icono1, $tipo);
+                        $this->envioNoticacionMotorista($titulo, $mensaje, $deviceid);
                     }
                 }
 
@@ -1937,6 +1909,56 @@ class PropietarioController extends Controller
         }
     }
 
+    // ver ordenes de hoy, que han sido completadas
+    public function verCompletadasHoy(Request $request){
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'id' => 'required'                  
+            );
+
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id propiestrio es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($p = Propietarios::where('id', $request->id)->first()){
+                
+                $orden = DB::table('ordenes')
+                ->select('id', 'precio_total', 'fecha_orden', 'precio_envio', 'estado_7', 'fecha_4', 'hora_2', 'fecha_5', 'estado_5', 'nota_orden')
+                ->where('estado_5', 1) // orden completadas
+                ->where('servicios_id', $p->servicios_id)
+                ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
+                ->get(); 
+              
+                foreach($orden as $o){
+                    $o->fecha_orden = date("h:i A ", strtotime($o->fecha_orden));
+                     
+                    $total = $o->precio_total;
+                  
+                    $o->precio_total = number_format((float)$total, 2, '.', '');
+
+
+                    $time1 = Carbon::parse($o->fecha_4);
+                    $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A');
+                    $o->horaEstimada = $horaEstimada; 
+                }
+                    
+                return ['success' => 1, 'orden' => $orden];                
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
     // ORDENES CANCELADAS 
     public function verPagosCancelados(Request $request){
         if($request->isMethod('post')){ 
@@ -2028,7 +2050,19 @@ class PropietarioController extends Controller
         } 
     }
 
-    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
-        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionAdministrador($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
     }
 }

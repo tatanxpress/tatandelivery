@@ -553,20 +553,15 @@ class ProcesadorOrdenesController extends Controller
                                     array_push($pilaPropietarios, $m->device_id); 
                                 }
                             }
-                        } 
+                        }  
 
                     // NOTIFICACIONES A PROPIETARIOS, DISPONIBLES
                     if(!empty($pilaPropietarios)){
                         $titulo = "Nueva Orden #".$idOrden;
                         $mensaje = "Ver orden nueva!";
-                        $alarma = 1; //sonido alarma
-                        $color = 1; // color rojo
-                        $icono = 1; // campana
-                        $tipo = 1; // es propietario
-                       
-                        if(!empty($pilaPropietarios)){     
-                                
-                            $this->envioNoticacion($titulo, $mensaje, $pilaPropietarios, $alarma, $color, $icono, $tipo);                            
+                                             
+                        if(!empty($pilaPropietarios)){
+                            $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);                            
                         }
 
                     }else{
@@ -610,12 +605,8 @@ class ProcesadorOrdenesController extends Controller
                         if(!empty($pilaAdministradores)){
                             $titulo = "Orden sin Propietario";
                             $mensaje = "Servicio: ".$nombreServicio;
-                            $alarma = 1; //sonido alarma
-                            $color = 1; // color rojo
-                            $icono = 1; // campana
-                            $tipo = 4;
-
-                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);
+                     
+                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
                         }
                     }   
 
@@ -667,12 +658,8 @@ class ProcesadorOrdenesController extends Controller
                             if(!empty($pilaAdministradores)){
                                 $titulo = "Orden sin Motorista Disponible";
                                 $mensaje = "Servicio: ".$nombreServicio;
-                                $alarma = 1; //sonido alarma
-                                $color = 1; // color rojo
-                                $icono = 1; // campana
-                                $tipo = 4;
-
-                                $this->envioNoticacion($titulo, $mensaje, $pilaAdministradores, $alarma, $color, $icono, $tipo);
+                       
+                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
                                 
                             }
                         }
@@ -1007,13 +994,9 @@ class ProcesadorOrdenesController extends Controller
                     // enviar notificaciones a todos los propietarios asignados
                     $titulo = "Orden #".$o->id . " Cancelada";
                     $mensaje = "Orden cancelada por el cliente.";
-                    $alarma = 1;
-                    $color = 1;
-                    $icono = 5;
-                    $tipo = 1; //propietarios
-
+        
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                        $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
                     }
                     return ['success' => 1]; // cancelado
 
@@ -1109,13 +1092,9 @@ class ProcesadorOrdenesController extends Controller
 
                     $titulo = "Cliente acepto tiempo";
                     $mensaje = "El cliente desea esperar la orden";
-                    $alarma = 1;
-                    $color = 3;
-                    $icono = 1;
-                    $tipo = 1; // propietarios
-
+            
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+                        $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
                     }
 
                     $orden = DB::table('ordenes AS o')
@@ -1258,9 +1237,17 @@ class ProcesadorOrdenesController extends Controller
             } 
         }
     }
+ 
 
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
 
-    public function envioNoticacion($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo){
-        OneSignal::sendNotificationToUser($titulo, $mensaje, $pilaUsuarios, $alarma, $color, $icono, $tipo);
+    public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionAdministrador($titulo, $mensaje, $pilaUsuarios);
     }
 }

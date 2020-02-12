@@ -101,13 +101,15 @@ Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden')
 
 // cancelar orden extraordinariamente
 Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@cancelarOrdenExtraordinariamente'); // cancelar orden extraordinariamente
- 
+  
 // historial
 Route::post('propietario/ver/historial', 'Api\PropietarioController@verHistorial'); // ver historial
 
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes canceladas
 Route::post('propietario/ver/pago/tardia', 'Api\PropietarioController@verPagosTardio'); // ver ordenes canceladas
+Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes canceladas
+    
  
 // configuraciones
 Route::post('propietario/horarios', 'Api\PropietarioController@verHorarios'); // ver horarios 
@@ -119,7 +121,6 @@ Route::post('propietario/actualizar/password', 'Api\PropietarioController@actual
 Route::post('propietarios/estado/adomicilio', 'Api\PropietarioController@estadoAdomicilio'); // ver estado de adomicilio
 Route::post('propietarios/estado/tiempo', 'Api\PropietarioController@estadoAutomatico'); // estado automatico de ordenes
 Route::post('propietario/guardar/tiempo', 'Api\PropietarioController@guardarTiempo'); // guarda tiempo para la orden automatica o no
-
  
 // productos 
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // informacion cuenta
@@ -151,7 +152,7 @@ Route::post('motorista/ver/orden/proceso/id', 'Api\MotoristaController@verOrdenP
 Route::post('motorista/iniciar/entrega', 'Api\MotoristaController@iniciarEntrega'); // iniciar entrega de la orden
 Route::post('motorista/finalizar/entrega', 'Api\MotoristaController@finalizarEntrega'); // finalizar entrega de la orden
 Route::post('motorista/borrar/orden/cancelada', 'Api\MotoristaController@borrarOrdenCancelada'); // borrar orden cancelada
-  
+   
 Route::post('motorista/info/cuenta', 'Api\MotoristaController@informacionCuenta'); // informacion cuenta
 Route::post('motorista/info/disponibilidad', 'Api\MotoristaController@informacionDisponibilidad'); // informacion de disponibilidad
 Route::post('motorista/cambiar/correo', 'Api\MotoristaController@cambiarCorreo'); // cambiar correo cuenta
@@ -161,7 +162,7 @@ Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizar
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
  
     
-
+ 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
