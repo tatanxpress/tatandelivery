@@ -52,14 +52,7 @@
     });
 
     function login() {
-
-
-        var da = window.location.hostname;
-
-        console.log(da);
-
-        return;
-     
+             
         var correo = document.getElementById('correo').value;
         var password = document.getElementById('password').value;
 
