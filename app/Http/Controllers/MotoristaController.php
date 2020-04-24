@@ -22,12 +22,11 @@ class MotoristaController extends Controller
  
     // lista de motoristas
     public function index(){
-
         return view('backend.paginas.motoristas.listamotorista');
     } 
  
     // tabla 
-    public function mototabla(){ 
+    public function mototabla(){
          
         $moto = DB::table('motoristas')
         ->select('id', 'nombre', 'telefono', 'correo', 'activo', 'disponible', 'identificador')
@@ -47,8 +46,8 @@ class MotoristaController extends Controller
                 'correo' => 'required',
                 'tipovehiculo' => 'required',
                 'numerovehiculo' => 'required',
-               
-                'cbzona' => 'required',
+                'limite' => 'required',
+                'privado' => 'required'
             );
 
             $mensaje = array(
@@ -58,9 +57,9 @@ class MotoristaController extends Controller
                 'correo.required' => 'correo inicio es requerido',
                 'tipovehiculo.required' => 'tipo vehiculo es requerido',
                 'numerovehiculo.required' => 'numero vehiculo es requerido',
-               
-                'cbzona.required' => 'cbzona es requerido',
-                );
+                'limite.required' => 'limite dinero es requerido',
+                'privado.required' => 'privado es requerido'
+            );
 
                 
             $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -113,8 +112,8 @@ class MotoristaController extends Controller
                 $m->imagen = $nombreFoto;
                 $m->device_id = "0000";
                 $m->codigo_correo = "0000";
-                $m->limite_dinero = 25.00;
-                $m->zona_pago = $request->cbzona;
+                $m->limite_dinero = $request->limite;
+                $m->privado = $request->privado;
 
                 if($m->save()){
                     return ['success' => 2];
@@ -166,12 +165,10 @@ class MotoristaController extends Controller
                 'telefono' => 'required',
                 'correo' => 'required',
                 'tipovehiculo' => 'required',
-                'numerovehiculo' => 'required',
-                
-                'cbzona' => 'required',
-               
+                'numerovehiculo' => 'required',               
                 'cbactivo' => 'required',
-                'dinero' => 'required'
+                'dinero' => 'required',
+                'privado' => 'required'
             );
 
             $mensaje = array(
@@ -180,12 +177,10 @@ class MotoristaController extends Controller
                 'telefono.required' => 'telefono es requerida',
                 'correo.required' => 'correo inicio es requerido',
                 'tipovehiculo.required' => 'tipo vehiculo es requerido',
-                'numerovehiculo.required' => 'numero vehiculo es requerido',
-               
-                'cbzona.required' => 'cbzona es requerido',
-               
+                'numerovehiculo.required' => 'numero vehiculo es requerido',  
                 'cbactivo.required' => 'cbactivo es requerido',
-                'dinero.required' => 'Dinero es requerido'
+                'dinero.required' => 'Dinero es requerido',
+                'privado.required' => 'Privado es requerido'
                 );
 
                 $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -197,7 +192,6 @@ class MotoristaController extends Controller
                         'message' => $validar->errors()->all()
                     ];
                 } 
-
 
             if($po = Motoristas::where('id', $request->id)->first()){
                 
@@ -229,10 +223,9 @@ class MotoristaController extends Controller
                             'correo' => $request->correo,
                             'tipo_vehiculo' => $request->tipovehiculo,
                             'numero_vehiculo' => $request->numerovehiculo,
-                            'imagen' => $nombreFoto,
-                            'zona_pago' => $request->cbzona,
-                         
+                            'imagen' => $nombreFoto,                         
                             'activo' => $request->cbactivo,
+                            'privado' =>$request->privado
                             ]);
                             if(Storage::disk('usuario')->exists($imagenOld)){
                                 Storage::disk('usuario')->delete($imagenOld);                                
@@ -249,11 +242,10 @@ class MotoristaController extends Controller
                         'telefono' => $request->telefono,
                         'correo' => $request->correo,
                         'tipo_vehiculo' => $request->tipovehiculo,
-                        'numero_vehiculo' => $request->numerovehiculo,
-                      
-                        'zona_pago' => $request->cbzona,
+                        'numero_vehiculo' => $request->numerovehiculo, 
                         'activo' => $request->cbactivo,
-                        'limite_dinero' => $request->dinero
+                        'limite_dinero' => $request->dinero,
+                        'privado' =>$request->privado
                         ]);
  
                         return ['success' => 2];
@@ -264,7 +256,7 @@ class MotoristaController extends Controller
             }
         }  
     }
-
+ 
 
     //** motoristas asignados */
 

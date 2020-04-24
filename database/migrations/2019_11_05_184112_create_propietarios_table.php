@@ -16,7 +16,7 @@ class CreatePropietariosTable extends Migration
         Schema::create('propietarios', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nombre', 50);
-            $table->string('telefono', 20);
+            $table->string('telefono', 20)->unique();
             $table->string('password', 255);
             $table->string('correo', 100)->unique();
             $table->date('fecha');

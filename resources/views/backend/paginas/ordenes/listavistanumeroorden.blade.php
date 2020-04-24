@@ -329,6 +329,12 @@
                                     <label>Ganancia de motorista</label>
                                     <input type="text" disabled class="form-control" id="gananciamotorista">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Marcado como un minimo compra, sino no puede pedir</label>
+                                    <br>
+                                    <input type="checkbox" id="minenviogratis" disabled>
+                                </div>
                               
                             </div>
                         </div>
@@ -393,7 +399,6 @@
                     minute: "2-digit",
                     second: "2-digit"
                     }
-
 
                     $('#modalInfo').modal('show');
                     $('#nombreservicio').val(response.data.orden.nombreServicio);
@@ -558,6 +563,11 @@
 
                     $('#gananciamotorista').val(response.data.orden.ganancia_motorista);
                     
+                    if(response.data.orden.supero_envio_gratis == 0){
+                        $("#minenviogratis").prop("checked", false);
+                    }else{
+                        $("#minenviogratis").prop("checked", true);
+                    }
 
                 }else{
                     toastr.error('publicidad o promo no encontrada'); 

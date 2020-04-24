@@ -109,7 +109,7 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'p.activo', 'p.tipo', 'o.estado_8', 'o.cancelado_cliente', 'o.cancelado_propietario')
                 ->where('p.activo', 1)
                 ->orderBy('p.id', 'ASC')
                 ->get();
@@ -121,13 +121,6 @@ class AdminAppController extends Controller
                     $horaO = date("h:i A", strtotime($fechaOrden));
                     $fechaO = date("d-m-Y", strtotime($fechaOrden));
                     $o->fecha_orden = $horaO . " " . $fechaO;
-
-                    // hora estimada de entrega
-                    if($o->estado_4 == 1){
-                        
-                    }else{
-                        $o->horaEstimada = 0; 
-                    }
           
                     // hora inicio preparacion
                     if($o->estado_4 == 1){
@@ -142,6 +135,7 @@ class AdminAppController extends Controller
                         $o->iniciopreparar = $hora . " " . $fecha;
                     }else{
                         $o->iniciopreparar = 0;
+                        $o->horaEstimada = 0;                         
                     }
 
                     // hora termino preparar la orden
@@ -183,6 +177,7 @@ class AdminAppController extends Controller
                     }           
 
                 }
+
 
                 return ['success' => 2, 'orden' => $orden];
 

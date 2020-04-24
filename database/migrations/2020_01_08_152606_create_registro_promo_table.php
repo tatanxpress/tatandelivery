@@ -21,7 +21,7 @@ class CreateRegistroPromoTable extends Migration
             $table->date('fecha');
             $table->boolean('tipo'); // 1- publicidad  0- promocion
             $table->decimal('pago', 10, 2);
-            $table->string('descripcion', 100);
+            $table->string('descripcion', 200);
 
             $table->foreign('servicios_id')->references('id')->on('servicios');
         });

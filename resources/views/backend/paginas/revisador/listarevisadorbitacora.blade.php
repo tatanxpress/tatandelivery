@@ -82,6 +82,10 @@
                                     <label>Confirmadas Total</label>
                                     <input type="number" step="1" class="form-control" id="confirmada-nuevo" >
                                 </div>
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" maxlength="200" placeholder="Descripción" class="form-control" id="descripcion-nuevo" >
+                                </div>
                             
                             </div>
                         </div>
@@ -129,7 +133,10 @@
                                     <label>Confirmadas total</label>
                                     <input type="number" class="form-control" id="confirmada-editar" >
                                 </div>
-                            
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" maxlength="200" placeholder="Descripción" class="form-control" id="descripcion-editar" >
+                                </div>                            
                             </div>
                         </div>
                     </div>
@@ -175,6 +182,7 @@
         var fechahasta = document.getElementById('fechahasta-nuevo').value;
         var total = document.getElementById('total-nuevo').value;
         var confirmada = document.getElementById('confirmada-nuevo').value;
+        var descripcion = document.getElementById('descripcion-nuevo').value;
         
         var retorno = validarNuevo(revisador, fechadesde, fechahasta, total, confirmada);
 
@@ -187,6 +195,7 @@
             formData.append('fechahasta', fechahasta);
             formData.append('total', total);
             formData.append('confirmada', confirmada);
+            formData.append('descripcion', descripcion);
             
             axios.post('/admin/revisadorbitacora/nuevo', formData, { 
                     })
@@ -209,8 +218,7 @@
            
             var ruta = "{{ url('/admin/revisadorbitacora/tabla/lista') }}";
             $('#tablaDatatable').load(ruta);
-            $('#modalAgregar').modal('hide');  
-            
+            $('#modalAgregar').modal('hide');            
         }
         else {
             toastr.error('Error desconocido');
@@ -258,6 +266,7 @@
                     $('#fechahasta-editar').val(response.data.bitacora.fecha2);
                     $('#total-editar').val(response.data.bitacora.total);
                     $('#confirmada-editar').val(response.data.bitacora.confirmadas);
+                    $('#descripcion-editar').val(response.data.bitacora.descripcion);
                    
                 }else{
                     toastr.error("ID no encontrado");
@@ -277,6 +286,7 @@
         var fechahasta = document.getElementById('fechahasta-editar').value;
         var total = document.getElementById('total-editar').value;
         var confirmada = document.getElementById('confirmada-editar').value;
+        var descripcion = document.getElementById('descripcion-editar').value;
 
         var retorno = validarEditar(fechadesde, fechahasta, total, confirmada);
 
@@ -287,7 +297,8 @@
             formData.append('fechadesde', fechadesde);
             formData.append('fechahasta', fechahasta);
             formData.append('total', total);
-            formData.append('confirmada', confirmada);       
+            formData.append('confirmada', confirmada);
+            formData.append('descripcion', descripcion);
 
             axios.post('/admin/revisadorbitacora/editar', formData, { 
                     })

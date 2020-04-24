@@ -20,6 +20,7 @@ class CreateMotoristaPagoTable extends Migration
             $table->date('fecha2');
             $table->date('fecha');
             $table->decimal('pago', 10, 2);
+            $table->string('descripcion', 200)->default("");
 
             $table->foreign('motorista_id')->references('id')->on('motoristas');
 

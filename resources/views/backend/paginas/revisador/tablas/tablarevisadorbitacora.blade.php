@@ -7,12 +7,13 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             
                 <tr>
-                    <th style="width: 15%">Identificador revisador</th>   
-                    <th style="width: 20%">Nombre revisador</th> 
-                    <th style="width: 10%">Fecha inicio</th>        
-                    <th style="width: 15%">Fecha final</th> 
+                    <th style="width: 10%">ID Revisador</th>   
+                    <th style="width: 15%">Nombre revisador</th> 
+                    <th style="width: 10%">Fe. inicio</th>        
+                    <th style="width: 15%">Fe. final</th> 
                     <th style="width: 15%">Total $</th>
                     <th style="width: 15%">Confirmadas</th>
+                    <th style="width: 15%">Descripción</th>
                     <th style="width: 15%">Opciones</th>
                 </tr>
                 </thead>
@@ -24,7 +25,8 @@
                     <td>{{ $dato->fecha1 }}</td>
                     <td>{{ $dato->fecha2 }}</td> 
                     <td>{{ $dato->total }}</td>
-                    <td>{{ $dato->confirmadas }}</td>                    
+                    <td>{{ $dato->confirmadas }}</td> 
+                    <td>{{ $dato->descripcion }}</td>                    
                     <td>
                       <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                       <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar

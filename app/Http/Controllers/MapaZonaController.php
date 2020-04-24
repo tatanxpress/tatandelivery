@@ -32,7 +32,7 @@ class MapaZonaController extends Controller
 
         return view('backend.paginas.zonas.tablas.tablazona', compact('zonas'));
     }
-
+ 
     // crear zona
     public function nuevaZona(Request $request){
         if($request->isMethod('post')){   
@@ -41,7 +41,10 @@ class MapaZonaController extends Controller
                 'descripcion' => 'required',
                 'horaabierto' => 'required',
                 'horacerrado' => 'required',               
-                'identificador' => 'required'
+                'identificador' => 'required',
+                'tiempoextra' => 'required',
+                'latitud' => 'required',
+                'longitud' => 'required'
             );    
 
             $messages = array(                                      
@@ -50,6 +53,9 @@ class MapaZonaController extends Controller
                 'horaabierto.required' => 'El horario abierto requerido.',
                 'horacerrado.required' => 'El horario cerrado requerido.',               
                 'identificador.required' => 'Identificador requerido.',
+                'tiempoextra.required' => 'Tiempo extra es requerido.',
+                'latitud.required' => 'Latitud es requerido.',
+                'longitud.required' => 'Longitud es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -74,13 +80,15 @@ class MapaZonaController extends Controller
             $zona->nombre = $request->nombre;
             $zona->descripcion = $request->descripcion;
             $zona->identificador = $identificador;
-            $zona->latitud = "1";
-            $zona->longitud = "1";
+            $zona->latitud = $request->latitud;
+            $zona->longitud = $request->longitud;
             $zona->saturacion = 0;
             $zona->hora_abierto_delivery = $request->horaabierto;
             $zona->hora_cerrado_delivery = $request->horacerrado;
             $zona->fecha = $fecha;            
             $zona->activo = 1;
+            $zona->tiempo_extra = $request->tiempoextra;
+            
 
             if($zona->save()){
                 return ['success'=>1];
@@ -128,10 +136,12 @@ class MapaZonaController extends Controller
                 'descripcion' => 'required',
                 'horaabierto' => 'required',
                 'horacerrado' => 'required',
-                
+                'tiempoextra' => 'required',
                 'togglep' => 'required',
                 'togglea' => 'required',
-                'identificador' => 'required'
+                'identificador' => 'required',
+                'latitud' => 'required',
+                'longitud' => 'required'
             );    
 
             $messages = array(   
@@ -140,10 +150,12 @@ class MapaZonaController extends Controller
                 'descripcion.required' => 'la descripcion es requerido.',
                 'horaabierto.required' => 'El horario abierto requerido.',
                 'horacerrado.required' => 'El horario cerrado requerido.',
-               
+                'tiempoextra.required' => 'El tiempo extra es requerido.',               
                 'togglep.required' => 'El valor toggle saturacion requerido.',  
                 'togglea.required' => 'El valor toggle activo requerido.',
                 'identificador.required' => 'El identificador es requerido.',
+                'latitud.required' => 'Latitud es requerido.',
+                'longitud.required' => 'Longitud es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -166,7 +178,10 @@ class MapaZonaController extends Controller
                 
                 Zonas::where('id', $request->id)->update(['nombre' => $request->nombre,
                 'descripcion'=> $request->descripcion, 'hora_abierto_delivery' => $request->horaabierto, 
-                'hora_cerrado_delivery' => $request->horacerrado, 'identificador' => $identificador, 'saturacion' => $request->togglep, 'activo' => $request->togglea]);
+                'hora_cerrado_delivery' => $request->horacerrado, 
+                'tiempo_extra' => $request->tiempoextra, 'identificador' => $identificador, 
+                'saturacion' => $request->togglep, 'activo' => $request->togglea, 'latitud' => $request->latitud,
+                'longitud' => $request->longitud]);
                 
                 return ['success' => 1];
             }else{

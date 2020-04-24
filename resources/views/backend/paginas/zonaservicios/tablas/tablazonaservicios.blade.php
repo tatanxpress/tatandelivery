@@ -12,7 +12,10 @@
                   <th style="width: 20%">Servicio identificador</th>
                   <th style="width: 10%">Activo</th>
                   <th style="width: 15%">Precio envío</th>  
-                  <th style="width: 15%">Ganancia Motorista</th>               
+                  <th style="width: 10%">Servicio</th>
+                  <th style="width: 15%">Ganancia Motorista</th>   
+                  <th style="width: 10%">Envio Gratis</th>     
+                  <th style="width: 10%">Mitad Precio</th>          
                   <th style="width: 20%">Opciones</th>            
                 </tr>
                 </thead>
@@ -28,9 +31,30 @@
                     @else
                     <span class="badge bg-success">Activo</span> 
                     @endif                  
-                  </td>                  
+                  </td>                                 
                   <td>{{ $dato->precio_envio }}</td>
+                  <td> 
+                    @if($dato->privado == 0)
+                    <span class="badge bg-success">Publico</span>
+                    @else
+                    <span class="badge bg-danger">Privado</span> 
+                    @endif                  
+                  </td> 
                   <td>{{ $dato->ganancia_motorista }}</td>  
+                  <td> 
+                    @if($dato->zona_envio_gratis == 0)
+                    <span class="badge bg-success">NO</span>
+                    @else
+                    <span class="badge bg-warning">SI</span> 
+                    @endif                  
+                  </td>   
+                  <td> 
+                    @if($dato->mitad_precio == 0)
+                    <span class="badge bg-success">NO</span>
+                    @else
+                    <span class="badge bg-warning">SI</span> 
+                    @endif                  
+                  </td>
                   <td>
                     <button type="button" class="btn btn-primary btn-xs" onclick="verInformacion({{ $dato->id }})">
                     <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar                  

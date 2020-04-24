@@ -22,6 +22,7 @@
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para posiciones
             </button>
+            
           </div>
         </div>
       </div>
@@ -63,7 +64,7 @@
                                 <div class="form-group">
                                     <label style="color:#191818">Zonas identificador</label>
                                     <br>
-                                    <div>
+                                    <div> 
                                         <select class="form-control" id="select-identificador" onchange="buscarServicios(this)">   
                                                 <option value="0" selected>Seleccionar</option>                                         
                                             @foreach($identificador as $item)                                                
@@ -241,9 +242,6 @@
 
         var identificador = document.getElementById("select-identificador").value; //zona
         var servicio = document.getElementById("select-servicio").value; // servicio
-
-        console.log(identificador);
-        console.log(servicio);
                 
         var retorno = validacionNuevo(identificador, servicio);
 

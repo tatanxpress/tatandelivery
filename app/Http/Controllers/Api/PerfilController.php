@@ -12,6 +12,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 use App\Direccion;
 use App\Zonas;
+use App\CarritoTemporalModelo;
+use App\CarritoExtraModelo;
 
 class PerfilController extends Controller
 {
@@ -426,10 +428,9 @@ class PerfilController extends Controller
             if(User::where('id', $request->userid)->first()){
 
                 if(Direccion::where('id', $request->dirid)->first()){
-
+                    DB::beginTransaction();
+                    
                     try {
-
-                        DB::beginTransaction();
 
                         // setear a 0
                         Direccion::where('user_id', $request->userid)->update(['seleccionado' => 0]);
@@ -442,6 +443,13 @@ class PerfilController extends Controller
 
                         // actualizar zona donde esta el usuario
                         User::where('id', $request->userid)->update(['zonas_id' => $id]);
+
+                        // BORRAR CARRITO DE COMPRAS, YA QUE CAMBIO DE ZONA O DIRECCION
+
+                        if($tabla1 = CarritoTemporalModelo::where('users_id', $request->userid)->first()){
+                            CarritoExtraModelo::where('carrito_temporal_id', $tabla1->id)->delete();
+                            CarritoTemporalModelo::where('users_id', $request->userid)->delete();
+                        }                       
 
                         DB::commit();
 

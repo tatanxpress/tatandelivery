@@ -182,24 +182,12 @@
                                 <div class="form-group">
                                     <label>Ordenes canceladas</label>
                                     <input type="text" disabled class="form-control" id="totalcanceladas">
-                                </div>
-
-                               
-
-
-                                <div class="form-group">
-                                    <label>Total marcado gratis</label>
-                                    <input type="text" disabled class="form-control" id="totalgratis">
-                                </div>
-
+                                </div>                           
                                 
                                 <div class="form-group">
                                     <label>Total ganacia</label>
                                     <input type="text" disabled class="form-control" id="totalganancia">
                                 </div>
-
-                              
-
                               
                             </div>
                         </div>
@@ -636,6 +624,43 @@
         </div>        
     </div>      
 </div>
+
+<!-- modal cancelar -->
+<div class="modal fade" id="modalCancelar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Cancelar orden</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-cancelar">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+                                
+                                <div class="form-group">
+                                    <label>Mensaje</label>
+                                    <input type="hidden" id="idcancelar">
+                                    <input type="text" class="form-control" maxLength="200" id="mensajecancelar">
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+            
+            <button type="button" class="btn btn-primary" onclick="cancelarOrden()">Cancelar</button>
+
+            </div>          
+        </div>        
+    </div>      
+</div>
  
 <!-- modal select buscar servicio para cobro de motorista prestado -->
 <div class="modal fade" id="modalFiltroServicio">
@@ -698,6 +723,12 @@
         document.getElementById("formulario-buscar").reset();
         $('#modalBuscar').modal('show');
     }
+
+    function cancelar(id){
+        document.getElementById("formulario-cancelar").reset();
+        $('#idcancelar').val(id);
+        $('#modalCancelar').modal('show');
+    }
  
     function buscar(){
         var idmoto = document.getElementById('motoid').value;
@@ -759,7 +790,7 @@
                     $('#totalagarradas').val(response.data.totalagarradas);
                     $('#totalcompletadas').val(response.data.totalcompletada);
                     $('#totalcanceladas').val(response.data.totalcancelada);                  
-                    $('#totalgratis').val(response.data.totalmarcagratis);
+                   
                     $('#totalganancia').val(response.data.totalganancia);
                    
               
@@ -1019,6 +1050,58 @@
         window.open("{{ URL::to('admin/generar/reporte1') }}/" + idmoto + "/" + select + "/" + fecha1 + "/" + fecha2);
     }  
 
+    function cancelarOrden(){
+        var id = document.getElementById('idcancelar').value;
+        var mensajecancelar = document.getElementById("mensajecancelar").value;
+        
+        if(mensajecancelar === ''){
+            toastr.error('Mensaje es requerido'); 
+            return;
+        }
+
+        if(id === ''){
+            toastr.error('ID no encontrado'); 
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();             
+        var formData = new FormData();
+        formData.append('id', id);
+        formData.append('mensaje', mensajecancelar);
+
+        axios.post('/admin/cancelarorden/panel', formData, {
+        })
+        .then((response) => {
+            loadingOverlay().cancel(spinHandle);
+
+            if (response.data.success == 0) {
+                toastr.error('Validacion incorrecta');
+            } else if (response.data.success == 1) {
+                toastr.success('Cancelado');
+                
+                $('#modalCancelar').modal('hide');
+            } else if(response.data.success == 2){
+                // orden no puede ser cancelada
+                toastr.error('Esta orden ya fue cancelada');
+            }else if(response.data.success == 3){
+                // orden no puede ser cancelada
+                toastr.error('Orden aun no puede ser cancelada');
+            }
+            else {
+                toastr.error('Error desconocido');
+            } 
+                            
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
+        
+    }
+
+      
+    
+    
     function filtroReportePago(){
         var idmoto = document.getElementById('motoid-reportepago').value;
         var fechadesde = document.getElementById('fechadesde-reportepago').value;

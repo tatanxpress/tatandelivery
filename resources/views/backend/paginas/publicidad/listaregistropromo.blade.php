@@ -106,7 +106,7 @@
 
                                 <div class="form-group">
                                     <label>Descripcion</label>
-                                    <input type="text" maxlength="100" class="form-control" id="descripcion-nuevo">
+                                    <input type="text" maxlength="200" class="form-control" id="descripcion-nuevo">
                                 </div>
 
                              </div> 
@@ -207,7 +207,7 @@
 
                                 <div class="form-group">
                                     <label>Descripcion</label>
-                                    <input type="text" maxlength="100" class="form-control" id="descripcion-editar">
+                                    <input type="text" maxlength="200" class="form-control" id="descripcion-editar">
                                 </div>
 
                             </div> 

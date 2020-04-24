@@ -71,6 +71,7 @@ class ProcesadorOrdenesController extends Controller
                     $zonaidd = $cart->zonas_id; // guardar id de la zona
                     $zonaiduser = 0; // id zona donde esta el usuario selecciono su direccion
                     $limitePromocion = 0; // saver si producto es promocion, y limite por orden
+                    $privado = 0; // saver si el servicio es privado para evitar entrar en horario de zona
 
                     if(count($producto) >= 1){
                         $hayProducto = 1;
@@ -118,25 +119,22 @@ class ProcesadorOrdenesController extends Controller
                             if($cantidadCarrito > $pro->unidades){
                                 $excedido = 1; // un producto ha superado las unidades disponibles
                             }
-
-                           
-                                if($pro->limite_orden){
-                                    if($cantidadCarrito > $pro->cantidad_por_orden){
-                                        // limite por orden excedida
-                                        $limitePromocion = 1;
-                                    }
+                        
+                            if($pro->limite_orden){
+                                if($cantidadCarrito > $pro->cantidad_por_orden){
+                                    // limite por orden excedida
+                                    $limitePromocion = 1;
                                 }
-                         
+                            }                         
 
                         }else{
                            
-                                if($pro->limite_orden){
-                                    if($cantidadCarrito > $pro->cantidad_por_orden){
-                                        // limite por orden excedida
-                                        $limitePromocion = 1;
-                                    }
+                            if($pro->limite_orden){
+                                if($cantidadCarrito > $pro->cantidad_por_orden){
+                                    // limite por orden excedida
+                                    $limitePromocion = 1;
                                 }
-                          
+                            }                          
                         }
 
                         // un producto no esta disponible o activo
@@ -161,6 +159,7 @@ class ProcesadorOrdenesController extends Controller
 
                     $minimo = $servicioConsumo->minimo;
                     $utilizaMinimo = $servicioConsumo->utiliza_minimo;
+                    $privado = $servicioConsumo->privado;
                   
                     $minimoConsumido = 0;
 
@@ -182,8 +181,6 @@ class ProcesadorOrdenesController extends Controller
                         5 => 6, // viernes
                         6 => 7, // sabado
                     ];
-
-
 
                     // hora y fecha
                     $getValores = Carbon::now('America/El_Salvador');
@@ -216,7 +213,6 @@ class ProcesadorOrdenesController extends Controller
                                 ->where('h.hora4', '>=' , $hora);
                         }) 
                     ->get();
-
 
                         if(count($horario) >= 1){ // abierto
                             $horarioLocal = 0;
@@ -299,26 +295,75 @@ class ProcesadorOrdenesController extends Controller
 
                     // saver si el usuario esta activo
                     $usuarioActivo = User::where('id', $request->userid)->pluck('activo')->first();
+
+                    // solo disponible para servicios que sean privados. 
+
+                    // estos datos son para saver si el servicio privado dara adomicilio hasta una determinada
+                    // horario, si la zona da de 7 am a 10 pm, el servicio privado es libre de decidir
+                    // su horario de entrega a esa zona. solo propietarios con servicio privado.
+
+                    $datos_info = DB::table('zonas_servicios')
+                    ->where('zonas_id', $zonaiduser)
+                    ->where('servicios_id', $servicioidC)                    
+                    ->first();
+
+                    $tiempo_limite = $datos_info->tiempo_limite;
+                    $horainicio = $datos_info->horario_inicio;
+                    $horafinal = $datos_info->horario_final;
+                    $limiteentrega = 0;
+
+                    $hora1limite = date("h:i A", strtotime($horainicio));
+                    $hora2limite = date("h:i A", strtotime($horafinal));
+
+                    // sacar dinero limite por orden 
+                    $limitedineroorden = DB::table('dinero_orden')->where('id', 1)->pluck('limite')->first();
+
+                    
+                    if($tiempo_limite == 1){
+
+                        // revisado de tiempo
+                        if (($horainicio < $hora) && ($hora < $horafinal)) {
+                            $limiteentrega = 0; // abierto                        
+                        }else{
+                            $limiteentrega = 1; // cerrado
+                        }
+                    
+                    }else{
+                        // este dato no es tomado en cuenta si $tiempolimite == 0
+                        $limiteentrega = 1; // cerrado
+                    }     
                 
                     // validaciones
                     if($excedido == 1){ // producto excedido en cantidad*
                         return ['success' => 1];
                     }
+
                     if($activo == 1){ // un producto no esta disponible*
                         return ['success' => 2];
                     }
+
                     if($coincideZona == 0){ //l a zona de envio no coincide de donde solicito este servicio 
                         return ['success' => 3]; 
                     }                 // direccion siempre tiene que haber, sino se dispara success 3
-                    if($zonaSaturacion == 1 ){ // no hay entregas para esta zona por el momento*
-                        return ['success' => 5];
+                    
+                    // solo servicios publicos
+                    if($privado == 0){
+                        if($zonaSaturacion == 1 ){ // no hay entregas para esta zona por el momento*
+                            return ['success' => 5];
+                        }
                     }
+
                     if($cerradoEmergencia == 1){ // local cerrado por emergencia*
                         return ['success' => 6];
                     }
-                    if($horaDelivery == 0){ // horario de entrega a esta zona a finalizado
-                        return ['success' => 7, 'hora1' => $hora1, 'hora2' => $hora2];
+
+                    // solo negocios publicos
+                    if($privado == 0){
+                        if($horaDelivery == 0){ // horario de entrega a esta zona a finalizado
+                            return ['success' => 7, 'hora1' => $hora1, 'hora2' => $hora2];
+                        }
                     }
+                   
                     if($cerrado == 1){ // cerrado normalmente este dia*
                         return ['success' => 8];
                     }
@@ -330,18 +375,22 @@ class ProcesadorOrdenesController extends Controller
                     }
                     if($usuarioActivo == 0){ // usuario no activo
                         return ['success' => 11];
-                    }                   
-                    if($utilizaMinimo == 1){ // utiliza minimo de ventas
-                        if($minimoConsumido == 0){ //lo consumible no supera el minimo de venta
-                            return ['success' => 12, 'minimo' => number_format((float)$minimoString, 2, '.', '')];
-                        }                        
-                    }                    
+                    }      
+                    
+                    if($privado == 1){
+                        if($utilizaMinimo == 1){ // utiliza minimo de ventas
+                            if($minimoConsumido == 0){ //lo consumible no supera el minimo de venta
+                                return ['success' => 12, 'minimo' => number_format((float)$minimoString, 2, '.', '')];
+                            }                        
+                        }
+                    }
+
                     if($limitePromocion == 1){
                         // un producto excedio limite de promocion por orden
                         return ['success' => 13];
                     }
 
-                    if($hayProducto == 0){
+                    if($hayProducto == 0){ // hay productos en el carrito de compras
                         return ['success' => 17];
                     }
 
@@ -349,6 +398,24 @@ class ProcesadorOrdenesController extends Controller
                     if($servicionoactivo == 0){ // 0 es inactivo
                         return ['success' => 18];
                     }
+
+                    // solo para servicios privados, que quieren poner su horario de entrega a la zona 
+                    // que dan servicio
+                    if($privado == 1){
+                        if($tiempo_limite == 1){
+                            if($limiteentrega == 1){
+                                return ['success' => 19, 'hora1' => $hora1limite, 'hora2' => $hora2limite];
+                            }
+                        }
+                    }
+
+                    // success 20 ocupado para carrito de compras vacio
+                    if($consumido > $limitedineroorden){
+                        $l = number_format((float)$limitedineroorden, 2, '.', '');
+                        return ['success' => 21, 'limite' => $l];
+                    }
+
+                    //INGRESAR DATOS
                 
                     // obtener todos los productos de la orden
                     $producto = CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->get();
@@ -370,16 +437,37 @@ class ProcesadorOrdenesController extends Controller
                     // sacar precio envio
                     $envioPrecio = 0;
                     $gananciamotorista = 0;
+                    $copiaEnvio = 0;
+                    $mitadprecio = 0;
+                    $zona_envio_gratis = 0;
                     
                     // precio de la zona, aqui ya verificamos que si existe y esta activo
-                    if($zz = DB::table('zonas_servicios AS z')
-                    ->select('z.precio_envio', 'ganancia_motorista')
-                    ->where('z.zonas_id', $cart->zonas_id)
-                    ->where('z.servicios_id', $servicioid)
-                    ->first()){                       
+                    if($zz = DB::table('zonas_servicios')
+                    ->where('zonas_id', $cart->zonas_id)
+                    ->where('servicios_id', $servicioid)
+                    ->first()){       
+                        // PRIORIDAD 1                
                         $envioPrecio = $zz->precio_envio;
                         $gananciamotorista = $zz->ganancia_motorista;
+                        $copiaEnvio = $zz->precio_envio;
+                        $mitadprecio = $zz->mitad_precio; 
+                        $zona_envio_gratis = $zz->zona_envio_gratis;
                     }
+
+                    // PRIORIDAD 2
+                    // mitad de precio para el envio
+                    if($mitadprecio == 1){
+                        if($envioPrecio != 0){
+                            $dividir = $envioPrecio;
+                            $envioPrecio = $dividir / 2;
+                        }                       
+                    }
+
+                    // PRIORIDAD 3
+                    // envio gratis a esta zona
+                    if($zona_envio_gratis == 1){
+                        $envioPrecio = 0;
+                    }                    
                    
                     // array
                     $pila = array();
@@ -412,7 +500,6 @@ class ProcesadorOrdenesController extends Controller
                     // convertir subtotal a decimal y tipo string
                     $convertir = number_format((float)$resultado, 2, '.', '');
                     $precio_orden = (string) $convertir;
-
                     
                     // fecha hoy dia
                     $fecha = Carbon::now('America/El_Salvador');
@@ -421,6 +508,29 @@ class ProcesadorOrdenesController extends Controller
                     $envioGratis = $servicioConsumo->envio_gratis;
                     $nombreServicio = $servicioConsumo->nombre;
 
+                    // sacar minimo de compra para envio gratis, sino pagara el envio
+                    $datosInfo = DB::table('zonas_servicios')
+                    ->where('zonas_id', $zonaiduser)
+                    ->where('servicios_id', $servicioidC)
+                    ->first();
+
+                    // PRIORIDAD 4
+                    // variable para saver si sub total supero min requerido para envio gratis
+                    $superoEnvio = 0;
+
+                    // esta zona tiene un minimo de $$ para envio gratis
+                    if($datosInfo->min_envio_gratis == 1){
+                        $costo = $datosInfo->costo_envio_gratis;
+
+                        // precio envio sera 0, si supera $$ en carrito de compras
+                        if($resultado > $costo){
+                            $envioPrecio = 0;
+                            $superoEnvio = 1;
+                        }
+                    }                  
+                    
+
+                    // PRIORIDAD 5
                     // al tener envio gratis, solo caeran a los motoristas asignados a ese servicio
                     if($envioGratis == 1){
                         $envioPrecio = 0;
@@ -466,7 +576,8 @@ class ProcesadorOrdenesController extends Controller
                         'cancelado_cliente' => 0,
                         'cancelado_propietario' => 0,
                         'visible_m' => $productovisible, // si es 1, puede ver los productos el motorista
-                        'ganancia_motorista' => $gananciamotorista                      
+                        'ganancia_motorista' => $gananciamotorista ,
+                        'supero_envio_gratis' => $superoEnvio                    
                         ]
                     );
                      
@@ -528,6 +639,7 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->telefono = $dTelefono;
                     $nuevaDir->latitud = $dLati;
                     $nuevaDir->longitud = $dLong;
+                    $nuevaDir->copia_envio = $copiaEnvio;
                     
                     $nuevaDir->save();
 
@@ -538,10 +650,10 @@ class ProcesadorOrdenesController extends Controller
                     
                     // NOTIFICACIONES AL PROPIETARIO
                     // obtener todos los propietarios registrado al servicio
-                    $propietarios = DB::table('propietarios AS p')
-                    ->where('p.servicios_id', $cart->servicios_id)
-                    ->where('p.disponibilidad', 1)
-                    ->where('p.activo', 1)
+                    $propietarios = DB::table('propietarios')
+                    ->where('servicios_id', $cart->servicios_id)
+                    ->where('disponibilidad', 1)
+                    ->where('activo', 1)
                     ->get(); 
                   
                     // unir todos los identificadores para el envio de notificaciones
@@ -561,7 +673,10 @@ class ProcesadorOrdenesController extends Controller
                         $mensaje = "Ver orden nueva!";
                                              
                         if(!empty($pilaPropietarios)){
-                            $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);                            
+                            try {
+                                $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);                               
+                            } catch (Exception $e) {                              
+                            }                                                        
                         }
 
                     }else{
@@ -605,8 +720,12 @@ class ProcesadorOrdenesController extends Controller
                         if(!empty($pilaAdministradores)){
                             $titulo = "Orden sin Propietario";
                             $mensaje = "Servicio: ".$nombreServicio;
-                     
+                            try {
                                 $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                            } catch (Exception $e) {
+                                
+                            }
+                            
                         }
                     }   
 
@@ -658,11 +777,15 @@ class ProcesadorOrdenesController extends Controller
                             if(!empty($pilaAdministradores)){
                                 $titulo = "Orden sin Motorista Disponible";
                                 $mensaje = "Servicio: ".$nombreServicio;
-                       
-                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
-                                
+                                try {
+                                    $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                                } catch (Exception $e) {
+                                    
+                                }
+                                                                
                             }
                         }
+
                     
                         DB::commit();
 
@@ -670,7 +793,7 @@ class ProcesadorOrdenesController extends Controller
 
                 }else{
                     return [
-                        'success' => 16 // carrito de compras no encontrado
+                        'success' => 20 // carrito de compras no encontrado
                     ];
                 }
 
@@ -773,10 +896,19 @@ class ProcesadorOrdenesController extends Controller
                 
 
                 $excedido = 0; // para ver si el cliente puede cancelar la orden por tardio
-                            
+                      
+                // CLIENTE MIRA EL TIEMPO DEL PROPIETARIO MAS COPIA DEL TIEMPO DE ZONA
+                $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
 
                 // obtener fecha orden y sumarle tiempo si estado es igual a 2
                 foreach($orden as $o){
+
+                    $sumado = $tiempo->copia_tiempo_orden + $o->hora_2;
+
+                    $o->hora_2 = $sumado;
+
+                    // ver si fue cancelado desde panel de control
+                    $o->canceladoextra = $tiempo->cancelado_extra;
 
                     // sumar precio de envio + producto
                     $sumado = $o->precio_total + $o->precio_envio;
@@ -996,7 +1128,12 @@ class ProcesadorOrdenesController extends Controller
                     $mensaje = "Orden cancelada por el cliente.";
         
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
+                        try {
+                            $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
+                        } catch (Exception $e) {
+                            
+                        }
+                        
                     }
                     return ['success' => 1]; // cancelado
 
@@ -1085,8 +1222,10 @@ class ProcesadorOrdenesController extends Controller
                     // enviar notificaciones  
                     $pilaUsuarios = array();
                     foreach($propietarios as $p){     
-                        if(!empty($p->device_id)){       
-                        array_push($pilaUsuarios, $p->device_id); 
+                        if(!empty($p->device_id)){ 
+                            if($p->device_id != "0000"){
+                                array_push($pilaUsuarios, $p->device_id); 
+                            }
                         }
                     }
 
@@ -1094,7 +1233,12 @@ class ProcesadorOrdenesController extends Controller
                     $mensaje = "El cliente desea esperar la orden";
             
                     if(!empty($pilaUsuarios)){
-                        $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
+                        try {
+                            $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
+                        } catch (Exception $e) {
+                            
+                        }
+                       
                     }
 
                     $orden = DB::table('ordenes AS o')

@@ -25,10 +25,16 @@ class CreateOrdenesDireccionesTable extends Migration
             $table->string('telefono', 20);
             $table->string('latitud', 50)->default('');
             $table->string('longitud', 50)->default('');
+            // si un servicio uso el min de compra para envio gratis, y usa motorista de la app
+            // este precio envio se guarda la copia
+            $table->decimal('copia_envio', 7,2);
+            $table->integer('copia_tiempo_orden'); // es el tiempo extra de cada zona para la orden
+            $table->boolean('cancelado_extra')->default(0); // esto es desde panel de control se puede cancelar una orden
             
             $table->foreign('users_id')->references('id')->on('users');
             $table->foreign('ordenes_id')->references('id')->on('ordenes');
             $table->foreign('zonas_id')->references('id')->on('zonas');
+
         });
     }
 

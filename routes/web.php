@@ -11,29 +11,35 @@
 |
 */
 
-
-Route::get('/', 'FrontendController@index')->name('inicio');
-Route::get('/preguntas-frecuentes', 'FrontendController@verFAQ');
+ 
+Route::get('/', 'FrontendController@index')->name('inicio'); // inicio del sitio web
+Route::get('/preguntas-frecuentes', 'FrontendController@verFAQ'); // pagina de preguntas
  
 // Rutas administrador
  
-Route::get('admin/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');
-Route::post('admin/logout', 'Auth\AdminLoginController@logout')->name('admin.logout');
-Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.submit');
+Route::get('admin/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');  // pagina inicio de sesion admin
+Route::post('admin/logout', 'Auth\AdminLoginController@logout')->name('admin.logout'); // cerrado de sesion
+Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.submit'); // inicio de sesion
 
-// RUTA ADMINISTRADOR
-Route::prefix('admin')->group(function () {  
-  Route::get('/', 'DashboardController@index')->name('admin.dashboard');
-  Route::get('/inicio', 'DashboardController@getInicio')->name('admin.inicio');
+  // RUTA ADMINISTRADOR 
+  Route::prefix('admin')->group(function () {  
+  Route::get('/', 'DashboardController@index')->name('admin.dashboard'); // inicio del panel de control
+  Route::get('/inicio', 'DashboardController@getInicio')->name('admin.inicio'); // carga la primera pagina 
   // mapa zonas
   Route::get('/zona/mapa/zona', 'MapaZonaController@index');
   Route::get('/zona/tablas/zona', 'MapaZonaController@zonatabla');
   Route::post('/zona/informacion-zona','MapaZonaController@informacionZona');
-  Route::post('/zona/nueva-zona','MapaZonaController@nuevaZona');
+  Route::post('/zona/nueva-zona','MapaZonaController@nuevaZona'); 
   Route::post('/zona/editar-zona','MapaZonaController@editarZona');
   Route::post('/zona/nuevo-poligono','MapaZonaController@crearPoligono');
   Route::post('/zona/borrar-poligono','MapaZonaController@borrarPoligono');
   Route::get('/zona/ver-poligonos/{id}', 'MapaZonaController@verMapa');
+  // tipos
+  Route::get('/tipos/lista-tipos', 'TipoServicioController@index2');
+  Route::get('/tipos/tablas/lista-tipos', 'TipoServicioController@tipostabla');
+  Route::post('/tipos/nuevo','TipoServicioController@nuevoTipos');
+  Route::post('/tipos/informacion','TipoServicioController@informacionTipos'); 
+  Route::post('/tipos/editar-tipos','TipoServicioController@editarTipos');
   // tipo servicios
   Route::get('/tiposervicio/lista-tipo-servicio', 'TipoServicioController@index');
   Route::get('/tiposervicio/tablas/lista-tipo-servicio', 'TipoServicioController@serviciotabla');
@@ -65,10 +71,8 @@ Route::prefix('admin')->group(function () {
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');
   Route::post('/servicios/nuevo', 'ServiciosController@nuevo'); 
   Route::post('/servicios/informacion/servicio', 'ServiciosController@informacionServicio');
-  Route::post('/servicios/informacion-tiempo/servicio', 'ServiciosController@informacionTiempo');
   Route::post('/servicios/informacion-horario/servicio', 'ServiciosController@informacionHorario');
   Route::post('/servicios/editar-servicio', 'ServiciosController@editarServicio');
-  Route::post('/servicios/editar-tiempo', 'ServiciosController@editarTiempo');
   Route::post('/servicios/editar-horas', 'ServiciosController@editarHoras'); 
   Route::get('/servicios/mapa/ubicacion/{id}', 'ServiciosController@servicioUbicacion'); 
   // categorias menu 
@@ -87,8 +91,11 @@ Route::prefix('admin')->group(function () {
   Route::get('/zonaservicios/{id}/{id1}', 'ZonaServiciosController@filtrado');
   Route::get('/zonaservicios/tabla/{id}/{id1}', 'ZonaServiciosController@tablaFiltrado');
   Route::post('/zonaservicios/ordenar', 'ZonaServiciosController@ordenar'); 
-    
-  // productos
+  Route::post('/zonaservicios/enviogratis', 'ZonaServiciosController@setearEnvioGratis'); 
+  Route::post('/zonaservicios/mitadprecio', 'ZonaServiciosController@setearMitadPrecio'); 
+ 
+     
+  // productos 
   Route::get('/productos/{id}', 'ProductoController@index');  
   Route::get('/productos/tablas/{id}', 'ProductoController@tablaProductos');
   Route::post('/productos/nuevo', 'ProductoController@nuevo');
@@ -145,7 +152,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/revisador/tabla/lista', 'RevisadorController@revisadortabla');
   Route::post('/revisador/nuevo', 'RevisadorController@nuevo'); 
   Route::post('/revisador/reseteo', 'RevisadorController@reseteo');
-  Route::post('/revisador/informacion', 'RevisadorController@informacion');
+  Route::post('/revisador/informacion', 'RevisadorController@informacion'); 
   Route::post('/revisador/editar', 'RevisadorController@editar');
   // revisador motorista 
   Route::get('/revisadormoto/lista', 'RevisadorController@index2');
@@ -165,7 +172,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/ordenes/ubicacion/{id}', 'OrdenesController@entregaUbicacion'); 
   Route::get('/ordenes/listaproducto/{id}', 'OrdenesController@listaproducto'); 
   Route::get('/ordenes/tabla/producto/{id}', 'OrdenesController@productos'); 
-  // motorista ordenes  
+  // motorista ordenes   
   Route::get('/motoorden/lista', 'OrdenesController@index2');
   Route::get('/motoorden/tabla/lista', 'OrdenesController@tablamotoorden');
   // experiencia 
@@ -175,8 +182,7 @@ Route::prefix('admin')->group(function () {
   Route::get('/buscar/moto/ordenes', 'OrdenesController@index4'); 
   Route::get('/buscar/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador');  // buscar ordenes motorista
   Route::get('/buscar2/moor/{id}/{id1}/{id2}', 'OrdenesController@buscador2');
- 
-
+  
   // buscar numero de orden
   Route::get('/buscar/numero/orden', 'OrdenesController@index6');
   Route::get('/buscar/num/orden/{id}', 'OrdenesController@buscarNumOrden');
@@ -184,24 +190,22 @@ Route::prefix('admin')->group(function () {
   Route::post('/buscar3/orden/servicio', 'OrdenesController@buscador3');
   Route::post('/buscar/orden/informacion', 'OrdenesController@infoordenbuscada');
   Route::post('/buscar/orden/filtraje', 'OrdenesController@filtro');
-  // reporte de servicio por motorista prestado 
-  //Route::get('/generar/reporte1/{id}/{id2}/{id3}/{id4}', 'OrdenesController@reporte');
   Route::get('/generar/reporte2/{id}/{id2}/{id3}', 'OrdenesController@reporte1'); // reporte de pago a motoristas
   // guardar registro de pago motorista
   Route::get('/motopago/lista', 'MotoristaPagoController@index');
-  Route::get('/motopago/tabla/lista', 'MotoristaPagoController@tablapago');
+  Route::get('/motopago/tabla/lista', 'MotoristaPagoController@tablapago'); // datos de pagos a motoristas
   Route::post('/registro/pago/motorista', 'MotoristaPagoController@nuevo');
   Route::post('/motopago/pago/ver', 'MotoristaPagoController@totalpagadomotorista');
-   
+    
   // pago a servicios  
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2');  
   Route::get('/buscarservicio/{id}/{id1}/{id2}', 'MotoristaPagoController@buscador'); // buscar ordenes completas del servicio
   Route::get('/generar/reporte3/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
-  //Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reportemotoristaprestado');
+  Route::get('/generar/reporte6/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteUtilizoMinEnvioGratis'); // servicio uso min de $$ para envio gratis
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido'); // reporte de productos vendidos
- 
+
      
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
@@ -237,9 +241,15 @@ Route::prefix('admin')->group(function () {
   Route::get('/registropromo/reporte2/{id}', 'ZonaPublicidadController@reporte2'); // buscar promo por vencer
   Route::post('/registropromo/informacion', 'ZonaPublicidadController@informacion');
   Route::post('/registropromo/editar', 'ZonaPublicidadController@editar');
-  // envio de notificaciones
-  Route::get('/notificacion/vista', 'AdminController@vistanotificacion'); 
- 
- 
+  
+  // cancelacion de una orden por panel de control
+  Route::post('/cancelarorden/panel', 'OrdenesController@cancelarOrdenPanel');
+
+  
+
+  // configuracion
+  Route::get('/dinero/limite', 'ConfiguracionesController@index'); 
+  Route::post('/dinero/limite/informacion', 'ConfiguracionesController@informacion');
+  Route::post('/dinero/limite/actualizar', 'ConfiguracionesController@actualizar');
 });       
   

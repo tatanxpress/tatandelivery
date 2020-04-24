@@ -16,7 +16,7 @@ class RegisterController extends Controller
          if($request->isMethod('post')){ 
 
             $rules = array(        
-                'nombre' => 'required|max:50',
+                'nombre' => 'required|max:100',
                 'telefono' => 'required|max:20',
                 'password' => 'required|min:8|max:16',
                 'correo' => 'required|max:100',
@@ -24,7 +24,7 @@ class RegisterController extends Controller
 
             $messages = array(                          
                 'nombre.required' => 'El nombre es requerido',                                    
-                'nombre.max' => '50 caracteres máximo para el nombre',             
+                'nombre.max' => '100 caracteres máximo para el nombre',             
 
                 'telefono.required' => 'El telefono es requerido',                                    
                 'telefono.max' => '20 caracteres máximo para el nombre',             

@@ -86,6 +86,11 @@
                                     <label>Pago</label>
                                     <input type="number" step="0.1" class="form-control" id="pago">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" class="form-control" maxlength="200" id="descripcion" placeholder="Descripción">
+                                </div>
                               
                             </div>
                         </div>
@@ -146,7 +151,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Total generado este servicio, solo estado 5</h4>
+                <h4 class="modal-title">Total pagado a este servicio</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -248,6 +253,7 @@
         var fechadesde = document.getElementById('fechadesde').value;
         var fechahasta = document.getElementById('fechahasta').value;
         var pago = document.getElementById('pago').value;
+        var descripcion = document.getElementById('descripcion').value;
         
         var retorno = validarNuevo(fechadesde, fechahasta, pago);
 
@@ -260,6 +266,7 @@
             formData.append('fecha1', fechadesde);
             formData.append('fecha2', fechahasta);
             formData.append('pago', pago);
+            formData.append('descripcion', descripcion);
                 
             axios.post('/admin/registro/pago/servicio',formData,{
                 })

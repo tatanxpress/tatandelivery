@@ -52,6 +52,9 @@ class VistaTipoTiendaController extends Controller
                     $producto = DB::table('servicios_tipo AS st')
                     ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
                     ->select('st.id')
+                    ->where('p.activo', 1)
+                    ->where('p.disponibilidad', 1)
+                    ->where('p.es_promocion', 0)
                     ->where('st.id', $user->tipoId)
                     ->get();
     
@@ -96,10 +99,8 @@ class VistaTipoTiendaController extends Controller
                 $diaSemana = $numSemana[$getDiaHora];   
                             
                 $servicio = DB::table('servicios AS s')
-                ->join('tiempo_aprox AS t', 't.servicios_id', '=', 's.id')
-                ->select('s.nombre', 's.descripcion', 's.imagen', 't.tiempo','s.minimo', 's.utiliza_minimo')
-                ->where('s.id', $request->servicioid)
-                ->where('t.dia', $diaSemana)
+                ->select('s.nombre', 's.descripcion', 's.imagen', 's.minimo', 's.utiliza_minimo')
+                ->where('s.id', $request->servicioid)                
                 ->get();
                
                 //obtener horario

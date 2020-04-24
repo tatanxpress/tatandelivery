@@ -30,10 +30,11 @@
                 <li><a>Redes Sociales</a></li>
                 <li>
                   <ul class="group group-sm footer-classic-social-list">
-                    <li><a class="link-social" href="https://www.facebook.com/tatanexpress/" title="Facebook">
-                        <div class="icon novi-icon mdi mdi-facebook"></div></a></li>
-                    <li><a class="link-social" href="https://www.instagram.com/tatanexpress/" title="Instagram">
-                        <div class="icon novi-icon mdi mdi-instagram"></div></a></li>
+
+                    <a href="https://www.facebook.com/tatanexpress/"><img src="{{ asset('images/facebook.png') }}" width="50px" height="50px" title="Facebook"> </a>
+
+                    <a href="https://www.instagram.com/tatanexpress/"><img src="{{ asset('images/instagram.png') }}" width="50px" height="50px" title="Instagram"> </a>
+
                   
                   </ul>
                 </li>

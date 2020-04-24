@@ -18,7 +18,7 @@ class CreateOrdenesDescripcionTable extends Migration
             $table->bigInteger('ordenes_id')->unsigned();
             $table->bigInteger('producto_id')->unsigned();
             $table->integer('cantidad')->default(0);
-            $table->string('nota', 800)->default('');
+            $table->string('nota', 400)->default('');
             $table->decimal('precio', 7,2);
 
             $table->foreign('ordenes_id')->references('id')->on('ordenes');

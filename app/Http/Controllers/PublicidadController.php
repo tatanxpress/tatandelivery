@@ -223,7 +223,6 @@ class PublicidadController extends Controller
             $nombreFoto = $nombre.strtolower($extension);
             $avatar = $request->file('imagen'); 
             $upload = Storage::disk('listaservicios')->put($nombreFoto, \File::get($avatar)); 
-
             
             $cadena2 = Str::random(15);
             $tiempo2 = microtime(); 

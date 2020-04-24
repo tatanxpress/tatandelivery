@@ -17,7 +17,7 @@ class CreateCarritoExtraTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('carrito_temporal_id')->unsigned();
             $table->bigInteger('producto_id')->unsigned();
-            $table->string('nota_producto', 200)->default('');
+            $table->string('nota_producto', 400)->default('');
             $table->integer('cantidad')->default('0');
 
             $table->foreign('carrito_temporal_id')->references('id')->on('carrito_temporal');

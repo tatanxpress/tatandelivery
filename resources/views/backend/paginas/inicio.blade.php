@@ -47,10 +47,7 @@
             <p>Total motorista agregados: <strong>{{ $totalmotorista }}</strong></p>
             <p>Total ordenes cancelada por cliente: <strong>{{ $totalordencanceladacliente }}</strong></p>
             <p>Total ordenes cancelada por propietario: <strong>{{ $totalordencanceladapropietario }}</strong></p>
-            <p>Producto mas vendido: <strong>{{ $nombre }}</strong></p>
-            <p>Identificador servicio: <strong>{{ $identificador }}</strong></p>
-            <p>Nombre servicio: <strong>{{ $servicio }}</strong></p>
-            
+                       
           </div>  
       </div>
     </section>

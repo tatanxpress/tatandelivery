@@ -27,8 +27,8 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                    <div id="tablaDatatable"></div>
-                </div>
+                      <div id="tablaDatatable"></div>
+                    </div>
                 </div>
             </div>
 		  </div>
@@ -111,11 +111,7 @@
             })
             .then((response) => {
               loadingOverlay().cancel(spinHandle);
-
-             respuesta(response);
-                    
- 
-
+                respuesta(response);
             })
             .catch((error) => {
                 loadingOverlay().cancel(spinHandle); 

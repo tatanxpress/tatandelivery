@@ -9,7 +9,6 @@
                     <tr>
                     <th style="width: 10%">ID</th>
                     <th style="width: 15%">Nombre</th>
-                    <th style="width: 20%">Descripcion</th>
                     <th style="width: 10%">Precio</th>
                     <th style="width: 15%">Disponibilidad</th>
                     <th style="width: 10%">Activo</th>
@@ -25,7 +24,6 @@
                     
                     <td>{{ $dato->id }}</td>
                     <td>{{ $dato->nombre }}</td>
-                    <td>{{ $dato->descripcion }}</td>
                     <td>{{ $dato->precio }}</td>
                     <td> 
                       @if($dato->disponibilidad == 0)

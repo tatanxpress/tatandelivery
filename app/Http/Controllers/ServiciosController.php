@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use App\Servicios;
 use App\TipoServicios;
 use App\HorarioServicio;
-use App\TiempoAproximado;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -24,7 +23,8 @@ class ServiciosController extends Controller
 
         // lista tipo servicios
         $tiposervicio =  DB::table('tipo_servicios')
-        ->where('id', '!=', 3)       
+        ->where('tipos_id', '!=', 2)   // promociones y publicidad 
+        ->where('tipos_id', '!=', 3)   // buscador  
         ->get();
 
         return view('backend.paginas.servicios.listaservicio', compact('tiposervicio'));
@@ -66,23 +66,12 @@ class ServiciosController extends Controller
                 'longitud' => 'required',
                 'direccion' => 'required',
                 'tipovista' => 'required',
-              
-                'tiempo' => 'required',
-
                 'cbenviogratis' => 'required',
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
                 'cbproducto' => 'required',
-                'cbautomatica' => 'required',
-
-                'lunes' => 'required',
-                'martes' => 'required',
-                'miercoles' => 'required',
-                'jueves' => 'required',
-                'viernes' => 'required',
-                'sabado' => 'required',
-                'domingo' => 'required',
-
+                'cbprivado' => 'required',
+                 
                 'horalunes1' => 'required',
                 'horalunes2' => 'required',
                 'horalunes3' => 'required',
@@ -146,13 +135,12 @@ class ServiciosController extends Controller
                 'longitud.required' => 'longitud es requerido',
                 'direccion.required' => 'Direccion es requerida',
                 'tipovista.required' => 'tipo vista es requerido',
-                'tiempo.required' => 'tiempo es requerido',
+                'cbprivado.required' => 'check si servicio es privado es requerido',
 
                 'cbenviogratis.required' => 'es requerido 1',
                 'cbminimo.required' => 'es requerido 2',
                 'minimocompra.required' => 'es requerido 3',
                 'cbproducto.required' => 'es requerido 4',
-                'cbautomatica.required' => 'es requerido 5',
 
                 'lunes.required' => 'es requerido 6',
                 'martes.required' => 'es requerido 7',
@@ -252,80 +240,37 @@ class ServiciosController extends Controller
      
                 if($upload && $upload2){
 
-
                     $fecha = Carbon::now('America/El_Salvador');
                 
                     $tipo = new Servicios();
                  
-                    $tipo->comision = $request->comision;
-                    $tipo->nombre = $request->nombre;
-                    $tipo->identificador = $request->identificador;
-                    $tipo->descripcion = $request->descripcion;
-                    $tipo->descripcion_corta = $request->descripcioncorta;
+                    $tipo->comision = $request->comision; //
+                    $tipo->nombre = $request->nombre; //
+                    $tipo->identificador = $request->identificador; //
+                    $tipo->descripcion = $request->descripcion; //
+                    $tipo->descripcion_corta = $request->descripcioncorta; //
                     $tipo->logo = $nombreFoto;
                     $tipo->imagen = $nombreFoto2;
-                    $tipo->cerrado_emergencia = 0;
+                    $tipo->cerrado_emergencia = 0; 
                     $tipo->fecha = $fecha;
-                    $tipo->activo = 0; 
-                    $tipo->tiempo = $request->tiempo; 
-                    $tipo->tipo_servicios_id = $request->tiposervicio;
-                    $tipo->envio_gratis = $request->cbenviogratis;
-                    $tipo->telefono = $request->telefono;
-                    $tipo->latitud = $request->latitud;
-                    $tipo->longitud = $request->longitud;
-                    $tipo->direccion = $request->direccion;
-                    $tipo->tipo_vista = $request->tipovista;
-                    $tipo->minimo = $request->minimocompra;
-                    $tipo->utiliza_minimo = $request->cbminimo;
-                    $tipo->orden_automatica = $request->cbautomatica;
-                    $tipo->producto_visible = $request->cbproducto;
-                    $tipo->privado = 0;
-                    
+                    $tipo->activo = 0; // inactivo por defecto
+                    $tipo->tiempo = 10; 
+                    $tipo->tipo_servicios_id = $request->tiposervicio; //
+                    $tipo->envio_gratis = $request->cbenviogratis; //
+                    $tipo->telefono = $request->telefono; //
+                    $tipo->latitud = $request->latitud; //
+                    $tipo->longitud = $request->longitud; //
+                    $tipo->direccion = $request->direccion; //
+                    $tipo->tipo_vista = $request->tipovista; //
+                    $tipo->minimo = $request->minimocompra; //
+                    $tipo->utiliza_minimo = $request->cbminimo; //
+                    $tipo->orden_automatica = 0;
+                    $tipo->producto_visible = $request->cbproducto; //
+                    $tipo->privado = $request->cbprivado;                    
                     $tipo->save();
 
                     $idservicio = $tipo->id;
-                    $tiempo1 = new TiempoAproximado();
-                    $tiempo1->servicios_id = $idservicio;
-                    $tiempo1->dia = 1;
-                    $tiempo1->tiempo = $request->lunes;
-                    $tiempo1->save();
-
-                    $tiempo2 = new TiempoAproximado();
-                    $tiempo2->servicios_id = $idservicio;
-                    $tiempo2->dia = 2;
-                    $tiempo2->tiempo = $request->martes;
-                    $tiempo2->save();
-
-                    $tiempo3 = new TiempoAproximado();
-                    $tiempo3->servicios_id = $idservicio;
-                    $tiempo3->dia = 3;
-                    $tiempo3->tiempo = $request->miercoles;
-                    $tiempo3->save();
-
-                    $tiempo4 = new TiempoAproximado();
-                    $tiempo4->servicios_id = $idservicio;
-                    $tiempo4->dia = 4;
-                    $tiempo4->tiempo = $request->jueves;
-                    $tiempo4->save();
-
-                    $tiempo5 = new TiempoAproximado();
-                    $tiempo5->servicios_id = $idservicio;
-                    $tiempo5->dia = 5;
-                    $tiempo5->tiempo = $request->viernes;
-                    $tiempo5->save();
-
-                    $tiempo6 = new TiempoAproximado();
-                    $tiempo6->servicios_id = $idservicio;
-                    $tiempo6->dia = 6;
-                    $tiempo6->tiempo = $request->sabado;
-                    $tiempo6->save();
-
-                    $tiempo7 = new TiempoAproximado();
-                    $tiempo7->servicios_id = $idservicio;
-                    $tiempo7->dia = 7;
-                    $tiempo7->tiempo = $request->domingo;
-                    $tiempo7->save();
-
+                    
                     $hora1 = new HorarioServicio();
                     $hora1->hora1 = $request->horalunes1;
                     $hora1->hora2 = $request->horalunes2;
@@ -359,7 +304,6 @@ class ServiciosController extends Controller
                     $hora3->cerrado = $request->cbcerradomiercoles;
                     $hora3->save();
 
-
                     $hora4 = new HorarioServicio();
                     $hora4->hora1 = $request->horajueves1;
                     $hora4->hora2 = $request->horajueves2;
@@ -382,7 +326,6 @@ class ServiciosController extends Controller
                     $hora5->cerrado = $request->cbcerradoviernes;
                     $hora5->save();
 
-
                     $hora6 = new HorarioServicio();
                     $hora6->hora1 = $request->horasabado1;
                     $hora6->hora2 = $request->horasabado2;
@@ -393,7 +336,6 @@ class ServiciosController extends Controller
                     $hora6->segunda_hora = $request->cbsabadosegunda;
                     $hora6->cerrado = $request->cbcerradosabado;
                     $hora6->save();
-
 
                     $hora7 = new HorarioServicio();
                     $hora7->hora1 = $request->horadomingo1;
@@ -415,9 +357,9 @@ class ServiciosController extends Controller
 
             } catch(\Throwable $e){
                 DB::rollback();
-                return ['success' => 3, 'error' => $e];
+                return ['success' => 3, 'error' => "es: ".$e];
             }
-        }
+        } 
     }
 
     // informacion del servicio
@@ -450,39 +392,7 @@ class ServiciosController extends Controller
                 return['success' => 2];
             }
         }
-    }
-
-    // informacion sobre tiempo
-    public function informacionTiempo(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'
-            );    
-
-            $messages = array(                                      
-                'id.required' => 'El ID tipo servicio es requerido.'                        
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages );
-
-            if ( $validator->fails() ) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validator->errors()->all()
-                ];
-            }
-
-            if(TiempoAproximado::where('id', $request->id)->first()){
-
-                $tiempo = TiempoAproximado::where('servicios_id', $request->id)->get();
-
-                return['success' => 1, 'tiempo' => $tiempo];
-            }else{
-                return['success' => 2];
-            }
-        }
-    }
+    } 
 
     // informacion sobre horarios
     public function informacionHorario(Request $request){
@@ -522,9 +432,7 @@ class ServiciosController extends Controller
         if($request->isMethod('post')){   
             $rules = array( 
                 'id' => 'required',
-                'comision' => 'required',
-              
-                'tiempo' => 'required',
+                'comision' => 'required',              
                 'nombre' => 'required',
                 'identificador' => 'required',
                 'descripcion' => 'required',
@@ -540,7 +448,6 @@ class ServiciosController extends Controller
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
                 'cbproducto' => 'required',
-                'cbautomatica' => 'required',
                 'cbcerradoemergencia' => 'required',
                 'cbactivo' => 'required',
                 'privado' => 'required'
@@ -549,7 +456,6 @@ class ServiciosController extends Controller
             $messages = array(   
                 'id.required' => 'El id es requerido',
                 'comision.required' => 'comision es requerido',
-                'tiempo.required' => 'tiempo es requerido',
                 'nombre.required' => 'El nombre es requerido',
                 'identificador.required' => 'El identificador es requerido',
                 'descripcion.required' => 'la descripcion es requerido',
@@ -564,7 +470,6 @@ class ServiciosController extends Controller
                 'cbminimo.required' => 'check minimo requerido',
                 'minimocompra.required' => 'minimo compra requerido',
                 'cbproducto.required' => 'check producto requerido',
-                'cbautomatica.required' => 'check automatico requerido',
                 'cbcerradoemergencia.required' => 'check cerrado emergencia requerido',
                 'cbactivo.required' => 'activo es requerido',
                 'privado.required' => 'opcion privado es requerido'
@@ -699,14 +604,12 @@ class ServiciosController extends Controller
                         'tipo_servicios_id' => $request->tiposervicio,
                         'envio_gratis' => $request->cbenviogratis,
                         'telefono' => $request->telefono,
-                        'tiempo' => $request->tiempo,
                         'latitud' => $request->latitud,
                         'longitud' => $request->longitud,
                         'direccion' => $request->direccion,
                         'tipo_vista' => $request->tipovista,
                         'minimo' => $request->minimocompra,
                         'utiliza_minimo' => $request->cbminimo,
-                        'orden_automatica' => $request->cbautomatica,
                         'producto_visible' => $request->cbproducto,
                         'privado' => $request->privado]);
 

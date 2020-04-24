@@ -88,9 +88,12 @@
           @foreach($registro as $dato)
             <tr>
               <td> {{ $conteo }} </td>
-              <td>{{ $dato->identificador }}</td>             
-              <td>{{ $dato->tipo }}</td>
-            
+              <td>{{ $dato->identificador }}</td>  
+              @if($dato->tipo == 0)
+                <td>Promoción</td>
+              @else
+                <td>Publicidad</td>
+              @endif            
             </tr>  
           @endforeach  
          

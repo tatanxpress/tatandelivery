@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 //Route::post('ejemplo', 'Api\Auth\LoginController@ejemplo');
-// USUARIOS
+// USUARIOS  
 Route::post('verificar/telefono', 'Api\Auth\LoginController@verificarNumero'); // verificar si el telefono esta registrado
 Route::post('verificar-codigo-temporal', 'Api\Auth\LoginController@verificarCodigoTemporal'); // verificar telefono + codigo temporal.
 Route::post('usuario/login', 'Api\Auth\LoginController@loginUsuario'); // login usuario
@@ -21,8 +21,8 @@ Route::post('usuario/codigo-correo', 'Api\Auth\LoginController@codigoCorreo'); /
 Route::post('usuario/revisar-codigo', 'Api\Auth\LoginController@revisarCodigoCorreo'); // revisar codigo del correo
 Route::post('usuario/registro', 'Api\Auth\RegisterController@registroUsuario'); // registro usuario
 Route::post('usuario/nueva-password', 'Api\PerfilController@nuevaPassword'); // cambia contraseña con correo
-  
-// perfil
+   
+// perfil 
 Route::post('usuario/informacion', 'Api\PerfilController@infoPerfil'); // cambia contraseña en perfil
 Route::post('usuario/editar-perfil', 'Api\PerfilController@editarPerfil'); // cambiar datos del perfil
 Route::post('usuario/direcciones', 'Api\PerfilController@verDirecciones'); // lista de direcciones
@@ -38,10 +38,10 @@ Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoS
 Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoProductoVistaComida'); // menu de local tipo comida
 Route::post('usuario/servicios/info/producto', 'Api\ServiciosController@getProductoIndividual'); // informacion de producto individual
 Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPublicidad'); // ver promocionales
-  
-// vista tipo tienda
+       
+// vista tipo tienda  
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
-  
+    
 // carrito
 Route::post('usuario/carrito/producto/agregar', 'Api\CarritoTemporalController@agregarProducto'); 
 Route::post('usuario/carrito/ver/orden', 'Api\CarritoTemporalController@verCarritoCompras'); // ver la orden
@@ -50,12 +50,13 @@ Route::post('usuario/carrito/ver/producto', 'Api\CarritoTemporalController@verPr
 Route::post('usuario/carrito/borrar/orden', 'Api\CarritoTemporalController@eliminarCarritoCompras'); // eliminar carrito de compras
 Route::post('usuario/carrito/cambiar/cantidad', 'Api\CarritoTemporalController@cambiarCantidad'); // cambiar cantidad de este producto
 Route::post('usuario/carrito/ver/proceso', 'Api\CarritoTemporalController@verProcesarOrden'); // ver info para procesar la orden
- 
+  
 // buscador
-Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // locales tipo tienda
+Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // buscador
 Route::post('usuario/productos/ver/seccion', 'Api\BuscadorController@buscarProductoSeccion'); // lista de productos "ver todos"
- 
-// proceso  
+Route::post('usuario/servicios/buscar/global', 'Api\BuscadorController@buscarProductoGlobal'); // buscador global de productos
+
+// proceso   
 Route::post('usuario/proceso/ver/ordenes', 'Api\ProcesadorOrdenesController@verOrdenes'); // ver orden hecha por mismo usuario
 Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@verOrdenPorID'); // ver orden por id
 Route::post('usuario/proceso/orden/productos', 'Api\ProcesadorOrdenesController@ordenProductos'); // ver lista de producto de orden
@@ -69,17 +70,16 @@ Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesControll
 
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
- 
-     
-
-// PROPIETARIOS
+    
+  
+// PROPIETARIOS  
  
 Route::post('propietario/login', 'Api\PropietarioController@loginPropietario'); // login propietario 
 Route::post('propietario/password/recuperacion', 'Api\PropietarioController@codigoCorreo'); // enviar codigo recuperacion
 Route::post('propietario/revisar/codigo', 'Api\PropietarioController@revisarCodigoCorreo'); // revisar codigo correo
 Route::post('propietario/cambiar/password', 'Api\PropietarioController@nuevaPassword'); // cambio de contraseña
 Route::post('propietario/buscar/telefono', 'Api\PropietarioController@buscarTelefono'); // buscar telefono
- 
+  
 // nuevas ordenes 
 Route::post('propietario/nueva/ordenes', 'Api\PropietarioController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('propietario/ver/productos', 'Api\PropietarioController@verProductosOrden'); // ver productos de la orden
@@ -107,7 +107,6 @@ Route::post('propietario/ver/historial', 'Api\PropietarioController@verHistorial
 
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes canceladas
-Route::post('propietario/ver/pago/tardia', 'Api\PropietarioController@verPagosTardio'); // ver ordenes canceladas
 Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes canceladas
     
  
@@ -121,22 +120,27 @@ Route::post('propietario/actualizar/password', 'Api\PropietarioController@actual
 Route::post('propietarios/estado/adomicilio', 'Api\PropietarioController@estadoAdomicilio'); // ver estado de adomicilio
 Route::post('propietarios/estado/tiempo', 'Api\PropietarioController@estadoAutomatico'); // estado automatico de ordenes
 Route::post('propietario/guardar/tiempo', 'Api\PropietarioController@guardarTiempo'); // guarda tiempo para la orden automatica o no
- 
+Route::post('propietarios/zonas/cobertura', 'Api\PropietarioController@zonaCobertura'); // lista de zonas que da cobertura este servicio
+Route::post('propietarios/zonas/informacion', 'Api\PropietarioController@informacionZona'); //info de la zona que modificara el propietario
+Route::post('propietarios/zonas/actualizar/zonahora', 'Api\PropietarioController@actualizarZonaHora'); //info de la zona que modificara el propietario
+Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona'); //info de la zona que modificara el propietario
+
+
 // productos 
-Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // informacion cuenta
+Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
  
 
 // MOTORISTA  
-
+ 
 Route::post('motorista/login', 'Api\MotoristaController@loginMotorista'); // login motorista
 Route::post('motorista/password/recuperacion', 'Api\MotoristaController@codigoCorreo'); // enviar codigo recuperacion
 Route::post('motorista/revisar/codigo', 'Api\MotoristaController@revisarCodigoCorreo'); // revisar codigo correo
 Route::post('motorista/cambiar/password', 'Api\MotoristaController@nuevaPassword'); // cambio de contraseña
 Route::post('motorista/buscar/telefono', 'Api\MotoristaController@buscarTelefono'); // buscar telefono
-  
+   
 // nueva ordenes 
 Route::post('motorista/nueva/ordenes', 'Api\MotoristaController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('motorista/ver/orden/id', 'Api\MotoristaController@verOrdenPorID'); // ver estados orden por id
@@ -166,10 +170,7 @@ Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
-// permite ver zonas de pago
-Route::post('motorista/ver/zona/pago', 'Api\MotoristaController@verZonaPago'); // pendientes de pago
-
-
+ 
 // REVISADOR DE PAGOS
 
 Route::post('revisador/login', 'Api\PagaderoController@loginRevisador'); // login revisador
@@ -179,7 +180,7 @@ Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); 
 
  
 // ver ordenes pendiente de pago
-Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago'); // login revisador
+Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago'); // 
  
 // confirmar pago
 Route::post('revisador/confirmar/pago', 'Api\PagaderoController@confirmarPago'); // confirmar revisador
@@ -199,7 +200,7 @@ Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login
 
 // ordenes del estado 1-4
 Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgente'); 
-
+ 
 // ocultar una orden de ordenes_pendiente
 Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // login revisador
  

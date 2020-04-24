@@ -41,10 +41,8 @@ class RevisadorController extends Controller
 
             $regla = array(
                 'identi' => 'required',
-                'nombre' => 'required',
-                'direccion' => 'required',
+                'nombre' => 'required',                
                 'telefono' => 'required',
-               
                 'codigo' => 'required',
                 'cbactivo' => 'required'
             );
@@ -52,9 +50,7 @@ class RevisadorController extends Controller
             $mensaje = array(
                 'identi.required' => 'identificador es requerido',
                 'nombre.required' => 'Nombre es requerido',
-                'direccion.required' => 'Direccion es requerido',
-                'telefono.required' => 'telefono es requerida',
-                
+                'telefono.required' => 'telefono es requerida',                
                 'codigo.required' => 'Codigo es requerido',
                 'cbactivo.required' => 'Activo es requerido',
                 );
@@ -81,10 +77,7 @@ class RevisadorController extends Controller
 
             $m = new Revisador();
             $m->nombre = $request->nombre;
-            $m->direccion = $request->direccion;
-            $m->telefono = $request->telefono;
-            $m->latitud = "1";
-            $m->longitud = "1";
+            $m->telefono = $request->telefono;     
             $m->password = bcrypt('12345678');
             $m->disponible = 0;
             $m->activo = $request->cbactivo;
@@ -169,10 +162,8 @@ class RevisadorController extends Controller
             
             $regla = array(
                 'id' => 'required',
-                'nombre' => 'required',
-                'direccion' => 'required',
-                'telefono' => 'required',
-            
+                'nombre' => 'required',               
+                'telefono' => 'required',            
                 'codigo' => 'required',
                 'cbactivo' => 'required',
                 'cbdisponible' => 'required'
@@ -181,9 +172,7 @@ class RevisadorController extends Controller
             $mensaje = array(
                 'id.required' => 'id es requerido',
                 'nombre.required' => 'Nombre es requerido',
-                'direccion.required' => 'Direccion es requerido',
-                'telefono.required' => 'telefono es requerida',
-              
+                'telefono.required' => 'telefono es requerida',              
                 'codigo.required' => 'Codigo es requerido',
                 'cbactivo.required' => 'Activo es requerido',
                 'cbdisponible.required' => 'Disponible cb es requerido',
@@ -206,8 +195,7 @@ class RevisadorController extends Controller
             if($po = Revisador::where('id', $request->id)->first()){
                
                 Revisador::where('id', $request->id)->update([
-                        'nombre' => $request->nombre,
-                        'direccion' => $request->direccion,
+                        'nombre' => $request->nombre,                        
                         'telefono' => $request->telefono,                       
                         'disponible' => $request->cbdisponible,
                         'activo' => $request->cbactivo,
@@ -324,11 +312,11 @@ class RevisadorController extends Controller
     } 
 
     // tabla 
-    public function revisadorbitacoratabla(){ 
+    public function revisadorbitacoratabla(){
          
         $revisador = DB::table('bitacora_revisador AS b')
         ->join('revisador AS r', 'r.id', '=', 'b.revisador_id')
-        ->select('b.id', 'r.identificador', 'r.nombre', 'b.fecha1', 'b.fecha2', 'b.total', 'b.confirmadas')
+        ->select('b.id', 'r.identificador', 'r.nombre', 'b.descripcion', 'b.fecha1', 'b.fecha2', 'b.total', 'b.confirmadas')
         ->get();
 
         return view('backend.paginas.revisador.tablas.tablarevisadorbitacora', compact('revisador'));
@@ -406,6 +394,13 @@ class RevisadorController extends Controller
             $m->fecha2 = $request->fechahasta;
             $m->total = $request->total;
             $m->confirmadas = $request->confirmada;
+
+            $descripcion = $request->descripcion;
+            if($descripcion == null){
+                $descripcion = "";
+            }
+
+            $m->descripcion = $descripcion;
             
             if($m->save()){
                 return ['success' => 1];
@@ -456,6 +451,7 @@ class RevisadorController extends Controller
                         'fecha2' => $request->fechahasta,
                         'total' => $request->total,
                         'confirmadas' => $request->confirmada,
+                        'descripcion' => $request->descripcion,
                         ]);
 
                         return ['success' => 1];

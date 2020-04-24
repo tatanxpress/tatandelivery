@@ -33,8 +33,22 @@
 
                             <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#faqExample">
                                 <div class="card-body">
-                                    Puedes buscar nuestra aplicación en Google Play por nombre Tatan Express. Proximamente para dispositivos Apple.
+                                    Puedes buscar nuestra aplicación en Google Play por nombre Tatan Express, igualmente para dispositivos ios en la App Store con el nombre de Tatan Express.
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header p-2" id="headingThree4">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse" data-target="#collapseThree4" aria-expanded="false" aria-controls="collapseThree4">
+                                    ¿Tenemos Redes Sociales?
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree4" class="collapse" aria-labelledby="headingThree4" data-parent="#faqExample">
+                                <div class="card-body">
+                                Puedes encontrarnos en Facebook con el nombre de Tatan Express, o dando clic en el siguiente enlace <a href="https://www.facebook.com/tatanexpress/">Tatan Express</a>
                             </div>
                         </div>
 

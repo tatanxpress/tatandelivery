@@ -16,7 +16,7 @@
           </div>    
           <button type="button" onclick="modalOpciones()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Nueva publicidad
+                    Nueva publicidad o promoción
           </button>    
       </div>
     </section>
@@ -240,7 +240,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>descripcion titulo</label>
-                                    <input type="text" maxlength="800" class="form-control" id="titulodescripcion-pu" placeholder="Descripcion de la publicidad">
+                                    <textarea type="text" maxlength="800" class="form-control" id="titulodescripcion-pu" placeholder="Descripcion de la publicidad"> </textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -250,7 +250,7 @@
 
                                 <div class="form-group">
                                     <label>Telefono</label>
-                                    <input type="text" maxlength="300" class="form-control" id="telefono-pu" placeholder="Telefono">
+                                    <textarea type="text" maxlength="100" class="form-control" id="telefono-pu" placeholder="Telefono"> </textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -477,7 +477,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>descripcion titulo</label>
-                                    <input type="text" maxlength="800" class="form-control" id="titulodescripcion-e" placeholder="Descripcion de la publicidad">
+                                    <textarea type="text" maxlength="800" class="form-control" id="titulodescripcion-e" placeholder="Descripcion de la publicidad"> </textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -487,7 +487,7 @@
 
                                 <div class="form-group">
                                     <label>Telefono</label>
-                                    <input type="text" maxlength="300" class="form-control" id="telefono-e" placeholder="Telefono">
+                                    <textarea type="text" maxlength="100" class="form-control" id="telefono-e" placeholder="Telefono"> </textarea>
                                 </div>
 
                                 <div class="form-group">
@@ -784,7 +784,7 @@ $(function() {
                 if(urlfacebook.length > 0){
                     // no tocar texto
                 }else{
-                    urlfacebook = "ninguno";
+                    urlfacebook = "-";
                 }
             }
 
@@ -799,7 +799,7 @@ $(function() {
                 if(urlyoutube.length > 0){
                     // no tocar texto
                 }else{
-                    urlyoutube = "ninguno";
+                    urlyoutube = "-";
                 }
             }
 
@@ -813,7 +813,7 @@ $(function() {
                 if(urlinstagram.length > 0){
                     // no tocar texto
                 }else{
-                    urlinstagram = "ninguno";
+                    urlinstagram = "-";
                 }
             }
 
@@ -827,7 +827,7 @@ $(function() {
                 if(titulodescripcion.length > 0){
                     // no tocar texto
                 }else{
-                    titulodescripcion = "ninguno";
+                    titulodescripcion = "-";
                 }
             } 
 
@@ -841,7 +841,7 @@ $(function() {
                 if(telefono.length > 0){
                     // no tocar texto
                 }else{
-                    telefono = "ninguno";
+                    telefono = "-";
                 }              
             }
 
@@ -856,7 +856,7 @@ $(function() {
                 if(visitanos.length > 0){
                     // no tocar texto
                 }else{
-                    visitanos = "ninguno";
+                    visitanos = "-";
                 } 
             }
 
@@ -871,7 +871,7 @@ $(function() {
                 if(titulo.length > 0){
                     // no tocar texto
                 }else{
-                    titulo = "ninguno";
+                    titulo = "-";
                 }
             }
 
@@ -1325,7 +1325,7 @@ $(function() {
                 if(urlfacebook.length > 0){
                     // no tocar texto
                 }else{
-                    urlfacebook = "ninguno";
+                    urlfacebook = "-";
                 }
             }
 
@@ -1340,7 +1340,7 @@ $(function() {
                 if(urlyoutube.length > 0){
                     // no tocar texto
                 }else{
-                    urlyoutube = "ninguno";
+                    urlyoutube = "-";
                 }
             }
 
@@ -1354,7 +1354,7 @@ $(function() {
                 if(urlinstagram.length > 0){
                     // no tocar texto
                 }else{
-                    urlinstagram = "ninguno";
+                    urlinstagram = "-";
                 }
             }
 
@@ -1368,7 +1368,7 @@ $(function() {
                 if(titulodescripcion.length > 0){
                     // no tocar texto
                 }else{
-                    titulodescripcion = "ninguno";
+                    titulodescripcion = "-";
                 }
             }
 
@@ -1382,7 +1382,7 @@ $(function() {
                 if(telefono.length > 0){
                     // no tocar texto
                 }else{
-                    telefono = "ninguno";
+                    telefono = "-";
                 }              
             }
 
@@ -1397,7 +1397,7 @@ $(function() {
                 if(visitanos.length > 0){
                     // no tocar texto
                 }else{
-                    visitanos = "ninguno";
+                    visitanos = "-";
                 } 
             }
 
@@ -1412,7 +1412,7 @@ $(function() {
                 if(titulo.length > 0){
                     // no tocar texto
                 }else{
-                    titulo = "ninguno";
+                    titulo = "-";
                 }
             }
 

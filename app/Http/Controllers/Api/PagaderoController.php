@@ -134,8 +134,7 @@ class PagaderoController extends Controller
             if(Revisador::where('id', $request->id)->first()){
 
                 // estas ordenes ya fueron revisadas
-                $noquiero = DB::table('ordenes_revisadas AS r')                
-                ->get();
+                $noquiero = DB::table('ordenes_revisadas')->get();
 
                 $pilaOrden = array();
                 foreach($noquiero as $p){
@@ -145,16 +144,18 @@ class PagaderoController extends Controller
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
-                'o.servicios_id', 'o.estado_8')
+                'o.servicios_id', 'o.estado_8', 'o.fecha_7')
                 ->where('mo.motoristas_id', $request->motoristaid)               
-                ->where('o.estado_8', 0)
-                ->whereNotIn('o.id', $pilaOrden)
+                ->where('o.estado_6', 1) // ordenes que motorista inicio la entrega 
+                ->where('o.estado_8', 0) // no canceladas
+                ->whereNotIn('o.id', $pilaOrden) // filtro para no ver ordenes revisadas
                 ->get();
 
                 $total = 0.0;
 
                 foreach($orden as $o){
-                    $fechaOrden = $o->fecha_5;
+                    
+                    $fechaOrden = $o->fecha_7;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
                     $o->fecha_orden = $hora . " " . $fecha;  

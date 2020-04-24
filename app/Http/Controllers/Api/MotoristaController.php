@@ -29,7 +29,7 @@ use App\OrdenesDirecciones;
 
 class MotoristaController extends Controller
 {
-     // login para propietario
+     // login para motorista
      public function loginMotorista(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
@@ -57,7 +57,7 @@ class MotoristaController extends Controller
             if($p = Motoristas::where('telefono', $request->phone)->first()){
  
                 if($p->activo == 0){
-                    return ['success' => 1]; // propietario no activo
+                    return ['success' => 1]; // motorista no activo
                 }
 
                 if (Hash::check($request->password, $p->password)) {
@@ -157,9 +157,7 @@ class MotoristaController extends Controller
                 // enviar correo, aunque no este validado
                 
                 $nombre = $p->nombre;
-                $correo = $p->correo;
-
-              
+                $correo = $p->correo;              
                               
                try{
                 // envio de correo
@@ -206,7 +204,8 @@ class MotoristaController extends Controller
             }
 
             // buscar correo y codigo
-            if($p = Motoristas::where('telefono', $request->telefono)->where('codigo_correo', $request->codigo)->first()){
+            if($p = Motoristas::where('telefono', $request->telefono)
+            ->where('codigo_correo', $request->codigo)->first()){
                 
                 return ['success' => 1]; // coincide, pasar a cambiar contraseña
             }else{
@@ -241,9 +240,7 @@ class MotoristaController extends Controller
                 }
 
             if($p = Motoristas::where('telefono', $request->telefono)->first()){
-
-          
-
+        
                 Motoristas::where('telefono', $request->telefono)->update(['password' => Hash::make($request->password)]);
             
                 return ['success' => 1];  // contraseña cambiada
@@ -324,14 +321,17 @@ class MotoristaController extends Controller
 
                     $nombre = $servicio->nombre;
                     $o->zona = $nombre;
+
+                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                                                 
-                    // HORARIO DE ENTREGA, YA SUMADO LOS 5 MINUTOS PARA CLIENTE
+                    $resta = $o->hora_2 - $tiempo->copia_tiempo_orden;
 
                     $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
+                    $horaEstimada = $time1->addMinute($resta)->format('h:i A d-m-Y');
                     $o->horaEntrega = $horaEstimada;
                 }
-                
+
+             
                 return ['success' => 2, 'ordenes' => $orden]; 
             }else{
                 return ['success' => 3];
@@ -381,7 +381,14 @@ class MotoristaController extends Controller
                 ->first();
 
                 $time1 = Carbon::parse($or->fecha_4);
-                $restaHoraEstimada = $or->hora_2 - 5; // hora estimada recogida de producto
+
+                $data = DB::table('ordenes_direcciones')
+                    ->where('ordenes_id', $or->id)              
+                    ->first();
+                    
+                $tiempozona = $data->copia_tiempo_orden;
+
+                $restaHoraEstimada = $or->hora_2 - $tiempozona; // hora estimada recogida de producto
                 $horaEstimada = $time1->addMinute($restaHoraEstimada)->format('h:i A d-m-Y');
                 $horaEstimada = $horaEstimada;              
                 
@@ -579,52 +586,48 @@ class MotoristaController extends Controller
                 
                 if($or = Ordenes::where('id', $request->ordenid)->first()){
 
-                    // verificar si motorista puede seguir agarrando ordenes
-
-                    $idservicio = $or->servicios_id;
-                    $datosprivado = Servicios::where('id', $idservicio)->first();
-
-                    // VER ORDENES PENDIENTE SIN ENTREGAR EL MOTORISTA
-
-
-                     // sacar todos los id de ordenes revisadas
-                    $revisada = DB::table('ordenes_revisadas')
-                    ->get();
-
-                    $pilaOrdenid = array();
-                    foreach($revisada as $p){
-                        array_push($pilaOrdenid, $p->ordenes_id);
-                    }
-                        
-                    $ordenid = DB::table('motorista_ordenes AS mo')
-                    ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-                    ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
-                    'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
-                    'mo.fecha_agarrada')
-                    ->where('mo.motoristas_id', $mo->id)
-                    ->where('o.estado_5', 1) // orden preparada                   
-                    ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
-                    ->get(); 
-                    
-                    $sum = 0.0;
-                    foreach($ordenid as $o){
-                      
-                        // sumar precio
-                        $precio = $o->precio_total + $o->precio_envio;
-                        $o->total = number_format((float)$precio, 2, '.', '');
-                        $sum = $sum + $precio;
-                    }   
-
-                    $suma = number_format((float)$sum, 2, '.', '');
-
-
-                    // LIMITAR ORDEN POR TOTAL DE DINERO
-
+                    // VERIFICARA LIMITE DE DINERO SOLO SI ES MOTORISTA PUBLICO
                     if($mo->privado == 0){
+
+                        // sacar todos los id de ordenes revisadas
+                        $revisada = DB::table('ordenes_revisadas')
+                        ->get();
+
+                        $pilaOrdenid = array();
+                        foreach($revisada as $p){
+                            array_push($pilaOrdenid, $p->ordenes_id);
+                        }
+                            
+                        $ordenid = DB::table('motorista_ordenes AS mo')
+                        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
+                        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+                        ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
+                        'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
+                        'mo.fecha_agarrada')
+                        ->where('mo.motoristas_id', $mo->id)
+                        ->where('o.estado_5', 1) // orden preparada                   
+                        ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
+                        ->get(); 
+                        
+                        $sum = 0.0;
+                        foreach($ordenid as $o){
+                        
+                            // sumar precio
+                            $precio = $o->precio_total + $o->precio_envio;
+                            $o->total = number_format((float)$precio, 2, '.', '');
+                            $sum = $sum + $precio;
+                        }   
+
+                        $suma = number_format((float)$sum, 2, '.', '');
+
+
+                        // LIMITAR ORDEN POR TOTAL DE DINERO
+                        // UNICAMENTE SERVICIOS
+                        
                         if($suma >= $mo->limite_dinero){
                             return ['success' => 1];
-                        }                        
+                        }
+
                     }
 
                     // esta libre aun, pero esto viene alguien inicio la entrega
@@ -729,7 +732,15 @@ class MotoristaController extends Controller
                     $p->zona = $nombre;
                     
                     $fechaOrden = Carbon::parse($p->fecha_4);
-                    $restaHoraEstimada = $p->hora_2 - 5;
+
+
+                    $data = DB::table('ordenes_direcciones')
+                    ->where('ordenes_id', $p->id)              
+                    ->first();
+                    
+                    $tiempozona = $data->copia_tiempo_orden;
+
+                    $restaHoraEstimada = $p->hora_2 - $tiempozona;
 
                     $horaEstimadaEntrega = $fechaOrden->addMinute($restaHoraEstimada)->format('h:i A d-m-Y');
                     $p->fecharecoger = $horaEstimadaEntrega;
@@ -850,7 +861,14 @@ class MotoristaController extends Controller
                 ->first();
 
                 $time1 = Carbon::parse($or->fecha_4);
-                $restaHoraEstimada = $or->hora_2 - 5; // hora estimada recogida de producto
+
+                $data = DB::table('ordenes_direcciones')
+                ->where('ordenes_id', $or->id)              
+                ->first();
+                
+                $tiempozona = $data->copia_tiempo_orden;
+
+                $restaHoraEstimada = $or->hora_2 - $tiempozona; // hora estimada recogida de producto
                 $horaEstimada = $time1->addMinute($restaHoraEstimada)->format('h:i A');
                 $horaEstimada = $horaEstimada;              
                 
@@ -890,8 +908,7 @@ class MotoristaController extends Controller
 
                 if($or->estado_8 == 1){
                     return ['success' => 3]; 
-                } 
-
+                }
                 // orden ya fue preparada por el propietario
                 if($or->estado_5 == 1 && $or->estado_6 == 0){
  
@@ -908,7 +925,11 @@ class MotoristaController extends Controller
                      
                     if(!empty($device)){
                         if($device != "0000"){ // evitar id malos
-                            $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                            } catch (Exception $e) {
+                                
+                            }
                         }                        
                     }
 
@@ -963,7 +984,11 @@ class MotoristaController extends Controller
                   
                     if(!empty($device)){
                         if($device != "0000"){
-                            $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $device); 
+                            } catch (Exception $e) {
+                                
+                            }                            
                         }                        
                     } 
 
@@ -1224,12 +1249,17 @@ class MotoristaController extends Controller
  
             if($p = Motoristas::where('id', $request->id)->first()){
 
+                // Este motorista trabaja para un servicio privado
+                if($p->privado){
+                    return ['success' => 1];
+                }
+
                 $start = Carbon::parse($request->fecha1)->startOfDay(); 
                 $end = Carbon::parse($request->fecha2)->endOfDay();
                 
                 $orden = DB::table('motorista_ordenes AS m')
                 ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                ->select('o.id', 'o.precio_total', 'o.fecha_orden', 
+                ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
                 'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
                 ->where('o.estado_7', 1) // solo completadas
                 ->where('m.motoristas_id', $request->id) // del motorista
@@ -1238,6 +1268,11 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
+
+                    // sumar total de orden + envio
+                    $sumado = $o->precio_total + $o->precio_envio;
+                    $o->precio_total = number_format((float)$sumado, 2, '.', '');
+
                     $fechaOrden = $o->fecha_orden;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
@@ -1259,9 +1294,9 @@ class MotoristaController extends Controller
                 // sumar ganancia de esta fecha
                 $suma = collect($orden)->sum('ganancia_motorista');
                 $ganado = number_format((float)$suma, 2, '.', '');
-                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
+                return ['success' => 2, 'histoorden' => $orden, 'ganado' => $ganado];
             }else{
-                return ['success' => 2];
+                return ['success' => 3];
             }
         }
     }

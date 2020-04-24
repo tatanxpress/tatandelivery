@@ -79,7 +79,7 @@ class OrdenesController extends Controller
              'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
              'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
              'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
+             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista', 'o.supero_envio_gratis') 
             ->where('o.id', $request->id)
             ->first(); 
 
@@ -87,8 +87,7 @@ class OrdenesController extends Controller
                 if($orden->estado_4 == 1){
                     $time1 = Carbon::parse($orden->fecha_4);
                     $horaestimada = $time1->addMinute($orden->hora_2)->format('h:i A d-m-Y'); 
-                }                
-            
+                }   
 
             return ['success' => 1, 'orden' => $orden, 'horaestimada' => $horaestimada]; 
           }else{
@@ -225,6 +224,64 @@ class OrdenesController extends Controller
         }
     }
 
+    // cancelar orden por panel de control
+    public function cancelarOrdenPanel(Request $request){
+
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required', 
+                'mensaje' => 'required'
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',  
+                'mensaje.required' => 'mensaje es requerido'                  
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+
+            /* solo podra cancelar si 
+                estado 5 == 1  // propietario completo orden
+                estado 6 == 1 // motorista inicia entrega de la orden               
+                estado 8 == 0 // aun no cancelada                
+            */
+
+            if(Ordenes::where('estado_5', 1)
+            ->where('estado_6', 1)
+            ->where('estado_8', 0)){
+
+                // y tambien que tambien no haya sido cancelada extra ya
+                if(OrdenesDirecciones::where('ordenes_id', $request->id)
+                    ->where('cancelado_extra', 0)->first()){
+                        
+                        OrdenesDirecciones::where('ordenes_id', $request->id)
+                        ->update(['cancelado_extra' => 1]); 
+        
+                        Ordenes::where('id', $request->id)
+                        ->update(['mensaje_8' => $request->mensaje]);
+        
+                        return ['success' => 1];
+
+                    }else{
+                        // ya fue seteada
+                        return ['success' => 2];
+                    }
+
+            }else{
+                return ['success' => 3];
+            }
+        } 
+    }
+
     // buscar por numero de orden
     public function buscarNumOrden($id){
             
@@ -287,7 +344,7 @@ class OrdenesController extends Controller
              'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
              'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
              'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista') 
+             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista', 'o.supero_envio_gratis') 
             ->where('o.id', $request->id)
             ->first();
 
@@ -395,57 +452,14 @@ class OrdenesController extends Controller
         }
     }
 
-    // reporte de servicio para cobrar por motorista prestado
-   /* function reporte($idmoto, $idservicio, $fecha1, $fecha2){
-
-        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
-        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
-
-        $ordenFiltro = DB::table('motorista_ordenes AS mo')
-        ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-        ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
-        ->select('o.id', 'o.precio_total', 'o.fecha_orden', 's.id AS idservicio', 'mo.motoristas_id',
-                'od.zonas_id AS idzona')
-        ->where('mo.motoristas_id', $idmoto)      
-        ->whereBetween('o.fecha_orden', array($date1, $date2))          
-        ->get();
-
-        $dinero = 0;
-        foreach($ordenFiltro as $o){
-
-            $dato = DB::table('zonas_servicios')
-            ->where('zonas_id', $o->idzona)
-            ->where('servicios_id', $o->idservicio)
-            ->first();
-
-            $o->precio_envio = $dato->precio_envio;
-
-            //sumar
-            $dinero = $dinero + $dato->precio_envio;
-
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $fecha1 . " " . $hora1;  
-        } 
-        
-        $totalDinero = number_format((float)$dinero, 2, '.', '');
-
-        $view =  \View::make('backend.paginas.reportes.cobroServicioMotoPrestado', compact(['ordenFiltro', 'totalDinero']))->render();
-        $pdf = \App::make('dompdf.wrapper');
-        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
-
-        return $pdf->stream();
-    }*/
-
     // reporte para pago del motorista, SOLO ORDENES NO CANCELADAS, Y ORDENES COMPLETADAS
     function reporte1($idmoto, $fecha1, $fecha2){
 
         $date1 = Carbon::parse($fecha1)->format('Y-m-d');
         $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
 
         $ordenFiltro = DB::table('motorista_ordenes AS mo')
         ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
@@ -471,16 +485,16 @@ class OrdenesController extends Controller
             $hora1 = date("h:i A", strtotime($fechaOrden));
             $fecha1 = date("d-m-Y", strtotime($fechaOrden));
             $o->fecha_orden = $fecha1 . " " . $hora1;  
-        }
+        } 
 
         $nombre = Motoristas::where('id', $idmoto)->pluck('nombre')->first();
         
         $totalDinero = number_format((float)$dinero, 2, '.', '');
 
-        $view =  \View::make('backend.paginas.reportes.pagoServicioMotorista', compact(['ordenFiltro', 'totalDinero', 'nombre']))->render();
+        $view =  \View::make('backend.paginas.reportes.pagoServicioMotorista', compact(['ordenFiltro', 'totalDinero', 'nombre', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
-
+ 
         return $pdf->stream();
     }
 

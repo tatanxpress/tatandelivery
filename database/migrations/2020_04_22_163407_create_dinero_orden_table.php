@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTiempoAproxTable extends Migration
+class CreateDineroOrdenTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateTiempoAproxTable extends Migration
      */
     public function up()
     {
-        Schema::create('tiempo_aprox', function (Blueprint $table) {
+        Schema::create('dinero_orden', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('servicios_id')->unsigned();
-            $table->integer('dia');
-            $table->string('tiempo', 50);
-            
-            $table->foreign('servicios_id')->references('id')->on('servicios');
+            $table->decimal('limite', 10,2);
         });
     }
 
@@ -30,6 +26,6 @@ class CreateTiempoAproxTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tiempo_aprox');
+        Schema::dropIfExists('dinero_orden');
     }
 }

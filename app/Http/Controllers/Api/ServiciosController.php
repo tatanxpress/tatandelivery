@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\User;
 use Carbon\Carbon;
+use DateTime;
 
 class ServiciosController extends Controller
 {
@@ -54,12 +55,12 @@ class ServiciosController extends Controller
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
-            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen')
+            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen', 't.tipos_id')
             ->where('tz.zonas_id', $idzona)
             ->where('tz.activo', '1') //solo servicios disponibles
             ->orderBy('tz.posicion', 'ASC')
             ->get();
-                                
+                                 
             return [
                 'success' => 1,                     
                 'servicios' => $servicios,
@@ -70,7 +71,7 @@ class ServiciosController extends Controller
 
     // retorna locales segun tipo servicio
     public function getTipoServicios(Request $request){
-       
+        
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
@@ -100,8 +101,7 @@ class ServiciosController extends Controller
             $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
 
             $nombreServicio = TipoServicios::where('id', $request->tipo)->pluck('nombre')->first();
-
-                
+               
 
             // dia        
             $numSemana = [
@@ -121,17 +121,47 @@ class ServiciosController extends Controller
             $hora = $getValores->format('H:i:s');
 
             // servicios para la zona
-            $servicios = DB::table('zonas_servicios AS z') 
+            $servicios = DB::table('zonas_servicios AS z')
             ->join('servicios AS s', 's.id', '=', 'z.servicios_id')
             ->select('s.id AS idServicio', 's.nombre AS nombreServicio',
-                    's.descripcion', 's.imagen', 's.logo', 's.tipo_vista', 's.cerrado_emergencia')
+                    's.descripcion', 's.imagen', 'z.id AS zonaservicioid',
+                     's.logo', 's.tipo_vista', 's.cerrado_emergencia', 
+                     'z.tiempo_limite', 'z.horario_inicio', 'z.horario_final', 's.privado')
             ->where('z.zonas_id', $idzona)
-            ->where('s.tipo_servicios_id', $request->tipo) 
-            ->where('z.activo', 1) 
+            ->where('s.tipo_servicios_id', $request->tipo)
+            ->where('z.activo', 1)
+            ->where('s.activo', 1)
             ->get();
            
                // verificar si esta agregado a favoritos
                foreach ($servicios as $user) {
+
+                // estos datos son para saver si el servicio privado dara adomicilio hasta una determinada
+                // horario, si la zona da de 7 am a 10 pm, el servicio privado es libre de decidir
+                // su horario de entrega a esa zona. solo propietarios con servicio privado.
+                    $tiempo_limite = $user->tiempo_limite;
+                    $horainicio = $user->horario_inicio;
+                    $horafinal = $user->horario_final;
+
+                    // guardar variable
+                    $user->tiempo_limite;
+
+                    if($tiempo_limite == 1){
+
+                        // revisado de tiempo
+                        if (($horainicio < $hora) && ($hora < $horafinal)) {
+                            $user->limiteentrega = 0; // abierto                        
+                        }else{
+                            $user->limiteentrega = 1; // cerrado
+                        }
+                    
+                    }else{
+                        // este dato no es tomado en cuenta si $tiempolimite == 0
+                        $user->limiteentrega = 1; // cerrado
+                    }  
+                    
+                    $user->horario_inicio = date("h:i A", strtotime($user->horario_inicio));
+                    $user->horario_final = date("h:i A", strtotime($user->horario_final));
 
                    // verificar si usara la segunda hora               
                     $dato = DB::table('horario_servicio AS h')
@@ -142,7 +172,7 @@ class ServiciosController extends Controller
                     ->get();
 
                       // si verificar con la segunda hora
-                    if(count($dato) >= 1){      
+                    if(count($dato) >= 1){
 
                         $horario = DB::table('horario_servicio AS h')
                             ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
@@ -158,13 +188,9 @@ class ServiciosController extends Controller
                         ->get();
 
                         if(count($horario) >= 1){ // abierto
-                            $user->horarioLocal = 0;
-                            
-                            
+                            $user->horarioLocal = 0;   
                         }else{
-                            $user->horarioLocal = 1; //cerrado
-
-                          
+                            $user->horarioLocal = 1; //cerrado                          
                         }
 
                     }else{
@@ -192,30 +218,29 @@ class ServiciosController extends Controller
                         $user->cerrado = 1;
                     }else{
                         $user->cerrado = 0;
-                    }                           
-                }               
-          
-
-
+                    }
+                }   
 
             // problema para enviar a esta zona, ejemplo motoristas sin disponibilidad
-            $zonaSa = DB::table('zonas AS z')
-            ->select('z.saturacion')
-            ->where('z.id', $idzona)
+            $zonaSa = DB::table('zonas')            
+            ->where('id', $idzona)
             ->first();
             $zonaSaturacion = $zonaSa->saturacion;
+
+            $horazona1 = date("h:i A", strtotime($zonaSa->hora_abierto_delivery));
+            $horazona2 = date("h:i A", strtotime($zonaSa->hora_cerrado_delivery));
                         
             // horario delivery para esa zona
-            $horaDelivery = DB::table('zonas AS z')
-            ->where('z.id', $idzona)
-            ->where('z.hora_abierto_delivery', '<=', $hora)
-            ->where('z.hora_cerrado_delivery', '>=', $hora)
+            $horaDelivery = DB::table('zonas')
+            ->where('id', $idzona)
+            ->where('hora_abierto_delivery', '<=', $hora)
+            ->where('hora_cerrado_delivery', '>=', $hora)
             ->get();
             
             if(count($horaDelivery) >= 1){
-                $horaDelivery = 0; // abierto
+                $horaEntrega = 0; // abierto
             }else{
-                $horaDelivery = 1; // cerrado
+                $horaEntrega = 1; // cerrado
             }
                         
             $tengoCarrito = 0; // para saver si tengo carrito de compras
@@ -231,18 +256,18 @@ class ServiciosController extends Controller
                         ->select('p.precio', 'c.cantidad')
                         ->get();
 
-                        $pila = array();
+                    $pila = array();
 
-                        foreach($producto as $p){
-                            $cantidad = $p->cantidad;
-                            $precio = $p->precio;
-                            $multi = $cantidad * $precio;
-                            array_push($pila, $multi); 
-                        }
-                       
-                        foreach ($pila as $valor){
-                            $resultado=$resultado+$valor; //sumar que sera el sub total
-                        }
+                    foreach($producto as $p){
+                        $cantidad = $p->cantidad;
+                        $precio = $p->precio;
+                        $multi = $cantidad * $precio;
+                        array_push($pila, $multi); 
+                    }
+                    
+                    foreach ($pila as $valor){
+                        $resultado=$resultado+$valor; //sumar que sera el sub total
+                    }
                 }                
             }
 
@@ -250,10 +275,12 @@ class ServiciosController extends Controller
                 'nombre' => $nombreServicio, // saver nombre del servicio, tienda, snack
                 'success' => 1, 
                 'zonasaturacion' => $zonaSaturacion,
-                'horadelivery' => $horaDelivery,
+                'horadelivery' => $horaEntrega,
                 'hayorden' => $tengoCarrito, // saver si tenemos carrito
                 'total' => number_format((float)$resultado, 2, '.', ''), //subtotal
-                'servicios' => $servicios
+                'horazona1' => $horazona1,
+                'horazona2' => $horazona2,
+                'servicios' => $servicios               
             ];                  
                
             }else{
@@ -268,7 +295,7 @@ class ServiciosController extends Controller
 
             // validaciones para los datos
             $reglaDatos = array(                
-                'servicioid' => 'required',
+                'servicioid' => 'required', 
             ); 
         
             $mensajeDatos = array(                                      
@@ -283,37 +310,37 @@ class ServiciosController extends Controller
                     'success' => 0, 
                     'message' => $validarDatos->errors()->all()
                 ];
-            }    
+            } 
 
             if(Servicios::where('id', $request->servicioid)->first()){
 
-             $tipo = DB::table('servicios_tipo AS st')    
-            ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')
-            ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
-            ->where('st.servicios_1_id', $request->servicioid)
-            ->where('st.activo', 1)
-            ->orderBy('st.posicion', 'ASC')
-            ->get();
+                $tipo = DB::table('servicios_tipo AS st')    
+                ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')
+                ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
+                ->where('st.servicios_1_id', $request->servicioid)
+                ->where('st.activo', 1)
+                ->orderBy('st.posicion', 'ASC')
+                ->get();
 
-            $resultsBloque = array();        
-            $index = 0;
+                $resultsBloque = array();        
+                $index = 0;
 
-            foreach($tipo as $secciones){
-                array_push($resultsBloque,$secciones);          
-            
-                $subSecciones = DB::table('producto AS p')  
-                ->select('p.id AS idProducto','p.nombre AS nombreProducto', 'p.descripcion AS descripcionProducto',
-                         'p.imagen AS imagenProducto', 'p.precio AS precioProducto', 'p.es_promocion', 'p.utiliza_imagen')
-                ->where('p.servicios_tipo_id', $secciones->tipoId)
-                ->where('p.activo', 1) // para inactivarlo solo para administrador
-                ->where('p.disponibilidad', 1) // para inactivarlo pero el propietario
-                ->where('p.es_promocion', 0)
-                ->orderBy('p.posicion', 'ASC')
-                ->get(); 
+                foreach($tipo as $secciones){
+                    array_push($resultsBloque,$secciones);          
                 
-                $resultsBloque[$index]->productos = $subSecciones; //agregar los productos en la sub seccion
-                $index++;
-            }
+                    $subSecciones = DB::table('producto AS p')  
+                    ->select('p.id AS idProducto','p.nombre AS nombreProducto', 'p.descripcion AS descripcionProducto',
+                            'p.imagen AS imagenProducto', 'p.precio AS precioProducto', 'p.es_promocion', 'p.utiliza_imagen')
+                    ->where('p.servicios_tipo_id', $secciones->tipoId)
+                    ->where('p.activo', 1) // para inactivarlo solo para administrador
+                    ->where('p.disponibilidad', 1) // para inactivarlo pero el propietario
+                    ->where('p.es_promocion', 0)
+                    ->orderBy('p.posicion', 'ASC')
+                    ->get(); 
+                    
+                    $resultsBloque[$index]->productos = $subSecciones; //agregar los productos en la sub seccion
+                    $index++;
+                }
 
             $numSemana = [
                 0 => 1, // domingo
@@ -328,14 +355,7 @@ class ServiciosController extends Controller
             $getValores = Carbon::now('America/El_Salvador');
             $getDiaHora = $getValores->dayOfWeek;
             $diaSemana = $numSemana[$getDiaHora];   
-                        
-            $servicio = DB::table('servicios AS s')
-            ->join('tiempo_aprox AS t', 't.servicios_id', '=', 's.id')
-            ->select('s.nombre', 's.descripcion', 's.imagen', 't.tiempo', 's.minimo', 's.utiliza_minimo')
-            ->where('s.id', $request->servicioid)
-            ->where('t.dia', $diaSemana)
-            ->get();
-            
+                           
             //obtener horario
             $horario = DB::table('horario_servicio')            
             ->where('servicios_id', $request->servicioid)
@@ -349,9 +369,15 @@ class ServiciosController extends Controller
             $segundaHora = $horario->segunda_hora; // si es 1, ocupa las 2 horas
             $cerrado = $horario->cerrado; // saver si hoy esta cerrado
 
+            // informacion del local
+            $servicio = DB::table('servicios AS s')
+            ->select('nombre', 'descripcion', 'imagen', 'minimo', 'utiliza_minimo')
+            ->where('s.id', $request->servicioid)
+            ->get();
+
             return [
-                'success' => 1,
-                'servicio' => $servicio,
+                'success' => 1,   
+                'servicio' => $servicio,           
                 'horario' => ['hora1' => $hora1, 'hora2'=> $hora2, 'hora3' => $hora3, 'hora4' => $hora4, 'segunda' => $segundaHora, 'cerrado' => $cerrado],
                 'productos' => $tipo
             ];
@@ -361,7 +387,7 @@ class ServiciosController extends Controller
             }
         }
     }
-
+  
     // informacion de producto individual
     public function getProductoIndividual(Request $request){
         if($request->isMethod('post')){ 
@@ -446,6 +472,7 @@ class ServiciosController extends Controller
                 $index = 0;
 
                 foreach($zonaPublicidad as $secciones){
+
                     array_push($resultsBloque,$secciones);
                 
                         $subSecciones = DB::table('publicidad_producto AS p')
@@ -453,6 +480,8 @@ class ServiciosController extends Controller
                         ->select('p.publicidad_id', 'pro.nombre', 'pro.id AS productoid', 
                         'pro.descripcion', 'pro.imagen', 'pro.precio', 'pro.utiliza_imagen')
                         ->where('publicidad_id', $secciones->publiid)
+                        ->where('pro.disponibilidad', 1)
+                        ->where('pro.activo', 1)
                         ->get();
                         
                         $resultsBloque[$index]->productos = $subSecciones;

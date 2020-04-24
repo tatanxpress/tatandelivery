@@ -129,10 +129,10 @@
                                     <br>
                                     <input type="checkbox" id="cbnota-nuevo">
                                 </div>
-
+ 
                                 <div class="form-group">
                                     <label>Nota (ejemp: si un producto necesita opciones a elegir)</label>
-                                    <input type="text" maxlength="50" class="form-control" id="nota-nuevo">
+                                    <input type="text" maxlength="50" value="" class="form-control" id="nota-nuevo">
                                 </div>
 
                             </div>
@@ -320,6 +320,7 @@
         var nota = document.getElementById('nota-nuevo').value;
         var cbimagen = document.getElementById('cbimagen-nuevo').checked;
 
+        
         var retorno = validarNuevo(nombre, imagen, descripcion, precio, unidades, cantidadorden);
 
         if(retorno){
@@ -350,18 +351,6 @@
             }
             if(cbnota){
                 cbnota_1 = 1;
-
-                if(nota === ''){
-                    toastr.error('Nota es requerida si marco opcion');
-                    return;
-                }
-            }else{
-
-                if(nota.length > 0){
-                    // no tocar texto
-                }else{
-                    nota = "ninguno";
-                }
             }
 
             if(cbimagen){
@@ -416,6 +405,9 @@
                 toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
                 return false;       
             } 
+        }else{
+            toastr.error('Imagen es requerida');
+            return;
         }
 
         if(descripcion === ''){
@@ -470,10 +462,7 @@
     function informacion(id){
         document.getElementById("formulario-nuevo").reset();
         document.getElementById("formulario-editar").reset();
-
-    
-
-
+  
         spinHandle = loadingOverlay().activate();
 
         axios.post('/admin/productos/informacion',{
@@ -622,19 +611,6 @@
             }
             if(cbutilizanota){
                 cbutilizanota_1 = 1;
-
-                if(nota === ''){
-                    toastr.error('Nota es requerida si marco opcion');
-                    return;
-                }
-            }else{
-
-                if(nota.length > 0){
-                    // no tocar texto
-                }else{
-                    nota = "ninguno";
-                }
-
             }
             if(cbimagen){
                 cbimagen_1 = 1;

@@ -10,8 +10,9 @@
                   <th style="width: 8%">ID</th>
                   <th style="width: 20%">Nombre</th>
                   <th style="width: 20%">Descripcion</th>
+                  <th style="width: 15%">Tipo</th>
                   <th style="width: 40%">Imagen</th>                  
-                  <th style="width: 20%">Opciones</th>            
+                  <th style="width: 15%">Opciones</th>            
                 </tr>
                 </thead>
                 <tbody>
@@ -20,6 +21,7 @@
                   <td>{{ $dato->id }}</td> 
                   <td>{{ $dato->nombre }}</td> 
                   <td>{{ $dato->descripcion }}</td> 
+                  <td>{{ $dato->nombretipo }}</td> 
                   <td><center><img alt="Servicios" src="{{ url('storage/listaservicios/'.$dato->imagen) }}" width="150px" height="150px" /></center></td>
                   <td>
                     <button type="button" class="btn btn-primary btn-xs" onclick="verInformacion({{ $dato->id }})">

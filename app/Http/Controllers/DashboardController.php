@@ -25,92 +25,66 @@ class DashboardController extends Controller
         $totaldineroordenes = 0; // total dinero ordenes con estado 5
         $totaldineroenvios = 0; // total dinero envios
  
+        // todas las ordenes completadas
         $orden = DB::table('ordenes')
         ->where('estado_5', 1)
         ->get(); 
 
+        // tabla de servicios pagados
         $pagoordenes = DB::table('servicio_pago')
         ->get(); 
 
+        // tabla de motoristas pagados
         $pagomotorista = DB::table('motorista_pago')
         ->get(); 
 
+        // total de productos agregados
         $totalproducto = DB::table('producto')
         ->count();
 
+        // total de servicios agregados
         $totalservicio = DB::table('servicios')
         ->count();
 
+        // total de servicios inactivos
         $totalservicioinactivo = DB::table('servicios')
         ->where('activo', 1)
         ->count();
-
-        /*$totalordentardio = DB::table('ordenes')
-        ->where('tardio', 1)
-        ->count();*/
-
+    
+        // total de ordenes canceladas por cliente
         $totalordencanceladacliente = DB::table('ordenes')
         ->where('cancelado_cliente', 1)
         ->count();
 
+        // total de ordenes canceladas por el propietario
         $totalordencanceladapropietario = DB::table('ordenes')
         ->where('cancelado_propietario', 1)
         ->count();
 
+        // total de motoristas agregados
         $totalmotorista = DB::table('motoristas')
         ->count();
 
-        $productomasvendido = DB::table('ordenes_descripcion AS od')
-        ->join('producto AS p', 'p.id', '=', 'od.producto_id')
-        ->select('p.id', 'p.nombre')
-        ->groupBy('p.id')
-        ->orderByRaw('COUNT(*) DESC')
-        ->limit(1)
-        ->get();
+        $ts = collect($pagoordenes)->sum('pago');
+        $tm = collect($pagomotorista)->sum('pago'); 
 
-        $nombre = "";
-        $idp = 0;
-        foreach($productomasvendido as $p){           
-            $idp = $p->id;
-            $nombre = $p->nombre;
-            break;
-        }
-         
-        $datos =  DB::table('servicios AS s')
-        ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
-        ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
-        ->select('s.identificador', 's.nombre')
-        ->where('p.id', $idp)
-        ->first();
-        
-        $identificador = "";
-        $servicio = "";
-        if($datos != null){
-            $identificador = $datos->identificador;
-            $servicio = $datos->nombre;
-        }
-        
-
-        $totalpagoservicio = collect($pagoordenes)->sum('pago');
-        $totalpagomotorista = collect($pagomotorista)->sum('pago');        
+        $totalpagoservicio = number_format((float)$ts, 2, '.', '');
+        $totalpagomotorista = number_format((float)$tm, 2, '.', '');
  
         foreach($orden as $o){
            $totaldineroordenes = number_format((float) $totaldineroordenes + $o->precio_total, 2, '.', '');
-
            $totaldineroenvios = number_format((float)$totaldineroenvios + $o->precio_envio, 2, '.', '');
         }
 
         return view('backend.paginas.inicio', compact('totaldineroordenes', 'totaldineroenvios', 
         'totalpagoservicio', 'totalpagomotorista', 'totalproducto', 'totalservicio', 'totalmotorista',
-        'totalservicioinactivo', 'totalordentardio', 'totalordencanceladacliente', 'totalordencanceladapropietario',
-        'identificador', 'servicio', 'nombre'));
+        'totalservicioinactivo', 'totalordencanceladacliente', 'totalordencanceladapropietario'));
     }
 
     // mostrar inicio del backend, y enviar nombre 
     public function index()
     {
-        $nombre = Auth::user()->nombre;
-
-        return view('backend.index', compact('nombre'));
+        $nombre = Auth::user()->nombre; // nombre de quien inicio sesion
+        return view('backend.index', compact('nombre')); 
     }
 }

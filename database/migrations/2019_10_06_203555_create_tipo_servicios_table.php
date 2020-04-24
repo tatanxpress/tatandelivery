@@ -18,6 +18,8 @@ class CreateTipoServiciosTable extends Migration
             $table->string('nombre', 50);
             $table->string('descripcion', 100);
             $table->string('imagen', 100);
+            $table->bigInteger('tipos_id')->unsigned();
+            $table->foreign('tipos_id')->references('id')->on('tipos');
         });
     }
 

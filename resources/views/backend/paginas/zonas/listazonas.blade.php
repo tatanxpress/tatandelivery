@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Identificador</label>
-                                    <input type="text" maxlength="10" class="form-control" id="identificador-nuevo" placeholder="Identificador">
+                                    <input type="text" maxlength="50" class="form-control" id="identificador-nuevo" placeholder="Identificador">
                                 </div>
                                 <div class="form-group">
                                     <label>Hora abierto</label>
@@ -75,9 +75,25 @@
                                 <div class="form-group">
                                     <label>Hora cerrado</label>
                                     <input type="time" class="form-control" id="horacerrado-nuevo">
-                                </div>                  
-                            </div>
-                          
+                                </div>      
+                                <div class="form-group">
+                                    <label>Tiempo extra (tiempo que se agregara a una nueva orden por zona)</label>
+                                    <input type="number" value="0" min="0" class="form-control" id="tiempoextra-nuevo">
+                                </div>  
+
+   
+                                <div class="form-group">
+                                    <label>Latitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="latitud-nuevo" placeholder="Latitud" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Longitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="longitud-nuevo" placeholder="Longitud" required>
+                                </div>
+
+
+                            </div>                          
                         </div>
                     </div>  
                 </form>
@@ -116,7 +132,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Identificador</label>
-                                    <input type="text" maxlength="10" class="form-control" id="identificador-editar" placeholder="Identificador">
+                                    <input type="text" maxlength="50" class="form-control" id="identificador-editar" placeholder="Identificador">
                                 </div>
                                 <div class="form-group">
                                     <label>Hora abierto</label>
@@ -125,7 +141,22 @@
                                 <div class="form-group">
                                     <label>Hora cerrado</label>
                                     <input type="time" class="form-control" id="horacerrado-editar">
-                                </div>                  
+                                </div>    
+                                <div class="form-group">
+                                    <label>Tiempo extra (tiempo que se agregara a una nueva orden por zona)</label>
+                                    <input type="number" value="0" min="0" class="form-control" id="tiempoextra-editar">
+                                </div>   
+
+                                <div class="form-group">
+                                    <label>Latitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="latitud-editar" placeholder="Latitud" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Longitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="longitud-editar" placeholder="Longitud" required>
+                                </div>
+
                             </div>
                             <div class="col-md-6">                             
                                
@@ -268,6 +299,10 @@
                     $('#descripcion-editar').val(response.data.zona.descripcion);
                     $('#horaabierto-editar').val(response.data.zona.hora_abierto_delivery);
                     $('#horacerrado-editar').val(response.data.zona.hora_cerrado_delivery);
+                    $('#tiempoextra-editar').val(response.data.zona.tiempo_extra)
+                     
+                    $('#latitud-editar').val(response.data.zona.latitud);
+                    $('#longitud-editar').val(response.data.zona.longitud);
                   
                     if(response.data.zona.saturacion == 0){
                         $("#toggle-problema").prop("checked", false);
@@ -297,6 +332,31 @@
         var identificador = document.getElementById('identificador-nuevo').value;
         var horaabierto = document.getElementById('horaabierto-nuevo').value;
         var horacerrado = document.getElementById('horacerrado-nuevo').value;
+        var tiempoextra = document.getElementById('tiempoextra-nuevo').value;
+
+        var latitud = document.getElementById("latitud-nuevo").value;  
+        var longitud = document.getElementById("longitud-nuevo").value;     
+
+        if (latitud === '') {
+            toastr.error("descripcion es requerido");
+            return false;
+        }
+
+        if(latitud.length > 50){
+            toastr.error("50 caracter máximo latitud");
+            return false;
+        }
+
+        
+        if (longitud === '') {
+            toastr.error("descripcion es requerido");
+            return false;
+        }
+
+        if(longitud.length > 50){
+            toastr.error("50 caracter máximo latitud");
+            return false;
+        }
                 
         var retorno = validacion_nuevo(nombre, descripcion, horaabierto, horacerrado, identificador);
 
@@ -308,8 +368,10 @@
             formData.append('descripcion', descripcion);
             formData.append('horaabierto', horaabierto);
             formData.append('horacerrado', horacerrado);
-            
+            formData.append('tiempoextra', tiempoextra);            
             formData.append('identificador', identificador);
+            formData.append('latitud', latitud);
+            formData.append('longitud', longitud);
 
             var spinHandle = loadingOverlay().activate();
 
@@ -383,8 +445,8 @@
             return false;
         }
 
-        if(identificador.length > 10){
-            toastr.error("10 caracter máximo identificador");
+        if(identificador.length > 50){
+            toastr.error("50 caracter máximo identificador");
             return false;
         }
      
@@ -399,9 +461,35 @@
         var identificador = document.getElementById('identificador-editar').value;
         var horaabierto = document.getElementById('horaabierto-editar').value;
         var horacerrado = document.getElementById('horacerrado-editar').value;
+        var tiempoextra = document.getElementById('tiempoextra-editar').value;
       
         var toggleproblema = document.getElementById('toggle-problema').checked;
         var toggleactivo = document.getElementById('toggle-activo').checked;
+        
+        var latitud = document.getElementById("latitud-editar").value;  
+        var longitud = document.getElementById("longitud-editar").value;    
+
+        
+        if (latitud === '') {
+            toastr.error("descripcion es requerido");
+            return false;
+        }
+
+        if(latitud.length > 50){
+            toastr.error("50 caracter máximo latitud");
+            return false;
+        }
+
+        
+        if (longitud === '') {
+            toastr.error("descripcion es requerido");
+            return false;
+        }
+
+        if(longitud.length > 50){
+            toastr.error("50 caracter máximo latitud");
+            return false;
+        }
                 
         var retorno = validacion_editar(nombre, descripcion, horaabierto, horacerrado, identificador);
 
@@ -425,8 +513,11 @@
             formData.append('identificador', identificador);
             formData.append('horaabierto', horaabierto);
             formData.append('horacerrado', horacerrado);
+            formData.append('tiempoextra', tiempoextra);
             formData.append('togglep', togglep);
             formData.append('togglea', togglea);
+            formData.append('latitud', latitud);
+            formData.append('longitud', longitud);
 
             var spinHandle = loadingOverlay().activate();
 
@@ -500,8 +591,8 @@
             return false;
         }
 
-        if(identificador.length > 10){
-            toastr.error("10 caracter máximo identificador");
+        if(identificador.length > 50){
+            toastr.error("50 caracter máximo identificador");
             return false;
         }
         

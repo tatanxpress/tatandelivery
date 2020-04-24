@@ -13,6 +13,6 @@ class DatabaseSeeder extends Seeder
     {
       $this->call(RolesAndPermissions::class);
       $this->call(administradores_seeder::class);
-         
+      $this->call(dinero_limite_orden::class);
     }
 } 

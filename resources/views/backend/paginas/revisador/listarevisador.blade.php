@@ -61,10 +61,7 @@
                                     <label>Nombre</label>
                                     <input type="text" maxlength="100" class="form-control" id="nombre-nuevo" placeholder="Nombre">
                                 </div>
-                                <div class="form-group">
-                                    <label>Direccion</label>
-                                    <input type="text" maxlength="800" class="form-control" id="direccion-nuevo" placeholder="Direccion">
-                                </div>
+                              
                                 <div class="form-group">
                                     <label>Telefono</label>
                                     <input type="text" maxlength="20" class="form-control" id="telefono-nuevo" placeholder="Telefono">
@@ -119,10 +116,7 @@
 
                                 <input type="text" maxlength="100" class="form-control" id="nombre-editar" placeholder="Nombre">
                             </div>
-                            <div class="form-group">
-                                <label>Direccion</label>
-                                <input type="text" maxlength="800" class="form-control" id="direccion-editar" placeholder="Direccion">
-                            </div>
+                           
                             <div class="form-group">
                                 <label>Telefono</label>
                                 <input type="text" maxlength="20" class="form-control" id="telefono-editar" placeholder="Telefono">
@@ -229,14 +223,11 @@
     function nuevo(){
         var identi = document.getElementById('identificador-nuevo').value;
         var nombre = document.getElementById('nombre-nuevo').value;
-        var direccion = document.getElementById('direccion-nuevo').value;
-        var telefono = document.getElementById('telefono-nuevo').value;
-        
+        var telefono = document.getElementById('telefono-nuevo').value;        
         var codigo = document.getElementById('codigo-nuevo').value;
-        var cbactivo = document.getElementById('activo-nuevo').checked;
-        
+        var cbactivo = document.getElementById('activo-nuevo').checked;        
 
-        var retorno = validarNuevo(identi, nombre, direccion, telefono, codigo);
+        var retorno = validarNuevo(identi, nombre, telefono, codigo);
 
         if(retorno){
 
@@ -249,7 +240,6 @@
             var formData = new FormData();
             formData.append('identi', identi);
             formData.append('nombre', nombre);
-            formData.append('direccion', direccion);
             formData.append('telefono', telefono);
     
             formData.append('codigo', codigo);
@@ -293,7 +283,7 @@
         }
     } 
 
-    function validarNuevo(identi, nombre, direccion, telefono, codigo){
+    function validarNuevo(identi, nombre, telefono, codigo){
 
         if(identi === ''){
             toastr.error("identificador es requerido");
@@ -310,18 +300,8 @@
             return;
         }
         
-        if(nombre.length > 50){
-            toastr.error("50 caracter máximo nombre");
-            return false;
-        }
-
-        if(direccion === ''){
-            toastr.error("direccion es requerido");
-            return;
-        }
-        
-        if(direccion.length > 800){
-            toastr.error("800 caracter máximo direccion");
+        if(nombre.length > 100){
+            toastr.error("100 caracter máximo nombre");
             return false;
         }
 
@@ -362,7 +342,6 @@
                     $('#modalEditar').modal('show');
                     $('#id-editar').val(response.data.revisador.id);
                     $('#nombre-editar').val(response.data.revisador.nombre);
-                    $('#direccion-editar').val(response.data.revisador.direccion);
                     $('#telefono-editar').val(response.data.revisador.telefono);
                    
                     $('#codigo-editar').val(response.data.revisador.codigo);
@@ -424,14 +403,12 @@
     function editar(){
         var id = document.getElementById('id-editar').value;
         var nombre = document.getElementById('nombre-editar').value;
-        var direccion = document.getElementById('direccion-editar').value;
-        var telefono = document.getElementById('telefono-editar').value;
-      
+        var telefono = document.getElementById('telefono-editar').value;      
         var codigo = document.getElementById('codigo-editar').value;
         var cbactivo = document.getElementById('activo-editar').checked;
         var cbdisponible = document.getElementById('disponible-editar').checked;
 
-        var retorno = validarEditar(nombre, direccion, telefono, codigo);
+        var retorno = validarEditar(nombre, telefono, codigo);
 
         if(retorno){
 
@@ -449,9 +426,7 @@
             var formData = new FormData();
             formData.append('id', id);
             formData.append('nombre', nombre);
-            formData.append('direccion', direccion);
-            formData.append('telefono', telefono);
-         
+            formData.append('telefono', telefono);         
             formData.append('codigo', codigo);
             formData.append('cbactivo', cbactivo_1);
             formData.append('cbdisponible', cbdisponible_1);
@@ -490,25 +465,15 @@
     } 
 
     
-    function validarEditar(nombre, direccion, telefono, codigo){
+    function validarEditar(nombre, telefono, codigo){
     
         if(nombre === ''){
             toastr.error("nombre es requerido");
             return;
         }
         
-        if(nombre.length > 50){
-            toastr.error("50 caracter máximo nombre");
-            return false;
-        }
-
-        if(direccion === ''){
-            toastr.error("direccion es requerido");
-            return;
-        }
-        
-        if(direccion.length > 800){
-            toastr.error("800 caracter máximo direccion");
+        if(nombre.length > 100){
+            toastr.error("100 caracter máximo nombre");
             return false;
         }
 

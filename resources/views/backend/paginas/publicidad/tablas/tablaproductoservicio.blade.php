@@ -1,7 +1,4 @@
-
-
-     <!-- Main content -->
- <section class="content">
+<section class="content">
       <div class="row">
         <div class="col-12">
           <div class="card">         
@@ -9,12 +6,12 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             
                 <tr>
-                <th style="width: 20%">Nombre</th>
-                    <th style="width: 20%">Descripcion</th>                    
-                    <th style="width: 15%">Precio</th>  
-                    <th style="width: 15%">Categoria</th>
-                    <th style="width: 15%">Opciones</th>            
-                </tr>
+                    <th style="width: 10%">Nombre</th>                    
+                    <th style="width: 10%">Precio</th>
+                    <th style="width: 10%">Categoria</th>
+                    <th style="width: 20%">Opciones</th>                                        
+                       
+                </tr> 
                 </thead>
                 <tbody> 
                 @foreach($producto as $dato)
@@ -22,7 +19,6 @@
                 <tr>
                     
                     <td>{{ $dato->nombre }}</td>
-                    <td>{{ $dato->descripcion }}</td>
                     <td>{{ $dato->precio }}</td>
                     <td>{{ $dato->categoria }}</td>
                     <td>
@@ -39,7 +35,7 @@
             </div>          
           </div>
         </div>
-      </div>
+      </div> 
     </section>
     
     

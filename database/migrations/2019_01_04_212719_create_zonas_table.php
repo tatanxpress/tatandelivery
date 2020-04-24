@@ -24,7 +24,8 @@ class CreateZonasTable extends Migration
             $table->time('hora_cerrado_delivery');
             $table->date('fecha');
             $table->boolean('activo');
-            $table->string('identificador', 10)->unique();
+            $table->string('identificador', 50)->unique();
+            $table->integer('tiempo_extra'); // aumenta el tiempo de una orden, a esta zona
         });
     }
 

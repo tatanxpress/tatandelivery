@@ -32,7 +32,7 @@ class MotoristaPagoController extends Controller
          
         $moto = DB::table('motorista_pago AS mp')
         ->join('motoristas AS m', 'm.id', '=', 'mp.motorista_id')
-        ->select('mp.id', 'm.identificador', 'm.nombre', 'mp.pago', 'mp.fecha', 'mp.fecha1', 'mp.fecha2')
+        ->select('mp.id', 'm.identificador', 'mp.descripcion', 'm.nombre', 'mp.pago', 'mp.fecha', 'mp.fecha1', 'mp.fecha2')
         ->get();
 
         foreach($moto as $o){
@@ -89,6 +89,7 @@ class MotoristaPagoController extends Controller
             $m->fecha2 = $request->fecha2;
             $m->fecha = $fecha;
             $m->pago = $request->pago;
+            $m->descripcion = $request->descripcion;
             
             if($m->save()){
                 return ['success' => 1];
@@ -156,7 +157,7 @@ class MotoristaPagoController extends Controller
  
             $date1 = Carbon::parse($fecha1)->format('Y-m-d');
             $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d'); 
-            
+             
             $orden = DB::table('ordenes AS o')
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
             ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
@@ -229,6 +230,59 @@ class MotoristaPagoController extends Controller
         $suma2 = number_format((float)$suma, 2, '.', ''); 
   
         $view =  \View::make('backend.paginas.reportes.reportepagoservicio', compact(['orden', 'redondear', 'suma2', 'totalDinero', 'nombre', 'pagar', 'comision', 'f1', 'f2']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+ 
+        return $pdf->stream();
+    }
+
+    // utilizo min de compra para envio gratis el servicio
+    function reporteUtilizoMinEnvioGratis($idservicio, $fecha1, $fecha2){
+
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
+
+        $orden = DB::table('ordenes AS o')
+            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+            ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
+            's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5', 'o.supero_envio_gratis')
+            ->where('s.id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas
+            ->where('o.supero_envio_gratis', 1)
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get(); 
+      
+            $dinero = 0;
+        foreach($orden as $o){
+            
+            $fechaOrden = $o->fecha_orden;
+            $hora1 = date("h:i A", strtotime($fechaOrden));
+            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
+            $o->fecha_orden = $fecha1 . " " . $hora1;  
+
+            // obtener nombre de la zona por cada orden
+            $data = DB::table('ordenes_direcciones AS o')
+            ->join('zonas AS z', 'z.id', '=', 'o.zonas_id')   
+            ->select('o.copia_envio', 'z.nombre')                 
+            ->where('o.ordenes_id', $o->idorden) // ordenes completadas 
+            ->first(); 
+
+            $o->nombrezona = $data->nombre;
+            $o->copiaenvio = $data->copia_envio;
+
+            $dinero = $dinero + $data->copia_envio;
+        }
+
+        $total = number_format((float)$dinero, 2, '.', '');
+
+        $data = Servicios::where('id', $idservicio)->first();
+        $nombre = $data->nombre;
+  
+        $view =  \View::make('backend.paginas.reportes.reporteusoenviogratis', compact(['orden', 'total', 'nombre', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
  
@@ -346,7 +400,8 @@ class MotoristaPagoController extends Controller
         ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
          'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 'mo.fecha_agarrada')
         ->where('mo.motoristas_id', $id)
-        ->where('o.estado_5', 1) // orden preparada        
+        ->where('o.estado_5', 1) // orden preparada
+        ->where('o.estado_8', 0) 
         ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
         ->get(); 
 
@@ -508,7 +563,7 @@ class MotoristaPagoController extends Controller
          
         $servicio = DB::table('servicio_pago AS sp')
         ->join('servicios AS s', 's.id', '=', 'sp.servicios_id')
-        ->select('sp.id', 's.identificador', 's.nombre', 'sp.pago', 'sp.fecha1', 'sp.fecha2', 'sp.fecha')
+        ->select('sp.id', 's.identificador', 's.nombre', 'sp.pago', 'sp.fecha1', 'sp.descripcion', 'sp.fecha2', 'sp.fecha')
         ->get();
 
         foreach($servicio as $o){
@@ -565,6 +620,7 @@ class MotoristaPagoController extends Controller
             $m->fecha2 = $request->fecha2;
             $m->fecha = $fecha;
             $m->pago = $request->pago;
+            $m->descripcion = $request->descripcion;
             
             if($m->save()){
                 return ['success' => 1];

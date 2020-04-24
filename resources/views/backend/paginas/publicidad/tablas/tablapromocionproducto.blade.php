@@ -9,7 +9,7 @@
                 <tr>
                   <th style="width: 10%">Nombre promocion</th>
                   <th style="width: 15%">Producto nombre</th>
-                  <th style="width: 15%">Descripcion</th>
+                  
                   <th style="width: 15%">Precio</th>
                   <th style="width: 20%">Opciones</th>            
                 </tr>
@@ -19,7 +19,7 @@
                 <tr>
                   <td>{{ $dato->nombre }}</td> 
                   <td>{{ $dato->productoNombre }}</td> 
-                  <td>{{ $dato->descripcion }}</td> 
+                 
                   <td>{{ $dato->precio }}</td> 
                  
                   <td>

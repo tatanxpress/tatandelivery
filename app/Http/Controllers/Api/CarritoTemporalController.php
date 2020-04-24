@@ -262,29 +262,22 @@ class CarritoTemporalController extends Controller
                                     $pro->suma = $cantidadCarrito; // unidades en carrito
                                 }
 
-                                // verificar si producto tiene limite producto cantidad por orden
-                               // if($pro->es_promocion){
-                                    if($pro->limite_orden){
-                                        if($cantidadCarrito > $pro->cantidad_por_orden){
-                                            // limite por orden excedida
-                                            $pro->promocion = 1;
-                                            $limitePromocion = 1;
-                                        }else{
-                                            $pro->promocion = 0;
-                                        }
+                                if($pro->limite_orden){
+                                    if($cantidadCarrito > $pro->cantidad_por_orden){
+                                        // limite por orden excedida
+                                        $pro->promocion = 1;
+                                        $limitePromocion = 1;
                                     }else{
                                         $pro->promocion = 0;
                                     }
-                               /* }else{
+                                }else{
                                     $pro->promocion = 0;
-                                }*/
-
+                                }
+                               
                             }else{
                                 // no utiliza cantidad, asi que no esta excedido
-
                                 $pro->excedio = 0;
                                 // verificar si producto tiene limite promocion por orden
-                                //if($pro->es_promocion){
                                     if($pro->limite_orden){
                                         if($cantidadCarrito > $pro->cantidad_por_orden){
                                             // limite por orden excedida
@@ -295,10 +288,8 @@ class CarritoTemporalController extends Controller
                                         }
                                     }else{
                                         $pro->promocion = 0;   
-                                    }
-                                /*}else{
-                                    $pro->promocion = 0;
-                                }*/
+                                    }                               
+                                $pro->suma = 0;
                             } 
                         
                             // saver si al menos un producto no esta activo o disponible
@@ -307,7 +298,11 @@ class CarritoTemporalController extends Controller
                             }
                             // multiplicar cantidad por el precio de cada producto
                             $precio = $pro->cantidad * $pro->precio;
-                            $pro->precio = $precio;
+                                                      
+                           // convertir
+                            $valor = number_format((float)$precio, 2, '.', '');
+                           
+                            $pro->precio = $valor;
 
 
                         } //end foreach
@@ -346,18 +341,7 @@ class CarritoTemporalController extends Controller
                     ->get();
 
                       // si verificar con la segunda hora
-                        if(count($dato) >= 1){
-                   
-                           /* $horario = DB::table('horario_servicio AS h')
-                            ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
-                            ->where('h.segunda_hora', 1) // segunda hora habilitada
-                            ->where('h.servicios_id', $servicioidC) // id servicio
-                            ->where('h.dia', $diaSemana) // dia    
-                            ->where('h.hora1', '<=', $hora)
-                            ->where('h.hora2', '>=', $hora)
-                            ->orWhere('h.hora3', '<=', $hora)
-                            ->where('h.hora4', '>=', $hora)
-                            ->get(); */
+                        if(count($dato) >= 1){                  
 
                             $horario = DB::table('horario_servicio AS h')
                             ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
@@ -371,7 +355,6 @@ class CarritoTemporalController extends Controller
                                     ->where('h.hora4', '>=' , $hora);
                             }) 
                           ->get();
-
 
                             if(count($horario) >= 1){ // abierto
                                 $horarioLocal = 0;
@@ -407,33 +390,80 @@ class CarritoTemporalController extends Controller
                             $cerrado = 0;
                         }
                         
-                        // sacar id de zona del carrito
+                        // sacar datos de la zona
                         $zon = DB::table('zonas AS z')->where('z.id', $cart->zonas_id)->first();
+
                        
                         $zonaSaturacion = $zon->saturacion; // saver si tenemos adomicilio completo a esta zona
 
                         // buscar el cerrado de emergencia
-                        $emergencia = DB::table('servicios AS c')->where('c.id', $servicioidC)->first();
+                        $emergencia = DB::table('servicios')->where('id', $servicioidC)->first();
+
+                        // saver si el servicio es privado
+                        $privado = $emergencia->privado;
 
                         $cerradoEmergencia = 0;
                         $cerradoEmergencia = $emergencia->cerrado_emergencia; // cerrado emergencia este local
-                        
+                       
+                        $activoservicio = 1;
+
+                        // ACTIVO O INACTIVO DE ENTERAMENTE EL SERVICIO
+                        $activoservicio = $emergencia->activo;
+
                         // horario delivery para esa zona
-                        $horaDelivery = DB::table('zonas AS z')
-                        ->where('z.id', $servicioidC)
-                        ->where('z.hora_abierto_delivery', '<=', $hora) 
-                        ->where('z.hora_cerrado_delivery', '>=', $hora) 
+                        $horaDelivery = DB::table('zonas')
+                        ->where('id', $cart->zonas_id)
+                        ->where('hora_abierto_delivery', '<=', $hora) 
+                        ->where('hora_cerrado_delivery', '>=', $hora) 
                         ->get();
             
                         if(count($horaDelivery) >= 1){
                             $horaDelivery = 0; // abierto
                         }else{
                             $horaDelivery = 1; // cerrado
-                        }   
+                        }  
+                        
+                        $horazona1 = date("h:i A", strtotime($zon->hora_abierto_delivery));
+                        $horazona2 = date("h:i A", strtotime($zon->hora_cerrado_delivery));
+                                               
+                        // estos datos son para saver si el servicio privado dara adomicilio hasta una determinada
+                        // horario, si la zona da de 7 am a 10 pm, el servicio privado es libre de decidir
+                        // su horario de entrega a esa zona. solo propietarios con servicio privado.
+
+                        $datoszona = DB::table('zonas_servicios')
+                                    ->where('servicios_id', $servicioidC)
+                                    ->where('zonas_id', $cart->zonas_id)
+                                    ->first();
+
+                        $tiempo_limite = $datoszona->tiempo_limite;
+                        $horainicio = $datoszona->horario_inicio;
+                        $horafinal = $datoszona->horario_final;
+                        // ACTIVO O INACTIVO DE ZONA SERVICIO
+                        // si es 0 no se tocara, ya que servicio entero esta inactivo
+                        if($activoservicio != 0){
+                            $activoservicio = $datoszona->activo;
+                        }                        
+                       
+                        $limiteentrega = 0;
+                       
+                        if($tiempo_limite == 1){
+                            // revisado de tiempo
+                            if (($horainicio < $hora) && ($hora < $horafinal)) {
+                                $limiteentrega = 0; // abierto
+                            }else{
+                                $limiteentrega = 1; // cerrado
+                            }                        
+                        }else{
+                            // este dato no es tomado en cuenta si $tiempolimite == 0
+                            $limiteentrega = 1; // cerrado
+                        }
+
+
+                        $horainicio = date("h:i A", strtotime($horainicio));
+                        $horafinal = date("h:i A", strtotime($horafinal));
             
                         return [
                             'success' => 2,
-                            'producto' => $producto, //todos los productos
                             'subtotal' => number_format((float)$subTotal, 2, '.', ''), // subtotal
                             'excedido' => $excedido, // unidades excedidas
                             'activo' => $activo, // un producto no esta activo,
@@ -442,7 +472,17 @@ class CarritoTemporalController extends Controller
                             'horario' => $horarioLocal, // horario normal por dia
                             'cerrado' => $cerrado, // si es 1, el local esta cerrado hoy
                             'cerrado_emergencia' => $cerradoEmergencia, //local cerrado por emergencia
-                            'zona_saturacion' => $zonaSaturacion, // sin adomicilio para esta zona 
+                            'zona_saturacion' => $zonaSaturacion, // sin adomicilio para esta zona,
+                            'tiempo_limite' => $tiempo_limite, // activacion de servicios privados
+                            'limiteentrega' => $limiteentrega, // horario de zona para servicios privados
+                            'privado' => $privado, // saver si servicio es privado o no
+                            'horadelivery' => $horaDelivery, // abierto o cerrado por zona,
+                            'horazona1' => $horazona1, // horario de la zona de su direccion actual
+                            'horazona2' => $horazona2, // horario de la zona de su direccion actual
+                            'horainicio' => $horainicio, // horario zona servicio negocio privado
+                            'horafinal' => $horafinal,      
+                            'producto' => $producto, //todos los productos  
+                            'activoservicio' => $activoservicio                                               
                         ];
 
                     }else{
@@ -704,18 +744,7 @@ class CarritoTemporalController extends Controller
                     }  
                     
                     $envioPrecio = 0;
-                   
-                   // precio de la zona
-                   // aqui no importa si esta activo o inactivo, solo obtendra el precio
-                   // para ver el proceso debe existir en zonas_servicios
-                    if($zz = DB::table('zonas_servicios AS z')
-                    ->select('z.precio_envio')                       
-                    ->where('z.zonas_id', $zonaiduser)
-                    ->where('z.servicios_id', $servicioidC)
-                    ->first()){                       
-                        $envioPrecio = $zz->precio_envio;
-                    }
-
+                          
                     $direccion = "";
                     // obtener direccion
                     if($di = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first()){                        
@@ -727,14 +756,42 @@ class CarritoTemporalController extends Controller
                         ];
                     }
 
+                    // precio de la zona
+                   // aqui no importa si esta activo o inactivo, solo obtendra el precio
+                   // para ver el proceso debe existir en zonas_servicios
+                   $zz = DB::table('zonas_servicios')                                   
+                   ->where('zonas_id', $zonaiduser)
+                   ->where('servicios_id', $servicioidC)
+                   ->first();
+
+                       // obtiene precio envio de la zona
+                    // PRIORIDAD 1
+                    $envioPrecio = $zz->precio_envio;                   
+
+                    // PRIORIDAD 2
+                    // mitad de precio al envio
+                    if($zz->mitad_precio == 1){
+                        if($envioPrecio != 0){
+                            $dividir = $envioPrecio;
+                            $envioPrecio = $dividir / 2;
+                        }                        
+                    }
+
+                    // PRIORIDAD 3
+                    // envio gratis a esta zona
+                    if($zz->zona_envio_gratis == 1){
+                        $envioPrecio = 0;
+                    }
+
+
+
                     // todo el producto del carrito de compras
                     $producto = DB::table('producto AS p')
                     ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                     ->select('p.precio', 'c.cantidad')
                     ->where('c.carrito_temporal_id', $cart->id)
                     ->get();
-
-                    //$subTotal = 0;
+                    
                     $pila = array();
 
                     foreach($producto as $p){
@@ -744,26 +801,55 @@ class CarritoTemporalController extends Controller
                         array_push($pila, $multi); 
                     }
 
-                    $resultado=0;
+                    $resultado=0; // sub total del carrito de compras
                     foreach ($pila as $valor){
                         $resultado=$resultado+$valor;
                     }
 
+                    $datosInfo = DB::table('zonas_servicios AS z')
+                    ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                    ->where('z.zonas_id', $zonaiduser)
+                    ->where('z.servicios_id', $servicioidC)
+                    ->first();
+
+                    // PRIORIDAD 4
+                    // esta zona tiene un minimo de $$ para envio gratis
+                    if($datosInfo->min_envio_gratis == 1){
+                        $costo = $datosInfo->costo_envio_gratis;
+
+                        // precio envio sera 0, si supera $$ en carrito de compras
+                        if($resultado > $costo){
+                            $envioPrecio = 0;
+                        }
+                    }
+
+                    // si el servicio da gratis para todas las zonas que da cobertura
                     $datosServicio = Servicios::where('id', $servicioidC)->first();
                     $gratis = $datosServicio->envio_gratis;
                     
+                    // total de carrito de compras
                     $total = $resultado;
-                    if($gratis == 0){
-                        $total = $resultado + $envioPrecio;
-                    }
+                    
+                    // PRIORIDAD 5
+                    // cambiar precio envio a 0, si el servicio da envio gratis a todas las zonas
+                    if($gratis == 1){
+                        $envioPrecio = 0;
+                    } 
+
+                    // sumar a total
+                    $total = $resultado + $envioPrecio;
+
                     $convertir = number_format((float)$total, 2, '.', '');
                     $t = (string)$convertir;
+
+                    $c2 = number_format((float)$envioPrecio, 2, '.', '');
+                    $e = (string)$c2;
                     
                     return [
                         'success' => 1,
                         'total' => $t,
                         'subtotal' => number_format((float)$resultado, 2, '.', ''),
-                        'envio' => $envioPrecio,
+                        'envio' => $e,
                         'direccion' => $direccion,
                         'gratis' => $gratis
                     ];

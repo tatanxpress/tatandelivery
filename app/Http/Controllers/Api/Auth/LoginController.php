@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\DB;
 use Twilio\Rest\Client;
 use Illuminate\Support\Facades\Hash;
 
-
 class LoginController extends Controller
 {
     // verificar si el numero esta registrado o no, envio SMS
@@ -48,7 +47,6 @@ class LoginController extends Controller
             }
         }
     }
-
 
     // login usuario por usuario y contraseña
     public function loginUsuario(Request $request){

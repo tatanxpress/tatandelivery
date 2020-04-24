@@ -17,9 +17,9 @@ class CreateOrdenesTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('users_id')->unsigned();
             $table->bigInteger('servicios_id')->unsigned();
-            $table->string('nota_orden', 200)->default('');
-            $table->decimal('precio_total', 7,2);
-            $table->decimal('precio_envio', 7,2);
+            $table->string('nota_orden', 600)->default('');
+            $table->decimal('precio_total', 10,2); //precio del servicio nomas 
+            $table->decimal('precio_envio', 7,2); // 99.999,999.99
             $table->dateTime('fecha_orden');
             $table->string('cambio', 20)->default('');
             $table->boolean('estado_2')->default(0);
@@ -46,9 +46,12 @@ class CreateOrdenesTable extends Migration
             $table->boolean('cancelado_cliente')->default(0);
             $table->boolean('cancelado_propietario')->default(0);
           
-            $table->boolean('envio_gratis')->default(0);
+            $table->boolean('envio_gratis')->default(0); // dio envio gratis a todas las zonas
             $table->boolean('visible_m')->default(0);
             $table->decimal('ganancia_motorista', 5,2);
+
+            // si subtotal es mayor a minimo, su envio es gratis
+            $table->boolean('supero_envio_gratis')->default(0); 
 
             $table->foreign('users_id')->references('id')->on('users');
             $table->foreign('servicios_id')->references('id')->on('servicios');

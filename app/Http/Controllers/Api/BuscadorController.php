@@ -53,6 +53,67 @@ class BuscadorController extends Controller
         }
     }
 
+    // buscador de productos globalmente en los servicios donde esta la direccion del usuario
+    public function buscarProductoGlobal(Request $request){
+        
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(                
+                'userid' => 'required',   
+                'nombre' => 'required',             
+            );    
+                  
+            $mensajeDatos = array(                                      
+                'userid.required' => 'El id del usuario es requerido',
+                'nombre.required' => 'El nombre del producto es requerido'
+                );
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+            
+            // obtener todos los servicios de la direccion del usuario
+            $datos = DB::table('direccion_usuario AS du')    
+                ->join('zonas AS z', 'z.id', '=', 'du.zonas_id')
+                ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
+                ->select('du.user_id', 'du.seleccionado', 'du.direccion', 'zs.servicios_id', 'zs.activo')
+                ->where('du.user_id', $request->userid)
+                ->where('du.seleccionado', 1) // primera direccion seleccionada
+                ->where('zs.activo', 1) // zona servicio activo                       
+                ->get();
+
+                if($datos == null){
+                    return ['success' => 1]; // ninguna direccion encontrada
+                }
+
+                $pilaIDServicio = array();
+
+                foreach($datos as $p){
+                    $id = $p->servicios_id;                    
+                    array_push($pilaIDServicio, $id); 
+                }
+
+                $productos = DB::table('servicios AS s')    
+                ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
+                ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
+                ->select('p.id', 'p.nombre', 'p.precio', 'p.imagen', 'p.utiliza_imagen', 
+                's.nombre AS nombreservicio')
+                ->whereIn('s.id', $pilaIDServicio)
+                ->where('s.activo', 1) // servicio activo
+                ->where('st.activo', 1) // la categoria esta activa
+                ->where('p.activo', 1) // producto activo
+                ->where('p.disponibilidad', 1) // producto disponible
+                ->where('p.nombre', 'like', '%' . $request->nombre . '%')
+                ->orderBy('s.id', 'ASC')            
+                ->get();
+
+            return ['success' => 2, 'productos' => $productos];
+        }
+    }
+
     // ver lista de productos al tocar seccion "ver todos"
     public function buscarProductoSeccion(Request $request){
         

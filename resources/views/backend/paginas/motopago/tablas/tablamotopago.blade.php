@@ -9,12 +9,13 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             
                 <tr>
-                    <th style="width: 15%">Identificador motorista</th> 
-                    <th style="width: 15%">Nombre motorista</th> 
-                    <th style="width: 15%">Fecha ingreso</th> 
-                    <th style="width: 15%">Fecha desde</th> 
-                    <th style="width: 15%">Fecha hasta</th>   
-                    <th style="width: 15%">Pago</th>                    
+                    <th style="width: 10%">ID motorista</th> 
+                    <th style="width: 15%">Motorista</th> 
+                    <th style="width: 10%">Fe. ingreso</th> 
+                    <th style="width: 10%">Fe. desde</th> 
+                    <th style="width: 10%">Fe. hasta</th> 
+                    <th style="width: 15%">Descripción</th>     
+                    <th style="width: 8%">Pago</th>                    
 
                 </tr>  
                 </thead>
@@ -26,6 +27,7 @@
                     <td>{{ $dato->fecha }}</td>
                     <td>{{ $dato->fecha1 }}</td>
                     <td>{{ $dato->fecha2 }}</td>
+                    <td>{{ $dato->descripcion }}</td>
                     <td>${{ $dato->pago }}</td>
                 </tr>
      

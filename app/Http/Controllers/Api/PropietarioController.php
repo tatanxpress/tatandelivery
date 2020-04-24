@@ -14,10 +14,13 @@ use Mail;
 use App\Mail\RecuperarPasswordEmail;
 use App\Ordenes;
 use App\OrdenesDescripcion;
+use App\OrdenesDirecciones;
 use App\PagoPropietario;
 use App\Producto;
 use App\Servicios;
 use App\User;
+use App\Zonas;
+use App\ZonasServicios;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
@@ -29,6 +32,16 @@ class PropietarioController extends Controller
 {
     // login para propietario
     public function loginPropietario(Request $request){
+
+
+       /* $titulo = "Tiempo de preparación";
+        $mensaje = "Revisar tiempo de espera";
+        $pilaUsuarios = "8593a228-c92b-491a-96c7-4c219f388ad2";
+
+        $this->envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios);
+
+        return "llego";*/
+ 
 
         if($request->isMethod('post')){   
             $rules = array(                
@@ -169,17 +182,12 @@ class PropietarioController extends Controller
                 $correo = $p->correo;
                               
                try{
-                // envio de correo
-                Mail::to($correo)->send(new RecuperarPasswordEmail($nombre, $codigo));
+                    // envio de correo
+                    Mail::to($correo)->send(new RecuperarPasswordEmail($nombre, $codigo));
 
-                return [
-                    'success' => 2,
-                    'message' => 'Correo enviado'
-                ]; 
+                    return ['success' => 2, 'message' => 'Correo enviado']; 
                 }   catch(Exception $e){
-                    return [
-                        'success' => 3 // correo error                        
-                    ];       
+                    return ['success' => 3];   // error al enviar correo    
                 }
             }else{
                 return [
@@ -234,7 +242,7 @@ class PropietarioController extends Controller
             );
 
             $messages = array(                                      
-                'telefono.required' => 'El correo es requerido',  
+                'telefono.required' => 'El telefono es requerido',  
                 'password.required' => 'La contraseña es requerida',
                 'password.min' => 'Mínimo 8 caracteres',
                 'password.max' => 'Máximo 16 caracteres',
@@ -291,8 +299,9 @@ class PropietarioController extends Controller
                     return ['success'=> 1];
                 }
 
+             
                 $orden = DB::table('ordenes AS o')                
-                ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.nota_orden', 'o.fecha_orden', 'o.envio_gratis')
+                ->select('o.id', 'o.precio_total', 'o.nota_orden', 'o.fecha_orden')
                 ->where('o.servicios_id', $p->servicios_id)
                 ->where('o.visible_p', 1)
                 ->get();
@@ -305,9 +314,6 @@ class PropietarioController extends Controller
 
                     // resta para total del propietario
                     $precio = $o->precio_total;
-                    $envio = $o->precio_envio;
-                    $total = $precio - $envio;
-                    $o->total = $total;
                 }
 
                 return ['success' => 2, 'ordenes' => $orden]; 
@@ -405,7 +411,7 @@ class PropietarioController extends Controller
             }
         }
     }
-
+ 
     // configuracion para ordenes automatica
     public function guardarTiempo(Request $request){
         if($request->isMethod('post')){   
@@ -658,10 +664,10 @@ class PropietarioController extends Controller
                 ->where('p.id', $p->id)
                 ->first();
 
-                $envio = $estado->privado;
+                $privado = $estado->privado;
 
-                // utilizara motorista del servicio, porque es privado
-                if($envio == 1){
+                // mostrara motorista del servicio, porque es privado
+                if($privado == 1){
                     $motorista = DB::table('motoristas_asignados AS ma')
                     ->join('motoristas AS m', 'm.id', '=', 'ma.motoristas_id')
                     ->select('m.nombre', 'ma.servicios_id')
@@ -674,6 +680,252 @@ class PropietarioController extends Controller
                 return ['success'=> 3];
             }else{
                 return ['success'=> 4];
+            }            
+        }
+    }
+
+    // listado de zona que da cobertura el servicio privado
+    public function zonaCobertura(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+                
+                $estado = DB::table('servicios AS s')
+                ->join('propietarios AS p', 'p.servicios_id', '=', 's.id')
+                ->select('s.id')
+                ->where('p.id', $p->id)
+                ->first();
+
+                // listado de zonas
+                $zonas = DB::table('zonas_servicios AS zs')
+                ->join('zonas AS z', 'z.id', '=', 'zs.zonas_id')
+                ->select('z.id', 'z.nombre')
+                ->where('servicios_id', $estado->id)
+                ->get();                
+                                
+                return ['success'=> 1, 'zonas' => $zonas];
+            }else{
+                return ['success'=> 2];
+            }            
+        }
+    }
+
+    // actualizar precio de zona servicio y su horario adomicilio
+    public function actualizarZonaHora(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idzona' => 'required',
+                'hora1' => 'required',
+                'hora2' => 'required',
+                'estadocostogratis' => 'required', // min a comprar para envio gratis
+                'estadozona' => 'required' // si limitara horario por zona adomicilio
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idzona.required' => 'El id zona es requerido',
+                'hora1.required' => 'El horario 1 es requerido',
+                'hora2.required' => 'El horario 2 es requerido',
+                'estadocostogratis.required' => 'El estado parta costo minimo es requerido',
+                'estadozona' => 'El estado zona es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){     
+                
+                $hora1 = $request->hora1;
+                $hora2 = $request->hora2;
+              
+                if($hora1 == $hora2){
+                    return ['success'=> 1];
+                }
+
+                if($hora1 > $hora2){
+                    return ['success'=> 2];
+                }
+
+                $estado = DB::table('servicios AS s')
+                ->join('propietarios AS p', 'p.servicios_id', '=', 's.id')
+                ->select('s.id')
+                ->where('p.id', $p->id)
+                ->first();
+
+                // actulizara precio
+                    if($request->precio == ""){
+                        return ['success'=> 3];
+                    }
+                    ZonasServicios::where('zonas_id', $request->idzona)
+                ->where('servicios_id', $estado->id)
+                ->update(['precio_envio' => $request->precio]);
+                
+
+                // actualiza precio minimo a comprar para envio gratis, sino tomara el precio de envio
+                if($request->estadocostogratis == "1"){
+                    if($request->costo == ""){
+                        return ['success'=> 4];
+                    }
+                    ZonasServicios::where('zonas_id', $request->idzona)
+                    ->where('servicios_id', $estado->id)
+                    ->update(['min_envio_gratis' => $request->estadocostogratis, 
+                    'costo_envio_gratis' => $request->costo]);
+                }else{
+                    ZonasServicios::where('zonas_id', $request->idzona)
+                    ->where('servicios_id', $estado->id)
+                    ->update(['min_envio_gratis' => 0]);
+                }
+ 
+                if($request->estadozona == "1"){
+                    ZonasServicios::where('zonas_id', $request->idzona)
+                    ->where('servicios_id', $estado->id)
+                    ->update(['tiempo_limite' => 1]);
+                }else{
+                    ZonasServicios::where('zonas_id', $request->idzona)
+                    ->where('servicios_id', $estado->id)
+                    ->update(['tiempo_limite' => 0]);
+                }
+
+                ZonasServicios::where('zonas_id', $request->idzona)
+                ->where('servicios_id', $estado->id)
+                ->update(['horario_inicio' => $hora1, 'horario_final' => $hora2]);
+                                
+                return ['success'=> 5];
+            }else{
+                return ['success'=> 6];
+            }            
+        }
+    }
+
+    // ver mapa zona cobertura, solo propietarios privados
+    public function verMapaZona(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'idzona' => 'required'
+            );
+
+            $messages = array(                                      
+                'idzona.required' => 'El id zona es requerido',
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }                      
+              
+            $tablas = DB::table('zonas')
+            ->select('id', 'latitud', 'longitud')
+            ->where('id', $request->idzona)
+            ->get();
+
+            $resultsBloque = array();        
+            $index = 0;
+
+            foreach($tablas  as $secciones){
+                array_push($resultsBloque,$secciones);          
+            
+                $subSecciones = DB::table('poligono_array AS pol')            
+                ->select('pol.latitud AS latitudPoligono', 'pol.longitud AS longitudPoligono')
+                ->where('pol.zonas_id', $secciones->id)
+                ->get(); 
+                
+                $resultsBloque[$index]->poligonos = $subSecciones;
+                $index++;
+            }
+
+            return [
+                'success' => 1,               
+                'poligono' => $tablas
+            ];
+
+        }
+    }
+
+    // informacion de la zona_servicio que modificara el propietario de servicio privado
+    public function informacionZona(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idzona' => 'required'
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idzona.required' => 'El id zona es requerido',
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+                
+                $servicio = DB::table('servicios AS s')
+                ->join('propietarios AS p', 'p.servicios_id', '=', 's.id')
+                ->select('s.id')
+                ->where('p.id', $p->id)
+                ->first(); 
+
+                // info de la zona servicio
+                $zonas = DB::table('zonas_servicios AS zs')
+                ->join('zonas AS z', 'z.id', '=', 'zs.zonas_id')
+                ->select('z.nombre', 'zs.horario_inicio', 
+                'zs.horario_final', 'zs.precio_envio', 'zs.tiempo_limite', 
+                'zs.min_envio_gratis', 'zs.costo_envio_gratis')
+                ->where('servicios_id', $servicio->id)
+                ->where('zs.zonas_id', $request->idzona)
+                ->first();                 
+
+                $h1 = date("h:i A", strtotime($zonas->horario_inicio));
+                $h2 = date("h:i A", strtotime($zonas->horario_final));   
+                $h3 = $zonas->horario_inicio;
+                $h4 = $zonas->horario_final;
+                $nombre = $zonas->nombre;
+                $precio = $zonas->precio_envio;
+                $m = $zonas->min_envio_gratis;
+                $c = $zonas->costo_envio_gratis;
+                $t = $zonas->tiempo_limite;
+                                
+                return ['success'=> 1, 'nombre' => $nombre, 
+                'hora1' => $h1, 'hora2' => $h2, 'horadb1' => $h3, 'horadb2' => $h4, 'precio' => $precio, 
+                'min_envio_gratis' => $m, 'costo_envio_gratis' => $c, 'tiempo_limite' => $t];
+            }else{
+                return ['success'=> 2];
             }            
         }
     }
@@ -760,7 +1012,7 @@ class PropietarioController extends Controller
                     ->select('p.id AS idProducto','p.nombre AS nombreProducto', 
                             'p.descripcion AS descripcionProducto',
                             'p.imagen AS imagenProducto', 'p.precio AS precioProducto',
-                            'p.unidades', 'p.utiliza_cantidad', 'p.utiliza_imagen')
+                            'p.unidades', 'p.utiliza_cantidad', 'p.utiliza_imagen', 'p.disponibilidad')
                     ->where('p.servicios_tipo_id', $secciones->tipoId)
                     ->where('p.activo', 1) // para inactivarlo solo administrador
                     ->orderBy('p.posicion', 'ASC')
@@ -803,7 +1055,8 @@ class PropietarioController extends Controller
                 ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
                 ->select('p.id', 'p.nombre', 'p.descripcion', 'p.precio', 
-                'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 'p.utiliza_cantidad', 'p.utiliza_imagen')
+                'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 
+                'p.utiliza_cantidad', 'p.utiliza_imagen', 'p.utiliza_nota', 'p.nota')
                 ->where('p.id', $request->productoid)
                 ->where('p.activo', 1)
                 ->get();
@@ -820,21 +1073,21 @@ class PropietarioController extends Controller
     public function actualizarProducto(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
-                'id' => 'required',
                 'productoid' => 'required',
-                'estado1' => 'required',
-                'estado2' => 'required',
-                'precio' => 'required',
-                'unidades' => 'required' 
+                'estadonombre' => 'required', // cambiara nombre
+                'estadodescripcion' => 'required', // cambiara descripcion
+                'estadoprecio' => 'required', // cambiara precio
+                'estadoproducto' => 'required', // cambiara estado
+                'estadounidades' => 'required' // cambiara unidades                
             );
  
             $messages = array(                                      
-                'id.required' => 'El id propietario es requerido',
                 'productoid.required' => 'El id producto es requerido',
-                'estado1.required' => 'El estado 1 es requerido',
-                'estado2.required' => 'El estado 2 es requerido',
-                'precio.required' => 'El precio es requerido',
-                'unidades.required' => 'La unidad es requerido',
+                'estadonombre.required' => 'El estado nombre es requerido',
+                'estadodescripcion.required' => 'El estado descripcion es requerido',
+                'estadoprecio.required' => 'El estado precio es requerido',
+                'estadoproducto.required' => 'El estado producto es requerido',
+                'estadounidades.required' => 'El estado unidades requerido',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -848,30 +1101,62 @@ class PropietarioController extends Controller
             
             if(Producto::where('id', $request->productoid)->first()){
 
-                if($p = Propietarios::where('id', $request->id)->first()){
-                    if($p->activo == 0){
+                // modificara nombre del producto
+                if($request->estadonombre == "1"){
+                    if($request->nombre == ""){
                         return ['success'=> 1];
+                    }
+                    Producto::where('id', $request->productoid)->update(['nombre' => $request->nombre]);
+                }
+
+                // modificara descripcion del producto
+                if($request->estadodescripcion == "1"){
+                    if($request->descripcion == ""){
+                        return ['success'=> 2];
+                    }
+                    Producto::where('id', $request->productoid)->update(['descripcion' => $request->descripcion]);
+                }
+
+                // modificara precio
+                if($request->estadoprecio == "1"){
+                    if($request->precio == ""){
+                        return ['success'=> 3];
+                    }
+                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio]);
+                }
+
+                // modificara unidades
+                if($request->estadounidades == "1"){
+                    if($request->unidades != "" || $request->unidades != null){
+                        Producto::where('id', $request->productoid)->update(['unidades' => $request->unidades]);
                     }
                 } 
 
-                // SI ES -1, ENTONCES SIGNIFICA QUE NO TOCARA LAS UNIDADES
-                if($request->unidades == "-1"){
-                    // significa que no actualizara unidades
-                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
-                    'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2]);
-                    
+                // modificara nota producto
+                if($request->estadonota == "1"){
+                    $nota = $request->nota;
+                    if($request->nota == null){
+                        $nota = "";
+                    }
+
+                    Producto::where('id', $request->productoid)->update(['utiliza_nota' => $request->estadonota, 'nota' => $nota]);
                 }else{
-                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio,
-                    'disponibilidad' => $request->estado1, 'utiliza_cantidad'=>$request->estado2, 'unidades' => $request->unidades]);                    
+                    Producto::where('id', $request->productoid)->update(['utiliza_nota' => 0]);
                 }
-           
-                return ['success'=> 2];
+
+                // cambiar disponibilidad producto
+                Producto::where('id', $request->productoid)->update(['disponibilidad' => $request->estadoproducto]);
+
+                // cambiar estado de utilizar unidades
+                Producto::where('id', $request->productoid)->update(['utiliza_cantidad' => $request->estadounidades]);
+                        
+                return ['success'=> 5];
 
             }else{
-                return ['success'=> 3];
+                return ['success'=> 0];
             }            
         }
-    }
+    } 
 
     // buscador de productos
     public function buscarProducto(Request $request){
@@ -899,13 +1184,14 @@ class PropietarioController extends Controller
                 $productos = DB::table('servicios AS s')
                 ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
-                ->select('p.id', 'p.nombre', 'p.imagen', 'p.precio', 'p.disponibilidad', 'p.es_promocion', 'p.utiliza_imagen')
+                ->select('p.id', 'p.nombre', 'p.imagen', 'p.precio',
+                 'p.disponibilidad', 'p.es_promocion', 'p.utiliza_imagen', 'p.utiliza_cantidad', 'p.unidades')
                 ->where('s.id', $p->servicios_id)                
                 ->where('p.activo', 1)                
                 ->where('p.nombre', 'like', '%' . $request->nombre . '%')
                 ->get();
 
-                return ['productos' => $productos];
+                return ['success' => 1, 'productos' => $productos];
             }
             else{
                 return ['success'=>2];
@@ -1035,9 +1321,15 @@ class PropietarioController extends Controller
                      'o.mensaje_8', 's.orden_automatica', 's.tiempo', 'o.cancelado_cliente')
                     ->where('o.id', $request->ordenid)
                     ->get();
+
+                    //obtener la copia del tiempo de la zona, al que se agrego
+                   // $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
                
                 // obtener fecha orden y sumarle tiempo si estado es igual a 2
                 foreach($orden as $o){
+
+                   // $resta = $o->hora_2 - $tiempo->copia_tiempo_orden;
+                   // $o->hora_2 = $resta; // tiempo para el propietario, ya que este es el que envio
                     
                     if($o->estado_2 == 1){ // propietario da el tiempo de espera
                         
@@ -1091,7 +1383,7 @@ class PropietarioController extends Controller
                 'ordenid.required' => 'El id de la orden es requerido',
                 'tiempo.required' => 'El tiempo es requerido',
                 'tipo.required' => 'El tipo es requerido',
-                );
+                ); 
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
@@ -1105,31 +1397,28 @@ class PropietarioController extends Controller
             
             if($or = Ordenes::where('id', $request->ordenid)->first()){
 
- 
-
                 // aun no se ha establecido tiempo de espera
                 if($or->estado_2 == 0){
                    
                     $fecha = Carbon::now('America/El_Salvador');
 
-                    // verificar si sera orden automatica, iniciar preparacion de orden
-                    $servicioid = $or->servicios_id;
-                    $datosServicio = Servicios::where('id', $servicioid)->first();
+                    // verificar si sera orden automatica, iniciar preparacion de orden                   
+                    $datosServicio = Servicios::where('id', $or->servicios_id)->first();
  
                     // el tipo de orden automatica o no, cambio al momento de agregar la hora
                     if($request->tipo != $datosServicio->orden_automatica){
                         return ['success' => 1];
                     }
 
-                    $tiempo = 0;
-                    if($datosServicio->orden_automatica == 1){
-                        $tiempo = $datosServicio->tiempo + 5;
-                    }else{
-                        $tiempo = $request->tiempo + 5;
-                    }
-
-                    $titulo = "";
-                    $mensaje = "";
+                    // buscar tiempo extra que se sumara por cada zona
+                    $infoDireccion = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
+                    
+                    // sacar tiempo de la zona
+                    $dataExtra = Zonas::where('id', $infoDireccion->zonas_id)->first();
+                  
+                    // GUARDAR COPIA DEL TIEMPO EXTRA POR ZONA
+                    OrdenesDirecciones::where('ordenes_id', $request->ordenid)->update(['copia_tiempo_orden' => $dataExtra->tiempo_extra]);
+                   
 
                     // contestacion hasta estado 4
                     if($datosServicio->orden_automatica == 1){
@@ -1138,9 +1427,8 @@ class PropietarioController extends Controller
                         $mensaje = "Seguir el estado de su orden";
  
                         Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
-                        'fecha_2' => $fecha, 'hora_2' => $tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
+                        'fecha_2' => $fecha, 'hora_2' => $request->tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
                         'estado_4' => 1, 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
-
                                                  
                         // mandar notificacion a los motoristas asignados al servicio
                         $moto = DB::table('motoristas_asignados AS ms')
@@ -1152,7 +1440,7 @@ class PropietarioController extends Controller
                         ->get();
  
                         $pilaUsuarios = array();
-                        foreach($moto as $p){  
+                        foreach($moto as $p){
                             if(!empty($p->device_id)){
                                 if($p->device_id != "0000"){
                                     array_push($pilaUsuarios, $p->device_id); 
@@ -1164,8 +1452,13 @@ class PropietarioController extends Controller
                         $mensaje1 = "Se necesita motorista";
                   
                         // NOTIFICACION A LOS MOTORISTAS
-                        if(!empty($pilaUsuarios)){                       
-                            $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);
+                        if(!empty($pilaUsuarios)){      
+                            try {
+                                $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);
+                            } catch (Exception $e) {
+                                
+                            }                 
+                           
                         }else{
 
                             // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
@@ -1193,22 +1486,53 @@ class PropietarioController extends Controller
                                 }
                             } 
 
-                                //si no esta vacio 
+                            //si no esta vacio 
                             if(!empty($pilaAdministradores)){
                                 $titulo = "Orden Iniciada sin MOTORISTA";
                                 $mensaje = "Inicio preparacion y no se encuentra motoristas";
-                          
-                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);                            
+                                try {
+                                    $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                                } catch (Exception $e) {
+                                    
+                                }
+                                                            
                             }
                         } 
-    
-                    }else{
-                        $titulo = "Tiempo de preparación";
-                        $mensaje = "Revisar tiempo de espera";
+
+                        // ESTO ES PARA CUANDO PROPIETARIO INICIA AUTOMATICAMENTE UNA ORDEN
+
+                        $titulo = "Orden aceptada";
+                        $mensaje = "Revisar tiempo aproximado de entrega";
 
                         Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
-                        'fecha_2' => $fecha, 'hora_2' => $tiempo]);
+                        'fecha_2' => $fecha, 'hora_2' => $request->tiempo]);
+
+                        // mandar notificacion al cliente
+                        $usuario = User::where('id', $or->users_id)->first();
+                        $pilaUsuarios = $usuario->device_id;
+                                        
+                        if(!empty($pilaUsuarios)){
+                            if($pilaUsuarios != "0000"){
+                                try {
+                                    $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                                } catch (Exception $e) {
+                                    
+                                }
+                                
+                            }                        
+                        } 
+
+                        return ['success' => 2]; 
+    
                     }
+                  
+                    // CUANDO EL PROPIETARIO DIO EL TIEMPO DE ESPERA, Y EL CLIENTE DEBE ACEPTAR O NO
+
+                    $titulo = "Tiempo de preparación";
+                    $mensaje = "Revisar tiempo de espera";
+
+                    Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
+                    'fecha_2' => $fecha, 'hora_2' => $request->tiempo]);
 
                     // mandar notificacion al cliente
                     $usuario = User::where('id', $or->users_id)->first();
@@ -1216,16 +1540,21 @@ class PropietarioController extends Controller
                                        
                     if(!empty($pilaUsuarios)){
                         if($pilaUsuarios != "0000"){
-                            $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                            } catch (Exception $e) {
+                                
+                            }
+                           
                         }                        
                     } 
 
-                    return ['success' => 2]; 
+                    return ['success' => 3]; 
                 }else{
-                    return ['success'=> 3];
+                    return ['success'=> 4];
                 }
             }else{ 
-                return ['success'=> 4];
+                return ['success'=> 5];
             }
         }
     }
@@ -1281,7 +1610,12 @@ class PropietarioController extends Controller
 
                     if(!empty($pilaUsuarios)){
                         if($pilaUsuarios != "0000"){
-                            $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                            } catch (Exception $e) {
+                                
+                            }
+                            
                         }                        
                     }
             
@@ -1353,9 +1687,8 @@ class PropietarioController extends Controller
                     'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
-
+            }              
+ 
             if($or = Ordenes::where('id', $request->ordenid)->first()){               
 
                 if($or->estado_4 == 0 && $or->estado_8 == 0){
@@ -1374,7 +1707,12 @@ class PropietarioController extends Controller
                    
                     if(!empty($fcm)){                       
                         if($fcm != "0000"){
-                            $this->envioNoticacionCliente($titulo, $mensaje, $fcm);
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $fcm);
+                            } catch (Exception $e) {
+                                
+                            }
+                            
                         }                       
                     } 
 
@@ -1400,8 +1738,13 @@ class PropietarioController extends Controller
                     $mensaje1 = "Se necesita motorista";
                  
                     // NOTIFICACION A LOS MOTORISTAS
-                    if(!empty($pilaUsuarios)){                       
-                        $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);
+                    if(!empty($pilaUsuarios)){    
+                        try {
+                            $this->envioNoticacionMotorista($titulo1, $mensaje1, $pilaUsuarios);   
+                        } catch (Exception $e) {
+                            
+                        }                   
+                        
                     }else{
  
                         // GUARDAR REGISTROS PARA NOTIFICAR AL ADMINISTRADOR
@@ -1433,8 +1776,12 @@ class PropietarioController extends Controller
                         if(!empty($pilaAdministradores)){
                             $titulo = "Orden Iniciada sin MOTORISTA";
                             $mensaje = "Inicio preparacion y no se encuentra motoristas";
-                      
-                            $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);                            
+                            try {
+                                $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores); 
+                            } catch (Exception $e) {
+                                
+                            }
+                                                       
                         }
                     }  
 
@@ -1471,7 +1818,7 @@ class PropietarioController extends Controller
             
             if($p = Propietarios::where('id', $request->id)->first()){
                 $orden = DB::table('ordenes AS o')                
-                ->select('o.id', 'o.precio_total', 'o.estado_8', 'o.precio_envio', 'o.nota_orden', 
+                ->select('o.id', 'o.precio_total', 'o.estado_8', 'o.nota_orden', 
                 'o.fecha_4', 'o.hora_2')
                 ->where('o.estado_8', 0) // ordenes no canceladas
                 ->where('o.servicios_id', $p->servicios_id)
@@ -1480,7 +1827,12 @@ class PropietarioController extends Controller
                 ->where('o.estado_4', 1) // orden estado 4 preparacion
                 ->get();
            
+           
                 foreach($orden as $o){
+
+
+
+
                     $fechaOrden = $o->fecha_4;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
@@ -1491,9 +1843,10 @@ class PropietarioController extends Controller
                   
                     $o->total = number_format((float)$precio, 2, '.', '');
 
+                    // ESTA ES LA HORA2 PARA LA VISTA UNICAMENTE PROPIETARIO
 
                     $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A d-m-Y');
+                    $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimada; 
                 }
 
@@ -1550,11 +1903,12 @@ class PropietarioController extends Controller
                          $o->excedido = 0; // ya no puede cancelar la orden
                      }
 
+                                      
                
                     $tiempoExedido = Carbon::parse($o->fecha_4);
                     $tiempoExedido2 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $tiempoExedido->addMinute($o->hora_2)->format('H:i:s d-m-Y');
-                    $horaEstimadaFe = $tiempoExedido2->addMinute($o->hora_2 - 5)->format('h:i A');
+                    $horaEstimadaFe = $tiempoExedido2->addMinute($o->hora_2)->format('h:i A');
                     $o->horaEstimada = $horaEstimadaFe;
                     $d3 = new DateTime($horaEstimada);
 
@@ -1649,7 +2003,12 @@ class PropietarioController extends Controller
                          
                         if(!empty($pilaUsuarios)){
                             if($pilaUsuarios != "0000"){
-                                $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                                try {
+                                    $this->envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios);
+                                } catch (Exception $e) {
+                                    
+                                }
+                                
                             } 
                         }
 
@@ -1750,7 +2109,12 @@ class PropietarioController extends Controller
                     $mensaje1 = $texto;
                    
                     if(!empty($pilaUsuarios)){ 
-                        $this->envioNoticacionAdministrador($titulo1, $mensaje1, $pilaUsuarios);
+                        try {
+                            $this->envioNoticacionAdministrador($titulo1, $mensaje1, $pilaUsuarios);  
+                        } catch (Exception $e) {
+                            
+                        }
+                        
                     }    
                 }else{
                     // MANDAR NOTIFICACION AL MOTORISTA ASIGNADO A LA ORDEN, QUE LA ORDEN YA ESTA PREPARADA
@@ -1767,7 +2131,12 @@ class PropietarioController extends Controller
                     $mensaje = "Lista para ser Entregada";
               
                     if(!empty($deviceid)){
-                        $this->envioNoticacionMotorista($titulo, $mensaje, $deviceid);
+                        try {
+                            $this->envioNoticacionMotorista($titulo, $mensaje, $deviceid);   
+                        } catch (Exception $e) {
+                            
+                        }
+                       
                     }
                 }
 
@@ -1890,13 +2259,9 @@ class PropietarioController extends Controller
                     $fechaOrden = $o->fecha_orden;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $fecha;
+                    $o->fecha_orden = $fecha . " " . $hora;
 
-                    $dinero = $dinero + $o->precio_total;
-
-                    $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A');
-                    $o->horaEstimada = $horaEstimada; 
+                    $dinero = $dinero + $o->precio_total;                                    
                 }
 
                 $dineroTotal = number_format((float)$dinero, 2, '.', '');
@@ -1932,7 +2297,8 @@ class PropietarioController extends Controller
             if($p = Propietarios::where('id', $request->id)->first()){
                 
                 $orden = DB::table('ordenes')
-                ->select('id', 'precio_total', 'fecha_orden', 'precio_envio', 'estado_7', 'fecha_4', 'hora_2', 'fecha_5', 'estado_5', 'nota_orden')
+                ->select('id', 'precio_total', 'fecha_orden', 'precio_envio', 
+                'estado_7', 'fecha_4', 'hora_2', 'fecha_5', 'estado_5', 'nota_orden')
                 ->where('estado_5', 1) // orden completadas
                 ->where('servicios_id', $p->servicios_id)
                 ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
@@ -1940,15 +2306,18 @@ class PropietarioController extends Controller
               
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A ", strtotime($o->fecha_orden));
+
+                    $o->horacompletada = date("h:i A ", strtotime($o->fecha_5));
                      
                     $total = $o->precio_total;
                   
                     $o->precio_total = number_format((float)$total, 2, '.', '');
 
-
-                    $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($o->hora_2 - 5)->format('h:i A');
-                    $o->horaEstimada = $horaEstimada; 
+                    $data = DB::table('ordenes_direcciones')
+                    ->where('ordenes_id', $o->id)              
+                    ->first();
+                    
+                    $tiempozona = $data->copia_tiempo_orden;                      
                 }
                     
                 return ['success' => 1, 'orden' => $orden];                
@@ -2001,7 +2370,7 @@ class PropietarioController extends Controller
                     $fechaOrden = $o->fecha_orden;
                     $hora = date("h:i A", strtotime($fechaOrden));
                     $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $fecha;
+                    $o->fecha_orden = $fecha . " " . $hora;
 
                     $dinero = $dinero + $o->precio_total;
                 }

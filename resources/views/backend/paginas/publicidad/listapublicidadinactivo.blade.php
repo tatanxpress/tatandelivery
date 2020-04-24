@@ -234,7 +234,7 @@
 
                                 <div class="form-group">
                                     <label>Telefono</label>
-                                    <input type="text" maxlength="300" class="form-control" id="telefono-e" placeholder="Telefono">
+                                    <input type="text" maxlength="100" class="form-control" id="telefono-e" placeholder="Telefono">
                                 </div>
 
                                 <div class="form-group">
@@ -573,7 +573,7 @@
                 if(urlfacebook.length > 0){
                     // no tocar texto
                 }else{
-                    urlfacebook = "ninguno";
+                    urlfacebook = "-";
                 }
             }
 
@@ -588,7 +588,7 @@
                 if(urlyoutube.length > 0){
                     // no tocar texto
                 }else{
-                    urlyoutube = "ninguno";
+                    urlyoutube = "-";
                 }
             }
 
@@ -602,7 +602,7 @@
                 if(urlinstagram.length > 0){
                     // no tocar texto
                 }else{
-                    urlinstagram = "ninguno";
+                    urlinstagram = "-";
                 }
             }
 
@@ -616,7 +616,7 @@
                 if(titulodescripcion.length > 0){
                     // no tocar texto
                 }else{
-                    titulodescripcion = "ninguno";
+                    titulodescripcion = "-";
                 }
             }
 
@@ -630,7 +630,7 @@
                 if(telefono.length > 0){
                     // no tocar texto
                 }else{
-                    telefono = "ninguno";
+                    telefono = "-";
                 }              
             }
 
@@ -645,7 +645,7 @@
                 if(visitanos.length > 0){
                     // no tocar texto
                 }else{
-                    visitanos = "ninguno";
+                    visitanos = "-";
                 } 
             }
 
@@ -660,7 +660,7 @@
                 if(titulo.length > 0){
                     // no tocar texto
                 }else{
-                    titulo = "ninguno";
+                    titulo = "-";
                 }
             }
 
@@ -721,6 +721,55 @@
             toastr.error('Error desconocido');
         }
     }
+
+    function validarNuevoPu2(nombre, descripcion, logo, imagen, fechainicio, fechafin){
+        if(nombre === ''){
+            toastr.error("nombre es requerido");
+            return;
+        }
+         
+        if(nombre.length > 100){
+            toastr.error("100 caracter máximo nombre");
+            return false;
+        }
+
+        if(descripcion === ''){
+            toastr.error("descripcion es requerido");
+            return;
+        }
+        
+        if(descripcion.length > 100){
+            toastr.error("100 caracter máximo descripcion");
+            return false;
+        }
+
+        if(fechainicio === ''){
+            toastr.error("fecha inicio es requerido");
+            return;
+        }        
+
+        if(fechafin === ''){
+            toastr.error("fecha fin es requerido");
+            return;
+        }
+        
+        if(logo.files && logo.files[0]){ // si trae imagen
+            if (!logo.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
+                toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                return false;       
+            } 
+        }
+
+        if(imagen.files && imagen.files[0]){ // si trae imagen
+            if (!imagen.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
+                toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
+                return false;       
+            } 
+        }
+
+        return true;
+    }
+
 
   </script>
 

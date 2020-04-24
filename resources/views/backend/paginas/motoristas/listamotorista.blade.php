@@ -81,14 +81,19 @@
                                     <input type="text" maxlength="50" class="form-control" id="tipovehiculo-nuevo" placeholder="Tipo de vehiculo">
                                 </div>
                                 <div class="form-group">
-                                    <label>Numero vehiculo</label>
+                                    <label>Número vehiculo</label>
                                     <input type="text" maxlength="50" class="form-control" id="numerovehiculo-nuevo" placeholder="Numero de vehiculo">
                                 </div>
-                    
-                                
+
                                 <div class="form-group">
-                                    <label>Zona Pago (Motorista pueden ver donde entregar el dinero)</label>
-                                    <input type="checkbox" id="zonapago-nuevo">
+                                    <label>Limite de dinero para entregar a cobrador</label>
+                                    <input type="number" step="0.01" class="form-control" id="limite-nuevo" value="0.00" require>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Motorista sera asignado a Servicio Privado</label>
+                                    <br>
+                                    <input type="checkbox" id="privado-nuevo">
                                 </div>
 
                                 <div class="form-group">
@@ -149,24 +154,23 @@
                                     <input type="text" maxlength="50" class="form-control" id="tipovehiculo-editar" placeholder="Tipo de vehiculo">
                                 </div>
                                 <div class="form-group">
-                                    <label>Numero vehiculo</label>
+                                    <label>Número vehiculo</label>
                                     <input type="text" maxlength="50" class="form-control" id="numerovehiculo-editar" placeholder="Numero de vehiculo">
                                 </div>
-                         
-                                
+                                                         
                                 <div class="form-group">
                                     <label>Dinero Limite (Para entregar al Cobrador, sino no puede seleccionar mas ordenes)</label>
                                     <input type="number" step="0.01" class="form-control" id="dinero-editar">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Zona Pago (Motorista pueden ver donde entregar el dinero)</label>
-                                    <input type="checkbox" id="zonapago-editar">
-                                </div>
+                                </div>                               
 
                                 <div class="form-group">
                                     <label>Activo</label>
                                     <input type="checkbox" id="activo-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Este Motorista trabaja para un servicio Privado</label>
+                                    <input type="checkbox" id="privado-editar">
                                 </div>
 
                                 <div class="form-group">
@@ -275,18 +279,27 @@
         var correo = document.getElementById('correo-nuevo').value;
         var tipovehiculo = document.getElementById('tipovehiculo-nuevo').value;
         var numerovehiculo = document.getElementById('numerovehiculo-nuevo').value;
-        var cbzona = document.getElementById('zonapago-nuevo').checked;
+
+        var limite = document.getElementById('limite-nuevo').value;
+        var privado = document.getElementById('privado-nuevo').checked;
 
         var imagen = document.getElementById('imagen-nuevo');
 
         var retorno = validarNuevo(identi, nombre, telefono, correo, tipovehiculo, numerovehiculo,  imagen);
 
-        if(retorno){
 
-            var cbzona_1 = 0;
-            if(cbzona){
-                cbzona_1 = 1;
+        if(limite === ''){
+            toastr.error("Dinero limite es requerido");
+            return;
+        }
+
+        if(retorno){
+            var privado_1 = 0
+
+            if(privado){
+                privado_1 = 1;
             }
+           
 
             var spinHandle = loadingOverlay().activate();
             var formData = new FormData();
@@ -296,9 +309,9 @@
             formData.append('correo', correo);
             formData.append('tipovehiculo', tipovehiculo);
             formData.append('numerovehiculo', numerovehiculo);
+            formData.append('limite', limite);
+            formData.append('privado', privado_1);
             formData.append('imagen', imagen.files[0]);
-            formData.append('cbzona', cbzona_1);
-
 
             axios.post('/admin/motoristas/nuevo', formData, { 
                     })
@@ -420,7 +433,7 @@
         return true;
     }
 
- 
+  
     function informacion(id){
         spinHandle = loadingOverlay().activate();
         document.getElementById("formulario-editar").reset();
@@ -443,15 +456,12 @@
                     
                     $('#dinero-editar').val(response.data.motorista.limite_dinero);
 
+                    if(response.data.motorista.privado == 1){
+                        $('#privado-editar').prop('checked', true);
+                    }
 
                     $('#img-imagen').prop("src","{{ url('storage/usuario') }}"+'/'+ response.data.motorista.imagen);
  
-                    if(response.data.motorista.zona_pago == 0){
-                        $("#zonapago-editar").prop("checked", false);
-                    }else{
-                        $("#zonapago-editar").prop("checked", true);
-                    }
-
                     if(response.data.motorista.activo == 0){
                         $("#activo-editar").prop("checked", false);
                     }else{
@@ -476,29 +486,26 @@
         var correo = document.getElementById('correo-editar').value;
         var tipovehiculo = document.getElementById('tipovehiculo-editar').value;
         var numerovehiculo = document.getElementById('numerovehiculo-editar').value;
-       
-        var cbzona = document.getElementById('zonapago-editar').checked;
-     
+           
         var cbactivo = document.getElementById('activo-editar').checked;
         var imagen = document.getElementById('imagen-editar');
         var dinero = document.getElementById('dinero-editar').value;
+        var privado = document.getElementById('privado-editar').checked;
 
         var retorno = validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, imagen);
  
         if(retorno){
 
-            var cbzona_1 = 0;
             var cbactivo_1 = 0;
-
-            if(cbzona){
-                cbzona_1 = 1;
-            }
-
+            var privado_1 = 0;
 
             if(cbactivo){
                 cbactivo_1 = 1;
             }
 
+            if(privado){
+                privado_1 = 1;
+            }
 
             var spinHandle = loadingOverlay().activate();
             var formData = new FormData();
@@ -509,9 +516,9 @@
             formData.append('tipovehiculo', tipovehiculo);
             formData.append('numerovehiculo', numerovehiculo);
             formData.append('imagen', imagen.files[0]);
-            formData.append('cbzona', cbzona_1);
             formData.append('cbactivo', cbactivo_1);
             formData.append('dinero', dinero);
+            formData.append('privado', privado_1);
 
             axios.post('/admin/motoristas/editar', formData, {
             })

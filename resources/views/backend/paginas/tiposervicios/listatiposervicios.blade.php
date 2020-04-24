@@ -9,14 +9,15 @@
 <section class="content-header">
       <div class="container-fluid">
         <div class="row mb-2">
-          <div class="col-sm-3">
+          <div class="col-sm-12">
           <h1>Tipo de servicios</h1>
           </div>
-          <div class="col-sm-2">
-          <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
-          <i class="fas fa-pencil-alt"></i>
-            Nuevo Tipo Servicio
-        </button>
+          
+          <div  style="margin-top:15px;">
+            <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
+            <i class="fas fa-pencil-alt"></i>
+                Nuevo Tipo Servicio
+            </button>
           </div>
         </div>
       </div>
@@ -44,7 +45,7 @@
 <div class="modal fade" id="modalAgregar">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header"> 
                 <h4 class="modal-title">Nuevo Tipo Servicio</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -62,6 +63,18 @@
                                 <div class="form-group">
                                     <label>Descripción</label>
                                     <input type="text" maxlength="100" class="form-control" id="descripcion-nuevo" placeholder="Descripción tipo servicio">
+                                </div>
+                                <div class="form-group">
+                                    <label style="color:#191818">ID Tipo</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-tipos">   
+                                                <option value="0" selected>Seleccionar</option>                                         
+                                            @foreach($tipos as $item)
+                                                <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                            @endforeach                                          
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <div>
@@ -91,7 +104,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Editar Tipo Servicio</h4>
+                <h4 class="modal-title">Editar Tipo Servicio</h4>                
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -120,6 +133,8 @@
                                         <input type="file" style="color:#191818" id="imagen-editar" accept="image/jpeg, image/jpg, image/png"/>
                                     </div>
                                 </div>
+
+                                
                             </div>
                         </div>
                     </div>
@@ -165,7 +180,13 @@
         var nombre = document.getElementById('nombre-nuevo').value;
         var descripcion = document.getElementById('descripcion-nuevo').value;
         var imagen = document.getElementById('imagen-nuevo'); 
-                
+        var tipos = document.getElementById("select-tipos").value;
+
+        if (tipos == 0) {
+            toastr.error("Seleccionar identificador Tipos");
+            return false;
+        }
+
         var retorno = validacion_nuevo(nombre, descripcion, imagen);
 
         if (retorno) {
@@ -175,6 +196,7 @@
             formData.append('nombre', nombre);
             formData.append('descripcion', descripcion);
             formData.append('imagen', imagen.files[0]);
+            formData.append('tipos', tipos);
 
             var spinHandle = loadingOverlay().activate();
 

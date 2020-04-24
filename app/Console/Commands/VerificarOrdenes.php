@@ -10,6 +10,7 @@ use OneSignal;
 use App\OrdenesUrgentes;
 use App\Servicios;
 use DateTime;
+use App\OrdenesDirecciones;
 use App\OrdenesPendienteContestar;
 
 class VerificarOrdenes extends Command
@@ -55,26 +56,27 @@ class VerificarOrdenes extends Command
         ->orderBy('id', 'ASC')
         ->get();
 
-        if(count($orden) > 0){
+        if(count($orden) > 0){ // verificar que hay al menos 1
 
-            $total = 0;
+            $total = 0; // contar ordenes
             $seguro = false;
             // obtener cada id, de la orden que necesita motorista y enviar notificacion
             // al administrador una alerta por todas las ordenes pendientes. 
             foreach($orden as $o){
 
                 // SOLO PARA SERVICIOS NO PRIVADOS
-                $valor = Servicios::where('id', $o->servicios_id)->first();
+                //$valor = Servicios::where('id', $o->servicios_id)->first();
 
-                if($valor->privado == 0){
+               // if($valor->privado == 0){
                     if(OrdenesUrgentes::where('ordenes_id', $o->id)->first()){
-                        // no guardar registro.
+                        // ya tengo un registro igual, asi que no guardarla
                     }else{
 
+                        $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
+
                         // preguntar si supera hora estimada, con la hora actual
-                        $time1 = Carbon::parse($o->fecha_4);
-                        $resta = $o->hora_2 - 5; // sin los 5 minutos al cliente                             
-                        $horaEstimada = $time1->addMinute($resta + 2)->format('Y-m-d H:i:s'); // 2 min de advertencia
+                        $time1 = Carbon::parse($o->fecha_4);                         
+                        $horaEstimada = $time1->addMinute($o->hora_2 + 2)->format('Y-m-d H:i:s'); // 2 min de advertencia
                        
                         $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
                                         
@@ -102,7 +104,7 @@ class VerificarOrdenes extends Command
 
                          }
                     }
-                }  
+                //}  
             }           
 
             if($seguro){
@@ -127,8 +129,12 @@ class VerificarOrdenes extends Command
                 if(!empty($pilaAdministradores)){
                     $titulo = "Orden Para Entrega Inmediata";
                     $mensaje = $total . " Ordenes pendiente de Entrega";
-                   
-                    $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);                            
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                    } catch (Exception $e) {
+                        
+                    } 
+                                               
                 }
             }
         }
@@ -199,8 +205,10 @@ class VerificarOrdenes extends Command
                         ->get();
 
                         foreach($datos as $d){
-                            if($d->device_id != "0000"){                                   
-                                array_push($pilaPropietarios, $d->device_id); 
+                            if(!empty($d->device_id)){
+                                if($d->device_id != "0000"){                                   
+                                    array_push($pilaPropietarios, $d->device_id); 
+                                }
                             }
                         }
                         
@@ -213,7 +221,11 @@ class VerificarOrdenes extends Command
                     $titulo = "Ordenes Pendientes";
                     $mensaje = "Revisar Ordenes Nuevas";
                    
-                    $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);                            
+                    try {
+                        $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);  
+                    } catch (Exception $e) {
+                        
+                    }                                              
                 }
 
                 $administradores1 = DB::table('administradores')
@@ -235,9 +247,14 @@ class VerificarOrdenes extends Command
                 if(!empty($pilaAdministradores1)){
                     $titulo = "Orden Sin Contestacion";
                     $mensaje = "Hay ordenes sin contestacion";
-                   
-                    $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores1);                            
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores1);   
+                    } catch (Exception $e) {
+                        
+                    }                                               
                 }
+
+                
             }            
         }       
     }

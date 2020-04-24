@@ -33,6 +33,11 @@
                     Reporte Productos Vendidos
           </button> 
 
+          <button type="button" onclick="modalReporte6()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Reporte Servicio uso min compra para envio gratis
+          </button> 
+
        </div>
      </section>
      
@@ -360,6 +365,57 @@
     </div>      
 </div>
 
+<!-- modal reporte6 -->
+<div class="modal fade" id="modalReporte6">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Reporte Servicio uso min de compra para envio gratis</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-reporte6">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicios identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control selectpicker" id="servicioid-reporte6" data-live-search="true" required>   
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha desde</label>
+                                    <input type="date" class="form-control" id="fechadesde-reporte6">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha hasta</label>
+                                    <input type="date" class="form-control" id="fechahasta-reporte6">
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="reporte6()">Buscar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
   <!-- modal informacion-->
 <div class="modal fade" id="modalInfo">
     <div class="modal-dialog">
@@ -677,6 +733,11 @@
         $('#modalReporte5').modal('show');
     }
 
+    function modalReporte6(){
+        document.getElementById("formulario-reporte6").reset();
+        $('#modalReporte6').modal('show');
+    }
+
     function buscar(){
         var servicioid = document.getElementById('servicioid').value;
         var fechadesde = document.getElementById('fechadesde').value;
@@ -757,6 +818,20 @@
         if(retorno){
 
             window.open("{{ URL::to('admin/generar/reporte7') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta);
+
+        }
+    }
+
+    function reporte6(){
+        var servicioid = document.getElementById('servicioid-reporte6').value;
+        var fechadesde = document.getElementById('fechadesde-reporte6').value;
+        var fechahasta = document.getElementById('fechahasta-reporte6').value;            
+        
+        var retorno = validarNuevo(fechadesde, fechahasta);
+
+        if(retorno){
+
+            window.open("{{ URL::to('admin/generar/reporte6') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta);
 
         }
     }

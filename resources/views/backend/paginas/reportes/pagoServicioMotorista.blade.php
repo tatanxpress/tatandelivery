@@ -75,9 +75,10 @@
     <div class="row"> 
             <center><p class="titulo">
             REPORTE DE PAGO<br>
-            MOTORISTA {{ $nombre }}       
-            </p></center>           
-    </div>  
+            MOTORISTA: {{ $nombre }}       
+            </p>
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>          
+    </div>   
 
         <table id="customers">
           <tr>
@@ -87,7 +88,7 @@
           </tr>
 
           @foreach($ordenFiltro as $dato)
-            <tr>
+            <tr> 
               <td>{{ $dato->id }}</td>
               <td>{{ $dato->fecha_orden }}</td>
               <td>${{ $dato->ganancia_motorista }}</td>
@@ -103,6 +104,10 @@
         </table>
 
           
+        <p class="oficina">
+        ___________________________  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; _________________________ <br>
+       Administrador  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Motorista         
+        </p>
         
 
 </body>

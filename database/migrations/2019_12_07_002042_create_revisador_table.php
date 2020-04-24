@@ -15,11 +15,8 @@ class CreateRevisadorTable extends Migration
     {
         Schema::create('revisador', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('nombre', 100);
-            $table->string('direccion', 800);
-            $table->string('telefono', 20)->unique();
-            $table->string('latitud', 50);
-            $table->string('longitud', 50);
+            $table->string('nombre', 100);            
+            $table->string('telefono', 20)->unique();           
             $table->string('password', 255);
             $table->boolean('disponible');
             $table->boolean('activo');

@@ -153,7 +153,7 @@
         formData.append('toggle', toggle);
        
         var spinHandle = loadingOverlay().activate();
-
+ 
         axios.post('/admin/cliente/editar', formData, {
         })
             .then((response) => {

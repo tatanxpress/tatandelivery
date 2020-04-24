@@ -5,7 +5,8 @@
      <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
      
  @stop 
-
+ 
+ <!--Pagina para editar el administrador que inicio sesion-->
 
  <section class="content-header">
        <div class="container-fluid">
@@ -164,7 +165,7 @@
         }
 
         if(correo === ''){
-            toastr.error("nombre es requerido");
+            toastr.error("correo es requerido");
             return;
         }
         
@@ -185,32 +186,32 @@
 
     function validar1(password1, password2){
         if(password1 === ''){
-            toastr.error("password1 es requerido");
+            toastr.error("contraseña es requerido");
             return;
         }
         
         if(password1.length > 20){
-            toastr.error("20 caracter máximo password1");
+            toastr.error("20 caracter máximo contraseña");
             return false;
         }
 
         if(password1.length < 8){
-            toastr.error("8 caracter minimo password1");
+            toastr.error("8 caracter minimo contraseña");
             return false;
         }
 
         if(password2 === ''){
-            toastr.error("password2 es requerido");
+            toastr.error("contraseña repetida es requerido");
             return;
         }
 
         if(password2.length < 8){
-            toastr.error("8 caracter minimo password2");
+            toastr.error("8 caracter minimo contraseña repetida");
             return false;
         }
         
         if(password2.length > 20){
-            toastr.error("20 caracter máximo password2");
+            toastr.error("20 caracter máximo contraseña repetida");
             return false;
         }
 

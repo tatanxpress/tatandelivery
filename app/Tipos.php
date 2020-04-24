@@ -4,12 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TiempoAproximado extends Model
-{ 
-    protected $table = 'tiempo_aprox';
+class Tipos extends Model
+{
+    protected $table = 'tipos';
     public $timestamps = false;
 
     protected $fillable = [
-        'servicios_id', 'dia', 'tiempo'
+        'nombre', 'descripcion'
     ];
 }

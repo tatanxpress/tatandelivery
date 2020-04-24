@@ -9,7 +9,6 @@
                 <tr>
                   <th style="width: 8%">ID</th>
                   <th style="width: 10%">Nombre</th>
-                  <th style="width: 15%">Descripcion</th>
                   <th style="width: 15%">Identificador</th>
                   <th style="width: 11%">Cerrado Emergencia</th>
                   <th style="width: 10%">Activo</th>
@@ -22,7 +21,6 @@
                 <tr>
                   <td>{{ $dato->id }}</td> 
                   <td>{{ $dato->nombre }}</td> 
-                  <td>{{ $dato->descripcion }}</td> 
                   <td>{{ $dato->identificador }}</td> 
                   <td> 
                     @if($dato->cerrado_emergencia == 0)

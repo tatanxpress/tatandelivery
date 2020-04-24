@@ -24,6 +24,15 @@
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para posiciones
             </button>
+
+            <button type="button" style="margin-left" onclick="abrirModalFiltro2()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Filtro para envio gratis por zonas (Servicio Publico)
+            </button>
+            <button type="button" style="margin-left" onclick="abrirModalFiltro3()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Filtro para mitad de precio por zonas (Servicio Publico)
+            </button>
           </div>
         </div>
       </div>
@@ -103,6 +112,7 @@
                                     <input type="number" step="any" id="ganancia">
                                 </div>
 
+
                             </div>
                         </div>
                     </div>
@@ -159,6 +169,29 @@
                                     <input type="number" step="any" id="ganancia-editar">
                                 </div>
 
+                                <div class="form-group">
+                                    <label>Envio gratis si supera x cantidad</label>
+                                    <br>
+                                    <input type="checkbox" id="cbmingratis-editar">
+                                </div>
+                                <div class="form-group">                                
+                                    <label>Minimo de compra para envio gratis</label>
+                                    <input type="number" step="any" id="minenvio-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Esta zona tiene envio gratis (unicamente servicios publicos)?</label>
+                                    <br>
+                                    <input type="checkbox" id="cbzonagratis-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mitad de precio (unicamente servicios publicos)?</label>
+                                    <br>
+                                    <input type="checkbox" id="cbmitadprecio-editar">
+                                </div>
+
+                               
 
                             </div>
                         </div>
@@ -184,7 +217,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="formulario-nuevo">
+                <form id="formulario-filtro">
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12"> 
@@ -210,8 +243,6 @@
                                         </select>
                                     </div>
                                 </div> 
-                              
-
                             </div>
                         </div>
                     </div>
@@ -220,6 +251,92 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtrar()">Filtrar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+<!-- modal filtro para servicios publicos, cambiar estado envio gratis -->
+<div class="modal fade" id="modalFiltro2">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Filtro para colocar envio gratis (Servicios publicos)</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-filtro2">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                                <div class="form-group">
+                                    <label style="color:#191818">Zonas identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="selectzona-filtro2" multiple="multiple" >   
+                                            @foreach($zonas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div>  
+                                </div>    
+                                <div class="form-group">
+                                    <label>Envio gratis a todas las zonas con servicio publico</label>
+                                    <input type="checkbox" id="cbzonapublico">
+                                </div>                             
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="filtrar2()">Filtrar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+<!-- modal filtro para servicios publicos, cambiar estado mitad de precio -->
+<div class="modal fade" id="modalFiltro3">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Filtro para colocar mitad de precio (Servicios publicos)</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-filtro3">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                                <div class="form-group">
+                                    <label style="color:#191818">Zonas identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="selectzona-filtro3" multiple="multiple" >   
+                                            @foreach($zonas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div>  
+                                </div>    
+                                <div class="form-group">
+                                    <label>Mitad de precio a todas las zonas con servicio publico</label>
+                                    <input type="checkbox" id="cbzonapublico2">
+                                </div>                             
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="filtrar3()">Filtrar</button>
             </div>          
         </div>        
     </div>      
@@ -258,7 +375,8 @@
         var selectservicio = document.getElementById('selectservicio-identificador').value;
         var cbactivo = document.getElementById('cbactivo').checked;
         var precioenvio = document.getElementById("precioenvio").value;
-        var ganancia = document.getElementById("ganancia").value;        
+        var ganancia = document.getElementById("ganancia").value;
+       
                                 
         var retorno = validacionNuevo(precioenvio, ganancia);
 
@@ -277,6 +395,7 @@
             formData.append('cbactivo', cbactivo_1);
             formData.append('precioenvio', precioenvio);
             formData.append('ganancia', ganancia);
+            
 
             var spinHandle = loadingOverlay().activate();
 
@@ -284,7 +403,6 @@
             })
                 .then((response) => {
                     loadingOverlay().cancel(spinHandle);
-                    console.log(response);
                     respuestaNuevo(response);
                 })
                 .catch((error) => {
@@ -325,16 +443,17 @@
             return false;
         }
 
-        return true;
-    }
+        return true; 
+    } 
 
     // informacion tipo servicios zona
     function verInformacion(id){
         spinHandle = loadingOverlay().activate();
-
+        document.getElementById("formulario-editar").reset();
+        
         axios.post('/admin/zonaservicios/informacion',{
         'id': id
-            })
+            }) 
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
                 if(response.data.success == 1){
@@ -343,6 +462,8 @@
                     $('#fecha-editar').val(response.data.zonaservicio.fecha);
                     $('#zonaidentificador-editar').val(response.data.zonaservicio.idenZona);
                     $('#servicioidentificador-editar').val(response.data.zonaservicio.idenServicio);
+
+
                     if(response.data.zonaservicio.activo == 0){
                         $("#cbactivo-editar").prop("checked", false);
                     }else{
@@ -350,6 +471,38 @@
                     }  
                     $('#precioenvio-editar').val(response.data.zonaservicio.precio_envio);
                     $('#ganancia-editar').val(response.data.zonaservicio.ganancia_motorista);
+
+                    if(response.data.zonaservicio.min_envio_gratis == 0){
+                        $("#cbmingratis-editar").prop("checked", false);
+                    }else{
+                        $("#cbmingratis-editar").prop("checked", true);
+                    } 
+                    $('#minenvio-editar').val(response.data.zonaservicio.costo_envio_gratis);
+ 
+                    // no podra tocarse los servicios que sean privados
+                    if(response.data.zonaservicio.privado == 1){
+                        document.getElementById("cbzonagratis-editar").disabled = true;
+                    }else{
+                        document.getElementById("cbzonagratis-editar").disabled = false;
+                        if(response.data.zonaservicio.zona_envio_gratis == 0){
+                            $("#cbzonagratis-editar").prop("checked", false);
+                        }else{
+                            $("#cbzonagratis-editar").prop("checked", true);
+                        }    
+                    }     
+
+                     // no podra tocarse los mitad de precio los servicios privador
+                    if(response.data.zonaservicio.privado == 1){
+                        document.getElementById("cbmitadprecio-editar").disabled = true;
+
+                    }else{
+                        document.getElementById("cbmitadprecio-editar").disabled = false;
+                        if(response.data.zonaservicio.mitad_precio == 0){
+                            $("#cbmitadprecio-editar").prop("checked", false);
+                        }else{
+                            $("#cbmitadprecio-editar").prop("checked", true);
+                        }    
+                    }            
 
                 }else{  
                     toastr.error('Tipo servicio zona no encontrado'); 
@@ -369,9 +522,32 @@
         var precioenvio = document.getElementById('precioenvio-editar').value;
         var ganancia = document.getElementById('ganancia-editar').value;
 
+        var cbmingratis = document.getElementById('cbmingratis-editar').checked;
+        var minenvio = document.getElementById('minenvio-editar').value;
+
+        var cbzonagratis = document.getElementById('cbzonagratis-editar').checked;
+        var cbmitadprecio = document.getElementById('cbmitadprecio-editar').checked;
+
+                
         var toggle = 0;
+        var cbmingratis_1 = 0;
+        var cbzonagratis_1 = 0;
+        var cbmitadprecio_1 = 0;
+
         if(toggleactivo){
             toggle = 1;
+        }
+
+        if(cbmitadprecio){
+            cbmitadprecio_1 = 1;
+        }
+        
+        if(cbmingratis){
+            cbmingratis_1 = 1;
+        }
+
+        if(cbzonagratis){
+            cbzonagratis_1 = 1;
         }
 
         if(precioenvio === ''){
@@ -382,7 +558,9 @@
         if(ganancia === ''){
             toastr.error('Agregar ganancia');
             return;
-        }
+        } 
+
+
     
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
@@ -390,7 +568,12 @@
         formData.append('toggle', toggle);
         formData.append('precioenvio', precioenvio);
         formData.append('ganancia', ganancia);
-
+        formData.append('cbmingratis', cbmingratis_1);
+        formData.append('minenvio', minenvio);
+        formData.append('cbzonagratis', cbzonagratis_1);
+        formData.append('cbmitadprecio', cbmitadprecio_1);
+        
+        
         axios.post('/admin/zonaservicios/editar', formData, {
         })
         .then((response) => {
@@ -418,13 +601,22 @@
         else {
             toastr.error('Error desconocido');
         }
-    }
+    } 
 
     // filtros
     function abrirModalFiltro(){
         $('#modalFiltro').modal('show');
     }
 
+    function abrirModalFiltro2(){
+        document.getElementById("formulario-filtro2").reset();
+        $('#modalFiltro2').modal('show');
+    }
+
+    function abrirModalFiltro3(){
+        document.getElementById("formulario-filtro3").reset();
+        $('#modalFiltro3').modal('show');
+    }
 
     function filtrar(){
         var idzona = document.getElementById('selectzona-filtro').value;
@@ -432,6 +624,88 @@
         
          
         window.location.href="{{ url('/admin/zonaservicios') }}/"+idzona+'/'+idtipo;
+    }
+
+    function filtrar2(){
+        var values = $('#selectzona-filtro2').val();  
+        var cbzonapublico = document.getElementById('cbzonapublico').checked;
+                
+        var cbzonapublico_1 = 0;        
+        if(cbzonapublico){
+            cbzonapublico_1 = 1;
+        }
+
+        if(values.length == null || values.length == 0){
+            toastr.error('Seleccionar mínimo 1 zona');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        for (var i = 0; i < values.length; i++) {
+            formData.append('idzonas[]', values[i]);
+        }
+        formData.append('cbzonapublico', cbzonapublico_1);       
+        
+        axios.post('/admin/zonaservicios/enviogratis', formData, {
+        })
+        .then((response) => {
+            
+            loadingOverlay().cancel(spinHandle);
+            if(response.data.success == 1) {
+                toastr.success('Actualizado');
+                var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+                $('#tablaDatatable').load(ruta);               
+            }
+            else {
+                toastr.error('Error desconocido');
+            }
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
+    }
+
+    function filtrar3(){
+        var values = $('#selectzona-filtro3').val();  
+        var cbzonapublico = document.getElementById('cbzonapublico2').checked;
+                
+        var cbzonapublico_1 = 0;        
+        if(cbzonapublico){
+            cbzonapublico_1 = 1;
+        }
+
+        if(values.length == null || values.length == 0){
+            toastr.error('Seleccionar mínimo 1 zona');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        for (var i = 0; i < values.length; i++) {
+            formData.append('idzonas[]', values[i]);
+        }
+        formData.append('cbzonapublico', cbzonapublico_1);       
+        
+        axios.post('/admin/zonaservicios/mitadprecio', formData, {
+        })
+        .then((response) => {
+            
+            loadingOverlay().cancel(spinHandle);
+            if(response.data.success == 1) {
+                toastr.success('Actualizado');
+                var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+                $('#tablaDatatable').load(ruta);               
+            }
+            else {
+                toastr.error('Error desconocido');
+            }
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
     }
 
 </script>

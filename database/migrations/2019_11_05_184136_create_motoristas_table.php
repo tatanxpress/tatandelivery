@@ -18,7 +18,7 @@ class CreateMotoristasTable extends Migration
             $table->string('nombre', 50);
             $table->string('identificador', 50);
             $table->string('telefono', 20)->unique();
-            $table->string('correo', 100);
+            $table->string('correo', 100)->unique();
             $table->string('password', 255);
             $table->string('tipo_vehiculo', 50);
             $table->string('numero_vehiculo', 50);
@@ -29,8 +29,8 @@ class CreateMotoristasTable extends Migration
             $table->string('imagen', 100);
             $table->string('device_id', 100);
             $table->string('codigo_correo', 10);
-            $table->boolean('zona_pago')->default(0); // permite ver las zonas de pago, a los otros motorista
-            // no podran ver las zonas de pago, osea donde ir a dejar el dinero
+            $table->boolean('privado');
+            
         });
     }
 

@@ -18,7 +18,7 @@ class CreateMotoristaExperienciaTable extends Migration
             $table->bigInteger('ordenes_id')->unsigned();
             $table->bigInteger('motoristas_id')->unsigned();
             $table->integer('experiencia');
-            $table->string('mensaje', 200)->nullable();
+            $table->string('mensaje', 200)->default("");
             $table->dateTime('fecha');
               
             $table->foreign('ordenes_id')->references('id')->on('ordenes');

@@ -37,7 +37,7 @@ class CreateServiciosTable extends Migration
             $table->boolean('producto_visible'); 
             $table->decimal('comision', 5,2);
             $table->integer('tiempo'); // tiempo espera para contestacion automatica
-            $table->boolean('privado'); 
+            $table->boolean('privado'); // para darme una lista de servicios privados en el panel de control
             
             $table->foreign('tipo_servicios_id')->references('id')->on('tipo_servicios')->onUpdate('cascade');
 

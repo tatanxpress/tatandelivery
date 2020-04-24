@@ -72,7 +72,7 @@
                                             <input type="text" maxlength="50" class="form-control" id="identificador-nuevo" placeholder="Identificador unico">
                                         </div>
                                         <div class="form-group">
-                                            <label>Descripción (No mostrada en APP)</label>
+                                            <label>Descripción corta</label>
                                             <input type="text" maxlength="300" class="form-control" id="descripcion-nuevo" placeholder="Descripción servicio">
                                         </div>
                                         <div class="form-group">
@@ -92,7 +92,7 @@
                                         <div class="form-group">
                                             <div>
                                                 <label>Imagen</label>
-                                                <p>Tamaño recomendado de: 600 x 300</p>
+                                                <p>Tamaño recomendado de: 600 x -</p>
                                             </div> 
                                             <br>
                                             <div class="col-md-10">
@@ -100,32 +100,34 @@
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            <label>Envío gratis</label>
+                                            <label>Envío gratis (envio $0.00 para este servicio en todas las zonas)</label> 
+                                            <br>
                                             <input type="checkbox" id="cbenviogratis">
                                         </div>
 
                                         <div class="form-group">
-                                            <label>Utiliza mínimo</label>
+                                            <label>Utiliza mínimo (si esta activo, el minimo de compra sera necesario $)</label> 
+                                            </br>
                                             <input type="checkbox" id="cbminimo">
                                         </div>
                                         <div class="form-group">
                                         <br>
-                                            <label>Mínimo $ compra</label>
+                                            <label>Mínimo $ compra (para brindar el servicio adomicilio)</label>
+                                            </br>
                                             <input type="number" value="0" step="any" id="minimocompra">
                                         </div>
                                         <div class="form-group">
-                                            <label>Producto visible al Motorista</label>
+                                            <label>Producto visible al Motorista (por ejemplo: farmacias, el motorista no vera el producto)</label>
+                                            <br>
                                             <input type="checkbox" id="cbproducto">
                                         </div>
+
                                         <div class="form-group">
-                                            <label>Orden es automatica</label>
-                                            <input type="checkbox" id="cbautomatica">
+                                            <label>Este servicio es privado?</label>
+                                            <br>
+                                            <input type="checkbox" id="cbprivado">
                                         </div>
-                                        <div class="form-group">
-                                        <br>
-                                            <label>Tiempo de espera (cuando respuesta es automatica)</label>
-                                            <input type="number" value="5" step="any" id="tiempo-nuevo">
-                                        </div> 
+                                       
                                         <div class="form-group">
                                             <label style="color:#191818">Tipo Servicio</label>
                                             <br>
@@ -168,39 +170,8 @@
                                     </div> 
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="col-md-12">
-                                        <p>Tiempo aproximado de entrega para cada dia</p>
-                                            <div class="form-group">
-                                                <label>Lunes</label>
-                                                <input type="text" maxlength="50" class="form-control" id="lunes-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Martes</label>
-                                                <input type="text" maxlength="50" class="form-control" id="martes-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Miercoles</label>
-                                                <input type="text" maxlength="50" class="form-control" id="miercoles-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Jueves</label>
-                                                <input type="text" maxlength="50" class="form-control" id="jueves-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Viernes</label>
-                                                <input type="text" maxlength="50" class="form-control" id="viernes-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Sabado</label>
-                                                <input type="text" maxlength="50" class="form-control" id="sabado-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>
-                                            <div class="form-group">
-                                                <label>Domingo</label>
-                                                <input type="text" maxlength="50" class="form-control" id="domingo-nuevo" placeholder="Horario de entrega aproximado">
-                                            </div>  
-                                            <br>
+                                    <div class="col-md-12">                                           
                                             <p>Horarios</p>
-
 
                                             <!-- horario abre y cierre -->
                                             <div class="form-group">
@@ -377,15 +348,13 @@
                                             <div class="form-group">
                                                 <label>Horario cierra de nuevo Domingo</label>
                                                 <input type="time" class="form-control" id="horadomingo4">
-                                            </div>
-                                        
+                                            </div>                                        
                                     </div>    
                                 </div>
-
                             </div>
-                    </div>
-                </form>
-            </div>
+                        </div>
+                    </form>
+                </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="nuevo()">Guardar</button>
@@ -417,12 +386,7 @@
                                             Editar Servicio
                                     </button>
                                 </div>
-                                <div class="form-group">
-                                    <button class="form-control" type="button" onclick="modalTiempo()" class="btn btn-info btn-sm">
-                                        <i class="fas fa-pencil-alt"></i>
-                                            Editar Tiempo Aprox
-                                    </button>
-                                </div>
+                                
                                 <div class="form-group">
                                     <button class="form-control" type="button" onclick="modalHorario()" class="btn btn-info btn-sm">
                                         <i class="fas fa-pencil-alt"></i>
@@ -467,11 +431,11 @@
                                 <input type="text" maxlength="50" class="form-control" id="identificador-editar" placeholder="Identificador unico">
                             </div>
                             <div class="form-group">
-                                <label>Descripción (No mostrada en APP)</label>
+                                <label>Descripción del servicio</label>
                                 <input type="text" maxlength="300" class="form-control" id="descripcion-editar" placeholder="Descripción servicio">
                             </div>
                             <div class="form-group">
-                                <label>Descripción Corta</label>
+                                <label>Descripción (No mostrada en la App)</label>
                                 <input type="text" maxlength="100" class="form-control" id="descripcioncorta-editar" placeholder="Descripción corta">
                             </div>
                             <div class="form-group">
@@ -486,8 +450,8 @@
                             </div>
                             <div class="form-group">
                                 <div>
-                                    <label>Imagen</label>d
-                                    <p>Tamaño recomendado de: 600 x 300</p>
+                                    <label>Imagen</label>
+                                    <p>Tamaño recomendado de: 600 x -</p>
                                 </div> 
                                 <br>
                                 <div class="col-md-10">
@@ -495,40 +459,25 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label>Envío gratis</label>
+                                <label>Envío gratis (envio $0.00 para este servicio en todas las zonas)</label>
                                 <input type="checkbox" id="cbenviogratis-editar">
                             </div>
 
                             <div class="form-group">
-                                <label>Utiliza mínimo</label>
+                                <label>Utiliza mínimo (si esta activo, el minimo de compra sera necesario $)</label>
                                 <input type="checkbox" id="cbminimo-editar">
                             </div>
                             <div class="form-group">
                             <br>
-                                <label>Mínimo $ compra</label>
+                                <label>Mínimo $ compra (para brindar el servicio adomicilio)</label>
                                 <input type="number" step="any" id="minimocompra-editar">
                             </div>
                             <div class="form-group">
-                                <label>Producto visible al Motorista</label>
+                                <label>Producto visible al Motorista (por ejemplo: farmacias, el motorista no vera el producto)</label>
                                 <input type="checkbox" id="cbproducto-editar">
                             </div>
-                            <div class="form-group">
-                                <label>Orden es automatica</label>
-                                <input type="checkbox" id="cbautomatica-editar">
-                            </div>
-                            <div class="form-group">
-                            <br>
-                                <label>Tiempo de espera (cuando respuesta es automatica)</label>
-                                <input type="number" step="any" id="tiempo-editar">
-                            </div>
-                            <div class="form-group">
-                                <label style="color:#191818">Tipo Servicio</label>
-                                <br>
-                                <div>
-                                    <select class="form-control" id="select-servicio-editar">                                        
-                                    </select>
-                                </div>
-                            </div> 
+                           
+                            
                             <div class="form-group">
                                 <label>Teléfono</label>
                                 <input type="text" maxlength="20" class="form-control" id="telefono-editar" placeholder="Telefono">
@@ -555,8 +504,16 @@
                                     </select>
                                 </div>
                             </div> 
-                           
 
+                            <div class="form-group">
+                                <label style="color:#191818">Tipo Servicio</label>
+                                <br>
+                                <div>
+                                    <select class="form-control" id="select-servicio-editar">                                     
+                                    </select>
+                                </div> 
+                            </div>
+                           
                             <div class="form-group">
                                 <label>Cerrado emergencia</label>
                                 <br>
@@ -582,64 +539,6 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 @can('completo')
                     <button type="button" class="btn btn-primary" onclick="editarservicio()">Guardar</button>
-                @endcan
-            </div>          
-        </div>        
-    </div>      
-</div>
-
-<!-- modal editar tiempo-->
-<div class="modal fade" id="modalTiempo">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Editar Tiempo Aprox</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-tiempo">
-                    <div class="card-body">
-                        <div class="col-md-12">
-
-                            <div class="form-group">
-                                <label>Lunes</label>
-                                <input type="text" maxlength="50" class="form-control" id="lunes-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Martes</label>
-                                <input type="text" maxlength="50" class="form-control" id="martes-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Miercoles</label>
-                                <input type="text" maxlength="50" class="form-control" id="miercoles-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Jueves</label>
-                                <input type="text" maxlength="50" class="form-control" id="jueves-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Viernes</label>
-                                <input type="text" maxlength="50" class="form-control" id="viernes-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Sabado</label>
-                                <input type="text" maxlength="50" class="form-control" id="sabado-editar" placeholder="Tiempo aprox">
-                            </div>
-                            <div class="form-group">
-                                <label>Domingo</label>
-                                <input type="text" maxlength="50" class="form-control" id="domingo-editar" placeholder="Tiempo aprox">
-                            </div>
-                        
-                        </div> 
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                @can('completo')
-                    <button type="button" class="btn btn-primary" onclick="editarTiempo()">Guardar</button>
                 @endcan
             </div>          
         </div>        
@@ -877,16 +776,15 @@
     function modalNuevo(){
         document.getElementById("formulario-nuevo").reset();
         $('#modalAgregar').modal('show');
-    }
+    } 
 
     //nuevo servicio
     function nuevo(){
         
-
         // parte 1
         var comision = document.getElementById('comision-nuevo').value;
       
-        var nombre = document.getElementById('nombre-nuevo').value;
+        var nombre = document.getElementById('nombre-nuevo').value; 
         var identificador = document.getElementById('identificador-nuevo').value;
         var descripcion = document.getElementById('descripcion-nuevo').value;
         var descripcioncorta = document.getElementById('descripcioncorta-nuevo').value;
@@ -899,26 +797,16 @@
         var direccion = document.getElementById('direccion-nuevo').value;
         var tipovista = document.getElementById('select-vista').value;
         
+        var cbprivado = document.getElementById('cbprivado').checked;
         var cbenviogratis = document.getElementById('cbenviogratis').checked;
         var cbminimo = document.getElementById('cbminimo').checked;
         var minimocompra = document.getElementById('minimocompra').value;
         var cbproducto = document.getElementById('cbproducto').checked;
-        var cbautomatica = document.getElementById('cbautomatica').checked;
-        var tiempo = document.getElementById('tiempo-nuevo').value; // tiempo espera cuando orden es automatica
-
-        //parte 2
-        var lunes = document.getElementById('lunes-nuevo').value;
-        var martes = document.getElementById('martes-nuevo').value;
-        var miercoles = document.getElementById('miercoles-nuevo').value;
-        var jueves = document.getElementById('jueves-nuevo').value;
-        var viernes = document.getElementById('viernes-nuevo').value;
-        var sabado = document.getElementById('sabado-nuevo').value;
-        var domingo = document.getElementById('domingo-nuevo').value;
-
+             
         var horalunes1 = document.getElementById('horalunes1').value;
         var horalunes2 = document.getElementById('horalunes2').value;
         var horalunes3 = document.getElementById('horalunes3').value;
-        var horalunes4 = document.getElementById('horalunes4').value;
+        var horalunes4 = document.getElementById('horalunes4').value; 
         var cblunessegunda = document.getElementById('cblunessegunda').checked;
         var cbcerradolunes = document.getElementById('cbcerradolunes').checked;
 
@@ -965,7 +853,7 @@
         var cbcerradodomingo = document.getElementById('cbcerradodomingo').checked;
         
         var retorno1 = validacionNuevo(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-         telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo);
+         telefono, latitud, longitud, direccion);
 
         if(!retorno1){
             return;
@@ -980,8 +868,7 @@
             var cbenviogratis_1 = 0;
             var cbminimo_1 = 0;
             var cbproducto_1 = 0;
-            var cbautomatica_1 = 0; 
-            
+                        
             var cblunessegunda_1 = 0;           
             var cbcerradolunes_1 = 0;
             var cbmartessegunda_1 = 0;           
@@ -996,9 +883,10 @@
             var cbcerradosabado_1 = 0;
             var cbdomingosegunda_1 = 0;           
             var cbcerradodomingo_1 = 0;
+            var cbprivado_1 = 0
 
-            if(tiempo === ''){
-                tiempo = 15;
+            if(cbprivado){
+                cbprivado_1 = 1;
             }
 
             if(minimocompra === ''){
@@ -1017,9 +905,6 @@
                 cbproducto_1 = 1;
             }
 
-            if(cbautomatica){
-                cbautomatica_1 = 1;
-            }
 
             //--
 
@@ -1099,18 +984,8 @@
             formData.append('cbminimo', cbminimo_1);
             formData.append('minimocompra', minimocompra);
             formData.append('cbproducto', cbproducto_1);
-            formData.append('cbautomatica', cbautomatica_1);
-            formData.append('tiempo', tiempo);
-
-            formData.append('lunes', lunes);
-            formData.append('martes', martes);
-            formData.append('miercoles', miercoles);
-            formData.append('jueves', jueves);
-            formData.append('viernes', viernes);
-            formData.append('sabado', sabado);
-            formData.append('domingo', domingo);
-
-
+            formData.append('cbprivado', cbprivado_1);
+            
             formData.append('horalunes1', horalunes1);
             formData.append('horalunes2', horalunes2);
             formData.append('horalunes3', horalunes3);
@@ -1171,6 +1046,7 @@
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
                 
+                console.log(response);
                 respuestaNuevo(response);               
             })
             .catch((error) => {
@@ -1204,7 +1080,7 @@
  
     // validar datos a guardar
     function validacionNuevo(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, lunes, martes, miercoles, jueves, viernes, sabado, domingo){
+     telefono, latitud, longitud, direccion){
 
         if (comision === '') {
             toastr.error('Comision es requerido');
@@ -1313,78 +1189,6 @@
 
         if(direccion.length > 300){
             toastr.error("300 caracter máximo direccion");
-            return false;
-        }
-
-        // horarios
-        
-        if (lunes === '') {
-            toastr.error("lunes horario es requerido");
-            return false;
-        }
-
-        if(lunes.length > 50){
-            toastr.error("50 caracter máximo lunes tiempo");
-            return false;
-        }
-
-        if (martes === '') {
-            toastr.error("martes horario es requerido");
-            return false;
-        }
-
-        if(martes.length > 50){
-            toastr.error("50 caracter máximo martes tiempo");
-            return false;
-        }
-
-        if (miercoles === '') {
-            toastr.error("miercoles horario es requerido");
-            return false;
-        }
-
-        if(miercoles.length > 50){
-            toastr.error("50 caracter máximo miercoles tiempo");
-            return false;
-        }
-
-        if (jueves === '') {
-            toastr.error("jueves horario es requerido");
-            return false;
-        }
-
-        if(jueves.length > 50){
-            toastr.error("50 caracter máximo jueves tiempo");
-            return false;
-        }
-
-        if (viernes === '') {
-            toastr.error("viernes horario es requerido");
-            return false;
-        }
-
-        if(viernes.length > 50){
-            toastr.error("50 caracter máximo viernes tiempo");
-            return false;
-        }
-
-        if (sabado === '') {
-            toastr.error("sabado horario es requerido");
-            return false;
-        }
-
-        if(sabado.length > 50){
-            toastr.error("50 caracter máximo sabado tiempo");
-            return false;
-        }
-
-        if (domingo === '') {
-            toastr.error("domingo horario es requerido");
-            return false;
-        }
-
-        if(domingo.length > 50){
-            toastr.error("50 caracter máximo domingo tiempo");
             return false;
         }
         
@@ -1578,7 +1382,6 @@
                     $('#nombre-editar').val(response.data.servicio.nombre);
                     $('#descripcion-editar').val(response.data.servicio.descripcion);
                     $('#descripcioncorta-editar').val(response.data.servicio.descripcion_corta);
-                    $('#tiempo-editar').val(response.data.servicio.tiempo);
                       
                     if(response.data.servicio.envio_gratis == 1){
                         $('#cbenviogratis-editar').prop('checked', true);
@@ -1596,12 +1399,6 @@
                     if(response.data.servicio.producto_visible == 1){
                         $('#cbproducto-editar').prop('checked', true);
                     }
-
-                    if(response.data.servicio.orden_automatica == 1){
-                        $('#cbautomatica-editar').prop('checked', true);
-                    }
-
-                   
 
                     var tipo = document.getElementById("select-servicio-editar");
                     // limpiar select
@@ -1649,7 +1446,6 @@
 
         var id = document.getElementById('id-editar').value;
         var comision = document.getElementById('comision-editar').value;
-        var tiempo = document.getElementById('tiempo-editar').value;
         var nombre = document.getElementById('nombre-editar').value;
         var identificador = document.getElementById('identificador-editar').value;
         var descripcion = document.getElementById('descripcion-editar').value;
@@ -1666,21 +1462,19 @@
         var cbminimo = document.getElementById('cbminimo-editar').checked;
         var minimocompra = document.getElementById('minimocompra-editar').value;
         var cbproducto = document.getElementById('cbproducto-editar').checked;
-        var cbautomatica = document.getElementById('cbautomatica-editar').checked;
         var cbcerradoemergencia = document.getElementById('cbcerradoemergencia-editar').checked;
         var cbactivo = document.getElementById('cbactivo-editar').checked;
       
         var privado = document.getElementById('cbprivado-editar').checked;
 
-        var retorno = validarservicio(comision, tiempo, nombre, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, minimocompra);
+        var retorno = validarservicio(comision, nombre, descripcion, descripcioncorta, logo, imagen,
+     telefono, latitud, longitud, direccion, minimocompra, identificador);
 
      if(retorno){
 
         var cbenviogratis_1 = 0;
         var cbminimo_1 = 0;
         var cbproducto_1 = 0;
-        var cbautomatica_1 = 0;
         var cbcerradoemergencia_1 = 0;
         var activo = 0;
       
@@ -1702,9 +1496,6 @@
             cbproducto_1 = 1;
         }
 
-        if(cbautomatica){
-            cbautomatica_1 = 1;
-        }
 
         if(cbcerradoemergencia){
             cbcerradoemergencia_1 = 1;
@@ -1734,10 +1525,8 @@
         formData.append('cbminimo', cbminimo_1);
         formData.append('minimocompra', minimocompra);
         formData.append('cbproducto', cbproducto_1);
-        formData.append('cbautomatica', cbautomatica_1);
         formData.append('cbcerradoemergencia', cbcerradoemergencia_1);
         formData.append('cbactivo', activo);
-        formData.append('tiempo', tiempo);
         formData.append('privado', privado_1);
 
         axios.post('/admin/servicios/editar-servicio', formData, {
@@ -1776,8 +1565,8 @@
         }
     }
 
-    function validarservicio(comision, nombre, identificador, descripcion, descripcioncorta, logo, imagen, tiposervicio,
-     telefono, latitud, longitud, direccion, minimocompra){
+    function validarservicio(comision, nombre, descripcion, descripcioncorta, logo, imagen,
+     telefono, latitud, longitud, direccion, minimocompra, identificador){
         
         if (comision === '') {
             toastr.error("comision es requerido");
@@ -1789,22 +1578,11 @@
             return false;
         }
 
-        if(identificador.length > 50){
-            toastr.error("50 caracter máximo identificador");
-            return false;
-        }
-
-        if (identificador === '') {
-            toastr.error("identificador es requerido");
-            return false;
-        }
-
         if(nombre.length > 50){
             toastr.error("50 caracter máximo nombre");
             return false;
         }
- 
-
+        
         if (descripcion === '') {
             toastr.error("descripcion es requerido");
             return false;
@@ -1821,10 +1599,10 @@
         }
 
         if(descripcioncorta.length > 100){
-            toastr.error("50 caracter máximo descripcion corta");
+            toastr.error("100 caracter máximo descripcion corta");
             return false;
         }
-        
+  
         if(logo.files && logo.files[0]){ // si trae imagen
             if (!logo.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
                 toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
@@ -1838,7 +1616,7 @@
                 return false;       
             } 
         }
-
+        
         if (telefono === '') {
             toastr.error("telefono es requerido");
             return false;
@@ -1869,6 +1647,11 @@
             return false;
         }
 
+        if(identificador.length > 50){
+            toastr.error("50 caracter máximo identificador11");
+            return false;
+        }
+        
         if (direccion === '') {
             toastr.error("direccion es requerido");
             return false;
@@ -1884,61 +1667,18 @@
             return false;
         }
 
+        if (identificador === '') {
+            toastr.error("identificador es requerido");
+            return false;
+        }
+
         return true;
     }
 
-    // vista editar tiempo aproximado
-    function modalTiempo(){
-        document.getElementById("formulario-tiempo").reset();
-
-        var id = document.getElementById('id-editar').value;
-        spinHandle = loadingOverlay().activate();
-
-        axios.post('/admin/servicios/informacion-tiempo/servicio',{
-        'id': id
-            })
-            .then((response) => {
-                loadingOverlay().cancel(spinHandle);
-                if(response.data.success == 1){
-                     
-                    $('#modalTiempo').modal('show');
-
-                    $.each(response.data.tiempo, function( key, val ){  
-                        if(val.dia == 1){ //domingo
-                            $('#domingo-editar').val(val.tiempo);
-                        }else if(val.dia == 2){
-                            $('#lunes-editar').val(val.tiempo);
-                        }else if(val.dia == 3){
-                            $('#martes-editar').val(val.tiempo);
-                        }
-                        else if(val.dia == 4){
-                            $('#miercoles-editar').val(val.tiempo);
-                        }
-                        else if(val.dia == 5){
-                            $('#jueves-editar').val(val.tiempo);
-                        }
-                        else if(val.dia == 6){
-                            $('#viernes-editar').val(val.tiempo);
-                        }
-                        else if(val.dia == 7){
-                            $('#sabado-editar').val(val.tiempo);
-                        }
-                       
-                    });                   
-
-                }else{
-                    toastr.error('Tipo servicio no encontrado');
-                }
-            })
-            .catch((error) => {
-                loadingOverlay().cancel(spinHandle);
-                toastr.error('Error del servidor');
-        });
-    }
 
     // vista editar horarios
     function modalHorario(){
-        document.getElementById("formulario-tiempo").reset();
+        document.getElementById("formulario-horario").reset();
 
         var id = document.getElementById('id-editar').value;
         spinHandle = loadingOverlay().activate();
@@ -2060,132 +1800,7 @@
             .catch((error) => {
                 loadingOverlay().cancel(spinHandle);
                 toastr.error('Error del servidor');
-        });        
-    }
-
-    function editarTiempo(){
-        var id = document.getElementById('id-editar').value;
-        var lunes = document.getElementById('lunes-editar').value;
-        var martes = document.getElementById('martes-editar').value;
-        var miercoles = document.getElementById('miercoles-editar').value;
-        var jueves = document.getElementById('jueves-editar').value;
-        var viernes = document.getElementById('viernes-editar').value;
-        var sabado = document.getElementById('sabado-editar').value;
-        var domingo = document.getElementById('domingo-editar').value;
-
-        var retorno = validarTiempo(lunes, martes, miercoles, jueves, viernes, sabado, domingo);
-
-        if(retorno){
-
-            var spinHandle = loadingOverlay().activate();
-            var formData = new FormData();
-            formData.append('id', id);
-            formData.append('lunes', lunes);
-            formData.append('martes', martes);
-            formData.append('miercoles', miercoles);
-            formData.append('jueves', jueves);
-            formData.append('viernes', viernes);
-            formData.append('sabado', sabado);
-            formData.append('domingo', domingo);
-
-            axios.post('/admin/servicios/editar-tiempo', formData, {
-            })
-            .then((response) => {
-                loadingOverlay().cancel(spinHandle);
-                respuestaEditarTiempo(response);
-            })
-            .catch((error) => {
-                loadingOverlay().cancel(spinHandle);
-                toastr.error('Error');
-            });
-        }        
-    }
-
-    function respuestaEditarTiempo(response){
-        if (response.data.success == 0) {
-            toastr.error('Validacion incorrecta');
-        } else if (response.data.success == 1) {
-            toastr.success('Tiempo Aprox actualizado');       
-            $('#modalTiempo').modal('hide');
-        }
-        else {
-            toastr.error('Error desconocido');
-        }
-    }
-
-    // validar tiempo
-    function validarTiempo(lunes, martes, miercoles, jueves, viernes, sabado, domingo){
-        if (lunes === '') {
-            toastr.error("lunes horario es requerido");
-            return false;
-        }
-
-        if(lunes.length > 50){
-            toastr.error("50 caracter máximo lunes tiempo");
-            return false;
-        }
-
-        if (martes === '') {
-            toastr.error("martes horario es requerido");
-            return false;
-        }
-
-        if(martes.length > 50){
-            toastr.error("50 caracter máximo martes tiempo");
-            return false;
-        }
-
-        if (miercoles === '') {
-            toastr.error("miercoles horario es requerido");
-            return false;
-        }
-
-        if(miercoles.length > 50){
-            toastr.error("50 caracter máximo miercoles tiempo");
-            return false;
-        }
-
-        if (jueves === '') {
-            toastr.error("jueves horario es requerido");
-            return false;
-        }
-
-        if(jueves.length > 50){
-            toastr.error("50 caracter máximo jueves tiempo");
-            return false;
-        }
-
-        if (viernes === '') {
-            toastr.error("viernes horario es requerido");
-            return false;
-        }
-
-        if(viernes.length > 50){
-            toastr.error("50 caracter máximo viernes tiempo");
-            return false;
-        }
-
-        if (sabado === '') {
-            toastr.error("sabado horario es requerido");
-            return false;
-        }
-
-        if(sabado.length > 50){
-            toastr.error("50 caracter máximo sabado tiempo");
-            return false;
-        }
-
-        if (domingo === '') {
-            toastr.error("domingo horario es requerido");
-            return false;
-        }
-
-        if(domingo.length > 50){
-            toastr.error("50 caracter máximo domingo tiempo");
-            return false;
-        }
-
-        return true;
+        }); 
     }
 
     // ditar las horas del servicio

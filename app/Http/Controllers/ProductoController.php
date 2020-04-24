@@ -47,9 +47,7 @@ class ProductoController extends Controller
     }
 
     // nuevo producto
-    public function nuevo(Request $request){
-
-        
+    public function nuevo(Request $request){        
         if($request->isMethod('post')){  
  
             $regla = array( 
@@ -64,7 +62,7 @@ class ProductoController extends Controller
                 'cblimite' => 'required',
                 'cantidadorden' => 'required',
                 'cbnota' => 'required',
-                'nota' => 'required',
+                
                 'cbimagen' => 'required',
                 'cbpromocion' => 'required'
             );
@@ -81,7 +79,7 @@ class ProductoController extends Controller
                 'cblimite.required' => 'cblimite es requerido',
                 'cantidadorden.required' => 'cantidadorden es requerido',
                 'cbnota.required' => 'cbnota es requerido',
-                'nota.required' => 'nota es requerido',
+               
                 'cbimagen.required' => 'utiliza imagen es requerido',
                 'cbpromocion.required' => 'promocion es requerida'
             );
@@ -116,9 +114,6 @@ class ProductoController extends Controller
                     return ['success' => 1]; // imagen no valida
                 }
             }
-           
-            // guardar imagen si trae 
-            if($request->hasFile('imagen')){
 
                 $cadena = Str::random(15);
                 $tiempo = microtime(); 
@@ -143,6 +138,11 @@ class ProductoController extends Controller
 
                     $fecha = Carbon::now('America/El_Salvador');
 
+                    $nota = $request->nota;
+                    if($request->nota == null){
+                        $nota = "";
+                    }
+
                     $ca = new Producto();
                     $ca->servicios_tipo_id = $request->idcategoria;
                     $ca->nombre = $request->nombre;
@@ -159,7 +159,7 @@ class ProductoController extends Controller
                     $ca->limite_orden = $request->cblimite;
                     $ca->cantidad_por_orden = $request->cantidadorden;
                     $ca->utiliza_nota = $request->cbnota;
-                    $ca->nota = $request->nota;
+                    $ca->nota = $nota;
                     $ca->utiliza_imagen = $request->cbimagen;
         
                     if($ca->save()){
@@ -169,52 +169,8 @@ class ProductoController extends Controller
                     }
                 }else{
                     return ['success' => 4]; // error al guardar imagen
-                }
-
-            }else{
-                // solo datos
-
-                if($request->cbimagen == 1){
-                    return ['success' => 5]; // mostrara imagen pero no hay
-                }
-
-                $conteo = Producto::where('servicios_tipo_id', $request->idcategoria)->count();
-                $posicion = 1;
-    
-                if($conteo >= 1){
-                    $registro = Producto::where('servicios_tipo_id', $request->idcategoria)->orderBy('id', 'DESC')->first();
-                    $posicion = $registro->posicion;
-                    $posicion++;
-                } 
-
-                $fecha = Carbon::now('America/El_Salvador');
-
-
-                $ca = new Producto();
-                $ca->servicios_tipo_id = $request->idcategoria;
-                $ca->nombre = $request->nombre;
-                $ca->imagen = '';
-                $ca->descripcion = $request->descripcion;
-                $ca->precio = $request->precio;
-                $ca->unidades = $request->unidades;
-                $ca->disponibilidad = $request->cbdisponibilidad;
-                $ca->activo = $request->cbactivo;
-                $ca->posicion = $posicion;
-                $ca->utiliza_cantidad = $request->cbcantidad;
-                $ca->fecha = $fecha;
-                $ca->es_promocion = $request->cbpromocion;
-                $ca->limite_orden = $request->cblimite;
-                $ca->cantidad_por_orden = $request->cantidadorden;
-                $ca->utiliza_nota = $request->cbnota;
-                $ca->nota = $request->nota;
-                $ca->utiliza_imagen = $request->cbimagen;
-    
-                if($ca->save()){
-                    return ['success' => 2]; // guardado
-                }else{
-                    return ['success' => 3]; // error la guardar
-                }
-            }
+                }            
+            
         }
     } 
 
@@ -274,7 +230,7 @@ class ProductoController extends Controller
                 'cblimite' => 'required',
                 'cbutilizanota' => 'required',
                 'cbimagen' => 'required',
-                'nota' => 'required',
+                
                 'cantidadorden' => 'required',
             );
 
@@ -293,7 +249,7 @@ class ProductoController extends Controller
                 'cbutilizanota.required' => 'El check utiliza nota es requerido',
                 'cbimagen.required' => 'El check utiliza imagen requerido',
                 'cantidadorden.required' => 'la cantidad por orden es requerido',
-                'nota.required' => 'la nota es requerido',
+                
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -342,6 +298,11 @@ class ProductoController extends Controller
                     
                     if($upload){
                         $imagenOld = $po->imagen;
+
+                        $nota = $request->nota;
+                        if($request->nota == null){
+                            $nota = "";
+                        }
                         
                         Producto::where('id', $request->id)->update([
                             'servicios_tipo_id' => $request->selectcategoria,
@@ -357,7 +318,7 @@ class ProductoController extends Controller
                             'limite_orden' => $request->cblimite,
                             'cantidad_por_orden' => $request->cantidadorden,
                             'utiliza_nota' => $request->cbutilizanota,
-                            'nota' => $request->nota,
+                            'nota' => $nota,
                             'utiliza_imagen' => $request->cbimagen,
                             ]);
                             
@@ -372,6 +333,11 @@ class ProductoController extends Controller
                     }             
                 }else{
                     // solo guardar datos
+
+                    $nota = $request->nota;
+                        if($request->nota == null){
+                            $nota = "";
+                        }
                         
                     Producto::where('id', $request->id)->update([
                         'servicios_tipo_id' => $request->selectcategoria,
@@ -386,7 +352,7 @@ class ProductoController extends Controller
                         'limite_orden' => $request->cblimite,
                         'cantidad_por_orden' => $request->cantidadorden,
                         'utiliza_nota' => $request->cbutilizanota,
-                        'nota' => $request->nota,
+                        'nota' => $nota,
                         'utiliza_imagen' => $request->cbimagen,
                         ]);
 

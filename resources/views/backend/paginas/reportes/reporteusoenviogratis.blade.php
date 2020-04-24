@@ -62,38 +62,37 @@
 } 
 
 .oficina{
-    margin-top: 175px;
+    margin-top: 150px;
     font-size: 16px;   
-    padding-right: 75px;    
+    padding-right: 0px;    
     font-family: "Times New Roman", Times, serif;
-    text-align: center;
+    text-align: left;
 }
 
 </style>
     <!-- cabecera -->
     <div class="row"> 
             <center><p class="titulo">
-            REPORTE DE ORDEN TIEMPO EXCEDIDO<br>
-            SERVICIO {{ $nombre }}
-            </p><p><small>De: {{ $f1 }}  Hasta: {{ $f2 }}</small></p></center>      
+            REPORTE DE COBRO POR USO DE ENVIO GRATIS<br>
+            SERVICIO: {{ $nombre }}       
+            </p>
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
     </div>  
 
         <table id="customers">
           <tr>
             <th># Orden</th>           
             <th>Fecha orden</th>
-            <th>Hora entrega</th>
-           
-            <th>Precio orden</th>
+            <th>Zona</th>
+            <th>Envio</th>
           </tr>
 
           @foreach($orden as $dato)
             <tr>
-              <td>{{ $dato->idorden }}</td>             
-              <td>{{ $dato->fecha_orden }}</td>
-              <td>{{ $dato->horaEstimada }}</td>
-            
-              <td>${{ $dato->precio_total }}</td>
+              <td>{{$dato->idorden }}</td>             
+              <td>{{$dato->fecha_orden}}</td>
+              <td>{{$dato->nombrezona}}</td>
+              <td>${{$dato->copiaenvio}}</td>
             </tr> 
           @endforeach  
 
@@ -101,42 +100,18 @@
             <td>Total:</td>
             <td></td>
             <td></td>
-            <td></td>
-            <td>${{ $totalDinero }}</td>
+            <td>${{ $total }}</td>
           </tr>
-          
-          <tr>
-            <td>Total ordenes:</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td> {{ $conteo }} </td>
-          </tr>
-
-          <tr>
-            <td>Multa:</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td> {{ $conteo }} * {{ $multa }}</td>
-          </tr> 
-
-          <tr>
-            <td>Pagar:</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td>${{ $pagar }}</td>
-          </tr>
-        
+         
+         
         </table>
 
-          <!-- oficina -->
-       
-              <p class="oficina">
-                  Tatan Express
-              </p>
-        
+
+        <p class="oficina">
+        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
+        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
+        </p>
+
 
 </body>
 </html> 

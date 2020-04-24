@@ -294,6 +294,12 @@
                                     <label>Ganancia de motorista</label>
                                     <input type="text" disabled class="form-control" id="gananciamotorista">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Marcado como min compra para envio gratis</label>
+                                    <br>
+                                    <input type="checkbox" id="minenviogratis" disabled>
+                                </div>
                               
                             </div>
                         </div>
@@ -475,6 +481,13 @@
                     }
 
                     $('#gananciamotorista').val(response.data.orden.ganancia_motorista);
+                    
+                    if(response.data.orden.supero_envio_gratis == 0){
+                        $("#minenviogratis").prop("checked", false);
+                    }else{
+                        $("#minenviogratis").prop("checked", true);
+                    }
+
                     
 
                 }else{

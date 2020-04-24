@@ -86,6 +86,11 @@
                                     <label>Pago</label>
                                     <input type="number" step="0.1" class="form-control" id="pago">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" placeholder="Descripción" maxlength="200" class="form-control" id="descripcion">
+                                </div>
                               
                             </div>
                         </div>
@@ -247,6 +252,7 @@
         var fechadesde = document.getElementById('fechadesde').value;
         var fechahasta = document.getElementById('fechahasta').value;
         var pago = document.getElementById('pago').value;
+        var descripcion = document.getElementById('descripcion').value;
         
         var retorno = validarNuevo(fechadesde, fechahasta, pago);
 
@@ -259,6 +265,7 @@
             formData.append('fecha1', fechadesde);
             formData.append('fecha2', fechahasta);
             formData.append('pago', pago);
+            formData.append('descripcion', descripcion);
                  
             axios.post('/admin/registro/pago/motorista',formData,{
                 })

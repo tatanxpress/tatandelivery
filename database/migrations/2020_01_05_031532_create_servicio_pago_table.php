@@ -20,6 +20,7 @@ class CreateServicioPagoTable extends Migration
             $table->date('fecha2');
             $table->date('fecha');
             $table->decimal('pago', 10, 2);
+            $table->string('descripcion', 200)->default("");
 
             $table->foreign('servicios_id')->references('id')->on('servicios');
         }); 

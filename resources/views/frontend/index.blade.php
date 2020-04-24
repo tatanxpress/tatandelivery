@@ -37,7 +37,8 @@
           <br>
 
           <div class="text-center">
-            <img src="{{ asset('images/logogoogle.png') }}">
+          <a href="https://www.facebook.com/tatanexpress/"><img src="{{ asset('images/google.png') }}"> &nbsp;&nbsp; </a>
+          <a href="https://www.facebook.com/tatanexpress/"><img src="{{ asset('images/apple.png') }}"></a>
           </div>         
         </div>
       </section>

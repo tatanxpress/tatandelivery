@@ -20,6 +20,7 @@ class CreateBitacoraRevisadorTable extends Migration
             $table->date('fecha2');
             $table->decimal('total', 10,2);
             $table->integer('confirmadas');
+            $table->string('descripcion', 200)->default("");
 
             $table->foreign('revisador_id')->references('id')->on('revisador');
         });
