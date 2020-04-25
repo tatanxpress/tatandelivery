@@ -10,6 +10,14 @@ class Direccion extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'nombre', 'direccion', 'numero_casa', 'punto_referencia', 'telefono', 'seleccionado', 'latitud', 'longitud', 'zonas_id', 'user_id'
-    ];
+        'nombre', 
+        'direccion',
+        'numero_casa', 
+        'punto_referencia',
+        'telefono', 
+        'seleccionado',
+        'latitud', 
+        'longitud',
+        'zonas_id', 
+        'user_id'    ];
 }

@@ -338,6 +338,7 @@ class OrdenesController extends Controller
             ->join('zonas AS z', 'z.id', '=', 'od.zonas_id')
             ->select('o.id', 's.nombre AS nombreServicio', 'od.nombre AS nombreCliente',
             'z.identificador', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
+            'od.latitud', 'od.longitud', 'od.latitud_real', 'od.longitud_real',
             'od.telefono', 'o.nota_orden', 'o.precio_total', 'o.precio_envio',
              'o.fecha_orden', 'o.cambio', 'o.estado_2', 'o.fecha_2', 'o.hora_2',
              'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.fecha_5',

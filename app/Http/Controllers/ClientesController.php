@@ -138,7 +138,7 @@ class ClientesController extends Controller
             ->join('zonas AS z', 'z.id', '=', 'd.zonas_id')              
             ->select('d.nombre', 'd.direccion', 'd.numero_casa',
                     'd.punto_referencia', 'd.telefono', 'd.seleccionado',
-                    'z.identificador')
+                    'z.identificador', 'd.latitud_real', 'd.longitud_real')
             ->where('d.id', $request->id)
             ->first();
 

@@ -34,7 +34,7 @@ class PoligonoController extends Controller
            }
 
            if(User::where('id', $request->userid)->first()){
-
+ 
                 // obtener latitud y longitud de ciudad seleccionada
                 $direccion = DB::table('users')            
                 ->join('zonas', 'zonas.id', '=', 'users.zonas_id')                
@@ -45,6 +45,7 @@ class PoligonoController extends Controller
 
                 $tablas = DB::table('zonas AS z')
                 ->select('z.id AS idZona', 'z.nombre AS nombreZona')
+                ->where('z.activo', 1)
                 ->get();
 
                 $resultsBloque = array();        

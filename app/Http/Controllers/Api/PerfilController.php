@@ -301,7 +301,7 @@ class PerfilController extends Controller
                 'numero_casa' => 'max:30',
                 'punto_referencia' => 'max:400',                
                 'telefono' => 'required|max:20',
-                'zona_id' => 'required',                
+                'zona_id' => 'required',
             );    
     
             $mensajeDatos = array(                                      
@@ -360,6 +360,14 @@ class PerfilController extends Controller
                         $direccion->longitud = "";
                     }else{
                         $direccion->longitud = $request->longitud;
+                    }
+
+                    if($request->latitudreal != null){
+                        $direccion->latitud_real = $request->latitudreal;
+                    }
+
+                    if($request->longitudreal != null){
+                        $direccion->longitud_real = $request->longitudreal;
                     }
                     
                     if($direccion->save()){

@@ -611,6 +611,8 @@ class ProcesadorOrdenesController extends Controller
                     $dLong = $datoDir->longitud;
                     $dZona = $datoDir->zonas_id;
                     $dUser = $datoDir->user_id;
+                    $dLatiReal = $datoDir->latitud_real;
+                    $dLongiReal = $datoDir->longitud_real;
 
                     if(empty($dNumero)){
                         $dNumero = "";
@@ -627,6 +629,14 @@ class ProcesadorOrdenesController extends Controller
                     if(empty($dLong)){
                         $dLong = "";
                     }
+
+                    if(empty($dLatiReal)){
+                        $dLatiReal = "";
+                    }
+
+                    if(empty($dLongiReal)){
+                        $dLongiReal = "";
+                    }
                    
                     $nuevaDir = new OrdenesDirecciones;
                     $nuevaDir->users_id = $dUser;
@@ -640,6 +650,8 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->latitud = $dLati;
                     $nuevaDir->longitud = $dLong;
                     $nuevaDir->copia_envio = $copiaEnvio;
+                    $nuevaDir->latitud_real = $dLatiReal;
+                    $nuevaDir->longitud_real = $dLongiReal;
                     
                     $nuevaDir->save();
 

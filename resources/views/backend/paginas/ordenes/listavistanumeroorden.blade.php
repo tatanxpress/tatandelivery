@@ -123,6 +123,26 @@
                                     <input type="text" disabled class="form-control" id="telefono">
                                 </div>
 
+                                <div class="form-group">
+                                    <label>Latitud Direccion</label>
+                                    <input type="text" disabled class="form-control" id="latitud">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Longitud Direccion</label>
+                                    <input type="text" disabled class="form-control" id="longitud">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Latitud Real</label>
+                                    <input type="text" disabled class="form-control" id="latitudreal">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Longitud real</label>
+                                    <input type="text" disabled class="form-control" id="longitudreal">
+                                </div>
+
 
                                 <!-- Ordenes -->
 
@@ -411,6 +431,11 @@
                     $('#notaorden').val(response.data.orden.nota_orden);
                     $('#preciototal').val(response.data.total);
                     $('#precioenvio').val(response.data.orden.precio_envio);
+
+                    $('#latitud').val(response.data.orden.latitud);
+                    $('#longitud').val(response.data.orden.longitud);
+                    $('#latitudreal').val(response.data.orden.latitud_real);
+                    $('#longitudreal').val(response.data.orden.longitud_real);
 
                     var FormatoFecha1 = response.data.orden.fecha_orden;
                     var fecha1 = new Date(FormatoFecha1);

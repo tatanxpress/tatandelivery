@@ -68,6 +68,16 @@
                 <br>
                 <input id="telefono" disabled class="form-control"></label>
             </div>  
+            <div class="form-group">
+                <label style="color:#191818">Latitud real</label>
+                <br>
+                <input id="latitudreal" disabled class="form-control"></label>
+            </div>  
+            <div class="form-group">
+                <label style="color:#191818">Longitud real</label>
+                <br>
+                <input id="longitudreal" disabled class="form-control"></label>
+            </div>  
         </div>
           
         <div class="modal-footer float-right">
@@ -154,7 +164,9 @@
                 $('#direccion').val(response.data.direccion.direccion);
                 $('#numero').val(response.data.direccion.numero_casa);
                 $('#referencia').val(response.data.direccion.punto_referencia);        
-                $('#telefono').val(response.data.direccion.telefono);        
+                $('#telefono').val(response.data.direccion.telefono);  
+                $('#latitudreal').val(response.data.direccion.latitud_real);        
+                $('#longitudreal').val(response.data.direccion.longitud_real);        
             }else{
                 toastr.error('Direccion no encontrada'); 
             }
