@@ -75,9 +75,7 @@ class ZonaServiciosController extends Controller
                     'success' => 0, 
                     'message' => $validar->errors()->all()
                 ];
-            }  
-
-            return ['success' => 2];
+            } 
 
             // ya existe
             if(ZonasServicios::where('zonas_id', $request->selectzona)->where('servicios_id', $request->selectservicio)->first()){
@@ -95,6 +93,8 @@ class ZonaServiciosController extends Controller
                 $posicion = $registro->posicion;
                 $posicion++;
             } 
+
+            return ['success' => 2];
 
             $fecha = Carbon::now('America/El_Salvador');
 
