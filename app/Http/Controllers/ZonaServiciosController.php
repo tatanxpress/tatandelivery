@@ -77,6 +77,8 @@ class ZonaServiciosController extends Controller
                 ];
             }  
 
+            return ['success' => 2];
+
             // ya existe
             if(ZonasServicios::where('zonas_id', $request->selectzona)->where('servicios_id', $request->selectservicio)->first()){
                 return ['success' => 1];
