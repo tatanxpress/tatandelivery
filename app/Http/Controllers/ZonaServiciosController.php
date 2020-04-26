@@ -109,6 +109,10 @@ class ZonaServiciosController extends Controller
             $zona->zona_envio_gratis = 0;
             $zona->mitad_precio = 0;
             $zona->tiempo_limite = 0;
+            $zona->horario_inicio = "07:00";
+            $zona->horario_final = "21:00";
+            $zona->costo_envio_gratis = 0;
+            $zona->min_envio_gratis = 0;
 
             if($zona->save()){
                 return ['success' => 2];
