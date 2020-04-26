@@ -94,8 +94,6 @@ class ZonaServiciosController extends Controller
                 $posicion++;
             } 
 
-            return ['success' => 2];
-
             $fecha = Carbon::now('America/El_Salvador');
 
             $zona = new ZonasServicios();
