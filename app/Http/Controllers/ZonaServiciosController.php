@@ -57,7 +57,7 @@ class ZonaServiciosController extends Controller
                 'cbactivo' => 'required',
                 'precioenvio' => 'required',
                 'ganancia' => 'required',              
-            );
+            ); 
  
             $mensaje = array(
                 'selectzona.required' => 'Select zona es requerido',
