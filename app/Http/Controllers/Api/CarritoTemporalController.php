@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\User;
 use Carbon\Carbon;
+use App\DineroOrden;
 
 class CarritoTemporalController extends Controller
 {
@@ -822,20 +823,10 @@ class CarritoTemporalController extends Controller
                             $envioPrecio = 0;
                         }
                     }
-
-                    // si el servicio da gratis para todas las zonas que da cobertura
-                    $datosServicio = Servicios::where('id', $servicioidC)->first();
-                    $gratis = $datosServicio->envio_gratis;
                     
                     // total de carrito de compras
                     $total = $resultado;
-                    
-                    // PRIORIDAD 5
-                    // cambiar precio envio a 0, si el servicio da envio gratis a todas las zonas
-                    if($gratis == 1){
-                        $envioPrecio = 0;
-                    } 
-
+                 
                     // sumar a total
                     $total = $resultado + $envioPrecio;
 
@@ -844,6 +835,9 @@ class CarritoTemporalController extends Controller
 
                     $c2 = number_format((float)$envioPrecio, 2, '.', '');
                     $e = (string)$c2;
+
+                    // ver si estara visible el boton cupones
+                    $bntcupon = DineroOrden::where('id', 1)->pluck('ver_cupones')->first();
                     
                     return [
                         'success' => 1,
@@ -851,7 +845,7 @@ class CarritoTemporalController extends Controller
                         'subtotal' => number_format((float)$resultado, 2, '.', ''),
                         'envio' => $e,
                         'direccion' => $direccion,
-                        'gratis' => $gratis
+                        'btncupon' => $bntcupon                    
                     ];
                     
                 }else{

@@ -25,7 +25,6 @@ class CreateServiciosTable extends Migration
             $table->date('fecha');
             $table->boolean('activo')->default(1);
             $table->bigInteger('tipo_servicios_id')->unsigned();
-            $table->boolean('envio_gratis');
             $table->string('telefono', 20);
             $table->string('latitud', 50);
             $table->string('longitud', 50);
@@ -35,12 +34,11 @@ class CreateServiciosTable extends Migration
             $table->boolean('utiliza_minimo');
             $table->boolean('orden_automatica');
             $table->boolean('producto_visible'); 
-            $table->decimal('comision', 5,2);
+            $table->integer('comision');
             $table->integer('tiempo'); // tiempo espera para contestacion automatica
             $table->boolean('privado'); // para darme una lista de servicios privados en el panel de control
             
             $table->foreign('tipo_servicios_id')->references('id')->on('tipo_servicios')->onUpdate('cascade');
-
         });
     }
 

@@ -16,6 +16,7 @@ class CreateDineroOrdenTable extends Migration
         Schema::create('dinero_orden', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->decimal('limite', 10,2);
+            $table->boolean('ver_cupones');
         });
     }
 

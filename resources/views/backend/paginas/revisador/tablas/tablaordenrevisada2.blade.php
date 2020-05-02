@@ -20,11 +20,9 @@
                 <tr>
                     <th style="width: 10%"># orden</th>
                     <th style="width: 15%">Identificador Motorista</th>
-                    <th style="width: 15%">Fecha agarrada</th>
-                    <th style="width: 20%">Precio orden</th> 
-                    <th style="width: 15%">Envio</th> 
+                    <th style="width: 15%">Fecha agarrada</th>                    
                     <th style="width: 15%">Total $</th> 
-                    <th style="width: 15%">Opcion</th>  
+                    <th style="width: 15%">Cupon</th>  
                 </tr>
                 </thead>
                 <tbody> 
@@ -33,15 +31,10 @@
                 <tr>
                     <td>{{ $dato->ordenes_id }}</td>
                     <td>{{ $dato->identificador }}</td>
-                    <td>{{ $dato->fecha_agarrada }}</td>
-                    <td>${{ $dato->precio_total }}</td>
-                    <td>${{ $dato->precio_envio }}</td>
+                    <td>{{ $dato->fecha_agarrada }}</td>                   
                     <td>${{ $dato->total }}</td>
-                    <td>
-                      <button type="button" class="btn btn-info btn-xs" onclick="informacion({{ $dato->ordenes_id }})">
-                      <i class="fas fa-eye" title="Informacion"></i>&nbsp; Info
-                      </button> 
-                    </td>
+                    <td>{{ $dato->usacupon }}</td>
+                   
                 </tr>
      
                 @endforeach            

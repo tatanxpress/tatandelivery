@@ -1260,7 +1260,7 @@ class MotoristaController extends Controller
                 $orden = DB::table('motorista_ordenes AS m')
                 ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
                 ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.envio_gratis')
+                'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id')
                 ->where('o.estado_7', 1) // solo completadas
                 ->where('m.motoristas_id', $request->id) // del motorista
                 ->whereBetween('o.fecha_orden', [$start, $end]) 

@@ -262,7 +262,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/ordenes/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Todas las Ordenes</p>
+                  <p>Ultimas 100</p>
                 </a>
               </li>
   
@@ -297,8 +297,6 @@
             </ul> 
           </li> 
 
-          
-          @can('completo')
           <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
@@ -317,7 +315,56 @@
 
             </ul>
           </li>
-        @endcan
+
+
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fa fa fa-globe"></i>
+              <p>
+                Cupones
+                <i class="right fas fa-angle-left"></i>
+              </p> 
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ url('/admin/cupones/tipo/lista') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Tipo de cupones</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/cupones/lista/enviogratis') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Envio gratis</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/cupones/lista/descuentod') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Descuento dinero</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/cupones/lista/descuentop') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Descuento porcentaje</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/cupones/lista/productos') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Producto gratis</p>
+                </a>
+              </li>
+              
+
+            </ul>
+          </li>
+    
       
         
          

@@ -46,12 +46,17 @@ class CreateOrdenesTable extends Migration
             $table->boolean('cancelado_cliente')->default(0);
             $table->boolean('cancelado_propietario')->default(0);
           
-            $table->boolean('envio_gratis')->default(0); // dio envio gratis a todas las zonas
             $table->boolean('visible_m')->default(0);
             $table->decimal('ganancia_motorista', 5,2);
 
-            // si subtotal es mayor a minimo, su envio es gratis
-            $table->boolean('supero_envio_gratis')->default(0); 
+            /* tipo de cargo de envio que se aplica
+            1- cargo de envio tomado de precio de zona servicio 
+            2- cargo de envio se aplico mitad de descuento
+            3- cargo de envio se aplico entrega gratis tomado de zona servicio
+            4- cargo de envio si supero o igualo min de compra
+            */
+            
+            $table->integer('tipo_cargo'); 
 
             $table->foreign('users_id')->references('id')->on('users');
             $table->foreign('servicios_id')->references('id')->on('servicios');

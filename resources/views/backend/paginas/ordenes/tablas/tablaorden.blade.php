@@ -12,8 +12,10 @@
                     <th style="width: 10%">ID orden</th> 
                     <th style="width: 20%">Identificador servicio</th> 
                     <th style="width: 15%">Precio total</th>                     
-                    <th style="width: 15%">Fecha orden</th>  
-                    <th style="width: 15%">Opciones</th>            
+                    <th style="width: 15%">Fecha orden</th>
+                    <th style="width: 15%">Estado</th>
+                    <th style="width: 10%">Cupon</th>
+                                             
                 </tr>
                 </thead>
                 <tbody> 
@@ -23,21 +25,14 @@
                     <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->precio_total }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
-
-                    <td>
-                      <button type="button" class="btn btn-info btn-xs" onclick="informacion({{ $dato->id }})">
-                      <i class="fas fa-eye" title="Informacion"></i>&nbsp; Info
-                      </button> 
-
-                      <button type="button" class="btn btn-success btn-xs" onclick="mapa({{ $dato->id }})">
-                      <i class="fas fa-eye" title="Entrega"></i>&nbsp; Entrega
-                      </button> 
-
-                      <button type="button" class="btn btn-primary btn-xs" onclick="producto({{ $dato->id }})">
-                      <i class="fas fa-eye" title="Productos"></i>&nbsp; Productos
-                      </button> 
-                    </td> 
-
+                    @if($dato->estado_7 == 0)
+                    <td>Orden en proceso</td>
+                    @elseif($dato->estado_7 == 1)
+                    <td>Orden completada</td>
+                    @elseif($dato->estado_8 == 1)
+                    <td>Orden Cancelada</td>              
+                    @endif
+                    <td>{{ $dato->cupon }}</td>
                     </tr>            
      
                 @endforeach            

@@ -73,7 +73,7 @@
     <!-- cabecera -->
     <div class="row"> 
             <center><p class="titulo">
-            REPORTE DE COBRO POR USO DE ENVIO GRATIS<br>
+            REPORTE DE CARGO DE ENVIO <br>
             SERVICIO: {{ $nombre }}       
             </p>
             <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
@@ -82,9 +82,11 @@
         <table id="customers">
           <tr>
             <th># Orden</th>           
-            <th>Fecha orden</th>
+            <th>Fecha</th>
             <th>Zona</th>
-            <th>Envio</th>
+            <th>Precio Zona</th>
+            <th>Cobro</th>
+            <th>Tipo</th>
           </tr>
 
           @foreach($orden as $dato)
@@ -92,7 +94,19 @@
               <td>{{$dato->idorden }}</td>             
               <td>{{$dato->fecha_orden}}</td>
               <td>{{$dato->nombrezona}}</td>
-              <td>${{$dato->copiaenvio}}</td>
+              <td>${{$dato->copia_envio}}</td>
+              <td>${{$dato->ganancia_motorista}}</td>
+             
+                @if($dato->tipo_cargo == 1)
+                  <td>Zona servicio</td>
+                  @elseif($dato->tipo_cargo == 2)
+                  <td>Mitad de precio</td>
+                  @elseif($dato->tipo_cargo == 3)
+                  <td>Envio Gratis</td>
+                  @elseif($dato->tipo_cargo == 4)
+                  <td>Minimo de compra</td>                    
+                @endif                  
+              
             </tr> 
           @endforeach  
 
@@ -100,7 +114,9 @@
             <td>Total:</td>
             <td></td>
             <td></td>
+            <td>${{ $total2 }}</td>
             <td>${{ $total }}</td>
+            <td></td>            
           </tr>
          
          

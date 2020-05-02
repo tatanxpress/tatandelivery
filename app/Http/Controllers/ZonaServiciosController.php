@@ -44,7 +44,7 @@ class ZonaServiciosController extends Controller
         ->get();  
  
         return view('backend.paginas.zonaservicios.tablas.tablazonaservicios', compact('servicio'));
-    }
+    } 
  
     // agregar zona servicio
     public function nuevo(Request $request){

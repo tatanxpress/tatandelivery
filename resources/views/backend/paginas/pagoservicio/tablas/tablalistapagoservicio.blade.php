@@ -10,10 +10,9 @@
                 <thead>             
                 <tr> 
                     <th style="width: 15%">Orden #</th> 
-                    <th style="width: 15%">Total orden</th>
+                    <th style="width: 15%">Total orden (Sin cargo)</th>
                     <th style="width: 15%">Fecha orden</th> 
-                    <th style="width: 15%">Identi servicio</th> 
-                    <th style="width: 15%">Opciones</th>            
+                    <th style="width: 15%">Identi servicio</th>                         
                 </tr> 
                 </thead>
                 <tbody>  
@@ -23,13 +22,6 @@
                     <td>{{ $dato->precio_total }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->identiservicio }}</td>
-
-                    <td>
-                      <button type="button" class="btn btn-info btn-xs" onclick="informacion({{ $dato->idorden }})">
-                      <i class="fas fa-eye" title="Informacion"></i>&nbsp; Info
-                      </button> 
-
-                    </td> 
 
                 </tr>            
      

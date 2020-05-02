@@ -35,7 +35,7 @@ class CreateZonasServiciosTable extends Migration
             // si el servicio dara envio gratis a esta zona, sin tocar el precio envio
             $table->boolean('zona_envio_gratis')->default(0);
 
-            // mitad de precio de envio
+            // si esta activo, tomara a mitad de precio el envio
             $table->boolean('mitad_precio')->default(0);
 
             $table->foreign('zonas_id')->references('id')->on('zonas');

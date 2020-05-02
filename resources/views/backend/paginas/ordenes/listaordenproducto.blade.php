@@ -58,7 +58,13 @@
 
   <script>
 
- 
+    function borrarServicio(id){
+
+    }
+
+    function borrarZona(id){
+      
+    }
 
   </script>
  

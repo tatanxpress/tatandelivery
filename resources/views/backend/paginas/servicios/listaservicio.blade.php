@@ -59,8 +59,8 @@
                                 <div class="col-md-6">
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label>Comision</label>
-                                            <input type="number" step="0.01" class="form-control" id="comision-nuevo">
+                                            <label>Comision (No Decimales)</label>
+                                            <input type="number" step="1" value="1" min="1" max="100" class="form-control" id="comision-nuevo">
                                         </div>
 
                                         <div class="form-group">
@@ -99,12 +99,7 @@
                                                 <input type="file" style="color:#191818" id="imagen-nuevo" accept="image/jpeg, image/jpg, image/png"/>
                                             </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Envío gratis (envio $0.00 para este servicio en todas las zonas)</label> 
-                                            <br>
-                                            <input type="checkbox" id="cbenviogratis">
-                                        </div>
-
+                                      
                                         <div class="form-group">
                                             <label>Utiliza mínimo (si esta activo, el minimo de compra sera necesario $)</label> 
                                             </br>
@@ -458,11 +453,7 @@
                                     <input type="file" style="color:#191818" id="imagen-editar" accept="image/jpeg, image/jpg, image/png"/>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label>Envío gratis (envio $0.00 para este servicio en todas las zonas)</label>
-                                <input type="checkbox" id="cbenviogratis-editar">
-                            </div>
-
+                       
                             <div class="form-group">
                                 <label>Utiliza mínimo (si esta activo, el minimo de compra sera necesario $)</label>
                                 <input type="checkbox" id="cbminimo-editar">
@@ -798,7 +789,7 @@
         var tipovista = document.getElementById('select-vista').value;
         
         var cbprivado = document.getElementById('cbprivado').checked;
-        var cbenviogratis = document.getElementById('cbenviogratis').checked;
+       
         var cbminimo = document.getElementById('cbminimo').checked;
         var minimocompra = document.getElementById('minimocompra').value;
         var cbproducto = document.getElementById('cbproducto').checked;
@@ -865,7 +856,7 @@
 
         if(retorno1 && retorno2){
 
-            var cbenviogratis_1 = 0;
+           
             var cbminimo_1 = 0;
             var cbproducto_1 = 0;
                         
@@ -893,10 +884,7 @@
                 minimocompra = 0;
             }
 
-            if(cbenviogratis){
-                cbenviogratis_1 = 1;
-            }
-
+          
             if(cbminimo){
                 cbminimo_1 = 1;
             }
@@ -980,7 +968,6 @@
             formData.append('direccion', direccion);
             formData.append('tipovista', tipovista);
             
-            formData.append('cbenviogratis', cbenviogratis_1);
             formData.append('cbminimo', cbminimo_1);
             formData.append('minimocompra', minimocompra);
             formData.append('cbproducto', cbproducto_1);
@@ -1084,6 +1071,16 @@
 
         if (comision === '') {
             toastr.error('Comision es requerido');
+            return false;
+        }
+
+        if(comision > 100){
+            toastr.error('Comision maximo es 100');
+            return false;
+        }
+
+        if(comision < 0){
+            toastr.error('Comision minima es 0');
             return false;
         }
         
@@ -1383,9 +1380,7 @@
                     $('#descripcion-editar').val(response.data.servicio.descripcion);
                     $('#descripcioncorta-editar').val(response.data.servicio.descripcion_corta);
                       
-                    if(response.data.servicio.envio_gratis == 1){
-                        $('#cbenviogratis-editar').prop('checked', true);
-                    }
+                  
                     if(response.data.servicio.utiliza_minimo == 1){
                         $('#cbminimo-editar').prop('checked', true);
                     }
@@ -1458,7 +1453,7 @@
         var longitud = document.getElementById('longitud-editar').value;
         var direccion = document.getElementById('direccion-editar').value;
         var tipovista = document.getElementById('select-vista-editar').value;
-        var cbenviogratis = document.getElementById('cbenviogratis-editar').checked;
+        
         var cbminimo = document.getElementById('cbminimo-editar').checked;
         var minimocompra = document.getElementById('minimocompra-editar').value;
         var cbproducto = document.getElementById('cbproducto-editar').checked;
@@ -1472,7 +1467,7 @@
 
      if(retorno){
 
-        var cbenviogratis_1 = 0;
+      
         var cbminimo_1 = 0;
         var cbproducto_1 = 0;
         var cbcerradoemergencia_1 = 0;
@@ -1484,14 +1479,12 @@
             privado_1 = 1;
         }
 
-        if(cbenviogratis){
-            cbenviogratis_1 = 1;
-        }
+       
 
         if(cbminimo){
             cbminimo_1 = 1;
         }
-
+ 
         if(cbproducto){
             cbproducto_1 = 1;
         }
@@ -1500,7 +1493,7 @@
         if(cbcerradoemergencia){
             cbcerradoemergencia_1 = 1;
         }
-
+ 
         if(cbactivo){
             activo = 1;
         }
@@ -1521,7 +1514,7 @@
         formData.append('longitud', longitud);
         formData.append('direccion', direccion);
         formData.append('tipovista', tipovista);
-        formData.append('cbenviogratis', cbenviogratis_1);
+        
         formData.append('cbminimo', cbminimo_1);
         formData.append('minimocompra', minimocompra);
         formData.append('cbproducto', cbproducto_1);
@@ -1570,6 +1563,16 @@
         
         if (comision === '') {
             toastr.error("comision es requerido");
+            return false;
+        }
+
+        if(comision > 100){
+            toastr.error("comision maxima es 100");
+            return false;
+        }
+
+        if(comision < 0){
+            toastr.error("comision minima es 0");
             return false;
         }
 

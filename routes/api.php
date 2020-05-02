@@ -50,7 +50,7 @@ Route::post('usuario/carrito/ver/producto', 'Api\CarritoTemporalController@verPr
 Route::post('usuario/carrito/borrar/orden', 'Api\CarritoTemporalController@eliminarCarritoCompras'); // eliminar carrito de compras
 Route::post('usuario/carrito/cambiar/cantidad', 'Api\CarritoTemporalController@cambiarCantidad'); // cambiar cantidad de este producto
 Route::post('usuario/carrito/ver/proceso', 'Api\CarritoTemporalController@verProcesarOrden'); // ver info para procesar la orden
-  
+   
 // buscador
 Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // buscador
 Route::post('usuario/productos/ver/seccion', 'Api\BuscadorController@buscarProductoSeccion'); // lista de productos "ver todos"
@@ -71,6 +71,9 @@ Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesControll
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
     
+Route::post('usuario/verficar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
+ 
+
   
 // PROPIETARIOS  
  

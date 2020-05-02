@@ -608,9 +608,13 @@
 
     // agregar poligonos
     function poligonos(){
+               
         var id = document.getElementById('id-poligono').value;
         var latitud = document.getElementById('latitud-poligono').value;
         var longitud = document.getElementById('longitud-poligono').value;
+
+        $('#latitud-poligono').val('');
+        $('#longitud-poligono').val('');
 
         var retorno = validacion_poligono(latitud, longitud);
 
@@ -620,13 +624,13 @@
             formData.append('id', id);
             formData.append('latitud', latitud);
             formData.append('longitud', longitud);
-           
+        
             var spinHandle = loadingOverlay().activate();
 
             axios.post('/admin/zona/nuevo-poligono', formData, {
             })
                 .then((response) => {
-                    loadingOverlay().cancel(spinHandle);                    
+                    loadingOverlay().cancel(spinHandle);
                     verificar_poligono(response);
                 })
                 .catch((error) => {
@@ -634,6 +638,7 @@
                     loadingOverlay().cancel(spinHandle);
             });
         }
+        
     }
 
     // verificar poligono guardado

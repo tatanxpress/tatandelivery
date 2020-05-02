@@ -66,7 +66,6 @@ class ServiciosController extends Controller
                 'longitud' => 'required',
                 'direccion' => 'required',
                 'tipovista' => 'required',
-                'cbenviogratis' => 'required',
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
                 'cbproducto' => 'required',
@@ -137,7 +136,6 @@ class ServiciosController extends Controller
                 'tipovista.required' => 'tipo vista es requerido',
                 'cbprivado.required' => 'check si servicio es privado es requerido',
 
-                'cbenviogratis.required' => 'es requerido 1',
                 'cbminimo.required' => 'es requerido 2',
                 'minimocompra.required' => 'es requerido 3',
                 'cbproducto.required' => 'es requerido 4',
@@ -256,7 +254,6 @@ class ServiciosController extends Controller
                     $tipo->activo = 0; // inactivo por defecto
                     $tipo->tiempo = 10; 
                     $tipo->tipo_servicios_id = $request->tiposervicio; //
-                    $tipo->envio_gratis = $request->cbenviogratis; //
                     $tipo->telefono = $request->telefono; //
                     $tipo->latitud = $request->latitud; //
                     $tipo->longitud = $request->longitud; //
@@ -268,7 +265,7 @@ class ServiciosController extends Controller
                     $tipo->producto_visible = $request->cbproducto; //
                     $tipo->privado = $request->cbprivado;                    
                     $tipo->save();
-
+ 
                     $idservicio = $tipo->id;
                     
                     $hora1 = new HorarioServicio();
@@ -444,7 +441,6 @@ class ServiciosController extends Controller
                 'direccion' => 'required',
                 'tipovista' => 'required',
                 
-                'cbenviogratis' => 'required',
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
                 'cbproducto' => 'required',
@@ -466,7 +462,7 @@ class ServiciosController extends Controller
                 'longitud.required' => 'longitud requerido',
                 'direccion.required' => 'direccion requerido',
                 'tipovista.required' => 'tipo vista requerida',
-                'cbenviogratis.required' => 'check envio gratis requerido',
+               
                 'cbminimo.required' => 'check minimo requerido',
                 'minimocompra.required' => 'minimo compra requerido',
                 'cbproducto.required' => 'check producto requerido',
@@ -601,8 +597,7 @@ class ServiciosController extends Controller
                         'descripcion_corta' => $request->descripcioncorta,
                         'cerrado_emergencia' => $request->cbcerradoemergencia,
                         'activo' => $request->cbactivo,
-                        'tipo_servicios_id' => $request->tiposervicio,
-                        'envio_gratis' => $request->cbenviogratis,
+                        'tipo_servicios_id' => $request->tiposervicio,                       
                         'telefono' => $request->telefono,
                         'latitud' => $request->latitud,
                         'longitud' => $request->longitud,

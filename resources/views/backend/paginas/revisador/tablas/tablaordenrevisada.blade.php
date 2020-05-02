@@ -22,7 +22,8 @@
                     <th style="width: 20%">Nombre</th> 
                     <th style="width: 15%">Fecha orden</th> 
                     <th style="width: 15%">Fecha revisada</th>
-                    <th style="width: 15%">Precio Total $</th>
+                    <th style="width: 15%">Precio (Sub Total + Envio)</th>
+                    <th style="width: 10%">Cupon</th>
                 </tr>
                 </thead>
                 <tbody> 
@@ -35,6 +36,7 @@
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->fecha }}</td>
                     <td>{{ $dato->precio }}</td>
+                    <td>{{ $dato->usacupon }}</td>
                 </tr>
      
                 @endforeach            

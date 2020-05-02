@@ -14,10 +14,10 @@
                     <th style="width: 15%">Nombre</th> 
                     <th style="width: 15%">Experiencia calificacion</th>   
                     <th style="width: 15%">Mensaje</th>
-                    <th style="width: 15%">Fecha</th>
+                    <th style="width: 15%">Fecha Ingreso</th>
                 </tr> 
                 </thead>
-                <tbody> 
+                <tbody>  
                 @foreach($orden as $dato)
                 <tr>
                     <td>{{ $dato->ordenes_id }}</td>

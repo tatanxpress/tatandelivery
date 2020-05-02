@@ -73,7 +73,7 @@
     <!-- cabecera -->
     <div class="row"> 
             <center><p class="titulo">
-            REPORTE DE PAGO<br>
+            REPORTE DE COBRO (CUPON PORCENTAJE)<br>
             SERVICIO: {{ $nombre }}       
             </p>
             <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
@@ -81,37 +81,35 @@
 
         <table id="customers">
           <tr>
-            <th># Orden</th>           
+            <th># Orden</th>
             <th>Fecha orden</th>
             <th>Total orden</th>
+            <th>Porcentaje</th>
+            <th>Descuento</th>
+            <th>Total</th>
           </tr>
 
           @foreach($orden as $dato)
             <tr>
-              <td>{{$dato->idorden }}</td>             
+              <td>{{$dato->id }}</td>             
               <td>{{$dato->fecha_orden}}</td>
               <td>${{$dato->precio_total}}</td>
+              <td>{{$dato->porcentaje}}%</td>
+              <td>${{$dato->descuento}}</td>
+              <td>${{$dato->total}}</td>
             </tr> 
           @endforeach  
 
           <tr>
             <td>Total:</td>
             <td></td>
-            <td>${{ $totalDinero }}</td>
-          </tr>
-          
-          <tr>
-            <td>Comisión: {{ $redondear }}%</td>
+            <td>${{ $totalorden }}</td>
             <td></td>
-            <td>${{ $suma2 }}</td>
+            <td>${{ $sumardescuento }}</td>
+            <td>${{ $totaldescontado }}</td>
           </tr>
+         
 
-          <tr>
-            <td>Pagar:</td>
-            <td></td>
-            <td>${{ $pagar }}</td>
-          </tr>
-        
         </table>
 
 

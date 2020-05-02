@@ -4,21 +4,21 @@
      <link href="{{ asset('css/backend/adminlte.min.css') }}" type="text/css" rel="stylesheet" /> 
      <link href="{{ asset('css/backend/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" /> 
      <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
- 
+     <link href="{{ asset('css/backend/estiloToggle.css') }}" type="text/css" rel="stylesheet" /> 
  @stop  
  
  <section class="content-header">
        <div class="container-fluid">
            <div class="col-sm-12">
-             <h1>Limite de Dinero por orden</h1>
+             <h1>Configuraciones</h1>
            </div>  
            <button type="button" onclick="modalCambiar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Cambiar Limite
+                    Cambiar configuracion
           </button>  
          
        </div>
-     </section>
+     </section> 
      
    <!-- seccion frame -->
    <section class="content">
@@ -57,6 +57,18 @@
                                 <div class="form-group">                                   
                                     <input type="number" step="0.01" class="form-control" id="orden" required>
                                 </div>
+
+
+                                <div class="form-group" style="margin-left:20px">
+                                    <label>Mostrar Cupones en aplicacion</label><br>
+                                    <label class="switch" style="margin-top:10px">
+                                        <input type="checkbox" id="cupones">
+                                        <div class="slider round">
+                                            <span class="on">Activar</span>
+                                            <span class="off">Desactivar</span>
+                                        </div>
+                                    </label>
+                                </div>  
                               
                             </div>
                         </div>
@@ -94,7 +106,13 @@
                 if(response.data.success == 1){
 
                     $('#modalCambiar').modal('show');
-                    $('#orden').val(response.data.limite);
+                    $('#orden').val(response.data.info.limite);
+
+                    if(response.data.info.ver_cupones == 0){
+                        $("#cupones").prop("checked", false);
+                    }else{
+                        $("#cupones").prop("checked", true);
+                    }
 
                 }else{
                     toastr.error('No encontrado'); 
@@ -108,20 +126,28 @@
  
     function cambiar(){
         var dinero = document.getElementById('orden').value;
+        var cupones = document.getElementById('cupones').checked;
 
         if(dinero === ''){
             toastr.error('Dinero limite es requerido'); 
             return;
         }
 
-        if(dinero > 999999.99){
-            toastr.error('Limite es: 999,999.99'); 
+        if(dinero > 99999.99){
+            toastr.error('Limite es: 9,999.99'); 
             return;
+        }
+
+        var cupones_1 = 0;
+
+        if(cupones){
+            cupones_1 = 1;
         }
 
         var spinHandle = loadingOverlay().activate();             
         var formData = new FormData();
         formData.append('dinero', dinero);
+        formData.append('cupones', cupones_1);
 
         axios.post('/admin/dinero/limite/actualizar', formData, {
         })

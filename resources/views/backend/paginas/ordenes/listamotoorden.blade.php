@@ -10,7 +10,7 @@
 <section class="content-header">
       <div class="container-fluid">
           <div class="col-sm-12">
-            <h1>Lista motorista ordenes</h1>
+            <h1>Lista motorista ordenes (ultimas 100)</h1>
           </div>  
       </div>
     </section>
@@ -46,7 +46,7 @@
 
  <!-- incluir tabla --> 
   <script type="text/javascript">	 
-    $(document).ready(function(){   
+    $(document).ready(function(){    
 
         var ruta = "{{ url('/admin/motoorden/tabla/lista') }}";
       $('#tablaDatatable').load(ruta);

@@ -201,57 +201,7 @@
     </div>      
 </div>
 
-<!-- modal vista filtro para orden prestado -->
-<div class="modal fade" id="modalFiltroPrestado">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Filtrar datos, para ver ordenes motorista prestado</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-filtroprestado">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12">
 
-                            <div class="form-group">
-                                    <label style="color:#191818">Motorista identificador</label>
-                                    <br>
-                                    <div>  
-
-                                        <select class="form-control selectpicker" id="motoid-pre" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
-                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
-                                        </select>
-                                    </div> 
-                                </div> 
-
-                                <div class="form-group">
-                                    <label>Fecha desde</label>
-                                    <input type="date" class="form-control" id="fechadesde-pre">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha hasta</label>
-                                    <input type="date" class="form-control" id="fechahasta-pre">
-                                </div>
-                              
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="filtroPrestado()">Filtrar</button>
-            </div>          
-        </div>        
-    </div>      
-</div>
 
 
 <!-- modal filtro para conocer datos de los servicios a cobrar -->
@@ -360,271 +310,6 @@
     </div>      
 </div>
 
-<!-- modal informacion-->
-<div class="modal fade" id="modalInfo">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Informacion</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-info">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12">
-                                
-                                <div class="form-group">
-                                    <label>Nombre servicio</label>
-                                    <input type="text" disabled class="form-control" id="nombreservicio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Nombre Cliente</label>
-                                    <input type="text" disabled class="form-control" id="nombrecliente">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Zona identificador</label>
-                                    <input type="text" disabled class="form-control" id="zonaidentificador">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Direccion</label>
-                                    <input type="text" disabled class="form-control" id="direccion">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Numero de casa</label>
-                                    <input type="text" disabled class="form-control" id="numerocasa">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Punto de referencia</label>
-                                    <input type="text" disabled class="form-control" id="puntoreferencia">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Telefono</label>
-                                    <input type="text" disabled class="form-control" id="telefono">
-                                </div>
-
-
-                                <!-- Ordenes -->
-
-                                <div class="form-group">
-                                    <label>Nota orden</label>
-                                    <input type="text" disabled class="form-control" id="notaorden">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Precio total</label>
-                                    <input type="text" disabled class="form-control" id="preciototal">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Precio envio</label>
-                                    <input type="text" disabled class="form-control" id="precioenvio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha orden</label>
-                                    <input type="text" disabled class="form-control" id="fechaorden">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Cambio vuelto</label>
-                                    <input type="text" disabled class="form-control" id="cambiovuelto">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Estado 2 (propietario respondio con tiempo de espera)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado2" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 2</label>
-                                    <input type="text" disabled class="form-control" id="fecha2">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Minutos que esperara</label>
-                                    <input type="text" disabled class="form-control" id="minutosespera">
-                                </div>
-
-                                <!-- -->
-
-                                <div class="form-group">
-                                    <label>Estado 3 (cliente responde, que esperara tiempo)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado3" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 3</label>
-                                    <input type="text" disabled class="form-control" id="fecha3">
-                                </div>
-
-                                <!-- -->
-
-                                <div class="form-group">
-                                    <label>Estado 4 (propietario inicia la orden)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado4" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 4</label>
-                                    <input type="text" disabled class="form-control" id="fecha4">
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Estado 5 (propietario finalizo de preparar la orden)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado5" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 5</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fecha5" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Estado 6 (Motorista va en camino a dejar la orden)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado6" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 6</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fecha6" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Estado 7 (Motorista entrega la orden)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado7" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 7</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fecha7" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Estado 8 (Orden fue cancelada)</label>
-                                    <br>
-                                    <input type="checkbox" id="estado8" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha estado 8</label>
-                                    <br>
-                                    <input type="text" disabled class="form-control" id="fecha8" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Mensaje estado 8 (cancelado)</label>
-                                    <input type="text" disabled class="form-control" id="mensaje8">
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Visible 1 (Es visible al cliente la orden)</label>
-                                    <br>
-                                    <input type="checkbox" id="visible1" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Visible propietario (Es visible al propietario)</label>
-                                    <br>
-                                    <input type="checkbox" id="visiblep" disabled>
-                                </div>
-
-                                  <!-- -->
-
-                                  <div class="form-group">
-                                    <label>Visible propietario en orden preparacion</label>
-                                    <br>
-                                    <input type="checkbox" id="visiblep2" disabled>
-                                </div>
-
-                                  <!-- -->
-
-                                  <div class="form-group">
-                                    <label>Visible propietario 3 (Es visible al propietario, orden fue cancelada)</label>
-                                    <br>
-                                    <input type="checkbox" id="visiblep3" disabled>
-                                </div>
-
-                                  <!-- -->
-
-                                  <!-- -->
-
-                                  <div class="form-group">
-                                    <label>Cancelado cliente</label>
-                                    <br>
-                                    <input type="checkbox" id="canceladocliente" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Cancelado propietario</label>
-                                    <br>
-                                    <input type="checkbox" id="canceladopropietario" disabled>
-                                </div>
-
-                                 <!-- -->
-
-                                 <div class="form-group">
-                                    <label>Marcado como envio gratis</label>
-                                    <br>
-                                    <input type="checkbox" id="marcadogratis" disabled>
-                                </div>
-
-                                  <!-- -->
-
-                                  <div class="form-group">
-                                    <label>Producto visible al motorista</label>
-                                    <br>
-                                    <input type="checkbox" id="productovisible" disabled>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Ganancia de motorista</label>
-                                    <input type="text" disabled class="form-control" id="gananciamotorista">
-                                </div>
-                              
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-            </div>          
-        </div>        
-    </div>      
-</div>
-
 <!-- modal cancelar -->
 <div class="modal fade" id="modalCancelar">
     <div class="modal-dialog">
@@ -661,52 +346,7 @@
         </div>        
     </div>      
 </div>
- 
-<!-- modal select buscar servicio para cobro de motorista prestado -->
-<div class="modal fade" id="modalFiltroServicio">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Reporte de cobro por motorista prestado</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-servicio">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12">
-                                <div class="form-group">                                   
-                                    <input type="hidden" id="id-motorista">
-                                    <input type="hidden" id="fecha1-cobro">
-                                    <input type="hidden" id="fecha2-cobro">
-                                </div>
 
-                                <div class="form-group">
-
-                                    <label style="color:#191818">Servicio</label>
-                                    <br>
-                                    <div>
-                                        <select class="form-control" id="select-servicio">
-                                            <option value="0" selected>Vacio</option>
-                                        </select>
-                                    </div>
-                                </div>
-                              
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="reporte()">Reporte</button>
-            </div>          
-        </div>        
-    </div>      
-</div>                               
- 
  @extends('backend.menus.inferior')
  
  @section('content-admin-js')
@@ -771,7 +411,7 @@
         
         var retorno = validarNuevo(fechadesde, fechahasta);
 
-        if(retorno){
+        if(retorno){ 
 
             spinHandle = loadingOverlay().activate();
  
@@ -805,73 +445,8 @@
         }
     }
 
-    // buscar ordenes donde se presto el motorista
-    function filtroPrestado(){
-        var idmoto = document.getElementById('motoid-pre').value;
-        var fechadesde = document.getElementById('fechadesde-pre').value;
-        var fechahasta = document.getElementById('fechahasta-pre').value;
-        
-        var retorno = validarNuevo(fechadesde, fechahasta);
-
-        if(retorno){
-
-            var ruta = "{{ url('/admin/buscar2/moor') }}/"+idmoto+"/"+fechadesde+"/"+fechahasta;
-            $('#tablaDatatable').load(ruta);
-        }
-    }
-
-    // ver datos de registros de motorista prestado
-    function filtroRegistro(){
-        var idmoto = document.getElementById('motoid-registro').value;
-        var fechadesde = document.getElementById('fechadesde-registro').value;
-        var fechahasta = document.getElementById('fechahasta-registro').value;            
-        
-        $('#id-motorista').val(idmoto);
-        $('#fecha1-cobro').val(fechadesde);
-        $('#fecha2-cobro').val(fechahasta);
-
-        var retorno = validarNuevo(fechadesde, fechahasta);
-
-        if(retorno){
-
-            spinHandle = loadingOverlay().activate();
-
-            var formData = new FormData();
-            formData.append('id', idmoto);
-            formData.append('fecha1', fechadesde);
-            formData.append('fecha2', fechahasta);
-                
-            axios.post('/admin/buscar3/orden/servicio',formData,{
-                })
-                .then((response) => {
-                    loadingOverlay().cancel(spinHandle);
-                    console.log(response);
-                if(response.data.success == 1){
-                   // llenar id el select de los servicios a cobrar
-                   
-                   var tipo = document.getElementById("select-servicio");
-                    // limpiar select
-                    document.getElementById("select-servicio").options.length = 0;
-                    if(response.data.agrupado.length == 0){                          
-                        tipo.options[0] = new Option('Ninguna disponible', 0); 
-                    }else{
-                        $.each(response.data.agrupado, function( key, val ){  
-                            tipo.options[key] = new Option(val.identificador, val.id);
-                        });
-                    }
-                
-                   $('#modalFiltroServicio').modal('show');
-
-                }else{
-                    toastr.error('ID no encontrado'); 
-                }
-            })
-            .catch((error) => {
-                loadingOverlay().cancel(spinHandle); 
-                toastr.error('Error del servidor');    
-            });
-        }
-    }
+   
+  
 
     function validarNuevo(fechadesde, fechahasta){
 
@@ -1012,15 +587,8 @@
                     }else{
                         $("#canceladopropietario").prop("checked", true);
                     }
-
                 
                     
-                    if(response.data.orden.envio_gratis == 0){
-                        $("#marcadogratis").prop("checked", false);
-                    }else{
-                        $("#marcadogratis").prop("checked", true);
-                    }
-
                     if(response.data.orden.visible_m == 0){
                         $("#productovisible").prop("checked", false);
                     }else{

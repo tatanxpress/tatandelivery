@@ -89,7 +89,7 @@
 
                                 <div class="form-group">
                                     <label>Descripción</label>
-                                    <input type="text" class="form-control" maxlength="200" id="descripcion" placeholder="Descripción">
+                                    <input type="text" class="form-control" require maxlength="200" id="descripcion" placeholder="Descripción">
                                 </div>
                               
                             </div>
@@ -255,7 +255,7 @@
         var pago = document.getElementById('pago').value;
         var descripcion = document.getElementById('descripcion').value;
         
-        var retorno = validarNuevo(fechadesde, fechahasta, pago);
+        var retorno = validarNuevo(fechadesde, fechahasta, pago, descripcion);
 
         if(retorno){
 
@@ -300,7 +300,7 @@
         }       
     }
 
-    function validarNuevo(fechadesde, fechahasta, pago){
+    function validarNuevo(fechadesde, fechahasta, pago, descripcion){
 
         if(fechadesde === ''){
             toastr.error("fecha desde es requerido");
@@ -314,6 +314,11 @@
 
         if(pago === ''){
             toastr.error("pago es requerido");
+            return;
+        }
+
+        if(descripcion === ''){
+            toastr.error("descripcion es requerido");
             return;
         }
 

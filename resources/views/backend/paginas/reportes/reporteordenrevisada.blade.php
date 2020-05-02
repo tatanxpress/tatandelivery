@@ -82,10 +82,10 @@
         <table id="customers">
           <tr>
             <th style="width:2px;">Nro</th>
-            <th ># Orden</th>           
-            <th>Fecha Orden</th>
-            <th>Fecha Confirmada</th>
-            <th>Total $</th>
+            <th style="width:6px;"># Orden</th>           
+            <th style="width:6px;">Fecha Orden</th>
+            <th style="width:6px;">Fecha Confirmada</th>
+            <th style="width:5px;">Total $</th>
           </tr>
  
           {{ $i = 1 }}

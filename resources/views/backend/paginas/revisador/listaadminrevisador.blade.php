@@ -10,7 +10,7 @@
 <section class="content-header">
       <div class="container-fluid">
           <div class="col-sm-12">
-            <h1>Administradores para revision de ordenes sin motorista</h1>
+            <h1>Administradores App</h1>
           </div>
 
            <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">

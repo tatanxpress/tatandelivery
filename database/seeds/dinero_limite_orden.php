@@ -12,7 +12,8 @@ class dinero_limite_orden extends Seeder
     public function run()
     {
         $user = DineroOrden::create([ 
-            'limite' => '125.00'
+            'limite' => '125.00',
+            'ver_cupones' => '1'
             ]); 
     }
 }

@@ -9,15 +9,24 @@ use App\OrdenesDirecciones;
 use App\OrdenesDescripcion;
 use App\Motoristas;
 use App\OrdenesPendiente;
+use App\OrdenesCupones;
+use App\Cupones;
+use App\AplicaCuponUno;
+use App\AplicaCuponDos;
+use App\AplicaCuponTres;
+use App\AplicaCuponCuatro;
+use App\MotoristaExperiencia;
+use App\MotoristaOrdenes;
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class OrdenesController extends Controller
 {
-    /*public function __construct()
+    public function __construct()
     {
         $this->middleware('auth:admin');
-    }*/
+    }
    
     // lista de ordenes
     public function index(){
@@ -25,12 +34,14 @@ class OrdenesController extends Controller
         return view('backend.paginas.ordenes.listaorden');
     }
  
-    // tabla de lista de ordenes
+    // tabla de lista de ordenes, ultimas 100
     public function tablaorden(){
 
         $orden = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->select('o.id', 's.identificador', 'o.precio_total', 'o.fecha_orden')
+        ->select('o.id', 's.identificador', 'o.precio_total', 'o.fecha_orden', 'o.estado_7', 'o.estado_8')
+        ->latest('o.id')
+        ->take(100)       
         ->get(); 
 
         foreach($orden as $o){
@@ -38,64 +49,17 @@ class OrdenesController extends Controller
             $hora1 = date("h:i A", strtotime($fechaOrden));
             $fecha1 = date("d-m-Y", strtotime($fechaOrden));
             $o->fecha_orden = $hora1 . " " . $fecha1;  
+
+            $cupon = "";
+            if(OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                $cupon = "Si";
+            }
+            $o->cupon = $cupon;
         }
 
         return view('backend.paginas.ordenes.tablas.tablaorden', compact('orden'));
     } 
-
-    // informacion de esa orden
-    public function informacion(Request $request){
-        if($request->isMethod('post')){  
-
-            $regla = array(  
-                'id' => 'required', 
-            );
- 
-            $mensaje = array(
-                'id.required' => 'id es requerido',                      
-            );
-
-            $validar = Validator::make($request->all(), $regla, $mensaje );
-
-            if ($validar->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validar->errors()->all()
-                ];
-            }
-            
-          if(Ordenes::where('id', $request->id)->first()){
-
-            $orden = DB::table('ordenes AS o')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
-            ->join('zonas AS z', 'z.id', '=', 'od.zonas_id')
-            ->select('o.id', 's.nombre AS nombreServicio', 'od.nombre AS nombreCliente',
-            'z.identificador', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
-            'od.telefono', 'o.nota_orden', 'o.precio_total', 'o.precio_envio',
-             'o.fecha_orden', 'o.cambio', 'o.estado_2', 'o.fecha_2', 'o.hora_2',
-             'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.fecha_5',
-             'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
-             'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
-             'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista', 'o.supero_envio_gratis') 
-            ->where('o.id', $request->id)
-            ->first(); 
-
-            $horaestimada = "";
-                if($orden->estado_4 == 1){
-                    $time1 = Carbon::parse($orden->fecha_4);
-                    $horaestimada = $time1->addMinute($orden->hora_2)->format('h:i A d-m-Y'); 
-                }   
-
-            return ['success' => 1, 'orden' => $orden, 'horaestimada' => $horaestimada]; 
-          }else{
-            return ['success' => 2];
-          }
-        }
-    }
-
+   
     // ubicacion de orden entrega
     public function entregaUbicacion($id){
 
@@ -145,6 +109,8 @@ class OrdenesController extends Controller
         $orden = DB::table('motorista_ordenes AS mo')
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
         ->select('mo.ordenes_id', 'm.identificador', 'm.nombre', 'mo.fecha_agarrada')
+        ->latest('mo.ordenes_id')
+        ->take(100)
         ->get(); 
 
         foreach($orden as $o){
@@ -160,7 +126,8 @@ class OrdenesController extends Controller
     // ver calificaciones de los motoristas
     public function index3(){
 
-        return view('backend.paginas.ordenes.listamotoexpe');
+        $motoristas = Motoristas::all();
+        return view('backend.paginas.ordenes.listamotoexpe', compact('motoristas'));
     }
 
     // tabla de calificaciones de motorista
@@ -169,8 +136,10 @@ class OrdenesController extends Controller
         $orden = DB::table('motorista_experiencia AS mo')
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
         ->select('mo.ordenes_id', 'm.identificador', 'm.nombre', 'mo.experiencia', 'mo.mensaje', 'mo.fecha')
+        ->latest('mo.ordenes_id')
+        ->take(100)
         ->get();
-
+ 
         foreach($orden as $o){
             $fechaOrden = $o->fecha;
             $hora1 = date("h:i A", strtotime($fechaOrden));
@@ -190,6 +159,49 @@ class OrdenesController extends Controller
         return view('backend.paginas.ordenes.listabuscarmotoorden', compact('moto'));
     }
     
+    // calificacion global del motorista
+    public function calificacionGlobal(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido'  
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+
+            if(MotoristaExperiencia::where('motoristas_id', $request->id)->first()){
+
+                $todo = MotoristaExperiencia::where('motoristas_id', $request->id)->get();
+                $calificacion = 0;
+                $contador = 0;
+                foreach($todo as $t){
+                    $calificacion = $calificacion + $t->experiencia;
+                    $contador++;
+                } 
+
+                $total = $calificacion / $contador;
+                $total = number_format((float)$total, 2, '.', '');
+                return ['success' => 1, 'sumatoria' => $calificacion, 'contador' => $contador, 'calificacion' => $total];
+ 
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
     // buscador de motorista ordenes agarradas por fecha
     public function buscador($id, $fecha1, $fecha2){
     
@@ -201,22 +213,18 @@ class OrdenesController extends Controller
             $orden = DB::table('motorista_ordenes AS mo')
             ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
             ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->select('o.id AS idorden', 'o.envio_gratis',
-            'o.precio_envio', 'mo.motoristas_id', 'm.identificador', 'o.fecha_orden', 
+            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')           
+            ->select('o.id AS idorden',
+            'o.precio_envio', 'mo.motoristas_id', 'm.identificador', 'mo.fecha_agarrada', 
             'o.ganancia_motorista', 's.identificador AS identiservicio', 
-            'o.estado_7')
+            'o.estado_7') 
             ->where('mo.motoristas_id', $id)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
             ->get(); 
 
             foreach($orden as $o){
-                $fechaOrden = $o->fecha_orden;
-                $hora1 = date("h:i A", strtotime($fechaOrden));
-                $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-                $o->fecha_orden = $fecha1 . " " . $hora1;  
-            }           
+                $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));               
+            }
   
             return view('backend.paginas.ordenes.tablas.tablabuscarmotoorden', compact('orden'));
         }else{
@@ -287,29 +295,26 @@ class OrdenesController extends Controller
             
         $orden = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->select('o.id', 's.identificador', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden')
+        ->select('o.id', 's.identificador', 's.nombre', 'o.fecha_orden')
         ->where('o.id', $id)
         ->get(); 
 
         foreach($orden as $o){
 
-            $sumado = $o->precio_total + $o->precio_envio;
-            $total = number_format((float)$sumado, 2, '.', '');
-
-            $o->precio_total = $total;
- 
             $fechaOrden = $o->fecha_orden;
             $hora1 = date("h:i A", strtotime($fechaOrden));
             $fecha1 = date("d-m-Y", strtotime($fechaOrden));
             $o->fecha_orden = $hora1 . " " . $fecha1;  
         } 
 
-        return view('backend.paginas.ordenes.tablas.tablaorden2', compact('orden'));
+        return view('backend.paginas.ordenes.tablas.tablaordenbuscador', compact('orden'));
     }
     
 
-    // informacion de orden buscada
-    public function infoordenbuscada(Request $request){
+    //*** INFORMACION DE LAS ORDENES ********/
+
+    // informacion del cliente
+    public function informacioncliente(Request $request){
         if($request->isMethod('post')){  
 
             $regla = array( 
@@ -330,39 +335,296 @@ class OrdenesController extends Controller
                 ];
             }
             
-          if(Ordenes::where('id', $request->id)->first()){
+            if(Ordenes::where('id', $request->id)->first()){
 
-            $orden = DB::table('ordenes AS o')
-            ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
-            ->join('zonas AS z', 'z.id', '=', 'od.zonas_id')
-            ->select('o.id', 's.nombre AS nombreServicio', 'od.nombre AS nombreCliente',
-            'z.identificador', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
-            'od.latitud', 'od.longitud', 'od.latitud_real', 'od.longitud_real',
-            'od.telefono', 'o.nota_orden', 'o.precio_total', 'o.precio_envio',
-             'o.fecha_orden', 'o.cambio', 'o.estado_2', 'o.fecha_2', 'o.hora_2',
-             'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.fecha_5',
-             'o.estado_6', 'o.fecha_6', 'o.estado_7', 'o.fecha_7', 'o.estado_8', 
-             'o.fecha_8', 'o.mensaje_8', 'o.visible', 'o.visible_p', 'o.visible_p2',
-             'o.visible_p3', 'o.cancelado_cliente', 'o.cancelado_propietario',
-             'o.envio_gratis', 'o.visible_m', 'o.ganancia_motorista', 'o.supero_envio_gratis') 
-            ->where('o.id', $request->id)
-            ->first();
-
-            $estimada = "";
-            if($orden->estado_4 == 1){ 
-                $time1 = Carbon::parse($orden->fecha_4);
-                $horaEstimada = $time1->addMinute($orden->hora_2)->format('h:i A d-m-Y');
-                $estimada = $horaEstimada; 
+                $orden = DB::table('ordenes AS o')
+                ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
+                ->join('zonas AS z', 'z.id', '=', 'od.zonas_id')
+                ->join('users AS u', 'u.id', '=', 'od.users_id')
+                ->select('o.id', 'od.nombre', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
+                'od.latitud', 'od.longitud', 'od.latitud_real', 'od.longitud_real',
+                'od.telefono', 'od.copia_tiempo_orden', 'od.copia_envio',
+                'u.phone', 'z.identificador', 'z.nombre AS nombrezona') 
+                ->where('o.id', $request->id)
+                ->get();
+                      
+                return ['success' => 1, 'orden' => $orden];           
+            }else{
+                return ['success' => 2];
             }
+        }
+    } 
 
-            $sumado = $orden->precio_total + $orden->precio_envio;
-            $total = number_format((float)$sumado, 2, '.', '');
+    public function informacionorden(Request $request){
+        if($request->isMethod('post')){  
 
-            return ['success' => 1, 'orden' => $orden, 'estimada' => $estimada, 'total' => $total]; 
-          }else{
-            return ['success' => 2];
-          }
+            $regla = array( 
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+            if(Ordenes::where('id', $request->id)->first()){
+
+                $orden = DB::table('ordenes AS o')
+                ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
+                ->select('o.nota_orden', 'o.cambio', 'o.estado_2', 'o.fecha_2', 'o.hora_2',
+                'od.copia_tiempo_orden', 'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4',
+                'o.estado_5', 'o.fecha_5','o.estado_6', 'o.fecha_6','o.estado_7', 'o.fecha_7',
+                'o.estado_8', 'o.fecha_8', 'o.mensaje_8', 'o.cancelado_cliente', 'o.cancelado_propietario',
+                'od.copia_envio', 'o.ganancia_motorista', 'od.cancelado_extra')
+                ->where('o.id', $request->id)
+                ->get();
+
+                foreach($orden as $o){
+
+                    $suma = $o->hora_2 + $o->copia_tiempo_orden;
+                    $o->minutostotal = $suma;
+                    
+                    $canceladopor = ""; 
+                    if($o->cancelado_cliente == 1){
+                        $canceladopor = "Cliente";
+                    }                
+                    if($o->cancelado_propietario == 1){
+                        $canceladopor = "Propietario";
+                    }
+                    $o->canceladopor = $canceladopor;
+
+                    $tiempo = $o->copia_tiempo_orden + $o->hora_2;
+
+                    $o->minutostotal = $tiempo;
+        
+                    $estimada = "";
+                    if($o->estado_4 == 1){ 
+                        // tomara el tiempo, desde cuando propietario inicia la orden
+                        $timer = Carbon::parse($o->fecha_4);
+                        // sumar minutos del propietario + tiempo extra de la zona
+                        $horaEstimada = $timer->addMinute($tiempo)->format('h:i A d-m-Y');
+                        $estimada = $horaEstimada; 
+                    }
+                    $o->estimada = $estimada;
+
+                    // modificar fechas
+                    if($o->estado_2 == 1){
+                        $o->fecha_2 = date("h:i A", strtotime($o->fecha_2));
+                    }
+                    if($o->estado_3 == 1){
+                        $o->fecha_3 = date("h:i A", strtotime($o->fecha_3));
+                    }
+                    if($o->estado_4 == 1){
+                        $o->fecha_4 = date("h:i A", strtotime($o->fecha_4));
+                    }
+                    if($o->estado_5 == 1){
+                        $o->fecha_5 = date("h:i A", strtotime($o->fecha_5));
+                    }
+                    if($o->estado_6 == 1){
+                        $o->fecha_6 = date("h:i A", strtotime($o->fecha_6));
+                    }
+                    if($o->estado_7 == 1){
+                        $o->fecha_7 = date("h:i A", strtotime($o->fecha_7));
+                    }
+                    if($o->estado_8 == 1){
+                        $o->fecha_8 = date("h:i A", strtotime($o->fecha_8));
+                    }
+                }   
+
+                return ['success' => 1, 'orden' => $orden];
+            }
+        }
+    }
+
+    public function informacioncargo(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+            if(Ordenes::where('id', $request->id)->first()){
+
+                $orden = DB::table('ordenes AS o')
+                ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
+                ->select('o.precio_total', 'o.precio_envio', 'o.tipo_cargo',
+                'od.copia_min_gratis')
+                ->where('o.id', $request->id)
+                ->get();
+                
+                $aplico = "No";
+                foreach($orden as $o){ 
+                   
+                    // verificar si ocupo cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $request->id)->first()){
+                        $aplico = "Si";
+                        
+                        $c = Cupones::where('id', $oc->cupones_id)->first();
+                        // ver que tipo de cupon fue aplicado
+                        if($c->tipo_cupon_id == 1){ // envio gratis
+                            $info = AplicaCuponUno::where('ordenes_id', $request->id)->first();
+                            $o->tipocupon = 1;
+                            $o->dinerocarrito = $info->dinero;
+                        }else if($c->tipo_cupon_id == 2){ // descuento dinero
+                            $info = AplicaCuponDos::where('ordenes_id', $request->id)->first();
+                            $o->tipocupon = 2;
+                            $o->dinerocarrito = $info->dinero; // dinero que se esta descontando
+                            $o->aplicoenvio = $info->aplico_envio_gratis;
+                            
+                            $descuento = $o->precio_total - $info->dinero;
+                            if($descuento <= 0){
+                                $descuento = 0;
+                            }
+                            $envio = $o->precio_envio;
+                            if($info->aplico_envio_gratis == 1){
+                                $envio = 0;
+                            }
+
+                            $suma = $descuento + $envio;
+                            $o->pagara = number_format((float)$suma, 2, '.', '');
+                        }else if($c->tipo_cupon_id == 3){ // descuento porcentaje
+                            $info = AplicaCuponTres::where('ordenes_id', $request->id)->first();
+                            $o->tipocupon = 3;
+                            $o->dinerocarrito = $info->dinero;
+                            $o->porcentaje = $info->porcentaje;
+
+                            $resta = $o->precio_total * ($info->porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            $suma = $total + $o->precio_envio;
+
+                            $o->pagara = number_format((float)$suma, 2, '.', '');
+                        }else if($c->tipo_cupon_id == 4){ // producto gratis
+                            $info = AplicaCuponCuatro::where('ordenes_id', $request->id)->first();
+                            $o->tipocupon = 4;
+                            $o->dinerocarrito = $info->dinero_carrito;
+                            $o->producto = $info->producto;
+                        }else{
+                            $o->tipocupon = 0;
+                        }
+
+                    } 
+
+                    $o->aplico = $aplico;
+                }   
+
+                return ['success' => 1, 'orden' => $orden];
+            }
+        }
+    }
+
+    public function informacionmotorista(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+            if(MotoristaOrdenes::where('ordenes_id', $request->id)->first()){
+
+                $motorista = DB::table('motorista_ordenes AS mo')
+                ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+                ->select('m.nombre', 'm.identificador', 'mo.fecha_agarrada')
+                ->where('mo.ordenes_id', $request->id)
+                ->get();
+                
+                
+                foreach($motorista as $o){                    
+                    $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));
+                }   
+
+                return ['success' => 1, 'orden' => $motorista];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    public function informaciontipocargo(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+            if($or = Ordenes::where('id', $request->id)->first()){
+
+                $tipocargo = $or->tipo_cargo;
+
+               
+                $datos = DB::table('ordenes_direcciones')                
+                ->where('ordenes_id', $request->id)
+                ->first();
+
+                // copia del cargo de envio a esa zona
+                $cargozona = $datos->copia_envio;
+                // copia minimo para envio gratis
+                $mingratis = $datos->copia_min_gratis;
+
+                $mitad = "";
+                if($tipocargo == 2){
+                    $division = $cargozona / 2;
+                    $division = number_format((float)$division, 2, '.', '');
+                    $mitad = $division;
+                }
+                
+                return ['success' => 1, 'tipo' => $tipocargo, 'precio' => $cargozona, 'mitad' => $mitad, 'mingratis' => $mingratis];
+            }
         }
     }
 
@@ -401,11 +663,10 @@ class OrdenesController extends Controller
             ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
             ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
             ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-            ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
-            ->select('mo.motoristas_id', 'o.estado_7', 'o.estado_8', 'o.envio_gratis', 'o.ganancia_motorista')
+            ->select('mo.motoristas_id', 'o.estado_7', 'o.estado_8', 'o.ganancia_motorista')
             ->where('mo.motoristas_id', $request->id)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
-            ->get();
+            ->get(); 
  
             $totalagarradas=0;
             foreach ($orden as $valor){
@@ -426,14 +687,6 @@ class OrdenesController extends Controller
                 }
             }
 
-            
-            $totalmarcagratis=0;
-            foreach ($orden as $valor){
-                if($valor->envio_gratis == 1){
-                    $totalmarcagratis = $totalmarcagratis + 1;
-                }
-            }
-
             $totalganancia=0;
             foreach ($orden as $valor){
                 // no cancelado y si completada
@@ -446,7 +699,7 @@ class OrdenesController extends Controller
 
             return ['success' => 1, 'totalagarradas' => $totalagarradas,
                     'totalcompletada' => $totalcompletas, 'totalcancelada' => $totalcanceladas, 
-                    'totalmarcagratis' => $totalmarcagratis, 'totalganancia' => $total]; 
+                    'totalganancia' => $total]; 
           }else{
             return ['success' => 2]; 
           }
@@ -466,7 +719,6 @@ class OrdenesController extends Controller
         ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->join('motorista_ordenes AS moo', 'moo.ordenes_id', '=', 'o.id')
         ->join('ordenes_direcciones AS od', 'od.ordenes_id', '=', 'o.id')
         ->select('o.id', 'o.fecha_orden', 'mo.motoristas_id', 'o.estado_8', 'o.estado_7',
                     'o.ganancia_motorista')
@@ -540,15 +792,11 @@ class OrdenesController extends Controller
         return view('backend.paginas.ordenes.tablas.tablapendienteorden', compact('orden'));
     } 
 
-
-    
     // vista para buscar un # orden
     public function index6(){
 
         return view('backend.paginas.ordenes.listavistanumeroorden');
     }
-
-
 
     // ocultar una orden pendiente de motorista
     function ocultarordenpendiente(Request $request){

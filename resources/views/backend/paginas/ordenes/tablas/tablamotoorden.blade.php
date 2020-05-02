@@ -12,7 +12,7 @@
                     <th style="width: 15%">ID orden</th> 
                     <th style="width: 15%">Identificador motorista</th> 
                     <th style="width: 15%">Nombre</th> 
-                    <th style="width: 15%">Fecha</th>   
+                    <th style="width: 15%">Fecha Ingreso</th>   
            
                 </tr> 
                 </thead>

@@ -12,7 +12,7 @@
                 <thead>             
                 <tr>
                     <th style="width: 15%">ID orden</th> 
-                    <th style="width: 15%">Fecha orden</th>
+                    <th style="width: 15%">Fecha Agarro</th>
                     <th style="width: 15%">Identi motorista</th> 
                     <th style="width: 15%">Identi servicio</th> 
                     <th style="width: 15%">Estado orden</th>    
@@ -26,13 +26,13 @@
                 @foreach($orden as $dato)
                 <tr>
                     <td>{{ $dato->idorden }}</td>
-                    <td>{{ $dato->fecha_orden }}</td>
+                    <td>{{ $dato->fecha_agarrada }}</td>
                     <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->identiservicio }}</td>
 
                     <td> 
                       @if($dato->estado_7 == 0)
-                      <span class="badge bg-danger">No</span>
+                      <span class="badge bg-danger">En Proceso</span>
                       @else
                       <span class="badge bg-primary">Completado</span>
                       @endif
@@ -43,12 +43,9 @@
                     
 
                     <td>
-                      <button type="button" class="btn btn-info btn-xs" onclick="informacion({{ $dato->idorden }})">
-                      <i class="fas fa-eye" title="Informacion"></i>&nbsp; Info
-                      </button> 
-
+                     
                       <button type="button" class="btn btn-danger btn-xs" onclick="cancelar({{ $dato->idorden }})">
-                      <i class="fas fa-eye" title="Informacion"></i>&nbsp; Cancelar
+                      <i class="fas fa-eye" title="CANCELAR"></i>&nbsp; CANCELAR ORDEN
                       </button> 
 
                     </td> 
