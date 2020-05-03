@@ -21,6 +21,7 @@ class CreateCuponesTable extends Migration
             $table->integer('contador');
             $table->date('fecha');
             $table->boolean('activo');
+            $table->boolean('ilimitado');
 
             $table->foreign('tipo_cupon_id')->references('id')->on('tipo_cupon');
         });

@@ -114,10 +114,12 @@
 
           <!-- oficina -->
        
-              <p class="oficina">
-                  Tatan Express
-              </p>
-        
+             
+          <p class="oficina">
+        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; _________________________ <br>
+        &nbsp; &nbsp; &nbsp; Administrador  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;        Responsable de Cobro         
+        </p>
+         
 
 </body>
 </html> 

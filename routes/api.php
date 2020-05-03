@@ -76,7 +76,7 @@ Route::post('usuario/verficar/cupon', 'Api\ProcesadorOrdenesController@verificar
 
   
 // PROPIETARIOS  
- 
+  
 Route::post('propietario/login', 'Api\PropietarioController@loginPropietario'); // login propietario 
 Route::post('propietario/password/recuperacion', 'Api\PropietarioController@codigoCorreo'); // enviar codigo recuperacion
 Route::post('propietario/revisar/codigo', 'Api\PropietarioController@revisarCodigoCorreo'); // revisar codigo correo
@@ -105,12 +105,10 @@ Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden')
 // cancelar orden extraordinariamente
 Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@cancelarOrdenExtraordinariamente'); // cancelar orden extraordinariamente
   
-// historial
-Route::post('propietario/ver/historial', 'Api\PropietarioController@verHistorial'); // ver historial
 
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
-Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes canceladas
-Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes canceladas
+Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes completadas
+Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes completadas hoy
     
  
 // configuraciones
@@ -152,7 +150,7 @@ Route::post('motorista/ver/producto/individual', 'Api\MotoristaController@ordenP
 Route::post('motorista/obtener/orden', 'Api\MotoristaController@obtenerOrden'); // motorista obtiene la orden
  
 // orden proceso
-Route::post('motorista/orden/proceso', 'Api\MotoristaController@verProcesoOrdenes'); // ver orden en proce
+Route::post('motorista/orden/proceso', 'Api\MotoristaController@verProcesoOrdenes'); // ver orden en proceso
 Route::post('motorista/orden/procesoentrega', 'Api\MotoristaController@verProcesoOrdenesEntrega'); // ver orden en proce
   
 Route::post('motorista/ver/orden/proceso/id', 'Api\MotoristaController@verOrdenProcesoPorID'); // ver estados orden proceso por id

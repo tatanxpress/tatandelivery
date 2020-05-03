@@ -1339,12 +1339,68 @@ class ProcesadorOrdenesController extends Controller
 
                                     $total = number_format((float)$total, 2, '.', '');
 
-                                    return ['success' => 11, 'dinero' => $total, 'aplica' => $porcentaje];
+                                    //** conocer el envio, tipo de cargo */
+                                    $zonaiduser = 0;
+                                    // sacar id zona del usuario
+                                    if($user = Direccion::where('user_id', $request->userid)
+                                    ->where('seleccionado', 1)->first())
+                                    {
+                                        $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
+                                    } 
+                                    $envioPrecio = 0;                                            
+                                            
+                                    // precio de la zona
+                                    // aqui no importa si esta activo o inactivo, solo obtendra el precio
+                                    // para ver el proceso debe existir en zonas_servicios
+                                    $zz = DB::table('zonas_servicios')                                   
+                                    ->where('zonas_id', $zonaiduser)
+                                    ->where('servicios_id', $cart->servicios_id)
+                                    ->first();
+
+                                    // obtiene precio envio de la zona
+                                    // PRIORIDAD 1
+                                    $envioPrecio = $zz->precio_envio;                   
+
+                                    // PRIORIDAD 2
+                                    // mitad de precio al envio, solo servicios publicos
+                                    if($zz->mitad_precio == 1){
+                                        if($envioPrecio != 0){
+                                            $envioPrecio = $envioPrecio / 2;
+                                        }                        
+                                    }
+
+                                    // PRIORIDAD 3
+                                    // envio gratis a esta zona, solo servicios publicos desde panel de control
+                                    if($zz->zona_envio_gratis == 1){
+                                        $envioPrecio = 0;
+                                    }
+
+                                    $datosInfo = DB::table('zonas_servicios AS z')
+                                    ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                                    ->where('z.zonas_id', $zonaiduser)
+                                    ->where('z.servicios_id', $cart->servicios_id)
+                                    ->first();
+
+                                    // PRIORIDAD 4
+                                    // esta zona tiene un minimo de $$ para envio gratis
+                                    if($datosInfo->min_envio_gratis == 1){
+                                        // precio envio sera 0, si supera $$ en carrito de compras
+                                        if($consumido > $datosInfo->costo_envio_gratis){
+                                            $envioPrecio = 0;
+                                        }
+                                    }       
+                                   
+                                    // sumar sub total + cargo de envio
+                                    $totalsumado = $total + $envioPrecio;
+                                    
+                                    // sub total, cargo envio, total, porcentaje
+                                    return ['success' => 11, 'dinero' => $total, 'cargo' => $envioPrecio, 'total' => $totalsumado, 'aplica' => $porcentaje];
                                 }else{
                                     // consumible no alcanza el minimo para aplicar este cupon de 
                                     // descuento
-                                    $t = number_format((float)$minimo, 2, '.', '');
-                                    return ['success' => 12, 'dinero' => $t];
+                                    $minimo = number_format((float)$minimo, 2, '.', '');                                   
+
+                                    return ['success' => 12, 'dinero' => $minimo];
                                 }
 
                             }else{
@@ -1445,23 +1501,73 @@ class ProcesadorOrdenesController extends Controller
             if(User::where('id', $request->userid)->first()){
                 $orden = DB::table('ordenes AS o')
                     ->join('servicios AS s', 's.id', '=', 'o.servicios_id')              
-                    ->select('o.id', 's.nombre', 'o.precio_total', 'o.nota_orden', 'o.fecha_orden', 'o.precio_envio')
+                    ->select('o.id', 's.nombre', 'o.precio_total',
+                    'o.nota_orden', 'o.fecha_orden', 'o.precio_envio')
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible', 1)
                     ->get();
                  
-                foreach($orden as $o){
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
+                foreach($orden as $o){                    
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
-                    $total = $o->precio_total;
-                    $envio = $o->precio_envio;
-                    $t = $total + $envio;
-                    $sumado = number_format((float)$t, 2, '.', '');
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
-                    $o->precio_total = $sumado;
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;
+                            // modificar precio
+                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // precio modificado con el descuento dinero
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;
+
+                        $total = $o->precio_total;
+                        $envio = $o->precio_envio;
+                        $total = $total + $envio;
+                        $total = number_format((float)$total, 2, '.', '');
+    
+                        $o->precio_total = $total;
+                    }
+                    
                 }
 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -1496,18 +1602,13 @@ class ProcesadorOrdenesController extends Controller
 
             if(Ordenes::where('id', $request->ordenid)->first()){
             
-                $orden = DB::table('ordenes AS o')
-                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-                    ->select('o.id', 'o.servicios_id', 's.nombre', 'o.precio_total',
-                    'o.fecha_orden', 'o.precio_envio', 'o.estado_2', 'o.fecha_2',
-                    'o.hora_2', 'o.estado_3', 'o.fecha_3', 'o.estado_4', 'o.fecha_4',
-                    'o.estado_5', 'o.fecha_5', 'o.estado_6', 'o.fecha_6', 'o.estado_7',
-                    'o.fecha_7', 'o.estado_8', 'o.fecha_8', 'o.mensaje_8')
-                    ->where('o.id', $request->ordenid)                
-                    ->get();
-                
-
-                $excedido = 0; // para ver si el cliente puede cancelar la orden por tardio
+                $orden = DB::table('ordenes')                  
+                    ->select('id', 'fecha_orden', 'estado_2', 'fecha_2',
+                    'hora_2', 'estado_3', 'fecha_3', 'estado_4', 'fecha_4',
+                    'estado_5', 'fecha_5', 'estado_6', 'fecha_6', 'estado_7',
+                    'fecha_7', 'estado_8', 'fecha_8', 'mensaje_8')
+                    ->where('id', $request->ordenid)                
+                    ->get();                
                       
                 // CLIENTE MIRA EL TIEMPO DEL PROPIETARIO MAS COPIA DEL TIEMPO DE ZONA
                 $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
@@ -1516,79 +1617,47 @@ class ProcesadorOrdenesController extends Controller
                 foreach($orden as $o){
 
                     $sumado = $tiempo->copia_tiempo_orden + $o->hora_2;
-
                     $o->hora_2 = $sumado;
 
                     // ver si fue cancelado desde panel de control
                     $o->canceladoextra = $tiempo->cancelado_extra;
-
-                    // sumar precio de envio + producto
-                    $sumado = $o->precio_total + $o->precio_envio;
-                    $total = number_format((float)$sumado, 2, '.', '');
-
-                    $o->precio_total = $total;
                      
-                    if($o->estado_2 == 1){ // propietario da el tiempo de espera
-                        
-                        $fechaE2 = $o->fecha_2;
-                        $hora2 = date("h:i A", strtotime($fechaE2));
-                        $fecha2 = date("d-m-Y", strtotime($fechaE2));
-                    
-                        $o->fecha_2 = $hora2 . " " . $fecha2;
+                    if($o->estado_2 == 1){ // propietario da el tiempo de espera                        
+                        $o->fecha_2 = date("h:i A d-m-Y", strtotime($o->fecha_2));                    
                     }
 
-                    if($o->estado_3 == 1){                        
-                        $fechaE3 = $o->fecha_3;
-                        $hora3 = date("h:i A", strtotime($fechaE3));
-                        $fecha3 = date("d-m-Y", strtotime($fechaE3));                      
-                        $o->fecha_3 = $hora3 . " " . $fecha3;
+                    if($o->estado_3 == 1){ 
+                        $o->fecha_3 =date("h:i A d-m-Y", strtotime($o->fecha_3));  
                     }
                 
-                    if($o->estado_4 == 1){ // orden en ppreparacion
+                    if($o->estado_4 == 1){ // orden en preparacion
                         $time1 = Carbon::parse($o->fecha_4);
                         
+                        // ya va sumado el tiempo extra de la zona, aqui arriba
                         $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                         $o->horaEstimada = $horaEstimada;
-
                     }
                     
-                    if($o->estado_5 == 1){                        
-                        $fechaE5 = $o->fecha_5;
-                        $hora5 = date("h:i A", strtotime($fechaE5));
-                        $fecha5 = date("d-m-Y", strtotime($fechaE5));                      
-                        $o->fecha_5 = $hora5 . " " . $fecha5;
+                    if($o->estado_5 == 1){                             
+                        $o->fecha_5 = date("h:i A d-m-Y", strtotime($o->fecha_5));
                     }
 
-                    if($o->estado_6 == 1){
-                        $fechaE6 = $o->fecha_6;
-                        $hora6 = date("h:i A", strtotime($fechaE6));
-                        $fecha6 = date("d-m-Y", strtotime($fechaE6));                      
-                        $o->fecha_6 = $hora6 . " " . $fecha6;
+                    if($o->estado_6 == 1){                     
+                        $o->fecha_6 = date("h:i A d-m-Y", strtotime($o->fecha_6));
                     }
 
                     if($o->estado_7 == 1){
-                        $fechaE7 = $o->fecha_7;
-                        $hora7 = date("h:i A", strtotime($fechaE7));
-                        $fecha7 = date("d-m-Y", strtotime($fechaE7));
-                        $o->fecha_7 = $hora7 . " " . $fecha7;
+                        $o->fecha_7 = date("h:i A d-m-Y", strtotime($o->fecha_7));
                     }
 
                     if($o->estado_8 == 1){
-                        $fechaE8 = $o->fecha_8;
-                        $hora8 = date("h:i A", strtotime($fechaE8));
-                        $fecha8 = date("d-m-Y", strtotime($fechaE8));
-                        $o->fecha_8 = $hora8 . " " . $fecha8;
+                        $o->fecha_8 = date("h:i A d-m-Y", strtotime($o->fecha_8));
                     }
 
-                 
-
-                        $fechaOrden = $o->fecha_orden;
-                        $hora = date("h:i A", strtotime($fechaOrden));
-                        $fecha = date("d-m-Y", strtotime($fechaOrden));
-                        $o->fecha_orden = $hora . " " . $fecha;  
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                 }
             
-                return ['success' => 1, 'excedido' => $excedido, 'ordenes' => $orden];
+                return ['success' => 1, 'ordenes' => $orden];
             }else{
                 return ['success' => 2];
             }

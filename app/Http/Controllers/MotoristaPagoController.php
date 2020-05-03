@@ -18,6 +18,7 @@ use App\AplicaCuponUno;
 use App\AplicaCuponDos;
 use App\AplicaCuponTres;
 use App\AplicaCuponCuatro;
+use App\AplicaCuponCinco;
 use App\OrdenesDirecciones;
 
 class MotoristaPagoController extends Controller
@@ -211,6 +212,8 @@ class MotoristaPagoController extends Controller
                         $o->tipocupon = "Descuento Porcentaje";
                     }else if($c->tipo_cupon_id == 4){
                         $o->tipocupon = "Producto Gratis";
+                    }else if($c->tipo_cupon_id == 5){
+                        $o->tipocupon = "Donacion";
                     }
                 } 
 
@@ -323,6 +326,33 @@ class MotoristaPagoController extends Controller
                 }
 
                 return view('backend.paginas.pagoservicio.tablas.tablalistapagoserviciocuponproducto', compact('orden'));
+            
+            }else if($cupon == 6){ // Donacion
+                $orden = DB::table('ordenes AS o')
+                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+                ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
+                ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
+                ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
+                's.identificador AS identiservicio', 'oc.cupones_id', 'o.estado_7', 
+                'o.estado_8', 'o.estado_5', 'c.tipo_cupon_id', 'o.precio_envio')
+                ->where('s.id', $idservicio)
+                ->where('o.estado_5', 1) // ordenes completadas
+                ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
+                ->where('c.tipo_cupon_id', 5) // cupon donacion
+                ->whereBetween('o.fecha_orden', array($date1, $date2))          
+                ->get();
+
+                // conocer que tipo de cupon es
+                foreach($orden as $o){
+                    $info = AplicaCuponCinco::where('ordenes_id', $o->idorden)->first();                                      
+                    $o->donacion = $info->dinero;
+
+                    $total = $o->precio_total + $o->precio_envio + $info->dinero;
+
+                    $o->total = number_format((float)$total, 2, '.', '');
+                }
+
+                return view('backend.paginas.pagoservicio.tablas.tablalistapagoserviciocupondonacion', compact('orden'));
             }
            
         }else{
@@ -532,8 +562,8 @@ class MotoristaPagoController extends Controller
             $view =  \View::make('backend.paginas.reportes.servicios.reportepagoserviciocupon4', compact(['orden', 'nombre', 'f1', 'f2']))->render();
             $pdf = \App::make('dompdf.wrapper');
             $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
-            return $pdf->stream();
-            
+            return $pdf->stream(); 
+
         }
     }
 

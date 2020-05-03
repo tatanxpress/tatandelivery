@@ -26,6 +26,11 @@ use Exception;
 use OneSignal;
 use App\Zonas;
 use App\OrdenesDirecciones;
+use App\OrdenesCupones;
+use App\Cupones;
+use App\AplicaCuponCuatro;
+use App\AplicaCuponTres;
+use App\AplicaCuponDos;
 
 class MotoristaController extends Controller
 {
@@ -282,8 +287,7 @@ class MotoristaController extends Controller
                 ->where('motoristas_id', $m->id)
                 ->get();
 
-                $noquiero = DB::table('motorista_ordenes AS mo')                
-                ->get();
+                $noquiero = DB::table('motorista_ordenes AS mo')->get();
 
                 $pilaOrden = array();
                 foreach($noquiero as $p){
@@ -308,11 +312,7 @@ class MotoristaController extends Controller
 
                 foreach($orden as $o){
 
-                    $sumado = $o->precio_total + $o->precio_envio;
-                    $total = number_format((float)$sumado, 2, '.', '');
-
-                    $o->precio_total = $total;
-
+                    
                     $servicio = DB::table('zonas AS z')
                     ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
                     ->select('z.nombre')                    
@@ -329,7 +329,77 @@ class MotoristaController extends Controller
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($resta)->format('h:i A d-m-Y');
                     $o->horaEntrega = $horaEstimada;
-                }
+
+                     // buscar si aplico cupon
+                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;
+                            // modificar precio
+                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            // precio modificado con el descuento dinero
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $sumado = $o->precio_total + $o->precio_envio;
+                            $sumado = number_format((float)$sumado, 2, '.', '');
+    
+                            $o->precio_total = $sumado;
+
+                            $o->producto = $producto;
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;    
+                        
+                        $total = $o->precio_total + $o->precio_envio;
+                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                    }
+
+
+                } //end foreach
 
              
                 return ['success' => 2, 'ordenes' => $orden]; 
@@ -717,33 +787,96 @@ class MotoristaController extends Controller
                 ->get();
 
                 // sumar mas envio
-                foreach($orden as $p){
-                    $total = $p->precio_total + $p->precio_envio;
-                    $p->precio_total = number_format((float)$total, 2, '.', '');
-
+                foreach($orden as $o){
+                  
                     $zona = DB::table('zonas AS z')
                     ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
                     ->select('z.nombre AS nombreZona')
-                    ->where('zs.servicios_id', $p->servicioid)
+                    ->where('zs.servicios_id', $o->servicioid)
                     ->first();
                     
-
                     $nombre = $zona->nombreZona;
-                    $p->zona = $nombre;
+                    $o->zona = $nombre;
                     
-                    $fechaOrden = Carbon::parse($p->fecha_4);
-
-
                     $data = DB::table('ordenes_direcciones')
-                    ->where('ordenes_id', $p->id)              
+                    ->where('ordenes_id', $o->id)              
                     ->first();
                     
-                    $tiempozona = $data->copia_tiempo_orden;
+                    $tiempo = $data->copia_tiempo_orden + $o->hora_2;
+                    $fechaOrden = Carbon::parse($o->fecha_4);
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempo)->format('h:i A d-m-Y');
+                    $o->fecharecoger = $horaEstimadaEntrega;
 
-                    $restaHoraEstimada = $p->hora_2 - $tiempozona;
 
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($restaHoraEstimada)->format('h:i A d-m-Y');
-                    $p->fecharecoger = $horaEstimadaEntrega;
+                     // buscar si aplico cupon
+                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;
+                            // modificar precio
+                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            // precio modificado con el descuento dinero
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $sumado = $o->precio_total + $o->precio_envio;
+                            $sumado = number_format((float)$sumado, 2, '.', '');
+    
+                            $o->precio_total = $sumado;
+
+                            $o->producto = $producto;
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;    
+                        
+                        $total = $o->precio_total + $o->precio_envio;                       
+                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                    }
+
+                   
                 }
                 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -790,26 +923,101 @@ class MotoristaController extends Controller
                 ->where('mo.motoristas_id', $request->id)
                 ->get();
 
-                // sumar mas envio
-                foreach($orden as $p){
-                    $total = $p->precio_total + $p->precio_envio;
-                    $p->precio_total = number_format((float)$total, 2, '.', '');
+               
 
+                // sumar mas envio
+                foreach($orden as $o){
+
+                    // Tiempo dado por propietario + tiempo de zona extra
+                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+                   
+                    // obtener nombre de la zona donde se entregara
                     $zona = DB::table('zonas AS z')
                     ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
                     ->select('z.nombre AS nombreZona')
-                    ->where('zs.servicios_id', $p->servicioid)
+                    ->where('zs.servicios_id', $o->servicioid)
                     ->first();
                     
-
                     $nombre = $zona->nombreZona;
-                    $p->zona = $nombre;
+                    $o->zona = $nombre;
                     
-                    $fechaOrden = Carbon::parse($p->fecha_4);
-                    $restaHoraEstimada = $p->hora_2; // HORA DE ENTREGA AL CLIENTE
+                    $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
+                    $fechaOrden = Carbon::parse($o->fecha_4);
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');                   
+                    $o->fecharecoger = $horaEstimadaEntrega;
+                    
+                    // ver si fue cancelado desde panel de control
+                    $o->canceladoextra = $tiempo->cancelado_extra;
+                  
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($restaHoraEstimada)->format('h:i A');
-                    $p->fecharecoger = $horaEstimadaEntrega;
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;
+                            // modificar precio
+                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            // precio modificado con el descuento dinero
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $sumado = $o->precio_total + $o->precio_envio;
+                            $sumado = number_format((float)$sumado, 2, '.', '');
+
+                            $o->precio_total = $sumado;
+
+                            $o->producto = $producto;
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;    
+                        
+                        $total = $o->precio_total + $o->precio_envio;
+                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                    }
+
+
                 }
                 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -1173,13 +1381,9 @@ class MotoristaController extends Controller
                     'message' => $validator->errors()->all()
                 ];
             }
-
-           
-
+          
             if(Motoristas::where('id', $request->id)->first()){
 
-              
-                
                 Motoristas::where('id', $request->id)->update(['disponible' => $request->valor1]);
                
                 return ['success'=> 1];                
@@ -1249,11 +1453,6 @@ class MotoristaController extends Controller
  
             if($p = Motoristas::where('id', $request->id)->first()){
 
-                // Este motorista trabaja para un servicio privado
-                if($p->privado){
-                    return ['success' => 1];
-                }
-
                 $start = Carbon::parse($request->fecha1)->startOfDay(); 
                 $end = Carbon::parse($request->fecha2)->endOfDay();
                 
@@ -1268,15 +1467,8 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
-
-                    // sumar total de orden + envio
-                    $sumado = $o->precio_total + $o->precio_envio;
-                    $o->precio_total = number_format((float)$sumado, 2, '.', '');
-
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
+                   
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                     
                     // nombre servicio
                     $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
@@ -1289,14 +1481,82 @@ class MotoristaController extends Controller
                     // sacar zona de envio
                     $zona = Zonas::where('id', $pack->zonas_id)->pluck('descripcion')->first();
                     $o->zona = $zona;
+
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;
+                            // modificar precio
+                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            // precio modificado con el descuento dinero
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $sumado = $o->precio_total + $o->precio_envio;
+                            $sumado = number_format((float)$sumado, 2, '.', '');
+    
+                            $o->precio_total = $sumado;
+                            $o->producto = $producto;
+                            
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;    
+                        
+                        $total = $o->precio_total + $o->precio_envio;                       
+                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                    }
                 }
 
-                // sumar ganancia de esta fecha
+                // sumar ganancia de motorista de esta fecha
                 $suma = collect($orden)->sum('ganancia_motorista');
                 $ganado = number_format((float)$suma, 2, '.', '');
-                return ['success' => 2, 'histoorden' => $orden, 'ganado' => $ganado];
+                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
             }else{
-                return ['success' => 3];
+                return ['success' => 2];
             }
         }
     }
@@ -1385,10 +1645,7 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
-                    $fechaOrden = $o->fecha_agarrada;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));
                     
                     // nombre servicio
                     $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();

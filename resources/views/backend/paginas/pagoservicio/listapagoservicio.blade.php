@@ -107,7 +107,8 @@
                                             <option value="2">Envio Gratis</option>
                                             <option value="3">Descuento Dinero</option>
                                             <option value="4">Descuento Porcentaje</option>
-                                            <option value="5">Producto Gratis</option>                                
+                                            <option value="5">Producto Gratis</option>        
+                                            <option value="6">Donacion</option>                        
                                         </select>
                                     </div> 
                                 </div>
@@ -173,7 +174,8 @@
                                             <option value="1">Envio Gratis</option>
                                             <option value="2">Descuento Dinero</option>
                                             <option value="3">Descuento Porcentaje</option>
-                                            <option value="4">Producto Gratis</option>                                
+                                            <option value="4">Producto Gratis</option>    
+                                            <option value="5">Donacion</option>                            
                                         </select>
                                     </div> 
                                 </div>

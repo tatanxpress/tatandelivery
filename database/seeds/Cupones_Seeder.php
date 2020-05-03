@@ -31,5 +31,10 @@ class Cupones_Seeder extends Seeder
             'nombre' => 'Producto Gratis',
             'descripcion' => 'Aplicara para cualquier servicio, necesita minimo de compra'
             ]); 
+
+        $tipo5 = TipoCupon::create([ 
+            'nombre' => 'Donación',
+            'descripcion' => 'Aplicara para diferentes instituciones'
+            ]); 
     }
 }

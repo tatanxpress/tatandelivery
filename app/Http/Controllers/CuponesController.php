@@ -17,6 +17,8 @@ use App\CuponEnvioDinero;
 use Illuminate\Support\Facades\DB; 
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use App\Instituciones;
+use App\CuponDonacion;
 
 class CuponesController extends Controller
 {
@@ -99,8 +101,8 @@ class CuponesController extends Controller
         return view('backend.paginas.cupones.tablas.descuentop.tablacupondescuentop', compact('cupones'));
     }
 
-       // lista de cupones de productos gratis
-       public function indexProducto(){
+    // lista de cupones de productos gratis
+    public function indexProducto(){
         $servicios = DB::table('servicios')->select('id', 'identificador')->get();
 
         return view('backend.paginas.cupones.progratis.listacuponesprogratis', compact('servicios'));
@@ -118,7 +120,39 @@ class CuponesController extends Controller
         return view('backend.paginas.cupones.tablas.progratis.tablacuponprogratis', compact('cupones'));
     }
 
+    // lista instituciones
+    public function indexInstituciones(){
+        
+        return view('backend.paginas.cupones.instituciones.listainstituciones');
 
+    }
+
+    // tabla lista instituciones
+    public function tablaInstituciones(){
+        $instituciones = DB::table('instituciones')->get();
+
+        return view('backend.paginas.cupones.tablas.instituciones.tablainstituciones', compact('instituciones'));
+    }
+
+    // lista donaciones
+    public function indexDonacion(){     
+        $instituciones = DB::table('instituciones')->get();        
+
+        return view('backend.paginas.cupones.donacion.listadonacion', compact('instituciones'));
+    }
+
+    // tabla lista de donaciones
+    public function tablaDonacion(){
+        $donacion = DB::table('cupones AS c')
+        ->join('c_donacion AS d', 'd.cupones_id', '=', 'c.id')
+        ->join('instituciones AS i', 'i.id', '=', 'd.instituciones_id')
+        ->select('c.id', 'c.fecha', 'c.activo', 'c.ilimitado', 'c.texto_cupon',
+         'c.uso_limite', 'c.contador', 'i.nombre AS institucion', 'd.dinero')
+        ->where('c.tipo_cupon_id', 5) // cupon donacion
+        ->get();
+
+        return view('backend.paginas.cupones.tablas.donacion.tabladonacion', compact('donacion'));
+    }
 
     //******** */
     // nuevo cupon para envio gratis
@@ -156,7 +190,7 @@ class CuponesController extends Controller
 
             DB::beginTransaction();
            
-            try { 
+            try {
                 
                 // guardar nuevo cupon tipo envio gratis
                 $c = new Cupones();
@@ -166,6 +200,7 @@ class CuponesController extends Controller
                 $c->contador = 0;
                 $c->fecha = $fecha;
                 $c->activo = 1;
+                $c->ilimitado = 0;
                 if($c->save()){    
                     
                     $ced = new CuponEnvioDinero;
@@ -632,6 +667,7 @@ class CuponesController extends Controller
                 $c->contador = 0;
                 $c->fecha = $fecha;
                 $c->activo = 1;
+                $c->ilimitado = 0;
                 if($c->save()){
 
                     $d = new CuponDescuentoDinero();
@@ -924,6 +960,7 @@ class CuponesController extends Controller
                 $c->contador = 0;
                 $c->fecha = $fecha;
                 $c->activo = 1;
+                $c->ilimitado = 0;
                 if($c->save()){
 
                     $d = new CuponDescuentoPorcentaje();
@@ -1227,6 +1264,7 @@ class CuponesController extends Controller
                 $c->contador = 0;
                 $c->fecha = $fecha;
                 $c->activo = 1;
+                $c->ilimitado = 0;
                 if($c->save()){
 
                     $d = new CuponProductoGratis();
@@ -1287,8 +1325,8 @@ class CuponesController extends Controller
         }
     }
 
-     // editar cupon de producto gratis
-     public function editarProGratis(Request $request){
+    // editar cupon de producto gratis
+    public function editarProGratis(Request $request){
         if($request->isMethod('post')){   
             $rules = array( 
                 'id' => 'required',
@@ -1331,6 +1369,268 @@ class CuponesController extends Controller
                     CuponProductoGratis::where('cupones_id', $request->id)->update([
                     'dinero_carrito' => $request->dinero,
                     'nombre' => $request->producto
+                    ]);
+
+                return ['success' => 3];
+            }else{
+                return ['success' => 1];
+            }            
+        } 
+    }
+
+
+    public function nuevaInstitucion(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'nombre' => 'required'                             
+            );
+
+            $messages = array(   
+                'nombre.required' => 'El nombre es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            // nueva institucion
+            $c = new Instituciones();
+            $c->nombre = $request->nombre;
+            if($c->save()){
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+
+           
+        } 
+    }
+
+    public function infoInstitucion(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'id' => 'required'                             
+            );
+
+            $messages = array(   
+                'id.required' => 'El id es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            if($info = Instituciones::where('id', $request->id)->first()){  
+                              
+                return ['success' => 1, 'info' => $info];
+            }else{
+                return ['success' => 2];
+            }             
+        } 
+    }
+
+    public function editarInstitucion(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(
+                'id' => 'required',
+                'nombre' => 'required'                             
+            );
+
+            $messages = array(   
+                'id.required' => 'El id es requerido',
+                'nombre.required' => 'El nombre es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            if(Instituciones::where('id', $request->id)->first()){
+
+                // actualizar informacion del cupon
+                Instituciones::where('id', $request->id)->update([
+                    'nombre' => $request->nombre
+                    ]);
+
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            } 
+           
+        } 
+    }
+
+    // nuevo cupon para donacion
+    public function nuevaDonacion(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'textocupon' => 'required',
+                'usolimite' => 'required',
+                'donacion' => 'required',
+                'institucionid' => 'required'                 
+            );
+
+            $messages = array(   
+                'textocupon.required' => 'El texto cupon es requerido',
+                'usolimite.required' => 'Uso limite es requerido',
+                'donacion.required' => 'Donacion es requerido',
+                'institucionid.required' => 'id institucion es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            // buscar si ya existe el cupon
+            if(Cupones::where('texto_cupon', $request->textocupon)->first()){
+                return ['success' => 2];
+            }
+
+            $fecha = Carbon::now('America/El_Salvador');
+
+            DB::beginTransaction();
+           
+            try { 
+
+                // guardar nuevo cupon tipo envio gratis
+                $c = new Cupones();
+                $c->tipo_cupon_id = 5;
+                $c->texto_cupon = $request->textocupon;
+                $c->uso_limite = $request->usolimite;
+                $c->contador = 0;
+                $c->fecha = $fecha;
+                $c->activo = 1;
+                $c->ilimitado = 0;
+                if($c->save()){
+
+                    $d = new CuponDonacion();
+                    $d->cupones_id = $c->id;
+                    $d->instituciones_id = $request->institucionid;
+                    $d->dinero = $request->donacion;                 
+                    $d->save();                                      
+                   
+                    DB::commit();
+                    return ['success' => 3];
+
+                }else{
+                    return ['success' => 1];
+                }
+               
+            } catch(\Throwable $e){
+                DB::rollback();
+                return ['success' => 1];
+            }
+        } 
+    }
+
+    public function infoDonacion(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'id' => 'required'                             
+            );
+
+            $messages = array(   
+                'id.required' => 'El id es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            if(Cupones::where('id', $request->id)->first()){  
+
+                $info = DB::table('cupones AS c')
+                ->join('c_donacion AS d', 'd.cupones_id', '=', 'c.id')
+                ->select('c.id', 'c.texto_cupon', 'c.activo', 'c.uso_limite', 'd.dinero', 'c.ilimitado')
+                ->where('c.id', $request->id)
+                ->first();
+                              
+                return ['success' => 1, 'info' => $info];
+            }else{
+                return ['success' => 2];
+            }             
+        } 
+    }
+
+
+    public function editarDonacion(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'id' => 'required',
+                'texto' => 'required',
+                'limite' => 'required',
+                'dinero' => 'required',
+                'ilimitado' => 'required',
+                'activo' => 'required'                      
+            );
+
+            $messages = array(   
+                'id.required' => 'ID es requerido',
+                'texto.required' => 'El texto es requerido',
+                'limite.required' => 'limite de cupon es requerido',
+                'dinero.required' => 'dinero de cupon es requerido',
+                'ilimitado.required' => 'ilimitado es requerido',
+                'activo.required' => 'activo es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            if(Cupones::where('id', $request->id)->first()){
+
+                if(Cupones::where('texto_cupon', $request->texto)->where('id', '!=', $request->id)->first()){
+                    return ['success' => 2];
+                }
+
+                // actualizar informacion del cupon
+                Cupones::where('id', $request->id)->update([
+                    'texto_cupon' => $request->texto,
+                    'uso_limite' => $request->limite,
+                    'ilimitado' => $request->ilimitado,
+                    'activo' => $request->activo
+                    ]);
+ 
+                    CuponDonacion::where('cupones_id', $request->id)->update([
+                    'dinero' => $request->dinero                
                     ]);
 
                 return ['success' => 3];

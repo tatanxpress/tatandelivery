@@ -286,7 +286,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/cupones/envio/borrarzona', 'CuponesController@borrarZonaDeEnvio');
   Route::post('/cupones/envio/agregarzona', 'CuponesController@nuevaZonaEnvio');
   Route::post('/cupones/envio/agregarservicio', 'CuponesController@nuevoServicioEnvio');
-
+ 
 
   Route::get('/cupones/vistausogeneral/{id}', 'CuponesController@vistaUsosGeneral');
   Route::get('/cupones/tabla/vistausogeneral/{id}', 'CuponesController@tablaVistaUsosGeneral');
@@ -322,6 +322,20 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/cupones/info/progratis', 'CuponesController@cuponInfoProGratis');
   Route::post('/cupones/editar/progratis', 'CuponesController@editarProGratis');
   Route::get('/cupones/vista/progratis/{id}', 'CuponesController@vistaProGratis');
+
+  // lista de instituciones
+  Route::get('/cupones/lista/instituciones', 'CuponesController@indexInstituciones'); 
+  Route::get('/cupones/tabla/instituciones', 'CuponesController@tablaInstituciones'); 
+  Route::post('/cupones/nuevo/institucion', 'CuponesController@nuevaInstitucion');
+  Route::post('/cupones/info/institucion', 'CuponesController@infoInstitucion');
+  Route::post('/cupones/editar/institucion', 'CuponesController@editarInstitucion');
+
+  // lista de cupones para donaciones
+  Route::get('/cupones/lista/donacion', 'CuponesController@indexDonacion'); 
+  Route::get('/cupones/tabla/donacion', 'CuponesController@tablaDonacion');
+  Route::post('/cupones/nuevo/donacion', 'CuponesController@nuevaDonacion');
+  Route::post('/cupones/info/donacion', 'CuponesController@infoDonacion');
+  Route::post('/cupones/editar/donacion', 'CuponesController@editarDonacion');
 
 });         
   

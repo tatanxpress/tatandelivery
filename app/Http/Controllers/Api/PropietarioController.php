@@ -26,7 +26,9 @@ use DateTime;
 use Exception;
 use OneSignal;
 use App\OrdenesPendiente;
-
+use App\OrdenesCupones;
+use App\Cupones;
+use App\AplicaCuponCuatro;
 
 class PropietarioController extends Controller
 {
@@ -300,20 +302,42 @@ class PropietarioController extends Controller
                 }
 
              
-                $orden = DB::table('ordenes AS o')                
-                ->select('o.id', 'o.precio_total', 'o.nota_orden', 'o.fecha_orden')
-                ->where('o.servicios_id', $p->servicios_id)
-                ->where('o.visible_p', 1)
+                $orden = DB::table('ordenes')                
+                ->select('id', 'precio_total', 'nota_orden', 'fecha_orden')
+                ->where('servicios_id', $p->servicios_id)
+                ->where('visible_p', 1)
                 ->get();
             
                 foreach($orden as $o){
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
-                    // resta para total del propietario
-                    $precio = $o->precio_total;
+                    // cupones
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2; 
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;                          
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+                        }else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;
+                    }                    
                 }
 
                 return ['success' => 2, 'ordenes' => $orden]; 
@@ -1817,37 +1841,54 @@ class PropietarioController extends Controller
             }
             
             if($p = Propietarios::where('id', $request->id)->first()){
-                $orden = DB::table('ordenes AS o')                
-                ->select('o.id', 'o.precio_total', 'o.estado_8', 'o.nota_orden', 
-                'o.fecha_4', 'o.hora_2')
-                ->where('o.estado_8', 0) // ordenes no canceladas
-                ->where('o.servicios_id', $p->servicios_id)
-                ->where('o.visible_p2', 1) // estan en preparacion
-                ->where('o.visible_p3', 1) // aun sin terminar de preparar 
-                ->where('o.estado_4', 1) // orden estado 4 preparacion
-                ->get();
-           
+                $orden = DB::table('ordenes')                
+                ->select('id', 'precio_total', 'estado_8', 'nota_orden', 
+                'fecha_4', 'hora_2')
+                ->where('estado_8', 0) // ordenes no canceladas
+                ->where('servicios_id', $p->servicios_id)
+                ->where('visible_p2', 1) // estan en preparacion
+                ->where('visible_p3', 1) // aun sin terminar de preparar 
+                ->where('estado_4', 1) // orden estado 4 preparacion
+                ->get();           
            
                 foreach($orden as $o){
-
-
-
-
-                    $fechaOrden = $o->fecha_4;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $hora . " " . $fecha;
-
-                  
-                    $precio = $o->precio_total;
-                  
-                    $o->total = number_format((float)$precio, 2, '.', '');
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_4));
+                                    
+                    $o->total = number_format((float)$o->precio_total, 2, '.', '');
 
                     // ESTA ES LA HORA2 PARA LA VISTA UNICAMENTE PROPIETARIO
 
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimada; 
+
+                    // cupones
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2; 
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;                          
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+                        }else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;
+                    } 
                 }
 
                 return ['success' => 1, 'ordenes' => $orden]; 
@@ -2147,74 +2188,7 @@ class PropietarioController extends Controller
         }
     }
  
-    // ver historial 
-    public function verHistorial(Request $request){
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(
-                'id' => 'required',
-                'tipo' => 'required'               
-            );
-
-            $mensajeDatos = array(                                      
-                'id.required' => 'El id propiestrio es requerido.',
-                'tipo.required' => 'El tipo a buscar es requerido.'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            if($p = Propietarios::where('id', $request->id)->first()){
-
-                // buscar fecha hoy
-                if($request->tipo == 0){
-                    
-                    $orden = DB::table('ordenes AS o')
-                    ->select('o.id', 'o.precio_total', 'o.nota_orden', 
-                    'o.fecha_orden', 'o.estado_8', 'o.estado_7')
-                    ->where('o.servicios_id', $p->servicios_id)
-                    ->whereDate('o.fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-               
-                    foreach($orden as $o){
-                        $fechaOrden = $o->fecha_orden;
-                        $hora = date("h:i A", strtotime($fechaOrden));
-                        $fecha = date("d-m-Y", strtotime($fechaOrden));
-                        $o->fecha_orden = $hora . " " . $fecha;    
-                    }
-                    
-                    return ['success' => 1, 'histoorden' => $orden];
-                }else{
-
-                    // buscar con la fecha dada
-                    $orden = DB::table('ordenes AS o')
-                    ->select('o.id', 'o.precio_total', 'o.nota_orden', 
-                    'o.fecha_orden', 'o.estado_8','o.estado_7')
-                    ->where('o.servicios_id', $p->servicios_id)
-                    ->whereDate('o.fecha_orden', '=', Carbon::parse($request->fecha)->toDateString())
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-                               
-                    foreach($orden as $o){
-                        $fechaOrden = $o->fecha_orden;
-                        $hora = date("h:i A", strtotime($fechaOrden));
-                        $fecha = date("d-m-Y", strtotime($fechaOrden));
-                        $o->fecha_orden = $hora . " " . $fecha;
-    
-                    }
-                    
-                    return ['success' => 1, 'histoorden' => $orden];
-                }
-            }
-        }
-    }
+   
 
     // ORDENES COMPLETADAS POR EL SERVICIO
     public function verPagosCompletos(Request $request){
@@ -2255,24 +2229,49 @@ class PropietarioController extends Controller
                 ->get();
 
                 $dinero = 0;
-                foreach($orden as $o){
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $fecha . " " . $hora;
+                foreach($orden as $o){                    
+                    $o->fecha_orden = date("d-m-Y h:i A", strtotime($o->fecha_orden));
+                      
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
-                    $dinero = $dinero + $o->precio_total;                                    
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2;                           
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;                            
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;                           
+                        }
+                        else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;
+                    }
+
+                    $dinero = $dinero + $o->precio_total;
                 }
 
-                $dineroTotal = number_format((float)$dinero, 2, '.', '');
+                $dinero = number_format((float)$dinero, 2, '.', '');
                     
-                return ['success' => 1, 'orden' => $orden, 'dinero' => $dineroTotal];                
+                return ['success' => 1, 'orden' => $orden, 'dinero' => $dinero];                
             }else{
                 return ['success' => 2];
             }
         }
     }
-
+    
     // ver ordenes de hoy, que han sido completadas
     public function verCompletadasHoy(Request $request){
         if($request->isMethod('post')){ 
@@ -2307,17 +2306,37 @@ class PropietarioController extends Controller
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A ", strtotime($o->fecha_orden));
 
-                    $o->horacompletada = date("h:i A ", strtotime($o->fecha_5));
-                     
-                    $total = $o->precio_total;
-                  
-                    $o->precio_total = number_format((float)$total, 2, '.', '');
+                    $o->horacompletada = date("h:i A ", strtotime($o->fecha_5));                                       
+                    $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
-                    $data = DB::table('ordenes_direcciones')
-                    ->where('ordenes_id', $o->id)              
-                    ->first();
                     
-                    $tiempozona = $data->copia_tiempo_orden;                      
+                    // cupones
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2; 
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;                          
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+                        }else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;                        
+                    }
                 }
                     
                 return ['success' => 1, 'orden' => $orden];                
@@ -2367,12 +2386,36 @@ class PropietarioController extends Controller
 
                 $dinero = 0;
                 foreach($orden as $o){
-                    $fechaOrden = $o->fecha_orden;
-                    $hora = date("h:i A", strtotime($fechaOrden));
-                    $fecha = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $fecha . " " . $hora;
-
+                    $o->fecha_orden = date("d-m-Y d-m-Y", strtotime($o->fecha_orden));
                     $dinero = $dinero + $o->precio_total;
+
+                     // cupones
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $o->aplicacupon = 1;
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                            $o->tipocupon = 1;
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $o->tipocupon = 2; 
+                        }else if($tipo->tipo_cupon_id == 3){
+                            $o->tipocupon = 3;                          
+                        }else if($tipo->tipo_cupon_id == 4){
+                            $o->tipocupon = 4;
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+                        }else{
+                            $o->tipocupon = 0;
+                        }
+
+                    }else{
+                        $o->aplicacupon = 0;                        
+                    }
                 }
 
                 $dineroTotal = number_format((float)$dinero, 2, '.', '');
@@ -2382,10 +2425,7 @@ class PropietarioController extends Controller
                 return ['success' => 2];
             }
         }
-    }
-
-    
-
+    }   
 
     public function ocultarPago(Request $request){
         if($request->isMethod('post')){ 
