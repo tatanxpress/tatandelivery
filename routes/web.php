@@ -199,7 +199,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/buscar/orden/infocargo', 'OrdenesController@informacioncargo');
   Route::post('/buscar/orden/infomotorista', 'OrdenesController@informacionmotorista');
   Route::post('/buscar/orden/infotipocargo', 'OrdenesController@informaciontipocargo');
-
+ 
    
 
   Route::post('/buscar/orden/filtraje', 'OrdenesController@filtro');
@@ -302,7 +302,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/cupones/descuentod/agregarservicio', 'CuponesController@nuevaServicioDescuentoD');
   Route::post('/cupones/descuentod/borrarservicio', 'CuponesController@borrarServicioDescuentoD');
   Route::post('/cupones/descuentod/actualizadinero', 'CuponesController@actualizarDescuentoD');
-
+ 
   // lista de cupones para descuento en porcentaje
   Route::get('/cupones/lista/descuentop', 'CuponesController@indexDescuentoP'); 
   Route::get('/cupones/tabla/descuentop', 'CuponesController@tablaDescuentoP'); 

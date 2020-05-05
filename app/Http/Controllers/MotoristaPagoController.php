@@ -194,7 +194,7 @@ class MotoristaPagoController extends Controller
                 ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
                 ->whereBetween('o.fecha_orden', array($date1, $date2))          
                 ->get();
-
+ 
                 // conocer que tipo de cupon es
                 foreach($orden as $o){
                     $c = Cupones::where('id', $o->cupones_id)->first();
@@ -350,10 +350,10 @@ class MotoristaPagoController extends Controller
                     $total = $o->precio_total + $o->precio_envio + $info->dinero;
 
                     $o->total = number_format((float)$total, 2, '.', '');
-                }
+                } 
 
                 return view('backend.paginas.pagoservicio.tablas.tablalistapagoserviciocupondonacion', compact('orden'));
-            }
+            } 
            
         }else{
             return ['success' => 2];
@@ -563,7 +563,7 @@ class MotoristaPagoController extends Controller
             $pdf = \App::make('dompdf.wrapper');
             $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
             return $pdf->stream(); 
-
+ 
         }
     }
 

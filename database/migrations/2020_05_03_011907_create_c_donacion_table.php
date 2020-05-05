@@ -18,6 +18,7 @@ class CreateCDonacionTable extends Migration
             $table->bigInteger('cupones_id')->unsigned();
             $table->bigInteger('instituciones_id')->unsigned();
             $table->decimal('dinero', 7,2);
+            $table->string('descripcion', 100);
 
             $table->foreign('cupones_id')->references('id')->on('cupones');
             $table->foreign('instituciones_id')->references('id')->on('instituciones');

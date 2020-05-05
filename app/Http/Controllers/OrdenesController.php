@@ -17,6 +17,8 @@ use App\AplicaCuponTres;
 use App\AplicaCuponCuatro;
 use App\MotoristaExperiencia;
 use App\MotoristaOrdenes;
+use App\AplicaCuponCinco;
+use App\Instituciones;
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -526,7 +528,19 @@ class OrdenesController extends Controller
                             $o->tipocupon = 4;
                             $o->dinerocarrito = $info->dinero_carrito;
                             $o->producto = $info->producto;
-                        }else{
+                        }
+                        else if($c->tipo_cupon_id == 5){ // donacion
+                            $info = AplicaCuponCinco::where('ordenes_id', $request->id)->first();
+                            $nombre = Instituciones::where('id', $info->instituciones_id)->pluck('nombre')->first();
+                            $o->tipocupon = 5;
+                            $o->dinero = $info->dinero;
+                            $o->institucion = $nombre;
+
+                            $total = $o->precio_total + $o->precio_envio + $info->dinero;
+
+                            $o->total = number_format((float)$total, 2, '.', '');
+                        }
+                        else{
                             $o->tipocupon = 0;
                         }
 

@@ -60,6 +60,8 @@
                                     <label>Nombre</label>
                                     <input type="text" maxlength="100" class="form-control" id="nombre-nuevo" placeholder="Nombre institucion">
                                 </div>
+
+                              
                               
                             </div>
                         </div>
@@ -96,6 +98,7 @@
                                     <input type="hidden" id="id-institucion">
                                     <input type="text" maxlength="100" class="form-control" id="nombre-editar" placeholder="Nombre institucion">
                                 </div>
+
                               
                             </div>
                         </div>
@@ -148,13 +151,13 @@
             return;
         }
 
+
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
         
         formData.append('nombre', nombre);
-             
-        
-        axios.post('/admin/cupones/nuevo/institucion ', formData, {
+                     
+        axios.post('/admin/cupones/nuevo/institucion', formData, {
         })
         .then((response) => {
             loadingOverlay().cancel(spinHandle);
@@ -190,6 +193,7 @@
                     $('#modalEditar').modal('show');
                     $('#id-institucion').val(response.data.info.id);
                     $('#nombre-editar').val(response.data.info.nombre);
+                 
                 }else{
                     toastr.error("ID no encontrado");
                 }
@@ -200,11 +204,11 @@
         });        
     }
    
-
     // editar informacion de un cupon
     function editarInformacion(){
         var id = document.getElementById('id-institucion').value;
         var nombre = document.getElementById('nombre-editar').value;
+       
         
         // validaciones
                       
@@ -213,11 +217,13 @@
             return;
         }
 
+
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
         
         formData.append('id', id);
-        formData.append('nombre', nombre);   
+        formData.append('nombre', nombre);  
+       
                 
         axios.post('/admin/cupones/editar/institucion', formData, {
         })

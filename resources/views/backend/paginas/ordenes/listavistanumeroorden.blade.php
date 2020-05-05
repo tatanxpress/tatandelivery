@@ -447,6 +447,26 @@
                                     <label>Producto que regalaba</label>
                                     <input type="text" disabled class="form-control" id="c4producto">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>**** Cupon Donacion ****</label>                       
+                                </div>
+                                <div class="form-group">
+                                    <label>Aplico Cupon</label>
+                                    <input type="text" disabled class="form-control" id="aplico5">
+                                </div>    
+                                <div class="form-group">
+                                    <label>Institución</label>
+                                    <input type="text" disabled class="form-control" id="c5institucion">
+                                </div>                            
+                                <div class="form-group">
+                                    <label>Donación</label>
+                                    <input type="text" disabled class="form-control" id="c5donacion">
+                                </div>
+                                <div class="form-group">
+                                    <label>Total (Sub Total + Cargo envio + Donacion)</label>
+                                    <input type="text" disabled class="form-control" id="c5total">
+                                </div>
                                
 
                             </div>
@@ -817,7 +837,7 @@
                             $('#tipocargo').val("Precio de: Envio Gratis");                            
                         }else if(datos[index].tipo_cargo == 4){
                             $('#tipocargo').val("Precio de: Minimo de compra para envio $0.00");                            
-                        }    
+                        }   
                                       
                         //que tipo de cupon aplico
                         if(datos[index].tipocupon == 1){
@@ -846,7 +866,13 @@
                             $('#aplico4').val("Si");
                             $('#c4minimo').val(datos[index].dinerocarrito);
                             $('#c4producto').val(datos[index].producto);
-                        }          
+                        }    
+                        else if(datos[index].tipocupon == 5){
+                            $('#aplico5').val("Si");
+                            $('#c5institucion').val(datos[index].institucion);                            
+                            $('#c5donacion').val(datos[index].dinero);
+                            $('#c5total').val(datos[index].total);
+                        }      
                     });                  
 
                 }else{

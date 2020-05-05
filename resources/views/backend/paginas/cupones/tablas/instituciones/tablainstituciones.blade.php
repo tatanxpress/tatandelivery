@@ -8,7 +8,7 @@
                 <thead>             
                 <tr>
                     <th style="width: 10%">ID</th>   
-                    <th style="width: 20%">Nombre</th>                                   
+                    <th style="width: 20%">Nombre</th>     
                     <th style="width: 15%">Opciones</th>   
                 </tr>
                 </thead>

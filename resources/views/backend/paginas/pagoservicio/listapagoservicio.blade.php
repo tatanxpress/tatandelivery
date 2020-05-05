@@ -175,7 +175,6 @@
                                             <option value="2">Descuento Dinero</option>
                                             <option value="3">Descuento Porcentaje</option>
                                             <option value="4">Producto Gratis</option>    
-                                            <option value="5">Donacion</option>                            
                                         </select>
                                     </div> 
                                 </div>

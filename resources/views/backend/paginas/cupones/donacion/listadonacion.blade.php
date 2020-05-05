@@ -72,6 +72,11 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label>Descripcion</label>
+                                    <input type="text" maxlength="100" class="form-control" id="descripcion-nuevo" placeholder="Descripcion institucion">
+                                </div>
+
+                                <div class="form-group">
                                     <label style="color:#191818">Servicio</label>
                                     <br>
                                     <div>                                  
@@ -128,6 +133,12 @@
                                 <div class="form-group">
                                     <label>Donación</label>
                                     <input type="number" step="0.01" value="0" min="0" class="form-control" id="donacion-editar" placeholder="Donacion">
+                                </div>
+
+                                
+                                <div class="form-group">
+                                    <label>Descripcion</label>
+                                    <input type="text" maxlength="100" class="form-control" id="descripcion-editar" placeholder="Descripcion institucion">
                                 </div>
 
                                 <div class="form-group">
@@ -188,7 +199,8 @@
         var limite = document.getElementById('limite-nuevo').value;
         var donacion = document.getElementById('donacion-nuevo').value;
         var institucionid = document.getElementById('instituciones-select').value;
-       
+        var descripcion = document.getElementById('descripcion-nuevo').value;
+
         // validaciones
                       
         if(cupon === ''){
@@ -211,6 +223,12 @@
             return;
         }
 
+        
+        if(descripcion === ''){
+            toastr.error('Descripcion es requerido');
+            return;
+        }
+
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
         
@@ -218,7 +236,8 @@
         formData.append('usolimite', limite);
         formData.append('donacion', donacion);
         formData.append('institucionid', institucionid);
-        
+        formData.append('descripcion', descripcion);
+
         axios.post('/admin/cupones/nuevo/donacion ', formData, {
         })
         .then((response) => {
@@ -265,6 +284,7 @@
                     $('#nombre-editar').val(response.data.info.texto_cupon);
                     $('#limite-editar').val(response.data.info.uso_limite);
                     $('#donacion-editar').val(response.data.info.dinero);
+                    $('#descripcion-editar').val(response.data.info.descripcion);
 
                     if(response.data.info.ilimitado == 1){
                         $('#cupon-ilimitado').prop('checked', true);
@@ -293,7 +313,8 @@
         var donacion = document.getElementById('donacion-editar').value;
         var ilimitado = document.getElementById('cupon-ilimitado').checked;
         var activo = document.getElementById('cupon-activo').checked;
-        
+         var descripcion = document.getElementById('descripcion-editar').value;
+
         // validaciones
                       
         if(nombre === ''){
@@ -308,6 +329,12 @@
 
         if(modalDonacion === ''){
             toastr.error('Donacion es requerido');
+            return;
+        }
+
+        
+        if(descripcion === ''){
+            toastr.error('Descripcion es requerido');
             return;
         }
 
@@ -331,7 +358,8 @@
         formData.append('dinero', donacion); 
         formData.append('ilimitado', ilimitado_1); 
         formData.append('activo', activo_1);
-                
+        formData.append('descripcion', descripcion); 
+             
         axios.post('/admin/cupones/editar/donacion', formData, {
         })
         .then((response) => {

@@ -33,6 +33,7 @@ use App\Cupones;
 use App\AplicaCuponCuatro;
 use App\AplicaCuponTres;
 use App\AplicaCuponDos; 
+use App\AplicaCuponCinco;
 
 class PagaderoController extends Controller
 {
@@ -225,6 +226,15 @@ class PagaderoController extends Controller
                             $o->producto = $producto;
 
                             $totalcobro = $totalcobro + $sumado; 
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+                            $o->tipocupon = 5;
+                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            // sumar
+                            $suma = $o->precio_total + $o->precio_envio + $donacion;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
                         }
                         else{
                             $o->tipocupon = 0;

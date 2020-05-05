@@ -121,10 +121,8 @@ class CuponesController extends Controller
     }
 
     // lista instituciones
-    public function indexInstituciones(){
-        
+    public function indexInstituciones(){        
         return view('backend.paginas.cupones.instituciones.listainstituciones');
-
     }
 
     // tabla lista instituciones
@@ -603,14 +601,14 @@ class CuponesController extends Controller
 
     public function tablaVistaUsosGeneral($id){
 
-        $tipo = Cupones::where('id', $id)->pluck('tipo_cupon_id')->first();
+        //$tipo = Cupones::where('id', $id)->pluck('tipo_cupon_id')->first();
             
         $orden = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
         ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
         ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
         ->select('o.id', 's.nombre', 's.identificador', 'o.fecha_orden')
-        ->where('c.tipo_cupon_id', $tipo)
+        ->where('c.id', $id)
         ->get();
 
         foreach($orden as $o){           
@@ -635,7 +633,7 @@ class CuponesController extends Controller
                 'textocupon.required' => 'El texto cupon es requerido',
                 'usolimite.required' => 'Uso limite es requerido',
                 'dinero.required' => 'Dinero es requerido',
-                'aplica.required' => 'Aplica es requerido'                              
+                'aplica.required' => 'Aplica es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -1382,11 +1380,11 @@ class CuponesController extends Controller
     public function nuevaInstitucion(Request $request){
         if($request->isMethod('post')){   
             $rules = array( 
-                'nombre' => 'required'                             
+                'nombre' => 'required',
             );
 
             $messages = array(   
-                'nombre.required' => 'El nombre es requerido'                
+                'nombre.required' => 'El nombre es requerido',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -1445,12 +1443,14 @@ class CuponesController extends Controller
         if($request->isMethod('post')){   
             $rules = array(
                 'id' => 'required',
-                'nombre' => 'required'                             
+                'nombre' => 'required',
+                                
             );
 
             $messages = array(   
                 'id.required' => 'El id es requerido',
-                'nombre.required' => 'El nombre es requerido'                
+                'nombre.required' => 'El nombre es requerido',
+                                
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -1468,6 +1468,7 @@ class CuponesController extends Controller
                 // actualizar informacion del cupon
                 Instituciones::where('id', $request->id)->update([
                     'nombre' => $request->nombre
+                   
                     ]);
 
                 return ['success' => 1];
@@ -1486,14 +1487,16 @@ class CuponesController extends Controller
                 'textocupon' => 'required',
                 'usolimite' => 'required',
                 'donacion' => 'required',
-                'institucionid' => 'required'                 
+                'institucionid' => 'required',
+                'descripcion' => 'required'                 
             );
 
             $messages = array(   
                 'textocupon.required' => 'El texto cupon es requerido',
                 'usolimite.required' => 'Uso limite es requerido',
                 'donacion.required' => 'Donacion es requerido',
-                'institucionid.required' => 'id institucion es requerido'
+                'institucionid.required' => 'id institucion es requerido',
+                'descripcion.required' => 'descripcion es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -1531,7 +1534,8 @@ class CuponesController extends Controller
                     $d = new CuponDonacion();
                     $d->cupones_id = $c->id;
                     $d->instituciones_id = $request->institucionid;
-                    $d->dinero = $request->donacion;                 
+                    $d->dinero = $request->donacion;   
+                    $d->descripcion = $request->descripcion;              
                     $d->save();                                      
                    
                     DB::commit();
@@ -1573,7 +1577,7 @@ class CuponesController extends Controller
 
                 $info = DB::table('cupones AS c')
                 ->join('c_donacion AS d', 'd.cupones_id', '=', 'c.id')
-                ->select('c.id', 'c.texto_cupon', 'c.activo', 'c.uso_limite', 'd.dinero', 'c.ilimitado')
+                ->select('c.id', 'c.texto_cupon', 'd.descripcion', 'c.activo', 'c.uso_limite', 'd.dinero', 'c.ilimitado')
                 ->where('c.id', $request->id)
                 ->first();
                               
@@ -1584,7 +1588,6 @@ class CuponesController extends Controller
         } 
     }
 
-
     public function editarDonacion(Request $request){
         if($request->isMethod('post')){   
             $rules = array( 
@@ -1593,7 +1596,8 @@ class CuponesController extends Controller
                 'limite' => 'required',
                 'dinero' => 'required',
                 'ilimitado' => 'required',
-                'activo' => 'required'                      
+                'activo' => 'required',
+                'descripcion' => 'required'                  
             );
 
             $messages = array(   
@@ -1602,7 +1606,8 @@ class CuponesController extends Controller
                 'limite.required' => 'limite de cupon es requerido',
                 'dinero.required' => 'dinero de cupon es requerido',
                 'ilimitado.required' => 'ilimitado es requerido',
-                'activo.required' => 'activo es requerido'
+                'activo.required' => 'activo es requerido',
+                'descripcion.required' => 'descripcion es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -1630,7 +1635,8 @@ class CuponesController extends Controller
                     ]);
  
                     CuponDonacion::where('cupones_id', $request->id)->update([
-                    'dinero' => $request->dinero                
+                    'dinero' => $request->dinero,
+                    'descripcion' => $request->descripcion                 
                     ]);
 
                 return ['success' => 3];

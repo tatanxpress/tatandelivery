@@ -29,6 +29,7 @@ use App\OrdenesPendiente;
 use App\OrdenesCupones;
 use App\Cupones;
 use App\AplicaCuponCuatro;
+use App\AplicaCuponCinco;
 
 class PropietarioController extends Controller
 {
@@ -331,6 +332,9 @@ class PropietarioController extends Controller
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $o->producto = $producto;
+                        }else if($tipo->tipo_cupon_id == 5){
+                            $o->tipocupon = 5;
+                            
                         }else{
                             $o->tipocupon = 0;
                         }
@@ -2250,7 +2254,7 @@ class PropietarioController extends Controller
                             $o->tipocupon = 3;                            
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;                           
+                            $o->tipocupon = 4;
                         }
                         else{
                             $o->tipocupon = 0;

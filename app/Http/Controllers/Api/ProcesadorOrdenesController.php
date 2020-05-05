@@ -37,6 +37,9 @@ use App\AplicaCuponUno;
 use App\AplicaCuponDos;
 use App\AplicaCuponTres;
 use App\AplicaCuponCuatro;
+use App\AplicaCuponCinco;
+use App\CuponDonacion;
+use App\Instituciones;
 
 class ProcesadorOrdenesController extends Controller
 {
@@ -334,7 +337,6 @@ class ProcesadorOrdenesController extends Controller
 
                     // sacar dinero limite por orden 
                     $limitedineroorden = DB::table('dinero_orden')->where('id', 1)->pluck('limite')->first();
-
                     
                     if($tiempo_limite == 1){
 
@@ -399,7 +401,7 @@ class ProcesadorOrdenesController extends Controller
                         if($utilizaMinimo == 1){ // utiliza minimo de ventas
                             if($minimoConsumido == 0){ //lo consumible no supera el minimo de venta
                                 return ['success' => 12, 'minimo' => number_format((float)$minimoString, 2, '.', '')];
-                            }                        
+                            }
                         }
                     }
 
@@ -444,10 +446,12 @@ class ProcesadorOrdenesController extends Controller
                             $contador = $ccs->contador;
                             $activo = $ccs->activo;
                                     
+                            if($ccs->ilimitado == 0){
                                 // verificar si aun es valido este cupon
                                 if($contador >= $usolimite || $activo == 0){
                                     return ['success' => 22]; // cupon ya no es valido
                                 }
+                            }                                
         
                         }else{
                             // cupon no encontrado
@@ -802,7 +806,38 @@ class ProcesadorOrdenesController extends Controller
                                 }else{
                                     return ['success' => 23]; // cupon no valido
                                 }                               
-                            }else{
+                            }
+                            else if($ccs->tipo_cupon_id == 5){ // cupon donacion
+
+                                $contador = $ccs->contador;
+                                $contador = $contador + 1;
+
+                                // sumas +1 el contador
+                                Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
+                                $cd = CuponDonacion::where('cupones_id', $ccs->id)->first();       
+
+
+                                // ingresar registro
+                                $reg = new OrdenesCupones;
+                                $reg->ordenes_id = $idOrden;
+                                $reg->cupones_id = $ccs->id;
+                                $reg->save();
+
+                                $contador = $ccs->contador;
+                                $contador = $contador + 1;
+
+                                // sumas +1 el contador
+                                Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
+
+                                $cinco = new AplicaCuponCinco;
+                                $cinco->ordenes_id = $idOrden;
+                                $cinco->instituciones_id = $cd->instituciones_id;
+                                $cinco->dinero = $cd->dinero;
+ 
+                                $cinco->save();               
+                            }
+                            
+                            else{
                                 return ['success' => 23]; // cupon no valido
                             }
                         }else{
@@ -1095,11 +1130,12 @@ class ProcesadorOrdenesController extends Controller
                     $zonacarrito = $cart->zonas_id;
                     $serviciocarrito = $cart->servicios_id;
                     
-
-                     // verificar si aun es valido este cupon
-                     if($contador >= $usolimite || $activo == 0){
-                        return ['success' => 2]; // cupon ya no es valido
-                    }
+                    if($cupon->ilimitado == 0){
+                        // verificar si aun es valido este cupon
+                        if($contador >= $usolimite || $activo == 0){
+                            return ['success' => 2]; // cupon ya no es valido
+                        }
+                    }  
 
                     if($tipocupon == 1){// tipo: envio gratis
 
@@ -1463,11 +1499,113 @@ class ProcesadorOrdenesController extends Controller
                             // no aplica para este servicio el producto gratis
                             return ['success' => 17];
                         }
+                    }else if($tipocupon == 5){ // tipo: donacion
+
+                        // obtener datos del cupon donacion
+                        if($cd = CuponDonacion::where('cupones_id', $cupon->id)->first()){
+
+                            $institucion = $cd->instituciones_id;
+                            $donacion = $cd->dinero;   
+                            
+
+                            // si aplica el cupon
+                            // obtener el total del carrito de compras
+                            $producto = DB::table('producto AS p')
+                            ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                            ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
+                            ->where('c.carrito_temporal_id', $cart->id)
+                            ->get();
+
+                            $pilaSub = array(); // para obtener el sub total
+                
+                            // recorrer cada producto
+                            foreach ($producto as $pro) { 
+        
+                                // saver el precio multiplicado por la cantidad
+                                $cantidad = $pro->cantidad;
+                                $precio = $pro->precio;
+                                $multi = $cantidad * $precio;
+                                array_push($pilaSub, $multi); 
+                            }
+        
+                            $consumido=0;
+                            foreach ($pilaSub as $valor){
+                                $consumido=$consumido+$valor;
+                            }                                                                      
+                            
+                            // DONACION                              
+                            $total = $consumido + $donacion;
+                            $total = number_format((float)$total, 2, '.', '');
+
+                            //** conocer el envio, tipo de cargo */
+                            $zonaiduser = 0;
+                            // sacar id zona del usuario
+                            if($user = Direccion::where('user_id', $request->userid)
+                            ->where('seleccionado', 1)->first())
+                            {
+                                $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
+                            } 
+                            $envioPrecio = 0;                                            
+                                    
+                            // precio de la zona
+                            // aqui no importa si esta activo o inactivo, solo obtendra el precio
+                            // para ver el proceso debe existir en zonas_servicios
+                            $zz = DB::table('zonas_servicios')                                   
+                            ->where('zonas_id', $zonaiduser)
+                            ->where('servicios_id', $cart->servicios_id)
+                            ->first();
+
+                            // obtiene precio envio de la zona
+                            // PRIORIDAD 1
+                            $envioPrecio = $zz->precio_envio;                   
+
+                            // PRIORIDAD 2
+                            // mitad de precio al envio, solo servicios publicos
+                            if($zz->mitad_precio == 1){
+                                if($envioPrecio != 0){
+                                    $envioPrecio = $envioPrecio / 2;
+                                }                        
+                            }
+
+                            // PRIORIDAD 3
+                            // envio gratis a esta zona, solo servicios publicos desde panel de control
+                            if($zz->zona_envio_gratis == 1){
+                                $envioPrecio = 0;
+                            }
+
+                            $datosInfo = DB::table('zonas_servicios AS z')
+                            ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                            ->where('z.zonas_id', $zonaiduser)
+                            ->where('z.servicios_id', $cart->servicios_id)
+                            ->first();
+
+                            // PRIORIDAD 4
+                            // esta zona tiene un minimo de $$ para envio gratis
+                            if($datosInfo->min_envio_gratis == 1){
+                                // precio envio sera 0, si supera $$ en carrito de compras
+                                if($consumido > $datosInfo->costo_envio_gratis){
+                                    $envioPrecio = 0;
+                                }
+                            }       
+                            
+                            // sumar sub total + cargo de envio
+                            $totalsumado = $total + $envioPrecio;
+                            
+                            // sub total, cargo envio, total, donacion, descripcion
+                            return ['success' => 22, 
+                            'dinero' => $total, 
+                            'cargo' => $envioPrecio, 
+                            'total' => $totalsumado,                            
+                            'descripcion' => $cd->descripcion];   
+
+                        }else{
+                            return ['success' => 21]; // cupon no encontrado
+                        }
                     }else{
-                        return ['success' => 18]; // tipo de cupon no encontrado, aunque solo habra 4 tipos de cupones
+                        return ['success' => 21]; // cupon no encontrado
                     }
                 }else{
-                    return ['success' => 19]; // cupon no encontrado
+                    return ['success' => 21]; // cupon no encontrado
                 }
             }else{
                 return ['success' => 1]; // carrito de compras no encontrado
@@ -1552,6 +1690,9 @@ class ProcesadorOrdenesController extends Controller
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $o->producto = $producto;
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+                            $o->tipocupon = 5;
                         }
                         else{
                             $o->tipocupon = 0;

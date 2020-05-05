@@ -71,7 +71,7 @@ Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesControll
 Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@procesarOrdenEstado1'); // procesar orden primer paso *
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
     
-Route::post('usuario/verficar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
+Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
  
 
   
@@ -105,7 +105,7 @@ Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden')
 // cancelar orden extraordinariamente
 Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@cancelarOrdenExtraordinariamente'); // cancelar orden extraordinariamente
   
-
+ 
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes completadas
 Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes completadas hoy
@@ -165,9 +165,8 @@ Route::post('motorista/guadar/configuracion', 'Api\MotoristaController@modificar
 Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizarPassword'); // actualizar contraseña
  
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
- 
-    
- 
+
+
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
