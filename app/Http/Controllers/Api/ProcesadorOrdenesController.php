@@ -2214,5 +2214,5 @@ class ProcesadorOrdenesController extends Controller
 
     public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionAdministrador($titulo, $mensaje, $pilaUsuarios);
-    }
+    } 
 }

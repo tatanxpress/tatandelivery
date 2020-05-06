@@ -337,5 +337,20 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/cupones/info/donacion', 'CuponesController@infoDonacion');
   Route::post('/cupones/editar/donacion', 'CuponesController@editarDonacion');
 
-});         
+  // control de ordenes
+  Route::get('/control/lista/ordeneshoy', 'ControlOrdenesController@indexHoy'); 
+  Route::get('/control/tabla/ordeneshoy', 'ControlOrdenesController@tablaHoy');
+
+  // notificaciones 
+  Route::get('/control/lista/notificacion', 'ControlOrdenesController@indexNotificacion'); 
+
+  // notificacion a propietarios
+  Route::get('/control/tabla/notipropi/{id}', 'ControlOrdenesController@tablaPropiNoti');
+  Route::post('/control/propi/device', 'ControlOrdenesController@devicePropietario');
+  Route::post('/control/propi/notificacion', 'ControlOrdenesController@enviarNotiPropi');
+
+  // notificacion a clientes por zona
+  Route::get('/control/lista/notificacioncliente', 'ControlOrdenesController@indexNotiCliente'); 
   
+});         
+   

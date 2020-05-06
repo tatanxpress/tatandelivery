@@ -319,8 +319,6 @@
         });
     }
 
-    
-
     // informacion del cupon
     function informacion(id){
         document.getElementById("formulario-informacion").reset();

@@ -10,17 +10,12 @@
     <section class="content-header">
       <div class="container-fluid">
           <div class="col-sm-12">
-            <h1>Notificacion a propietarios</h1>
+            <h1>Notificacion a Clientes</h1>
           </div>  
 
-          <div class="form-group" style="width: 25%">
-              <label>Buscar por identificador de Servicio</label>
-              <input type="text" class="form-control" id="identificador" placeholder="Identificador Servicio">
-          </div> 
-
-          <button type="button" onclick="buscar()" class="btn btn-success btn-sm">
+          <button type="button" onclick="modal()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Buscar
+                    Buscar Zonas
           </button>          
 
       </div>
@@ -87,8 +82,6 @@
         </div>        
     </div>      
 </div>
-
-
 
 @extends('backend.menus.inferior')
 

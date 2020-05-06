@@ -10,11 +10,12 @@
                 <thead>             
                 <tr>
                     <th style="width: 10%">ID orden</th> 
-                    <th style="width: 20%">Identificador servicio</th> 
-                    <th style="width: 15%">Sub total</th>                     
-                    <th style="width: 15%">Fecha orden</th>
+                    <th style="width: 20%">ID Servicio</th> 
+                    <th style="width: 15%">Nombre</th>
+                    <th style="width: 15%">Hora</th>                     
+                    <th style="width: 15%">Sub Total</th>
+                    <th style="width: 15%">ID Zona</th>
                     <th style="width: 15%">Estado</th>
-                    <th style="width: 10%">Cupon</th>
                                              
                 </tr>
                 </thead>
@@ -23,16 +24,11 @@
                 <tr>
                     <td>{{ $dato->id }}</td>
                     <td>{{ $dato->identificador }}</td>
-                    <td>{{ $dato->precio_total }}</td>
+                    <td>{{ $dato->nombre }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
-                    @if($dato->estado_7 == 0)
-                    <td>Orden en proceso</td>
-                    @elseif($dato->estado_7 == 1)
-                    <td>Orden completada</td>
-                    @elseif($dato->estado_8 == 1)
-                    <td>Orden Cancelada</td>              
-                    @endif
-                    <td>{{ $dato->cupon }}</td>
+                    <td>{{ $dato->precio_total }}</td>                   
+                    <td>{{ $dato->zonaidenti }}</td>               
+                    <td>{{ $dato->estado }}</td>
                     </tr>            
      
                 @endforeach            

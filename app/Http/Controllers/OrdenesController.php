@@ -47,10 +47,7 @@ class OrdenesController extends Controller
         ->get(); 
 
         foreach($orden as $o){
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $hora1 . " " . $fecha1;  
+            $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));;  
 
             $cupon = "";
             if(OrdenesCupones::where('ordenes_id', $o->id)->first()){
@@ -116,10 +113,7 @@ class OrdenesController extends Controller
         ->get(); 
 
         foreach($orden as $o){
-            $fechaOrden = $o->fecha_agarrada;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_agarrada = $hora1 . " " . $fecha1;  
+            $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));
         }
 
         return view('backend.paginas.ordenes.tablas.tablamotoorden', compact('orden'));
@@ -143,10 +137,7 @@ class OrdenesController extends Controller
         ->get();
  
         foreach($orden as $o){
-            $fechaOrden = $o->fecha;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha = $hora1 . " " . $fecha1;  
+            $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha)); 
         }
 
         return view('backend.paginas.ordenes.tablas.tablamotoexpe', compact('orden'));
@@ -302,11 +293,7 @@ class OrdenesController extends Controller
         ->get(); 
 
         foreach($orden as $o){
-
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $hora1 . " " . $fecha1;  
+            $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
         } 
 
         return view('backend.paginas.ordenes.tablas.tablaordenbuscador', compact('orden'));
@@ -748,10 +735,8 @@ class OrdenesController extends Controller
             //sumar
             $dinero = $dinero + $o->ganancia_motorista;
 
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $fecha1 . " " . $hora1;  
+    
+            $o->fecha_orden = date("d-m-Y h:i A", strtotime($o->fecha_orden));
         } 
 
         $nombre = Motoristas::where('id', $idmoto)->pluck('nombre')->first();

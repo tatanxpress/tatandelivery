@@ -259,6 +259,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/control/lista/ordeneshoy') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ordenes HOY</p>
+                </a>
+              </li>
+
               <li class="nav-item">
                 <a href="{{ url('/admin/ordenes/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -310,6 +318,20 @@
                 <a href="{{ url('/admin/dinero/limite') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Dinero Limite</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/control/lista/notificacion') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Notificacion a Propietarios</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/control/lista/notificacioncliente') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Notificacion Cliente</p>
                 </a>
               </li>
 

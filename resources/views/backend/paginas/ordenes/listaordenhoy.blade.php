@@ -7,13 +7,24 @@
     
 @stop  
 
-  <section class="content-header">
-    <div class="container-fluid">
-        <div class="col-sm-12">
-          <h1>Ultimas 100 Ordenes</h1>
-        </div>  
-    </div>
-  </section>
+    <section class="content-header">
+      <div class="container-fluid">
+          <div class="col-sm-12">
+            <h1>Ordenes Hoy {{ $fecha }}</h1>
+          </div>  
+
+          <button type="button" onclick="recargar()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                  Recargar
+          </button>  
+
+          <div class="form-group" style="width: 25%">
+              <label>Cronometro</label>
+              <label id="contador"></label>
+          </div> 
+
+      </div>
+    </section>
      
   <!-- seccion frame -->
   <section class="content">
@@ -33,11 +44,9 @@
 	  </div>
 	</section>
 
-
-
 @extends('backend.menus.inferior')
 
-@section('content-admin-js')
+@section('content-admin-js') 
 
     <script src="{{ asset('js/backend/jquery.dataTables.js') }}" type="text/javascript"></script>
     <script src="{{ asset('js/backend/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
@@ -48,12 +57,40 @@
  <!-- incluir tabla --> 
   <script type="text/javascript">	 
     $(document).ready(function(){       
-        var ruta = "{{ URL::to('admin/ordenes/tabla/lista') }}";
+        var ruta = "{{ URL::to('admin/control/tabla/ordeneshoy') }}";
         $('#tablaDatatable').load(ruta);
+
+      countdown();
     });  
     
  </script>
 
+ <script>
+
+  function recargar(){
+    var ruta = "{{ url('/admin/control/tabla/ordeneshoy') }}";
+    $('#tablaDatatable').load(ruta);  
+  }
+
+  function countdown() {
+    var seconds = 60;
+    function tick() {
+        var counter = document.getElementById("contador");
+        seconds--;
+        counter.innerHTML = "0:" + (seconds < 10 ? "0" : "") + String(seconds);
+        if( seconds > 0 ) {
+            setTimeout(tick, 1000);
+        } else {
+            recargar();
+            countdown();
+        }
+    }
+    tick();
+  }
+
+
+
+ </script>
 
  
 @stop
