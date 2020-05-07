@@ -81,6 +81,7 @@ class PropiController extends Controller
             $p->servicios_id = $request->identificador;
             $p->codigo_correo = "0000";
             $p->activo = 1; 
+            $p->bloqueado = 0; 
             if($p->save()){
                 return ['success' => 1];
             }else{
@@ -129,7 +130,8 @@ class PropiController extends Controller
                 'identificador' => 'required',
                 'telefono' => 'required',
                 'correo' => 'required',
-                'activo' => 'required'            
+                'activo' => 'required',
+                'bloqueado' => 'required'            
             );
 
             $messages = array(   
@@ -138,7 +140,8 @@ class PropiController extends Controller
                 'identificador.required' => 'Identificador es requerido',
                 'telefono.required' => 'telefono es requerida',
                 'correo.required' => 'correo inicio es requerido',
-                'activo.required' => 'activo es requerido'
+                'activo.required' => 'activo es requerido',
+                'bloqueado.required' => 'Bloqueado es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -170,6 +173,7 @@ class PropiController extends Controller
                     'correo' => $request->correo,
                     'servicios_id' => $request->identificador,
                     'activo' => $request->activo,
+                    'bloqueado' => $request->bloqueado
                     ]);
     
                 return ['success' => 2];

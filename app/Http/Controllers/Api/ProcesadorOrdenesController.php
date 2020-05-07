@@ -40,6 +40,8 @@ use App\AplicaCuponCuatro;
 use App\AplicaCuponCinco;
 use App\CuponDonacion;
 use App\Instituciones;
+use Exception;
+
 
 class ProcesadorOrdenesController extends Controller
 {
@@ -956,8 +958,7 @@ class ProcesadorOrdenesController extends Controller
                             }                                                        
                         }
 
-                    }else{
-                
+                    }else{               
 
                         // GUARDAR REGISTROS SINO HAY PROPIETARIO DISPONIBLE
                         

@@ -21,7 +21,10 @@
           <a class="nav-link" href="#colorlib-footer" class="ancla" data-ancla="colorlib-footer">Contacto</a>
           </li>
           <li class="nav-item active">
-          <a class="nav-link" href="{{ url('/preguntas-frecuentes') }}">FAQ</a></li>
+            <a class="nav-link" href="{{ url('/preguntas-frecuentes') }}">FAQ</a></li>
+          </li>
+          <li class="nav-item active"> 
+            <a class="nav-link" href="{{ url('/terminos-condiciones') }}">Términos y Condiciones</a></li>
           </li>
        
         </ul>

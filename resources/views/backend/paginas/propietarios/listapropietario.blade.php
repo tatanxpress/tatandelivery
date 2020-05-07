@@ -86,6 +86,8 @@
                                      <label>Correo</label>
                                      <input type="text" maxlength="100" class="form-control" id="correo-nuevo" placeholder="Correo">
                                  </div>
+
+                                 
                                                              
                              </div>
                          </div>
@@ -142,6 +144,12 @@
                                  <div class="form-group">
                                     <label>Activo</label>
                                     <input type="checkbox" id="activo-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Bloquear propietario para que no pueda editar productos</label>
+                                    <br>
+                                    <input type="checkbox" id="bloqueado">
                                 </div>
                                
                              </div>
@@ -277,10 +285,10 @@
 
         if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(correo)){
         // valido
-    }else{
-        toastr.error("El correo es invalido");
-        return false;
-    }
+        }else{
+            toastr.error("El correo es invalido");
+            return false;
+        }
 
 
         return true;
@@ -314,10 +322,17 @@
                     $('#nombre-editar').val(response.data.propietario.nombre);
                     $('#correo-editar').val(response.data.propietario.correo);
                     $('#telefono-editar').val(response.data.propietario.telefono);
+                    
                     if(response.data.propietario.activo == 0){
                         $("#activo-editar").prop("checked", false);
                     }else{
                         $("#activo-editar").prop("checked", true);
+                    }
+
+                    if(response.data.propietario.bloqueado == 0){
+                        $("#bloquear").prop("checked", false);
+                    }else{
+                        $("#bloquear").prop("checked", true);
                     }
 
                     $('#modalEditar').modal('show');
@@ -340,13 +355,19 @@
         var telefono = document.getElementById('telefono-editar').value;
         var correo = document.getElementById('correo-editar').value; 
         var activo = document.getElementById('activo-editar').checked;
+        var bloqueado = document.getElementById('bloqueado').checked;
 
         var retorno = validarNuevo(nombre, telefono, correo);
 
         if(retorno){
             var activo_1 = 0;
+            var bloqueado_1 = 0;
             if(activo){
                 activo_1 = 1;
+            }
+
+            if(bloqueado){
+                bloqueado_1 = 1;
             }
 
             var spinHandle = loadingOverlay().activate();
@@ -357,6 +378,7 @@
             formData.append('telefono', telefono);
             formData.append('correo', correo);
             formData.append('activo', activo_1);
+            formData.append('bloqueado', bloqueado_1);
         
             axios.post('/admin/propietarios/editar', formData, { 
                     })

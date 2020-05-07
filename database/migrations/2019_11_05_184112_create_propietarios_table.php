@@ -25,6 +25,7 @@ class CreatePropietariosTable extends Migration
             $table->bigInteger('servicios_id')->unsigned();
             $table->string('codigo_correo', 10);
             $table->boolean('activo');
+            $table->boolean('bloqueado'); // para que no pueda editar productos desde la app
 
             $table->foreign('servicios_id')->references('id')->on('servicios');
 

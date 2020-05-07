@@ -25,7 +25,10 @@ class FrontendController extends Controller
         return view('frontend.paginas.faq');
     }
 
-
+    public function verTerminos(){
+        return view('frontend.paginas.terminos');
+    }
+    
   
 
 }

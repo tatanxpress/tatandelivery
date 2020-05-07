@@ -1028,13 +1028,14 @@ class PropietarioController extends Controller
                 ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
                 ->where('st.servicios_1_id', $p->servicios_id)
                 ->orderBy('st.posicion', 'ASC')
+                ->where('st.activo', 1)
                 ->get();
     
                 $resultsBloque = array();
                 $index = 0;
     
                 foreach($tipo  as $secciones){
-                    array_push($resultsBloque,$secciones);          
+                    array_push($resultsBloque,$secciones);
                 
                     $subSecciones = DB::table('producto AS p')  
                     ->select('p.id AS idProducto','p.nombre AS nombreProducto', 
@@ -1100,7 +1101,8 @@ class PropietarioController extends Controller
     // actualizar producto
     public function actualizarProducto(Request $request){
         if($request->isMethod('post')){   
-            $rules = array(                
+            $rules = array(   
+                'id' => 'required',             
                 'productoid' => 'required',
                 'estadonombre' => 'required', // cambiara nombre
                 'estadodescripcion' => 'required', // cambiara descripcion
@@ -1109,7 +1111,8 @@ class PropietarioController extends Controller
                 'estadounidades' => 'required' // cambiara unidades                
             );
  
-            $messages = array(                                      
+            $messages = array(  
+                'id.required' => 'El id es requerido',                                    
                 'productoid.required' => 'El id producto es requerido',
                 'estadonombre.required' => 'El estado nombre es requerido',
                 'estadodescripcion.required' => 'El estado descripcion es requerido',
@@ -1125,64 +1128,76 @@ class PropietarioController extends Controller
                     'success' => 0, 
                     'message' => $validator->errors()->all()
                 ];
-            }
-            
-            if(Producto::where('id', $request->productoid)->first()){
+            } 
 
-                // modificara nombre del producto
-                if($request->estadonombre == "1"){
-                    if($request->nombre == ""){
-                        return ['success'=> 1];
-                    }
-                    Producto::where('id', $request->productoid)->update(['nombre' => $request->nombre]);
+            if($pp = Propietarios::where('id', $request->id)->first()){
+
+                // no puede editar los productos
+                if($pp->bloqueado == 1){
+                    return ['success'=> 6];
                 }
 
-                // modificara descripcion del producto
-                if($request->estadodescripcion == "1"){
-                    if($request->descripcion == ""){
-                        return ['success'=> 2];
-                    }
-                    Producto::where('id', $request->productoid)->update(['descripcion' => $request->descripcion]);
-                }
+                if(Producto::where('id', $request->productoid)->first()){
 
-                // modificara precio
-                if($request->estadoprecio == "1"){
-                    if($request->precio == ""){
-                        return ['success'=> 3];
+                    // modificara nombre del producto
+                    if($request->estadonombre == "1"){
+                        if($request->nombre == ""){
+                            return ['success'=> 1];
+                        }
+                        Producto::where('id', $request->productoid)->update(['nombre' => $request->nombre]);
                     }
-                    Producto::where('id', $request->productoid)->update(['precio' => $request->precio]);
-                }
-
-                // modificara unidades
-                if($request->estadounidades == "1"){
-                    if($request->unidades != "" || $request->unidades != null){
-                        Producto::where('id', $request->productoid)->update(['unidades' => $request->unidades]);
+    
+                    // modificara descripcion del producto
+                    if($request->estadodescripcion == "1"){
+                        if($request->descripcion == ""){
+                            return ['success'=> 2];
+                        }
+                        Producto::where('id', $request->productoid)->update(['descripcion' => $request->descripcion]);
                     }
-                } 
-
-                // modificara nota producto
-                if($request->estadonota == "1"){
-                    $nota = $request->nota;
-                    if($request->nota == null){
-                        $nota = "";
+    
+                    // modificara precio
+                    if($request->estadoprecio == "1"){
+                        if($request->precio == ""){
+                            return ['success'=> 3];
+                        }
+                        Producto::where('id', $request->productoid)->update(['precio' => $request->precio]);
                     }
-
-                    Producto::where('id', $request->productoid)->update(['utiliza_nota' => $request->estadonota, 'nota' => $nota]);
+    
+                    // modificara unidades
+                    if($request->estadounidades == "1"){
+                        if($request->unidades != "" || $request->unidades != null){
+                            Producto::where('id', $request->productoid)->update(['unidades' => $request->unidades]);
+                        }
+                    } 
+    
+                    // modificara nota producto
+                    if($request->estadonota == "1"){
+                        $nota = $request->nota;
+                        if($request->nota == null){
+                            $nota = "";
+                        }
+    
+                        Producto::where('id', $request->productoid)->update(['utiliza_nota' => $request->estadonota, 'nota' => $nota]);
+                    }else{
+                        Producto::where('id', $request->productoid)->update(['utiliza_nota' => 0]);
+                    }
+    
+                    // cambiar disponibilidad producto
+                    Producto::where('id', $request->productoid)->update(['disponibilidad' => $request->estadoproducto]);
+    
+                    // cambiar estado de utilizar unidades
+                    Producto::where('id', $request->productoid)->update(['utiliza_cantidad' => $request->estadounidades]);
+                            
+                    return ['success'=> 5];
+    
                 }else{
-                    Producto::where('id', $request->productoid)->update(['utiliza_nota' => 0]);
-                }
-
-                // cambiar disponibilidad producto
-                Producto::where('id', $request->productoid)->update(['disponibilidad' => $request->estadoproducto]);
-
-                // cambiar estado de utilizar unidades
-                Producto::where('id', $request->productoid)->update(['utiliza_cantidad' => $request->estadounidades]);
-                        
-                return ['success'=> 5];
-
+                    return ['success'=> 0];
+                } 
             }else{
                 return ['success'=> 0];
-            }            
+            }
+            
+                      
         }
     } 
 

@@ -72,7 +72,7 @@
                                             <input type="text" maxlength="50" class="form-control" id="identificador-nuevo" placeholder="Identificador unico">
                                         </div>
                                         <div class="form-group">
-                                            <label>Descripción corta</label>
+                                            <label>Descripción corta No Mostrada en la App</label>
                                             <input type="text" maxlength="300" class="form-control" id="descripcion-nuevo" placeholder="Descripción servicio">
                                         </div>
                                         <div class="form-group">

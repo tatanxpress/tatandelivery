@@ -44,6 +44,7 @@
               <p class="footer-classic-title">Información</p>
               <ul class="footer-classic-nav">
                 <li><a href="{{ url('/preguntas-frecuentes') }}">Preguntas frecuentes</a></li>
+                <li><a href="{{ url('/terminos-condiciones') }}">Términos y Condiciones</a></li>
               </ul>
             </div>
         

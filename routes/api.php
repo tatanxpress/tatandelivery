@@ -73,7 +73,7 @@ Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@p
     
 Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
  
-
+ 
   
 // PROPIETARIOS  
   
@@ -133,7 +133,7 @@ Route::post('propietario/producto/individual', 'Api\PropietarioController@verPro
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
  
-
+ 
 // MOTORISTA  
  
 Route::post('motorista/login', 'Api\MotoristaController@loginMotorista'); // login motorista
@@ -202,7 +202,10 @@ Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login
 Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgente'); 
  
 // ocultar una orden de ordenes_pendiente
-Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); // login revisador
+Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); 
+
+// ver ordenes de solo hoy
+Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy');
  
 // ordenes urgente, tarea programada
 Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesProgramada');

@@ -338,7 +338,7 @@
                 }else{
                     toastr.error("ID no encontrado");
                 }
-            })
+            }) 
             .catch((error) => {
                 loadingOverlay().cancel(spinHandle); 
                 toastr.error('Error del servidor');    

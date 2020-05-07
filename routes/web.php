@@ -14,7 +14,8 @@
  
 Route::get('/', 'FrontendController@index')->name('inicio'); // inicio del sitio web
 Route::get('/preguntas-frecuentes', 'FrontendController@verFAQ'); // pagina de preguntas
- 
+Route::get('/terminos-condiciones', 'FrontendController@verTerminos'); // pagina de preguntas
+
 // Rutas administrador
  
 Route::get('admin/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');  // pagina inicio de sesion admin
@@ -340,7 +341,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // control de ordenes
   Route::get('/control/lista/ordeneshoy', 'ControlOrdenesController@indexHoy'); 
   Route::get('/control/tabla/ordeneshoy', 'ControlOrdenesController@tablaHoy');
-
+ 
   // notificaciones 
   Route::get('/control/lista/notificacion', 'ControlOrdenesController@indexNotificacion'); 
 
@@ -351,6 +352,13 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
 
   // notificacion a clientes por zona
   Route::get('/control/lista/notificacioncliente', 'ControlOrdenesController@indexNotiCliente'); 
+  Route::post('/control/buscar/clienteszona', 'ControlOrdenesController@buscarClientes');
+  Route::post('/control/enviarnoti/clienteszona', 'ControlOrdenesController@EnviarNotiClientesZonas');
+  Route::post('/control/buscar/cliente', 'ControlOrdenesController@buscarCliente');
+  Route::post('/control/enviarnoti/clienteunico', 'ControlOrdenesController@enviarNotiIndividual');
+
+
+
   
 });         
    

@@ -21,6 +21,7 @@ use App\Administradores;
 use App\OrdenesPendiente;
 use App\OrdenesUrgentes;
 use App\OrdenesPendienteContestar;
+use App\Zonas;
 
 class AdminAppController extends Controller
 {
@@ -441,13 +442,8 @@ class AdminAppController extends Controller
 
                 foreach($orden as $o){
 
-                    // ingreso la orden
-                    $fechaOrden = $o->fecha_orden;
-                    $horaO = date("h:i A", strtotime($fechaOrden));
-                    $fechaO = date("d-m-Y", strtotime($fechaOrden));
-                    $o->fecha_orden = $horaO . " " . $fechaO;
-        
-                  
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+                          
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
@@ -499,6 +495,82 @@ class AdminAppController extends Controller
             }
 
         }
+    }
+
+    public function ordenesHoy(){
+        $fecha = Carbon::now('America/El_Salvador');
+
+        $orden = DB::table('ordenes AS o')
+        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')       
+        ->select('o.id', 's.identificador', 'o.fecha_orden', 's.nombre',
+            'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.estado_6',
+            'o.estado_7', 'o.estado_8')
+        ->whereDate('o.fecha_orden', $fecha)
+        ->get();
+  
+        $estado = "";
+        foreach($orden as $o){        
+            $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
+
+            $od = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+            $o->zonanombre = Zonas::where('id', $od->zonas_id)->pluck('nombre')->first();
+
+            $haymotorista = 0;
+            $nombremotorista = "";
+
+            if($motorista = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                $haymotorista = 1;
+
+                $n = Motoristas::where('id', $motorista->motoristas_id)->first();
+                $nombremotorista = $n->nombre;
+            }
+
+            $o->motorista = $nombremotorista;
+            $o->haymotorista = $haymotorista;
+            
+            if($o->estado_2 == 0){
+                $estado = "Orden sin contestacion del propietario";
+            }
+
+            if($o->estado_2 == 1){
+                $estado = "Orden contestada, esperando contestacion del cliente";
+            }
+
+            if($o->estado_3 == 1){
+                $estado = "Orden contestada por cliente, esperando iniciar orden";
+            }
+
+            $horaestimada = ""; // a esta hora estara la orden preparada
+
+            if($o->estado_4 == 0){
+                $estado = "Orden inicio preparacion";
+
+                $time1 = Carbon::parse($o->fecha_4);                                 
+                $horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');                
+            }
+
+            $o->horaestimada = $horaestimada;
+
+            if($o->estado_5 == 0){
+                $estado = "Orden termino prepararse";
+            }
+
+            if($o->estado_6 == 0){
+                $estado = "Motorista va en camino";
+            }
+
+            if($o->estado_7 == 0){
+                $estado = "Motorista completo la orden";
+            }
+
+            if($o->estado_8 == 0){
+                $estado = "Orden cancelada";
+            }
+
+            $o->estado = $estado;
+        }
+
+        return ['success' => 1, 'ordenes' => $orden];
     }
 
 }

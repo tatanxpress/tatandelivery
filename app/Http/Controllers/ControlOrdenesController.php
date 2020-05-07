@@ -16,7 +16,7 @@ use App\AplicaCuponDos;
 use App\AplicaCuponTres;
 use App\AplicaCuponCuatro;
 use App\MotoristaExperiencia;
-use App\MotoristaOrdenes;
+use App\MotoristaOrdenes; 
 use App\AplicaCuponCinco;
 use App\Instituciones;
 use App\Zonas;
@@ -24,7 +24,12 @@ use OneSignal;
 use Illuminate\Support\Facades\DB;
 use App\Propietarios;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Hash;
+use App\User;
+use Exception;
+use App\Admin;
+use Auth; 
+ 
 class ControlOrdenesController extends Controller
 {
     public function __construct()
@@ -41,7 +46,10 @@ class ControlOrdenesController extends Controller
     }
 
     public function indexNotiCliente(){
-        return view('backend.paginas.notificacion.listanotificacionzona');
+
+        $zonas = Zonas::all();
+
+        return view('backend.paginas.notificacion.listanotificacionzona', compact('zonas'));
     }
  
     // tabla de lista de ordenes, ultimas 100
@@ -203,9 +211,162 @@ class ControlOrdenesController extends Controller
         }
     }
  
+    
+    public function buscarClientes(Request $request){
+        $info = DB::table('users')
+        ->whereIn('zonas_id', $request->idzonas)
+        ->count();
+
+        return ['success' => 1, 'info' => $info];
+    }
+
+    public function EnviarNotiClientesZonas(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'titulo' => 'required',
+                'mensaje' => 'required'
+            );
+        
+            $mensajeDatos = array(                                      
+                'titulo.required' => 'Titulo es requerido',
+                'mensaje.required' => 'Mensaje es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            $info = DB::table('users')           
+            ->whereIn('zonas_id', $request->idzonas)
+            ->get();
+
+            $pila = array();
+            foreach($info as $m){
+
+                if($m->activo == 1){ // usuarios activos
+                    if(!empty($m->device_id)){
+                        //EVITAR LOS NUEVOS REGISTRADOS
+                        if($m->device_id != "0000"){                                   
+                            array_push($pila, $m->device_id); 
+                        }
+                    }
+                }                
+            }  
+
+            // comparar clave
+            $password = Auth::user()->password;
+
+            if (Hash::check($request->clave, $password)) {
+                if(!empty($pila)){
+                    try {
+                        $this->envioNoticacionCliente($request->titulo, $request->mensaje, $pila);                               
+                    } catch (Exception $e) {}
+                }
+
+                return ['success' => 1, 'info' => $pila];
+            }else{
+                return ['success' => 2]; 
+            }
+        }       
+    }
+
+    public function buscarCliente(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'numero' => 'required'
+            );
+        
+            $mensajeDatos = array(                                      
+                'numero.required' => 'Numero es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($dato = User::where('phone', $request->numero)->first()){
+
+                return ['success' => 1, 'nombre' => $dato->name];
+            }else{
+                return ['success' => 2];
+            }
+        }       
+    }
+
+
+    public function enviarNotiIndividual(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'titulo' => 'required',
+                'mensaje' => 'required',
+                'numero' => 'required'
+            );
+        
+            $mensajeDatos = array(                                      
+                'titulo.required' => 'Titulo es requerido',
+                'mensaje.required' => 'Mensaje es requerido',
+                'numero.required' => 'Numero es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($dato = User::where('phone', $request->numero)->first()){
+
+                if($dato->device_id != "0000"){
+                    if($dato->activo == 1){
+                        try {
+                            $this->envioNoticacionCliente($request->titulo, $request->mensaje, $dato->device_id);                               
+                        } catch (Exception $e) {}
+        
+                        return ['success' => 1];
+                    }else{
+                        return ['success' => 2]; // no esta activo
+                    }
+                }else{
+                    return ['success' => 3]; // id es 0000
+                }
+               
+            }else{
+                return ['success' => 4]; // no encontrado
+            }
+        } 
+    }
+
     public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
     }
 
+    
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
 }
  
