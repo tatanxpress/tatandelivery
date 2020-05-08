@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://tatanexpress.com'),
+    'url' => env('APP_URL', 'https://tatanexpress.com'),
 
     'asset_url' => env('ASSET_URL', null),
 
