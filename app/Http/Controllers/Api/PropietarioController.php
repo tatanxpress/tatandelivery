@@ -1033,8 +1033,6 @@ class PropietarioController extends Controller
     
                 $resultsBloque = array();
                 $index = 0;
-
-                return [$tipo];
     
                 foreach($tipo  as $secciones){
                     array_push($resultsBloque,$secciones);
