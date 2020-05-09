@@ -75,7 +75,7 @@ class ServiciosController extends Controller
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
-            $reglaDatos = array(
+            $reglaDatos = array( 
                 'userid' => 'required',
                 'tipo' => 'required'
             );

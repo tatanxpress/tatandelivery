@@ -125,7 +125,7 @@ Route::post('propietarios/zonas/cobertura', 'Api\PropietarioController@zonaCober
 Route::post('propietarios/zonas/informacion', 'Api\PropietarioController@informacionZona'); //info de la zona que modificara el propietario
 Route::post('propietarios/zonas/actualizar/zonahora', 'Api\PropietarioController@actualizarZonaHora'); //info de la zona que modificara el propietario
 Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona'); //info de la zona que modificara el propietario
-
+ 
 
 // productos 
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos

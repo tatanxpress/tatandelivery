@@ -1033,6 +1033,8 @@ class PropietarioController extends Controller
     
                 $resultsBloque = array();
                 $index = 0;
+
+                return [$tipo];
     
                 foreach($tipo  as $secciones){
                     array_push($resultsBloque,$secciones);
@@ -1054,7 +1056,7 @@ class PropietarioController extends Controller
                 return ['success'=> 2, 'productos'=> $tipo];
             }else{
                 return ['success'=> 3];
-            }            
+            }
         }
     }
 
