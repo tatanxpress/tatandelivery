@@ -494,11 +494,11 @@
                     }else{
 
                         if(response.data.producto.imagen.length > 0){
-                            $("#txtImagen").html("No utiliza imagen de producto, pero hay una imagen guardada");
+                           
                             $('#img-producto').prop("src","{{ url('storage/productos') }}"+'/'+ response.data.producto.imagen);
                         }else{
                            
-                            $("#txtImagen").html("No utiliza imagen de producto");
+                            
                             $('#img-producto').prop("src","{{ asset('images/imagendefecto.jpg') }}");
 
                         }
