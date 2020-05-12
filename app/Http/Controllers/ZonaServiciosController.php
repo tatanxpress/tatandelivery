@@ -150,7 +150,7 @@ class ZonaServiciosController extends Controller
             ->select('zs.id', 'z.identificador AS idenZona', 's.identificador AS idenServicio', 
              'zs.fecha',  'zs.activo', 'zs.precio_envio', 'zs.ganancia_motorista', 
              'zs.min_envio_gratis', 'zs.costo_envio_gratis', 'zs.zona_envio_gratis',
-              's.privado', 'zs.mitad_precio')
+              's.privado', 'zs.mitad_precio', 'zs.nuevo_cargo')
             ->where('zs.id', $request->id)
             ->first();
 
@@ -171,7 +171,8 @@ class ZonaServiciosController extends Controller
                 'precioenvio' => 'required',
                 'ganancia' => 'required',
                 'cbmingratis' => 'required',
-                'minenvio' => 'required'
+                'minenvio' => 'required',
+                'nuevocargo' => 'required'
             );
 
             $messages = array(   
@@ -180,7 +181,8 @@ class ZonaServiciosController extends Controller
                 'precioenvio.required' => 'El precio envio es requerido',
                 'ganancia.required' => 'La ganancia es requerido',
                 'cbmingratis.required' => 'check min para envio gratis es requerido',
-                'minenvio.required' => 'costo minimo para envio gratis es requerido'                               
+                'minenvio.required' => 'costo minimo para envio gratis es requerido',
+                'nuevocargo.required' => 'nuevo cargo es requerido'                               
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
@@ -202,7 +204,8 @@ class ZonaServiciosController extends Controller
                     'min_envio_gratis' => $request->cbmingratis,
                     'costo_envio_gratis' => $request->minenvio,
                     'zona_envio_gratis' => $request->cbzonagratis,
-                    'mitad_precio' => $request->cbmitadprecio
+                    'mitad_precio' => $request->cbmitadprecio,
+                    'nuevo_cargo' => $request->nuevocargo
                     ]);
               
                 return ['success' => 1];

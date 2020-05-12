@@ -305,6 +305,10 @@ class ProcesadorOrdenesController extends Controller
                     ->where('id', $zonaidd)   // id de la zona
                     ->first();
 
+                    // copia del tiempo extra de la zona que se agrega
+                    $copiaTiempoOrden = $horarioDelivery->tiempo_extra;
+
+
                     $hora1 = date("h:i A", strtotime($horarioDelivery->hora_abierto_delivery));
                     $hora2 = date("h:i A", strtotime($horarioDelivery->hora_cerrado_delivery));
                             
@@ -353,6 +357,7 @@ class ProcesadorOrdenesController extends Controller
                         // este dato no es tomado en cuenta si $tiempolimite == 0
                         $limiteentrega = 1; // cerrado
                     }     
+
                 
                     //**** VALIDACIONES *****//
 
@@ -461,7 +466,7 @@ class ProcesadorOrdenesController extends Controller
                         }
                     }
 
-                  
+                   
 
                     //INGRESAR DATOS
                 
@@ -566,15 +571,16 @@ class ProcesadorOrdenesController extends Controller
                     ->first();
 
                     // PRIORIDAD 4
-                    // variable para saver si sub total supero min requerido para envio gratis
+                    // variable para saver si sub total supero min requerido para nuevo cargo
                    
-                    // esta zona tiene un minimo de $$ para envio gratis
+                    // esta zona tiene un minimo de $$ para aplicar nuevo cargo
                     if($datosInfo->min_envio_gratis == 1){
                         $costo = $datosInfo->costo_envio_gratis;
 
                         // precio envio sera 0, si supera $$ o igual en carrito de compras
                         if($resultado >= $costo){
-                            $envioPrecio = 0;
+
+                            $envioPrecio = $datosInfo->nuevo_cargo;  // aplicar el nuevo tipo de cargo
                             $tipocargo = 4;
                         }
                     }                  
@@ -598,7 +604,7 @@ class ProcesadorOrdenesController extends Controller
                     // ya verificado que cupon es valido y exista, ingresar registros
 
                     // setear precio envio si es cupon envio gratis, o el de descuento dinero
-
+                    
                                         
                     if($request->aplicacupon == 1){
                         if($ccs = Cupones::where('texto_cupon', $request->cupon)->first()){
@@ -865,7 +871,7 @@ class ProcesadorOrdenesController extends Controller
                                         'nota' => $notaP);
                             OrdenesDescripcion::insert($data);
                         }
-                   
+                       
                     // guardar direccion del usuario
                     $datoDir = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
                     $dNombre = $datoDir->nombre;
@@ -903,7 +909,7 @@ class ProcesadorOrdenesController extends Controller
                     if(empty($dLongiReal)){
                         $dLongiReal = "";
                     }
-                   
+                    
                     $nuevaDir = new OrdenesDirecciones;
                     $nuevaDir->users_id = $dUser;
                     $nuevaDir->ordenes_id = $idOrden;
@@ -919,9 +925,10 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->longitud_real = $dLongiReal;
                     $nuevaDir->copia_envio = $copiaenvio;
                     $nuevaDir->copia_min_gratis = $copiamingratis;
+                    $nuevaDir->copia_tiempo_orden = $copiaTiempoOrden;
                     
                     $nuevaDir->save();
-
+                   
                     // BORRAR CARRITO TEMPORAL DEL USUARIO
                     
                     CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->delete();
@@ -1074,7 +1081,7 @@ class ProcesadorOrdenesController extends Controller
                         'success' => 20 // carrito de compras no encontrado
                     ];
                 }
-
+ 
             } catch(\Throwable $e){
                 DB::rollback();
                 return [

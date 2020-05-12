@@ -807,20 +807,20 @@ class CarritoTemporalController extends Controller
                         $resultado=$resultado+$valor;
                     }
 
-                    $datosInfo = DB::table('zonas_servicios AS z')
-                    ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
-                    ->where('z.zonas_id', $zonaiduser)
-                    ->where('z.servicios_id', $servicioidC)
+                    $datosInfo = DB::table('zonas_servicios')                               
+                    ->where('zonas_id', $zonaiduser)
+                    ->where('servicios_id', $servicioidC)
                     ->first();
 
                     // PRIORIDAD 4
-                    // esta zona tiene un minimo de $$ para envio gratis
+                    // esta zona tiene un minimo de $$ para aplicar nuevo tipo de cargo
                     if($datosInfo->min_envio_gratis == 1){
                         $costo = $datosInfo->costo_envio_gratis;
 
-                        // precio envio sera 0, si supera $$ en carrito de compras
-                        if($resultado > $costo){
-                            $envioPrecio = 0;
+                        // verificar 
+                        if($resultado >= $costo){
+                            //aplicar nuevo tipo cargo
+                            $envioPrecio = $datosInfo->nuevo_cargo;
                         }
                     }
                     

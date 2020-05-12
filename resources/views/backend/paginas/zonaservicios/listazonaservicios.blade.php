@@ -169,15 +169,26 @@
                                     <input type="number" step="any" id="ganancia-editar">
                                 </div>
 
+
+                              <!-- nuevo tipo de cargo si supera x cantidad -->
+
                                 <div class="form-group">
-                                    <label>Envio gratis si supera x cantidad</label>
+                                    <label>Nuevo cargo si supera x cantidad</label>
                                     <br>
                                     <input type="checkbox" id="cbmingratis-editar">
-                                </div>
+                                </div>                              
+
                                 <div class="form-group">                                
-                                    <label>Minimo de compra para envio gratis</label>
-                                    <input type="number" step="any" id="minenvio-editar">
+                                    <label>Minimo de compra para aplicar nuevo tipo de cargo</label>
+                                    <input type="number" step="0.01" id="minenvio-editar">
                                 </div>
+
+                                <div class="form-group">                                
+                                    <label>Nuevo Cargo a aplicar si supera la x cantidad</label>
+                                    <input type="number" step="0.01" id="nuevocargo-editar">
+                                </div>
+
+                                <!-- *** -->
 
                                 <div class="form-group">
                                     <label>Esta zona tiene envio gratis (unicamente servicios publicos)?</label>
@@ -463,7 +474,8 @@
                     $('#fecha-editar').val(response.data.zonaservicio.fecha);
                     $('#zonaidentificador-editar').val(response.data.zonaservicio.idenZona);
                     $('#servicioidentificador-editar').val(response.data.zonaservicio.idenServicio);
-
+                    $('#nuevocargo-editar').val(response.data.zonaservicio.nuevo_cargo);
+                   
 
                     if(response.data.zonaservicio.activo == 0){
                         $("#cbactivo-editar").prop("checked", false);
@@ -529,6 +541,7 @@
         var cbzonagratis = document.getElementById('cbzonagratis-editar').checked;
         var cbmitadprecio = document.getElementById('cbmitadprecio-editar').checked;
 
+        var nuevocargo = document.getElementById('nuevocargo-editar').value;
                 
         var toggle = 0;
         var cbmingratis_1 = 0;
@@ -561,7 +574,10 @@
             return;
         } 
 
-
+        if(nuevocargo === ''){
+            toastr.error('Nuevo cargo es requerido');
+            return;
+        }
     
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
@@ -573,7 +589,7 @@
         formData.append('minenvio', minenvio);
         formData.append('cbzonagratis', cbzonagratis_1);
         formData.append('cbmitadprecio', cbmitadprecio_1);
-        
+        formData.append('nuevocargo', nuevocargo);
         
         axios.post('/admin/zonaservicios/editar', formData, {
         })
