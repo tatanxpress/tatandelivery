@@ -40,9 +40,10 @@ class BuscadorController extends Controller
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
                 ->select('p.id', 'p.nombre', 'p.imagen', 'p.activo', 'p.precio', 'p.disponibilidad', 'p.utiliza_imagen')
                 ->where('s.id', $request->servicioid)
-                ->where('p.disponibilidad', 1)
-                ->where('p.activo', 1)
-                
+                ->where('p.disponibilidad', 1) // producto disponible
+                ->where('p.activo', 1) // producto activo
+                ->where('st.activo', 1) // categoria activa
+                ->where('p.es_promocion', 0) // ningun producto marcado como promocion
                 ->where('p.nombre', 'like', '%' . $request->nombre . '%')
                 ->get();
                 
@@ -106,6 +107,7 @@ class BuscadorController extends Controller
                 ->where('st.activo', 1) // la categoria esta activa
                 ->where('p.activo', 1) // producto activo
                 ->where('p.disponibilidad', 1) // producto disponible
+                ->where('p.es_promocion', 0) // ningun producto marcado como promocion
                 ->where('p.nombre', 'like', '%' . $request->nombre . '%')
                 ->orderBy('s.id', 'ASC')            
                 ->get();

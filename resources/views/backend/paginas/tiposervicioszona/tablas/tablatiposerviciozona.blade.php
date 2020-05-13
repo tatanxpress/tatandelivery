@@ -8,7 +8,7 @@
                 <thead>             
                 <tr> 
                   <th style="width: 15%">Nombre zona</th>
-                  <th style="width: 20%">Descripción zona</th>
+                  <th style="width: 20%">Descripción</th>
                   <th style="width: 10%">Identificador</th>
                   <th style="width: 15%">Activo</th>  
                   <th style="width: 20%">Servicio</th>               
