@@ -1598,6 +1598,8 @@ class ProcesadorOrdenesController extends Controller
                             
                             // sumar sub total + cargo de envio
                             $totalsumado = $total + $envioPrecio;
+
+                            $totalsumado = number_format((float)$totalsumado, 2, '.', '');
                             
                             // sub total, cargo envio, total, donacion, descripcion
                             return ['success' => 22, 
