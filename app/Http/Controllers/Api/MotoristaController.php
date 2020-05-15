@@ -324,12 +324,10 @@ class MotoristaController extends Controller
                     $nombre = $servicio->nombre;
                     $o->zona = $nombre;
 
-                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-                                                
-                    $resta = $o->hora_2 - $tiempo->copia_tiempo_orden;
+                    
 
                     $time1 = Carbon::parse($o->fecha_4);
-                    $horaEstimada = $time1->addMinute($resta)->format('h:i A d-m-Y');
+                    $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEntrega = $horaEstimada;
 
                      // buscar si aplico cupon
