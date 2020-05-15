@@ -947,9 +947,9 @@ class MotoristaController extends Controller
                     $nombre = $zona->nombreZona;
                     $o->zona = $nombre;
                     
-                   //$tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
+                    $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
                     $fechaOrden = Carbon::parse($o->fecha_4);
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($o->hora_2)->format('h:i A');                   
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');                   
                     $o->fecharecoger = $horaEstimadaEntrega;
                     
                     // ver si fue cancelado desde panel de control
