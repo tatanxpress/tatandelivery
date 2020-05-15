@@ -935,7 +935,7 @@ class MotoristaController extends Controller
                 foreach($orden as $o){
 
                     // Tiempo dado por propietario + tiempo de zona extra
-                    //$tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                    
                     // obtener nombre de la zona donde se entregara
                     $zona = DB::table('zonas AS z')
