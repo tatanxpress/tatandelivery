@@ -19,6 +19,9 @@ use App\MotoristaExperiencia;
 use App\MotoristaOrdenes;
 use App\AplicaCuponCinco;
 use App\Instituciones;
+use OneSignal;
+
+
 
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -256,7 +259,8 @@ class OrdenesController extends Controller
                 estado 8 == 0 // aun no cancelada                
             */
 
-            if(Ordenes::where('estado_5', 1)
+            if($oo = Ordenes::where('id', $request->id)
+            ->where('estado_5', 1)
             ->where('estado_6', 1)
             ->where('estado_8', 0)){
 
@@ -269,6 +273,18 @@ class OrdenesController extends Controller
         
                         Ordenes::where('id', $request->id)
                         ->update(['mensaje_8' => $request->mensaje]);
+
+                        // notificacion al cliente
+                        $uus = User::where('id', $oo->users_id)->first();
+
+                        $titulo = "Lamentamos mucho decirte";
+                        $mensaje = "Tu pedido sufrio un percance, pronto nos comunicaremos contigo";
+
+                        try {
+                            $this->envioNoticacionCliente($titulo, $mensaje, $uus->device_id);
+                        } catch (Exception $e) {
+                            
+                        }
         
                         return ['success' => 1];
 
@@ -831,5 +847,12 @@ class OrdenesController extends Controller
           }
         }
     }
+
+
+    
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
+
 }
   
