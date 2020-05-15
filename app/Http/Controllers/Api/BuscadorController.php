@@ -153,4 +153,9 @@ class BuscadorController extends Controller
         }
     }
 
+
+    public function prueba(){
+        return "llego";
+    }
+
 }
