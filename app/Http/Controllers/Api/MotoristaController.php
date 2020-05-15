@@ -935,7 +935,7 @@ class MotoristaController extends Controller
                 foreach($orden as $o){
 
                     // Tiempo dado por propietario + tiempo de zona extra
-                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+                    //$tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                    
                     // obtener nombre de la zona donde se entregara
                     $zona = DB::table('zonas AS z')
@@ -947,9 +947,9 @@ class MotoristaController extends Controller
                     $nombre = $zona->nombreZona;
                     $o->zona = $nombre;
                     
-                    $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
+                   //$tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
                     $fechaOrden = Carbon::parse($o->fecha_4);
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');                   
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($o->hora_2)->format('h:i A');                   
                     $o->fecharecoger = $horaEstimadaEntrega;
                     
                     // ver si fue cancelado desde panel de control
