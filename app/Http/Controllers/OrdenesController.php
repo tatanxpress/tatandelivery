@@ -20,7 +20,7 @@ use App\MotoristaOrdenes;
 use App\AplicaCuponCinco;
 use App\Instituciones;
 use OneSignal;
-
+use App\User;
 
 
 use Illuminate\Support\Facades\Validator;
@@ -261,7 +261,7 @@ class OrdenesController extends Controller
 
             if($oo = Ordenes::where('id', $request->id)
             ->where('estado_5', 1)
-            ->where('estado_6', 1)
+            ->where('estado_6', 1) 
             ->where('estado_8', 0)){
 
                 // y tambien que tambien no haya sido cancelada extra ya
