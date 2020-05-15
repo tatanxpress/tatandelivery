@@ -1075,15 +1075,8 @@ class MotoristaController extends Controller
                 ->first();
 
                 $time1 = Carbon::parse($or->fecha_4);
-
-                $data = DB::table('ordenes_direcciones')
-                ->where('ordenes_id', $or->id)              
-                ->first();
-                
-                $tiempozona = $data->copia_tiempo_orden;
-
-                $restaHoraEstimada = $or->hora_2 - $tiempozona; // hora estimada recogida de producto
-                $horaEstimada = $time1->addMinute($restaHoraEstimada)->format('h:i A');
+               
+                $horaEstimada = $time1->addMinute($or->hora_2)->format('h:i A');
                 $horaEstimada = $horaEstimada;              
                 
                 return ['success' => 1, 'ordenes' => $orden,
