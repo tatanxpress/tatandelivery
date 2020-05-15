@@ -224,7 +224,3 @@ Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@oc
 // cambiar contrasena el administrador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); 
 
- 
-
-
-Route::get('/ver/prueba', 'Api\BuscadorController@prueba');
