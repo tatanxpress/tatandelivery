@@ -798,15 +798,10 @@ class MotoristaController extends Controller
                     ->first();
                     
                     $nombre = $zona->nombreZona;
-                    $o->zona = $nombre;
-                    
-                    $data = DB::table('ordenes_direcciones')
-                    ->where('ordenes_id', $o->id)              
-                    ->first();
-                    
-                    $tiempo = $data->copia_tiempo_orden + $o->hora_2;
+                    $o->zona = $nombre;                
+
                     $fechaOrden = Carbon::parse($o->fecha_4);
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempo)->format('h:i A d-m-Y');
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->fecharecoger = $horaEstimadaEntrega;
 
 
