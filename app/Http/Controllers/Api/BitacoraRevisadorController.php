@@ -16,7 +16,7 @@ class BitacoraRevisadorController extends Controller
     // ver fecha de recorte
     public function verFechaRecorte(Request $request){
         if($request->isMethod('post')){
-            $reglaDatos = array(
+            $reglaDatos = array( 
                 'id' => 'required',
             );
 
@@ -41,16 +41,16 @@ class BitacoraRevisadorController extends Controller
                 ->first();
 
                 if (empty($dato)) {
-                    $dinero = DB::table('ordenes_revisadas AS r')
+                    /*$dinero = DB::table('ordenes_revisadas AS r')
                     ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
                     ->select('o.precio_total')
                     ->where('r.revisador_id', $request->id)     
                     ->get();
 
                     $suma = collect($dinero)->sum('precio_total');
-                    $ganado = number_format((float)$suma, 2, '.', '');
+                    $ganado = number_format((float)$suma, 2, '.', '');*/
 
-                    // dato vendra null
+                    // no ahy ningun registro
                     return ['success' => 1];
                 }else{
 
@@ -60,7 +60,7 @@ class BitacoraRevisadorController extends Controller
                     $fecha2Dato = new DateTime($dato->fecha2);
                     $fecha2 = date_format($fecha2Dato, 'd-m-Y');
                     
-                    $fechaLimite = $dato->fecha2;
+                    /*$fechaLimite = $dato->fecha2;
                     
                     $dinero = DB::table('ordenes_revisadas AS r')
                     ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
@@ -78,14 +78,16 @@ class BitacoraRevisadorController extends Controller
                     ->select('o.precio_total', 'r.fecha', 'o.precio_envio')
                     ->where('r.revisador_id', $request->id)
                     ->whereBetween('r.fecha', [$start, $end])
-                    ->get();
+                    ->get();*/
                   
-                    $sumaRecorte = collect($fechaDinero)->sum('precio_total');
-                    $sumaRecorteEnvio = collect($fechaDinero)->sum('precio_envio');
+                    //$sumaRecorte = collect($fechaDinero)->sum('precio_total');
+                    //$sumaRecorteEnvio = collect($fechaDinero)->sum('precio_envio'); 
 
-                    $ganadoRecorte = number_format((float)$sumaRecorte + $sumaRecorteEnvio, 2, '.', '');
+                   //$ganadoRecorte = number_format((float)$sumaRecorte + $sumaRecorteEnvio, 2, '.', '');
+
+                   $total = number_format((float)$dato->total, 2, '.', '');
                     
-                    return ['success' => 2, 'fecha1' => $fecha1, 'fecha2' => $fecha2, 'recorte' => $ganadoRecorte];
+                    return ['success' => 2, 'fecha1' => $fecha1, 'fecha2' => $fecha2, 'recorte' => $total];
                 }
             }else{
                 return ['success' => 3];
