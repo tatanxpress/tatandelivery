@@ -151,6 +151,13 @@
                                             <label>Dirección</label>
                                             <input type="text" maxlength="300" class="form-control" id="direccion-nuevo" placeholder="Direccion del servicio">
                                         </div>
+
+                                        <div class="form-group">
+                                            <label>Limite de dinero para comprar en este servicio</label>
+                                            <input type="number" step="0.01" class="form-control" id="compra-nuevo" placeholder="Dinero Limite">
+                                        </div>
+
+
                                         <div class="form-group">
                                             <label style="color:#191818">Tipo Vista</label>
                                             <br>
@@ -485,6 +492,13 @@
                                 <label>Dirección</label>
                                 <input type="text" maxlength="300" class="form-control" id="direccion-editar" placeholder="Direccion del servicio">
                             </div>
+
+                            <div class="form-group">
+                                <label>Limite de dinero para comprar en este servicio</label>
+                                <input type="number" step="0.01" class="form-control" id="compra-editar" placeholder="Dinero Limite">
+                            </div>
+
+
                             <div class="form-group">
                                 <label style="color:#191818">Tipo Vista</label>
                                 <br>
@@ -787,6 +801,8 @@
         var longitud = document.getElementById('longitud-nuevo').value;
         var direccion = document.getElementById('direccion-nuevo').value;
         var tipovista = document.getElementById('select-vista').value;
+
+        var compra = document.getElementById('compra-nuevo').value;
         
         var cbprivado = document.getElementById('cbprivado').checked;
        
@@ -847,6 +863,11 @@
          telefono, latitud, longitud, direccion);
 
         if(!retorno1){
+            return;
+        }
+
+        if(compra === ''){
+            toastr.error('Dinero limite es requerido');
             return;
         }
 
@@ -972,6 +993,8 @@
             formData.append('minimocompra', minimocompra);
             formData.append('cbproducto', cbproducto_1);
             formData.append('cbprivado', cbprivado_1);
+
+            formData.append('compra', compra);
             
             formData.append('horalunes1', horalunes1);
             formData.append('horalunes2', horalunes2);
@@ -1379,6 +1402,8 @@
                     $('#nombre-editar').val(response.data.servicio.nombre);
                     $('#descripcion-editar').val(response.data.servicio.descripcion);
                     $('#descripcioncorta-editar').val(response.data.servicio.descripcion_corta);
+
+                    $('#compra-editar').val(response.data.servicio.compra_limite);
                       
                   
                     if(response.data.servicio.utiliza_minimo == 1){
@@ -1453,6 +1478,8 @@
         var longitud = document.getElementById('longitud-editar').value;
         var direccion = document.getElementById('direccion-editar').value;
         var tipovista = document.getElementById('select-vista-editar').value;
+
+        var compra = document.getElementById('compra-editar').value;
         
         var cbminimo = document.getElementById('cbminimo-editar').checked;
         var minimocompra = document.getElementById('minimocompra-editar').value;
@@ -1461,6 +1488,12 @@
         var cbactivo = document.getElementById('cbactivo-editar').checked;
       
         var privado = document.getElementById('cbprivado-editar').checked;
+
+        
+        if(compra === ''){
+            toastr.error('Dinero limite es requerido');
+            return;
+        }
 
         var retorno = validarservicio(comision, nombre, descripcion, descripcioncorta, logo, imagen,
      telefono, latitud, longitud, direccion, minimocompra, identificador);
@@ -1514,6 +1547,8 @@
         formData.append('longitud', longitud);
         formData.append('direccion', direccion);
         formData.append('tipovista', tipovista);
+
+        formData.append('compra', compra);
         
         formData.append('cbminimo', cbminimo_1);
         formData.append('minimocompra', minimocompra);

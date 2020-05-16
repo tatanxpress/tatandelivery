@@ -70,6 +70,7 @@ class ServiciosController extends Controller
                 'minimocompra' => 'required',
                 'cbproducto' => 'required',
                 'cbprivado' => 'required',
+                'compra' => 'required',
                  
                 'horalunes1' => 'required',
                 'horalunes2' => 'required',
@@ -136,6 +137,8 @@ class ServiciosController extends Controller
                 'tipovista.required' => 'tipo vista es requerido',
                 'cbprivado.required' => 'check si servicio es privado es requerido',
 
+                'compra.required' => 'compra es requerido',
+
                 'cbminimo.required' => 'es requerido 2',
                 'minimocompra.required' => 'es requerido 3',
                 'cbproducto.required' => 'es requerido 4',
@@ -146,7 +149,7 @@ class ServiciosController extends Controller
                 'jueves.required' => 'es requerido 9',
                 'viernes.required' => 'es requerido 10',
                 'sabado.required' => 'es requerido 11',
-                'domingo.required' => 'es requerido 12',
+                'domingo.required' => 'es requerido 12',                
 
                 'horalunes1.required' => 'es requerido 13',
                 'horalunes2.required' => 'es requerido 14',
@@ -263,7 +266,8 @@ class ServiciosController extends Controller
                     $tipo->utiliza_minimo = $request->cbminimo; //
                     $tipo->orden_automatica = 0;
                     $tipo->producto_visible = $request->cbproducto; //
-                    $tipo->privado = $request->cbprivado;                    
+                    $tipo->privado = $request->cbprivado;     
+                    $tipo->compra_limite = $request->compra;
                     $tipo->save();
  
                     $idservicio = $tipo->id;
@@ -440,6 +444,7 @@ class ServiciosController extends Controller
                 'longitud' => 'required',
                 'direccion' => 'required',
                 'tipovista' => 'required',
+                'compra' => 'required',
                 
                 'cbminimo' => 'required',
                 'minimocompra' => 'required',
@@ -462,6 +467,7 @@ class ServiciosController extends Controller
                 'longitud.required' => 'longitud requerido',
                 'direccion.required' => 'direccion requerido',
                 'tipovista.required' => 'tipo vista requerida',
+                'compra.required' => 'Dinero limite es requerido',
                
                 'cbminimo.required' => 'check minimo requerido',
                 'minimocompra.required' => 'minimo compra requerido',
@@ -606,6 +612,7 @@ class ServiciosController extends Controller
                         'minimo' => $request->minimocompra,
                         'utiliza_minimo' => $request->cbminimo,
                         'producto_visible' => $request->cbproducto,
+                        'compra_limite' => $request->compra,
                         'privado' => $request->privado]);
 
                     DB::commit();  

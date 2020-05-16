@@ -342,7 +342,7 @@ class ProcesadorOrdenesController extends Controller
                     $hora2limite = date("h:i A", strtotime($horafinal));
 
                     // sacar dinero limite por orden 
-                    $limitedineroorden = DB::table('dinero_orden')->where('id', 1)->pluck('limite')->first();
+                    $limitedineroorden = DB::table('servicios')->where('id', $servicioidC)->pluck('compra_limite')->first();
                     
                     if($tiempo_limite == 1){
 
