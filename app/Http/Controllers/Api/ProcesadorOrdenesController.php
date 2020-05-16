@@ -2196,11 +2196,16 @@ class ProcesadorOrdenesController extends Controller
                 $idMotorista = $motoristaDato->motoristas_id;
                 $fecha = Carbon::now('America/El_Salvador');
 
+                $men = $request->mensaje;
+                if($men == null){
+                    $men = "-";
+                }
+
                 $nueva = new MotoristaExperiencia;
                 $nueva->ordenes_id = $or->id;
                 $nueva->motoristas_id = $idMotorista;
                 $nueva->experiencia = $request->valor;
-                $nueva->mensaje = $request->mensaje;
+                $nueva->mensaje = $men;
                 $nueva->fecha = $fecha;
                 $nueva->save();
                 
