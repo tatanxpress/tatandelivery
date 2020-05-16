@@ -1209,7 +1209,7 @@ class MotoristaController extends Controller
         }
     }
 
-    // borrar orden, cuando fue cancelada extraordinariamente, y el motorista la acepto antes de los 10 minutos
+    // borrar orden, cuando fue cancelada extraordinariamente, y el motorista la acepto antes de los 5 minutos
     public function borrarOrdenCancelada(Request $request){
         if($request->isMethod('post')){ 
 

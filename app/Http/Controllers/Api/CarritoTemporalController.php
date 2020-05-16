@@ -45,13 +45,15 @@ class CarritoTemporalController extends Controller
                 ];
             } 
             
+           
+
             if(!Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first())
             {
                 return [
                     'success' => 6 // usuario sin direccion seleccionada
                 ];
             }
-
+          
             DB::beginTransaction();
         
             try {
@@ -59,11 +61,20 @@ class CarritoTemporalController extends Controller
                 $datos = DB::table('servicios AS s')
                 ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')            
-                ->select('s.id AS idServicio', 'p.utiliza_cantidad')
+                ->select('s.id AS idServicio', 'p.utiliza_cantidad', 'p.limite_orden', 'p.cantidad_por_orden')
                 ->where('p.id', $request->productoid)
                 ->first();
                 $idservicio = $datos->idServicio; //id servcio
                 $utilizaCantidad = $datos->utiliza_cantidad; // saver si utiliza cantidad este producto
+
+
+                // Preguntar si este producto tiene limite por orden. 
+                if($datos->limite_orden == 1){
+                    // ver si supero la cantidad
+                    if($request->cantidad >  $datos->cantidad_por_orden){
+                        return ['success' => 8, 'unidades' => $datos->cantidad_por_orden];
+                    }
+                }
                              
                 // verificar si el usuario va a borrar la tabla de carrito de compras
                 if($request->mismoservicio == 1){ // borrar tablas

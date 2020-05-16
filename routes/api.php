@@ -42,7 +42,7 @@ Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPubl
 // vista tipo tienda  
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
     
-// carrito
+// carrito 
 Route::post('usuario/carrito/producto/agregar', 'Api\CarritoTemporalController@agregarProducto'); 
 Route::post('usuario/carrito/ver/orden', 'Api\CarritoTemporalController@verCarritoCompras'); // ver la orden
 Route::post('usuario/carrito/eliminar/producto', 'Api\CarritoTemporalController@eliminarProducto'); // eliminar producto individual       
@@ -141,7 +141,7 @@ Route::post('motorista/password/recuperacion', 'Api\MotoristaController@codigoCo
 Route::post('motorista/revisar/codigo', 'Api\MotoristaController@revisarCodigoCorreo'); // revisar codigo correo
 Route::post('motorista/cambiar/password', 'Api\MotoristaController@nuevaPassword'); // cambio de contraseña
 Route::post('motorista/buscar/telefono', 'Api\MotoristaController@buscarTelefono'); // buscar telefono
-   
+    
 // nueva ordenes 
 Route::post('motorista/nueva/ordenes', 'Api\MotoristaController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('motorista/ver/orden/id', 'Api\MotoristaController@verOrdenPorID'); // ver estados orden por id
