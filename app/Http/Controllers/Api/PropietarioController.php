@@ -1470,11 +1470,9 @@ class PropietarioController extends Controller
                         $mensaje = "Seguir el estado de su orden";
 
                         // tiempo de la orden automatica
-
-                        $ss = Servicios::where('id', $or->servicios_id)->first();
- 
+                         
                         Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
-                        'fecha_2' => $fecha, 'hora_2' => $ss->tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
+                        'fecha_2' => $fecha, 'hora_2' => $datosServicio->tiempo, 'estado_3' => 1, 'fecha_3' => $fecha,
                         'estado_4' => 1, 'fecha_4' => $fecha, 'visible_p' => 0, 'visible_p2' => 1, 'visible_p3' => 1]);
                                                  
                         // mandar notificacion a los motoristas asignados al servicio
@@ -1551,8 +1549,8 @@ class PropietarioController extends Controller
                         $titulo = "Orden aceptada";
                         $mensaje = "Revisar tiempo aproximado de entrega";
 
-                        Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
-                        'fecha_2' => $fecha, 'hora_2' => $request->tiempo]);
+                        //Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
+                        //'fecha_2' => $fecha, 'hora_2' => $request->tiempo]);    no ira
 
                         // mandar notificacion al cliente
                         $usuario = User::where('id', $or->users_id)->first();
