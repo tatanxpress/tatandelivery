@@ -259,29 +259,32 @@ class OrdenesController extends Controller
                 estado 8 == 0 // aun no cancelada                
             */
 
-            if($oo = Ordenes::where('id', $request->id)
-            ->where('estado_5', 1)
+          
+
+            if($oo = Ordenes::where('id', $request->id)         
             ->where('estado_6', 1) 
-            ->where('estado_8', 0)){
+            ->where('estado_8', 0)->first()){
 
                 // y tambien que tambien no haya sido cancelada extra ya
                 if(OrdenesDirecciones::where('ordenes_id', $request->id)
                     ->where('cancelado_extra', 0)->first()){
-                        
+                                              
                         OrdenesDirecciones::where('ordenes_id', $request->id)
                         ->update(['cancelado_extra' => 1]); 
         
                         Ordenes::where('id', $request->id)
-                        ->update(['mensaje_8' => $request->mensaje]);
+                        ->update(['mensaje_8' => $request->mensaje]);                      
 
                         // notificacion al cliente
                         $uus = User::where('id', $oo->users_id)->first();
 
                         $titulo = "Lamentamos mucho decirte";
                         $mensaje = "Tu pedido sufrio un percance, pronto nos comunicaremos contigo";
-
+                        
                         try {
-                            $this->envioNoticacionCliente($titulo, $mensaje, $uus->device_id);
+                            if($uus->device_id != "0000"){
+                                $this->envioNoticacionCliente($titulo, $mensaje, $uus->device_id);
+                            }                           
                         } catch (Exception $e) {
                             
                         }
