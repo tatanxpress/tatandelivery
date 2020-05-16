@@ -648,7 +648,7 @@ class MotoristaController extends Controller
 
             if($validarDatos->fails()) 
             {
-                return [
+                return [ 
                     'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
@@ -690,13 +690,13 @@ class MotoristaController extends Controller
                             $sum = $sum + $precio;
                         }   
 
-                        $suma = number_format((float)$sum, 2, '.', '');
-
+                        
 
                         // LIMITAR ORDEN POR TOTAL DE DINERO
                         // UNICAMENTE SERVICIOS
-                        
-                        if($suma >= $mo->limite_dinero){
+                                             
+
+                        if($sum >= $mo->limite_dinero){
                             return ['success' => 1];
                         }
 
