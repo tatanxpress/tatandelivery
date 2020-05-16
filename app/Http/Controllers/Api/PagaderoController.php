@@ -467,6 +467,7 @@ class PagaderoController extends Controller
                             $totalcobro = $totalcobro + $sumado;
                         }
                         else{
+
                             $o->tipocupon = 0;
                         }
 
@@ -482,8 +483,8 @@ class PagaderoController extends Controller
 
                         // sumar ganancia de esta fecha
                 
-                $ganado = number_format((float)$total, 2, '.', '');
-                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];                             
+                $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
             }else{
                 return ['success' => 2];
             }
