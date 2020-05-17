@@ -2083,7 +2083,7 @@ class PropietarioController extends Controller
                             $mensaje1 = "El servicio cancelo la orden";
                             if($dato->device_id != "0000"){
                                 try {
-                                    $this->envioNoticacionPropietario($titulo1, $mensaje1, $dato->device_id);
+                                    $this->envioNoticacionMotorista($titulo1, $mensaje1, $dato->device_id);
                                 } catch (Exception $e) {
                                     
                                 }
