@@ -30,6 +30,8 @@ use App\OrdenesCupones;
 use App\Cupones;
 use App\AplicaCuponCuatro;
 use App\AplicaCuponCinco;
+use App\MotoristaOrdenes;
+use App\Motoristas;
 
 class PropietarioController extends Controller
 {
@@ -2072,6 +2074,21 @@ class PropietarioController extends Controller
                                 }
                                 
                             } 
+                        }
+
+                        // mandar notificacion al motorista si ya agarro la orden
+                        if($moo = MotoristaOrdenes::where('ordenes_id', $request->ordenid)->first()){
+                            $dato = Motoristas::where('id', $moo->motoristas_id)->first();
+                            $titulo1 = "Orden cancelada";
+                            $mensaje1 = "El servicio cancelo la orden";
+                            if($dato->device_id != "0000"){
+                                try {
+                                    $this->envioNoticacionPropietario($titulo1, $mensaje1, $dato->device_id);
+                                } catch (Exception $e) {
+                                    
+                                }
+                            }
+                          
                         }
 
                         return ['success' => 1]; // cancelado
