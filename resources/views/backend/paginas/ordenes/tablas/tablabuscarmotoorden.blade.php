@@ -34,7 +34,7 @@
                       <span class="badge bg-danger">Cancelada</span>
                       @else
                         @if($dato->estado_7 == 1)
-                        <span class="badge bg-primary">Completado</span>
+                        <span class="badge bg-success">Completado</span>
                         @else
                         <span class="badge bg-primary">Entregando orden</span>
                         @endif
