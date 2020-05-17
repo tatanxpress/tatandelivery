@@ -213,18 +213,20 @@ class OrdenesController extends Controller
             ->select('o.id AS idorden',
             'o.precio_envio', 'mo.motoristas_id', 'm.identificador', 'mo.fecha_agarrada', 
             'o.ganancia_motorista', 's.identificador AS identiservicio', 
-            'o.estado_7') 
+            'o.estado_7', 'o.estado_8') 
             ->where('mo.motoristas_id', $id)
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
             ->get(); 
 
             foreach($orden as $o){
-                $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));               
+                $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));  
+                
+               
             }
   
             return view('backend.paginas.ordenes.tablas.tablabuscarmotoorden', compact('orden'));
         }else{
-            return ['success' => 2];
+            return ['success' => 2]; 
         }
     }
 

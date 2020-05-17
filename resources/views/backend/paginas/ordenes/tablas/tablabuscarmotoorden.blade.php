@@ -29,12 +29,15 @@
                     <td>{{ $dato->fecha_agarrada }}</td>
                     <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->identiservicio }}</td>
-
                     <td> 
-                      @if($dato->estado_7 == 0)
-                      <span class="badge bg-danger">En Proceso</span>
+                      @if($dato->estado_8 == 1)
+                      <span class="badge bg-danger">Cancelada</span>
                       @else
-                      <span class="badge bg-primary">Completado</span>
+                        @if($dato->estado_7 == 1)
+                        <span class="badge bg-primary">Completado</span>
+                        @else
+                        <span class="badge bg-primary">Entregando orden</span>
+                        @endif
                       @endif
                     </td>
                     <td>${{ $dato->precio_envio }}</td>
