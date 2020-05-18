@@ -886,6 +886,9 @@ class MotoristaPagoController extends Controller
 
             // sumar precio            
             $o->total = number_format((float)$precio, 2, '.', '');
+
+            $o->precio = $precio;
+
             $sincompletar = $sincompletar + 1;
             $sum = $sum + $precio;
         }   
