@@ -781,7 +781,7 @@ class MotoristaPagoController extends Controller
                     }
                 }else if($tipocupon == 3){
                     $info = AplicaCuponTres::where('ordenes_id', $o->ordenes_id)->first();
-
+ 
                     $resta = $subtotal * ($info->porcentaje / 100);
                     $total = $subtotal - $resta;
 
@@ -874,6 +874,11 @@ class MotoristaPagoController extends Controller
 
                     $subtotal = $total;
                 }
+                else if($tipocupon == 5){
+                    // cupon donacion
+                    $info = AplicaCuponCinco::where('ordenes_id', $o->ordenes_id)->first();
+                    $subtotal = $subtotal + $info->dinero;                    
+                }
             }
 
             $precio = $subtotal + $precioenvio;
@@ -910,22 +915,12 @@ class MotoristaPagoController extends Controller
         $sum = 0.0;
         $conteo = 0;
         foreach($orden as $o){
-            $fechaOrden = $o->fecha_orden;
-            $hora1 = date("h:i A", strtotime($fechaOrden));
-            $fecha1 = date("d-m-Y", strtotime($fechaOrden));
-            $o->fecha_orden = $fecha1 . " " . $hora1;  
- 
-            $fecha = $o->fecha;
-            $hora = date("h:i A", strtotime($fecha));
-            $fecha = date("d-m-Y", strtotime($fecha));
-            $o->fecha = $fecha . " " . $hora; 
+            $fecha = date("d-m-Y h:i A", strtotime($o->fecha_orden));
+            $o->fecha_orden = $fecha;
+            $o->fecha = $fecha;          
 
-            // sumar precio
-            $precio = $o->precio_total + $o->precio_envio;
-            $o->precio = number_format((float)$precio, 2, '.', '');
-
-            $sum = $sum + $precio;
-            $conteo = $conteo + 1;
+             
+              
         }
  
         $suma = number_format((float)$sum, 2, '.', '');
