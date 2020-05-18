@@ -1703,12 +1703,31 @@ class ProcesadorOrdenesController extends Controller
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $o->producto = $producto;
+
+                            // solo sumara sub total + envio
+                            $total = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
                         }
                         else if($tipo->tipo_cupon_id == 5){
                             $o->tipocupon = 5;
+
+                            // sumar sub total + envio + donacion
+                            $acc = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $total = $o->precio_total + $o->precio_envio;
+                            $total = $total + $acc;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
                         }
                         else{
+                            // dado error, extrano
                             $o->tipocupon = 0;
+                            
+                            $total = $o->precio_total;
+                            $envio = $o->precio_envio;
+                            $total = $total + $envio;
+                            $total = number_format((float)$total, 2, '.', '');
+        
+                            $o->precio_total = $total;
                         }
 
                     }else{

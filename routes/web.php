@@ -222,7 +222,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
      
   // reporte por tipos de cargo de envio
   Route::get('/generar/tipocargo/{id}/{id2}/{id3}/{d4}', 'MotoristaPagoController@reporteTipoCargoRevuelto'); // servicio uso min de $$ para envio gratis
- 
+  
 
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 

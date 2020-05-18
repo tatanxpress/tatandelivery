@@ -174,7 +174,7 @@
             $('#tablaDatatable').load(ruta);       
                  
         } 
-    } 
+    }  
 
     // reporte de ordenes revisadas
     function reporte(){
