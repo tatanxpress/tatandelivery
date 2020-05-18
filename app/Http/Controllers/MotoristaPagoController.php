@@ -773,6 +773,9 @@ class MotoristaPagoController extends Controller
                     if($descuento <= 0){
                         $descuento = 0;
                     }
+
+                    $subtotal = $descuento;
+
                     if($info->aplico_envio_gratis == 1){
                         $precioenvio = 0;
                     }
@@ -788,8 +791,15 @@ class MotoristaPagoController extends Controller
 
                     $subtotal = $total;
                 }
-            }
+                else if($tipocupon == 4){
+                    // producto gratis
+                }
+                else if($tipocupon == 5){
+                    // cupon donacion
 
+                }
+            } 
+ 
             $precio = $subtotal + $precioenvio;
 
             $o->precio = number_format((float)$precio, 2, '.', '');
