@@ -784,9 +784,11 @@ class ProcesadorOrdenesController extends Controller
                                 // minimo a comprar para aplicar producto gratis
                                 $cpg = CuponProductoGratis::where('cupones_id', $ccs->id)->first();
 
+
                                 // verifica minimo
                                 if($resultado >= $cpg->dinero_carrito){
 
+                                    
                                     // verificar servicio si aplica
                                     if(CuponProductoGratis::where('cupones_id', $ccs->id)->where('servicios_id', $servicioid)->first()){
                                        
@@ -795,19 +797,20 @@ class ProcesadorOrdenesController extends Controller
                                         $reg->ordenes_id = $idOrden;
                                         $reg->cupones_id = $ccs->id;
                                         $reg->save();
-
+                                      
                                         $contador = $ccs->contador;
                                         $contador = $contador + 1;
 
                                         // sumas +1 el contador
                                         Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
-
+                                       
                                         $cuatro = new AplicaCuponCuatro;
+                                        $cuatro->ordenes_id = $idOrden;
                                         $cuatro->dinero_carrito = $cpg->dinero_carrito;
                                         $cuatro->producto = $cpg->nombre;
         
                                         $cuatro->save();
-
+                                        
                                     }else{
                                         return ['success' => 23]; // cupon no valido
                                     }                                  
