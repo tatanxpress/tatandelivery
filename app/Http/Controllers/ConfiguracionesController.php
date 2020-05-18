@@ -25,14 +25,16 @@ class ConfiguracionesController extends Controller
     public function actualizar(Request $request){
         if($request->isMethod('post')){   
             
-            $regla = array(  
-                'dinero' => 'required',
-                'cupones' => 'required'           
+            $regla = array(                 
+                'cupones' => 'required',
+                'sms' => 'required',
+                'correo' => 'required'
             );
 
-            $mensaje = array(                
-                'dinero.required' => 'Dinero es requerido',
-                'cupones.required' => 'Cupones es requerido'
+            $mensaje = array(
+                'cupones.required' => 'Cupones es requerido',
+                'sms.required' => 'SMS es requerido',
+                'correo.required' => 'Correo es requerido'
                 );
 
             $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -45,12 +47,15 @@ class ConfiguracionesController extends Controller
                 ];
             } 
 
-            DineroOrden::where('id', 1)->update([
-                'limite' => $request->dinero,
-                'ver_cupones' => $request->cupones
+            DineroOrden::where('id', 1)->update([             
+                'ver_cupones' => $request->cupones,
+                'correo' => $request->correo,
+                'activo_sms' => $request->sms
                 ]);
 
             return ['success' => 1];
         }  
     }
+
+    
 }

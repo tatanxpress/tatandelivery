@@ -70,6 +70,13 @@
                   <p>Ver Clientes</p>
                 </a>
               </li> 
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/numeros/temporales') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Numero Registro</p>
+                </a>
+              </li> 
                    
             </ul>
           </li>
@@ -317,7 +324,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/dinero/limite') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Dinero Limite</p>
+                  <p>Extras</p>
                 </a>
               </li>
 

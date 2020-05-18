@@ -7,6 +7,8 @@ use App\User;
 use App\Direccion;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use App\NumeroSMS;
+use Illuminate\Support\Carbon;
 
 class ClientesController extends Controller
 {
@@ -25,6 +27,67 @@ class ClientesController extends Controller
         ->get();
 
         return view('backend.paginas.cliente.tablas.tablacliente', compact('cliente'));
+    }
+
+     // lista de numeros registrados
+     public function index2(){
+        return view('backend.paginas.temporales.listatemporales');
+    }
+
+    // tabla para ver temporales
+    public function tablaTemporales(){
+        
+        $registro = DB::table('numeros_sms')->get();
+        return view('backend.paginas.temporales.tablas.tablatemporales', compact('registro'));
+    }
+
+    // nuevo registro de numeros temporales
+    public function nuevoRegistro(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'area' => 'required',
+                'numero' => 'required'                
+            );
+
+            $messages = array(                                      
+                'area.required' => 'El area es requerido.',
+                'numero.required' => 'el numero es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if($validator->fails() )
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            $codigo = '';
+            $pattern = '1234567890';
+            $max = strlen($pattern)-1; 
+            for($i=0;$i <6; $i++)           
+            {
+                $codigo .= $pattern{mt_rand(0,$max)};
+            }
+
+            $fecha = Carbon::now('America/El_Salvador');
+
+            $n = new NumeroSMS();
+            $n->area = $request->area;
+            $n->numero = $request->numero;
+            $n->codigo = $codigo;
+            $n->codigo_fijo = $codigo;
+            $n->contador = 0;
+            $n->fecha = $fecha;
+            if($n->save()){
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+
+        }
     }
 
     // informacion cliente
@@ -52,6 +115,69 @@ class ClientesController extends Controller
                 return ['success' => 1, 'cliente' => $cliente];
             }else{
                 return ['success' => 2];
+            }
+        }
+    }
+
+     // informacion registro de numero temporal
+     public function infoNumTemporal(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'                
+            );
+
+            $messages = array(                                      
+                'id.required' => 'El id direccion es requerido.'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if($validator->fails() )
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            if($info = NumeroSMS::where('id', $request->id)->first()){
+                return ['success' => 1, 'info' => $info];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    public function editarRegistro(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'area' => 'required',
+                'numero' => 'required'
+            );
+
+            $messages = array( 
+                'id.required' => 'El id es requerido.',
+                'area.required' => 'El Area es requerido.',
+                'numero.required' => 'Numero es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if($validator->fails() )
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+ 
+            if(NumeroSMS::where('id', $request->id)->first()){
+                NumeroSMS::where('id', $request->id)->update(['area' => $request->area, 'numero' => $request->numero]);
+            
+                return ['success'=>1];
+            }else{
+                return ['success'=>2];
             }
         }
     }

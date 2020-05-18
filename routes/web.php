@@ -267,6 +267,13 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/dinero/limite/informacion', 'ConfiguracionesController@informacion');
   Route::post('/dinero/limite/actualizar', 'ConfiguracionesController@actualizar');
 
+  // numeros temporales
+  Route::get('/numeros/temporales', 'ClientesController@index2'); 
+  Route::get('/numeros/tabla/temporales', 'ClientesController@tablaTemporales'); 
+  Route::post('/numeros/nuevo/registro', 'ClientesController@nuevoRegistro');
+  Route::post('/numeros/informacion', 'ClientesController@infoNumTemporal');
+  Route::post('/numeros/editar', 'ClientesController@editarRegistro');
+
   // lista de tipos de cupones
   Route::get('/cupones/tipo/lista', 'CuponesController@indextipo'); 
   Route::get('/cupones/tipo/tabla/lista', 'CuponesController@tablatipocupones'); 
