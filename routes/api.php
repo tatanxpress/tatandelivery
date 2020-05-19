@@ -193,7 +193,7 @@ Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); /
  
 // ver fecha de recorte
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
-
+ 
 
 // APP ADMINISTRADORES
 Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login revisador

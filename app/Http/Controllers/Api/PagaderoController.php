@@ -465,6 +465,16 @@ class PagaderoController extends Controller
                             $o->producto = $producto;                           
 
                             $totalcobro = $totalcobro + $sumado;
+                        }else if($tipo->tipo_cupon_id == 5){
+                            $o->tipocupon = 5;
+                            $info = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
+
+                            $sumado = $o->precio_total + $o->precio_envio + $info->dinero;
+                            $sumado = number_format((float)$sumado, 2, '.', '');
+
+                            $o->precio_total = $sumado;                                           
+
+                            $totalcobro = $totalcobro + $sumado;
                         }
                         else{
 
