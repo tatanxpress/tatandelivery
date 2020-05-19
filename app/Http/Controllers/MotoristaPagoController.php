@@ -792,11 +792,14 @@ class MotoristaPagoController extends Controller
                     $subtotal = $total;
                 }
                 else if($tipocupon == 4){
-                    // producto gratis
+                    
+
                 }
                 else if($tipocupon == 5){
                     // cupon donacion
+                    $info = AplicaCuponCinco::where('ordenes_id', $o->ordenes_id)->first();
 
+                    $subtotal = $subtotal + $info->dinero;
                 }
             } 
  
