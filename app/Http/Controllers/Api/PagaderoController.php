@@ -388,7 +388,7 @@ class PagaderoController extends Controller
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
-                $totalcobro = 0; 
+                $totalcobro = 0;                 
 
                 foreach($orden as $o){
                     $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
@@ -413,16 +413,16 @@ class PagaderoController extends Controller
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
                             $o->tipocupon = 1;
-                            
+                           
                             // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
-                            
-                            $totalcobro = $totalcobro + $precio->total;
+                          
+                            $totalcobro = $totalcobro + $o->precio_total;                           
                         }else if($tipo->tipo_cupon_id == 2){
                             $o->tipocupon = 2;
                             // modificar precio
                             $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
+                           
                             $total = $o->precio_total - $descuento;
                             if($total <= 0){
                                 $total = 0;
@@ -481,7 +481,7 @@ class PagaderoController extends Controller
                     }                   
                 }
 
-                        // sumar ganancia de esta fecha
+                // sumar ganancia de esta fecha
                 
                 $totalcobro = number_format((float)$totalcobro, 2, '.', '');
                 return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
