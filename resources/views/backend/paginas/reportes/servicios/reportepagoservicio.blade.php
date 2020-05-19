@@ -93,7 +93,7 @@
               <td>${{$dato->precio_total}}</td>
             </tr> 
           @endforeach  
-
+ 
           <tr>
             <td>Total:</td>
             <td></td>

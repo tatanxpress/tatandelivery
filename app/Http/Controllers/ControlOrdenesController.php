@@ -84,23 +84,23 @@ class ControlOrdenesController extends Controller
                 $estado = "Orden contestada por cliente, esperando iniciar orden";
             }
 
-            if($o->estado_4 == 0){
+            if($o->estado_4 == 1){
                 $estado = "Orden inicio preparacion";
             }
 
-            if($o->estado_5 == 0){
+            if($o->estado_5 == 1){
                 $estado = "Orden termino prepararse";
             }
 
-            if($o->estado_6 == 0){
+            if($o->estado_6 == 1){
                 $estado = "Motorista va en camino";
             }
 
-            if($o->estado_7 == 0){
+            if($o->estado_7 == 1){
                 $estado = "Motorista completo la orden";
             }
 
-            if($o->estado_8 == 0){
+            if($o->estado_8 == 1){
                 $estado = "Orden cancelada";
             }
 

@@ -1655,8 +1655,7 @@ class MotoristaController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'mo.fecha_agarrada', 
                 'o.servicios_id', 'o.estado_8')
-                ->where('mo.motoristas_id', $request->id)
-               
+                ->where('mo.motoristas_id', $request->id)               
                 ->where('o.estado_8', 0)
                 ->whereNotIn('o.id', $pilaOrden)
                 ->get();

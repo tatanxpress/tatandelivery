@@ -93,8 +93,8 @@
               <td>{{$dato->id }}</td>             
               <td>{{$dato->fecha_orden}}</td>
               <td>${{$dato->precio_total}}</td>
-              <td>{{$dato->minimo}}</td>
-              <td>${{$dato->producto}}</td>
+              <td>${{$dato->minimo}}</td>
+              <td>{{$dato->producto}}</td>
             </tr> 
           @endforeach  
          
@@ -103,8 +103,8 @@
 
 
         <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
+        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
+        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
         </p>
 
 

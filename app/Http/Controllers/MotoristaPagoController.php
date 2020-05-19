@@ -165,16 +165,29 @@ class MotoristaPagoController extends Controller
  
             $date1 = Carbon::parse($fecha1)->format('Y-m-d');
             $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d'); 
-             
+
             if($cupon == 0){ // Ninguno
+
+                // obtener todas las ordenes id para evitar agarrar esas
+                $todas = DB::table('ordenes_cupones AS oc')
+                ->join('ordenes AS o', 'o.id', '=', 'oc.ordenes_id')
+                ->whereBetween('o.fecha_orden', array($date1, $date2)) 
+                ->get();
+
+                $pilaOrden = array();
+                foreach($todas as $p){
+                    array_push($pilaOrden, $p->ordenes_id);
+                }
+
                 $orden = DB::table('ordenes AS o')
-                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')                
                 ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
                 's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5')
                 ->where('s.id', $idservicio)
                 ->where('o.estado_5', 1) // ordenes completadas
                 ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
-                ->whereBetween('o.fecha_orden', array($date1, $date2))          
+                ->whereBetween('o.fecha_orden', array($date1, $date2))    
+                ->whereNotIn('o.id', $pilaOrden)
                 ->get();
     
                     foreach($orden as $o){                       
@@ -186,9 +199,8 @@ class MotoristaPagoController extends Controller
 
                 $orden = DB::table('ordenes AS o')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-                ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
                 ->select('o.id AS idorden', 'o.precio_total', 'o.fecha_orden', 
-                's.identificador AS identiservicio', 'oc.cupones_id', 'o.estado_7', 'o.estado_8', 'o.estado_5')
+                's.identificador AS identiservicio', 'o.estado_7', 'o.estado_8', 'o.estado_5')
                 ->where('s.id', $idservicio)
                 ->where('o.estado_5', 1) // ordenes completadas
                 ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
@@ -197,26 +209,38 @@ class MotoristaPagoController extends Controller
  
                 // conocer que tipo de cupon es
                 foreach($orden as $o){
-                    $c = Cupones::where('id', $o->cupones_id)->first();
-                    if($c->tipo_cupon_id == 1){
-                        $o->tipocupon = "Envio Gratis";
-                    }else if($c->tipo_cupon_id == 2){
-                        $info = AplicaCuponDos::where('ordenes_id', $o->idorden)->first();
-                        if($info->aplico_envio_gratis == 1){
-                            $o->tipocupon = "Descuento Dinero Con Envio Gratis";
-                        }else{
-                            $o->tipocupon = "Descuento Dinero Sin Envio Gratis";
-                        }
-                        
-                    }else if($c->tipo_cupon_id == 3){
-                        $o->tipocupon = "Descuento Porcentaje";
-                    }else if($c->tipo_cupon_id == 4){
-                        $o->tipocupon = "Producto Gratis";
-                    }else if($c->tipo_cupon_id == 5){
-                        $o->tipocupon = "Donacion";
-                    }
-                } 
 
+                    // buscar si esta orden esta registrada en cupones
+                    if($cc = OrdenesCupones::where('ordenes_id', $o->idorden)->first()){
+
+                        $c = Cupones::where('id', $cc->cupones_id)->first();
+                       
+                        if($c->tipo_cupon_id == 1){
+                            $o->tipocupon = "Envio Gratis"; 
+                        }else if($c->tipo_cupon_id == 2){
+                            $info = AplicaCuponDos::where('ordenes_id', $o->idorden)->first();
+                            if($info->aplico_envio_gratis == 1){
+                                $o->tipocupon = "Descuento Dinero Con Envio Gratis";
+                            }else{
+                                $o->tipocupon = "Descuento Dinero Sin Envio Gratis";
+                            }
+                            
+                        }else if($c->tipo_cupon_id == 3){
+                            $o->tipocupon = "Descuento Porcentaje";
+                        }else if($c->tipo_cupon_id == 4){
+                            $o->tipocupon = "Producto Gratis";
+                        }else if($c->tipo_cupon_id == 5){
+                            $o->tipocupon = "Donacion";
+                        }
+                        else{
+                            $o->tipocupon = "Ninguno";
+                        }                       
+                    }else{
+                        $o->tipocupon = "Ninguno";
+                    } 
+                    
+                } 
+              
                 return view('backend.paginas.pagoservicio.tablas.tablalistapagoserviciocuponmixto', compact('orden'));
                 
             }else if($cupon == 2){ // Envio gratis
@@ -370,14 +394,27 @@ class MotoristaPagoController extends Controller
         $f2 = Carbon::parse($fecha2)->format('d-m-Y');
 
         if($cupon == 0){ // Ninguno
+
+            // obtener todas las ordenes id para evitar agarrar esas
+            $todas = DB::table('ordenes_cupones AS oc')
+            ->join('ordenes AS o', 'o.id', '=', 'oc.ordenes_id')
+            ->whereBetween('o.fecha_orden', array($date1, $date2)) 
+            ->get();
+
+            $pilaOrden = array();
+            foreach($todas as $p){
+                array_push($pilaOrden, $p->ordenes_id);
+            }
+
             $orden = DB::table('ordenes')
             ->select('id', 'precio_total', 'fecha_orden')
             ->where('servicios_id', $idservicio) // ordenes de este servicio
             ->where('estado_5', 1) // ordenes completadas
             ->where('estado_8', 0) // no canceladas
             ->whereBetween('fecha_orden', array($date1, $date2)) // unicamente esta fecha
+            ->whereNotIn('id', $pilaOrden)
             ->get(); 
-
+         
             $totalDinero = 0;
             foreach($orden as $o){
                 //sumar 
@@ -399,7 +436,7 @@ class MotoristaPagoController extends Controller
     
             $view =  \View::make('backend.paginas.reportes.servicios.reportepagoservicio', compact(['orden', 'comision', 'suma', 'totalDinero', 'nombre', 'pagar', 'f1', 'f2']))->render();
             $pdf = \App::make('dompdf.wrapper');
-            $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');     
             return $pdf->stream();
 
         }else if($cupon == 1){ // Envio gratis
@@ -412,8 +449,8 @@ class MotoristaPagoController extends Controller
             ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
             ->where('c.tipo_cupon_id', 1) // cupon envio gratis
             ->whereBetween('o.fecha_orden', array($date1, $date2))          
-            ->get();
-
+            ->get(); 
+ 
             $enviototal = 0;
             // obtener el precio de zona que era
             foreach($orden as $o){
@@ -862,6 +899,7 @@ class MotoristaPagoController extends Controller
                     if($descuento <= 0){
                         $descuento = 0;
                     }
+                    $subtotal = $descuento;
                     if($info->aplico_envio_gratis == 1){
                         $precioenvio = 0;
                     }
@@ -916,6 +954,7 @@ class MotoristaPagoController extends Controller
         ->select('or.ordenes_id', 'or.revisador_id', 'o.precio_total', 'o.precio_envio', 'r.nombre', 'r.identificador', 'o.fecha_orden',  'or.fecha')
         ->where('or.revisador_id', $id)
         ->whereBetween('or.fecha', array($date1, $date2))
+        ->orderBy('o.id', 'ASC')
         ->get();
  
         $sum = 0.0;
@@ -923,11 +962,67 @@ class MotoristaPagoController extends Controller
         foreach($orden as $o){
             $fecha = date("d-m-Y h:i A", strtotime($o->fecha_orden));
             $o->fecha_orden = $fecha;
-            $o->fecha = $fecha;          
+            $o->fecha = $fecha;   
+            
+            $precioenvio = $o->precio_envio;
 
-             
+            $subtotal = 0;
+            
+            if($oc = OrdenesCupones::where('ordenes_id', $o->ordenes_id)->first()){
+                    
+                $tipocupon = Cupones::where('id', $oc->cupones_id)->pluck('tipo_cupon_id')->first();
+ 
+                 if($tipocupon == 1){
+                     $precioenvio = 0;
+
+                     $subtotal = $o->precio_total;
+                 }else if($tipocupon == 2){
+                     $info = AplicaCuponDos::where('ordenes_id', $o->ordenes_id)->first();
+                                             
+                     $descuento = $o->precio_total - $info->dinero;
+                     if($descuento <= 0){
+                         $descuento = 0;
+                     }
+                     $subtotal = $descuento;
+
+                     if($info->aplico_envio_gratis == 1){
+                         $precioenvio = 0;
+                     }
+                 }else if($tipocupon == 3){
+                     $info = AplicaCuponTres::where('ordenes_id', $o->ordenes_id)->first();
+ 
+                     $resta = $o->precio_total * ($info->porcentaje / 100);
+                     $total = $o->precio_total - $resta;
+ 
+                    if($total <= 0){
+                         $total = 0;
+                    }
+ 
+                     $subtotal = $total;
+                }
+                else if($tipocupon == 4){
+                    $subtotal = $o->precio_total;
+                }
+                else if($tipocupon == 5){
+                    // cupon donacion
+                    $info = AplicaCuponCinco::where('ordenes_id', $o->ordenes_id)->first();
+                    $subtotal = $o->precio_total + $info->dinero;                    
+                }
+            }else{
               
+               $subtotal = $o->precio_total;               
+            }
+ 
+            $precio = $subtotal + $precioenvio;
+
+             // sumar precio            
+             $o->total = number_format((float)$precio, 2, '.', '');
+ 
+             $o->precio = number_format((float)$precio, 2, '.', '');
+ 
+             $sum = $sum + $precio;              
         }
+
  
         $suma = number_format((float)$sum, 2, '.', '');
 
@@ -936,7 +1031,7 @@ class MotoristaPagoController extends Controller
         $view =  \View::make('backend.paginas.reportes.reporteordenrevisada', compact(['orden', 'conteo', 'suma', 'nombre', 'f1', 'f2']))->render();
         $pdf = \App::make('dompdf.wrapper');
         $pdf->loadHTML($view)->setPaper('carta', 'portrait');
- 
+  
         return $pdf->stream();
     }
 
