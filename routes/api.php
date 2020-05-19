@@ -205,8 +205,8 @@ Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgent
 Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); 
 
 // ver ordenes de solo hoy
-Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy');
- 
+Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); 
+  
 // ordenes urgente, tarea programada
 Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesProgramada');
 

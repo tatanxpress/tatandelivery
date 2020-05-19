@@ -72,11 +72,11 @@ class VerificarOrdenes extends Command
                         // ya tengo un registro igual, asi que no guardarla
                     }else{
 
-                        $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
+                        //$tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
 
                         // preguntar si supera hora estimada, con la hora actual
                         $time1 = Carbon::parse($o->fecha_4);                         
-                        $horaEstimada = $time1->addMinute($o->hora_2 + 2)->format('Y-m-d H:i:s'); // 2 min de advertencia
+                        $horaEstimada = $time1->addMinute($o->hora_2)->format('Y-m-d H:i:s'); // 2 min de advertencia
                        
                         $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
                                         
@@ -209,7 +209,7 @@ class VerificarOrdenes extends Command
                                 if($d->device_id != "0000"){                                   
                                     array_push($pilaPropietarios, $d->device_id); 
                                 }
-                            }
+                            } 
                         }
                         
                     }
