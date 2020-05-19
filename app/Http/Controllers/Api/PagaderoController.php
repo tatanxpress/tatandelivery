@@ -235,6 +235,8 @@ class PagaderoController extends Controller
                             $suma = $o->precio_total + $o->precio_envio + $donacion;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
+
+                            $totalcobro = $totalcobro + $suma; 
                         }
                         else{
                             $o->tipocupon = 0;
