@@ -8,7 +8,7 @@
             <table id="table" class="table table-bordered">
                 <thead>
                     <tr> 
-                        <th style="width: 5%">#</th>
+                        <th style="width: 10%">#</th>
                         <th style="width: 10%">Nombre</th>
                         <th style="width: 15%">Identificador</th>
                         <th style="width: 15%">Cerrado Emergencia</th>
@@ -66,30 +66,32 @@
 
       function sendOrderToServer() {
 
-        idzona = {{ $idzona }};
-        idtipo = {{ $idtipo }};
-
         var order = [];
         $('tr.row1').each(function(index,element) {
           order.push({
-            id: $(this).attr('data-id'),
+            id: $(this).attr('data-id'), // esto es el id: zona servicio
             posicion: index+1
           }); 
         });
-
+       
         var spinHandle = loadingOverlay().activate();
 
         let formData = new FormData();
         formData.append('[order]', order);
 
         axios.post('/admin/zonaservicios/ordenar',{ 
-            'order': order,
-            'idzona': idzona,
-            'idtipo': idtipo  
+            'order': order           
             })
             .then((response) => {
             loadingOverlay().cancel(spinHandle);
+
+              if(response.data.success == 1){
                 toastr.success('Actualizado');
+              }else{
+                toastr.error('No se actualizo');
+              }
+              
+               
             })
             .catch((error) => {           
             loadingOverlay().cancel(spinHandle);

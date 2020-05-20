@@ -42,7 +42,7 @@
 <script src="{{ asset('js/frontend/toastr.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/frontend/axios.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/frontend/loadingOverlay.js') }}" type="text/javascript"></script>
-
+ 
 
 <script type="text/javascript">	 
     $(document).ready(function(){

@@ -287,12 +287,12 @@ class ZonaServiciosController extends Controller
         $servicio = DB::table('servicios AS s')
         ->join('tipo_servicios AS ts', 'ts.id', '=', 's.tipo_servicios_id') 
         ->join('zonas_servicios AS z', 'z.servicios_id', '=', 's.id')         
-        ->select('s.id','s.nombre', 's.descripcion', 's.imagen', 
+        ->select('z.id','s.nombre', 's.descripcion', 's.imagen', 
         's.cerrado_emergencia', 'z.zonas_id', 's.tipo_servicios_id', 's.activo', 's.identificador', 'ts.nombre AS nombreServicio')
         ->where('z.zonas_id', $idzona)
         ->where('s.tipo_servicios_id', $idtipo)
-        ->orderBy('s.id', 'ASC')
-        ->get();
+        ->orderBy('z.posicion', 'ASC')
+        ->get();  
 
         return view('backend.paginas.servicios.tablas.tablafiltrado', compact('servicio', 'idzona', 'idtipo'));
     }
@@ -300,32 +300,26 @@ class ZonaServiciosController extends Controller
     // ordenar producto
     public function ordenar(Request $request){
 
-        $idtipo = $request->idtipo;
-        $idzona = $request->idzona;
-
-        // dame todos los servicios de ese tipo, un array
-        $mismotipo = Servicios::where('tipo_servicios_id', $idtipo)->get();
-
-        $pila = array();
-        foreach($mismotipo as $p){
-            array_push($pila, $p->id);
+        // actualizar posicion por id de zona servicio y set posicion
+        foreach ($request->order as $order) {    
+            
+            DB::table('zonas_servicios')
+                ->where('id', $order['id'])
+                ->update(['posicion' => $order['posicion']]);
         }
 
-        $tasks = DB::table('servicios AS s')
-        ->join('zonas_servicios AS z', 'z.servicios_id', '=', 's.id')
-        ->select('z.id', 'z.zonas_id', 'z.posicion', 's.id AS idservicio')
-        ->where('z.zonas_id', $idzona) 
-        ->whereIn('s.id', $pila)
-        ->get();
+        return ['success' => 1];
+
         
         foreach ($tasks as $task) { 
             $id = $task->id;
     
-            foreach ($request->order as $order) {
+            foreach ($request->order as $order) {              
                 if ($order['id'] == $id) {
 
+
                     DB::table('zonas_servicios')
-                    ->where('id', $task->id)
+                    ->where('id', $id)
                     ->update(['posicion' => $order['posicion']]);
                 }
             }

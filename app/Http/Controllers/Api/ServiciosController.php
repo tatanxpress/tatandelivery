@@ -126,11 +126,12 @@ class ServiciosController extends Controller
             ->select('s.id AS idServicio', 's.nombre AS nombreServicio',
                     's.descripcion', 's.imagen', 'z.id AS zonaservicioid',
                      's.logo', 's.tipo_vista', 's.cerrado_emergencia', 
-                     'z.tiempo_limite', 'z.horario_inicio', 'z.horario_final', 's.privado')
+                     'z.tiempo_limite', 'z.horario_inicio', 'z.horario_final', 's.privado', 'z.posicion')
             ->where('z.zonas_id', $idzona)
             ->where('s.tipo_servicios_id', $request->tipo)
             ->where('z.activo', 1)
             ->where('s.activo', 1)
+            ->orderBy('z.posicion', 'ASC')
             ->get();
            
                // verificar si esta agregado a favoritos
