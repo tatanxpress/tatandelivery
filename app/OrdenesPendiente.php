@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrdenesPendiente extends Model
 {
-    // cuando hay una orden que llego al estado 4 y aun no tiene motorista asignado
+    // NO UTILIZADO 19/05/2020
     protected $table = 'ordenes_pendiente';
     public $timestamps = false;
 
-    protected $fillable = ['ordenes_id', 'fecha', 'activo', 'tipo'];
-     
+   
+      
 } 
  

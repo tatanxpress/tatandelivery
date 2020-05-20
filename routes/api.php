@@ -198,11 +198,9 @@ Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFe
 // APP ADMINISTRADORES
 Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login revisador
 
-// ordenes del estado 1-4
-Route::post('adminapp/ordenes/urgente', 'Api\AdminAppController@verOrdenesUrgente'); 
+
  
-// ocultar una orden de ordenes_pendiente
-Route::post('adminapp/ordenes/ocultar', 'Api\AdminAppController@ocultar'); 
+
 
 // ver ordenes de solo hoy
 Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); 
@@ -217,10 +215,7 @@ Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgen
 // ordenes sin contestacion, tarea programada
 Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion');
 
-// ocultar una orden de ordenes sin contestacion
-Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');
 
-
-// cambiar contrasena el administrador
-Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); 
+Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');// ocultar una orden de ordenes sin contestacion
+Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // cambio de contrasena
 

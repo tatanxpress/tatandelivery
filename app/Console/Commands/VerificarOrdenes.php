@@ -12,6 +12,10 @@ use App\Servicios;
 use DateTime;
 use App\OrdenesDirecciones;
 use App\OrdenesPendienteContestar;
+use App\MotoristaOrdenes;
+use App\OrdenesUrgentesDos;
+use App\OrdenesUrgentesTres;
+use App\OrdenesUrgentesCuatro;
 
 class VerificarOrdenes extends Command
 {
@@ -47,7 +51,9 @@ class VerificarOrdenes extends Command
     public function handle()
     {
 
-        // ORDENES DE HOY 
+        // ordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el 
+        // propietario + 2 min extra.
+        // tabla: ordenes_urgentes
 
         $orden = DB::table('ordenes')
         ->where('estado_5', 1) // terminada de preparar
@@ -60,51 +66,40 @@ class VerificarOrdenes extends Command
 
             $total = 0; // contar ordenes
             $seguro = false;
-            // obtener cada id, de la orden que necesita motorista y enviar notificacion
-            // al administrador una alerta por todas las ordenes pendientes. 
             foreach($orden as $o){
 
-                // SOLO PARA SERVICIOS NO PRIVADOS
-                //$valor = Servicios::where('id', $o->servicios_id)->first();
+                if(OrdenesUrgentes::where('ordenes_id', $o->id)->first()){
+                    // ya tengo un registro igual, asi que no guardara
+                }else{
 
-               // if($valor->privado == 0){
-                    if(OrdenesUrgentes::where('ordenes_id', $o->id)->first()){
-                        // ya tengo un registro igual, asi que no guardarla
-                    }else{
-
-                        //$tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
-
-                        // preguntar si supera hora estimada, con la hora actual
-                        $time1 = Carbon::parse($o->fecha_4);                         
-                        $horaEstimada = $time1->addMinute($o->hora_2)->format('Y-m-d H:i:s'); // 2 min de advertencia
-                       
-                        $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
-                                        
-                        $d1 = new DateTime($horaEstimada);
-                        $d2 = new DateTime($today);
-        
-                         if ($d1 > $d2){
-                            // tiempo aun no superado
-
-                         }else{
-                            // tiempo superado. MANDAR ADVERTENCIA
-
-                            $seguro = true;
+                    $time1 = Carbon::parse($o->fecha_4);                         
+                    $horaEstimada = $time1->addMinute($o->hora_2 + 2)->format('Y-m-d H:i:s');                     
+                    $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
+                                    
+                    $d1 = new DateTime($horaEstimada);
+                    $d2 = new DateTime($today);
     
-                            $total = $total + 1;
-        
-                            $fecha = Carbon::now('America/El_Salvador');
-        
-                            $osp = new OrdenesUrgentes;
-                            $osp->ordenes_id = $o->id; 
-                            $osp->fecha = $fecha;
-                            $osp->activo = 1;
-                            $osp->tipo = 1;
-                            $osp->save();
+                        if ($d1 > $d2){
+                        // tiempo aun no superado
 
-                         }
-                    }
-                //}  
+                        }else{
+                        // supero tiempo estimada de entrega
+
+                        $seguro = true;
+
+                        $total = $total + 1;
+    
+                        $fecha = Carbon::now('America/El_Salvador');
+    
+                        $osp = new OrdenesUrgentes;
+                        $osp->ordenes_id = $o->id; 
+                        $osp->fecha = $fecha;
+                        $osp->activo = 1;
+                        $osp->tipo = 1;
+                        $osp->save();
+
+                        }
+                }
             }           
 
             if($seguro){
@@ -140,10 +135,255 @@ class VerificarOrdenes extends Command
         }
 
 
+
         //*********************************** */
 
-        // buscar ordenes con retraso de 2 minutos que no contestaron.
-        // ordenes pendiente - revisar ordenes pendientes
+        // propietario termino de preparar la orden y ningun motorista agarro la orden
+        // tabla: ordenes_urgentes_dos
+
+        $orden2 = DB::table('ordenes')
+        ->where('estado_5', 1) // terminada de preparar
+        ->where('estado_7', 0) // aun no ha sido entregada
+        ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
+        ->orderBy('id', 'ASC')
+        ->get();
+
+        if(count($orden2) > 0){ // verificar que hay al menos 1
+
+            $total = 0; // contar ordenes
+            $seguro = false;
+            foreach($orden2 as $o){
+
+                if(MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                    // esta orden ya la agarro motorista
+                }else{
+                    // registrar pues que no la agarrado y la orden ya esta preparada
+                   
+                    $seguro = true;
+                    $total = $total + 1;
+
+                    $fecha = Carbon::now('America/El_Salvador');
+                    $osp = new OrdenesUrgentesDos;
+                    $osp->ordenes_id = $o->id; 
+                    $osp->fecha = $fecha;
+                    $osp->activo = 1;
+                    $osp->tipo = 1;
+                    $osp->save();
+                }
+            }           
+
+            if($seguro){
+
+                // ENVIAR NOTIFICACIONES
+                $administradores = DB::table('administradores')
+                ->where('activo', 1)
+                ->where('disponible', 1)
+                ->get();
+
+                $pilaAdministradores = array();
+                foreach($administradores as $p){
+                    if(!empty($p->device_id)){
+                        
+                        if($p->device_id != "0000"){
+                            array_push($pilaAdministradores, $p->device_id);
+                        }
+                    }
+                } 
+
+                //si no esta vacio
+                if(!empty($pilaAdministradores)){
+                    $titulo = "Orden Para Entrega Inmediata";
+                    $mensaje = $total . " Ordenes Sin Motorista";
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                    } catch (Exception $e) {
+                        
+                    }                                                
+                }
+            }
+        }
+
+
+        //*********************************** */
+        // pasaron 5+ de hora entrega al cliente (hora_2 + zona + 5+) y no se ha entregado su orden
+        // tabla ordenes_urgentes_tres
+        
+        $orden3 = DB::table('ordenes')
+        ->where('estado_5', 1) // terminada de preparar
+        ->where('estado_7', 0) // aun no ha sido entregado
+        ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
+        ->orderBy('id', 'ASC')
+        ->get();
+
+        if(count($orden3) > 0){ // verificar que hay al menos 1
+
+            $total = 0; // contar ordenes
+            $seguro = false;
+            foreach($orden3 as $o){
+
+                if(OrdenesUrgentesTres::where('ordenes_id', $o->id)->first()){
+                    // ya tengo un registro igual, asi que no guardara
+                }else{
+
+                     // tiempo de la zona agregado
+                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('copia_tiempo_orden')->first();
+
+                    // sumatoria
+                    $tiempoTotal = $o->hora_2 + $tiempo + 5;
+
+                    $time1 = Carbon::parse($o->fecha_4);                         
+                    $horaEstimada = $time1->addMinute($tiempoTotal)->format('Y-m-d H:i:s');                     
+                    $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
+                                    
+                    $d1 = new DateTime($horaEstimada);
+                    $d2 = new DateTime($today);
+    
+                    if ($d1 > $d2){
+                        // tiempo aun no superado
+
+                    }else{
+                        // supero tiempo estimada de entrega maxima
+
+                        $seguro = true;
+
+                        $total = $total + 1;
+    
+                        $fecha = Carbon::now('America/El_Salvador');
+    
+                        $osp = new OrdenesUrgentesTres;
+                        $osp->ordenes_id = $o->id; 
+                        $osp->fecha = $fecha;
+                        $osp->activo = 1;
+                        $osp->tipo = 1;
+                        $osp->save();
+                    }
+                }
+            }           
+
+            if($seguro){
+
+                // ENVIAR NOTIFICACIONES
+                $administradores = DB::table('administradores')
+                ->where('activo', 1)
+                ->where('disponible', 1)
+                ->get();
+
+                $pilaAdministradores = array();
+                foreach($administradores as $p){
+                    if(!empty($p->device_id)){
+                        
+                        if($p->device_id != "0000"){
+                            array_push($pilaAdministradores, $p->device_id);
+                        }
+                    }
+                } 
+
+                //si no esta vacio
+                if(!empty($pilaAdministradores)){
+                    $titulo = "Orden Sin Entregar";
+                    $mensaje = $total . " Orden supero tiempo de entrega maxima";
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                    } catch (Exception $e) {
+                        
+                    }                                                
+                }
+            }
+        }
+
+
+        // paso la mitad de tiempo que el propietario dijo que entregarian la orden
+        // ningun motorista agarro la orden
+        // tabla ordenes_urgentes_cuatro
+
+        $orden4 = DB::table('ordenes')
+        ->where('estado_4', 1) // ya inicio preparacion
+        ->where('estado_8', 0) // aun no ha sido cancelada
+        ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
+        ->orderBy('id', 'ASC')
+        ->get();
+
+        if(count($orden4) > 0){ // verificar que hay al menos 1
+
+            $total = 0; // contar ordenes
+            $seguro = false;
+            foreach($orden4 as $o){
+
+                if(MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                    // ya la agarraron
+                }else{
+                    if(OrdenesUrgentesCuatro::where('ordenes_id', $o->id)->first()){
+                        // ya tengo un registro igual, asi que no guardara
+                    }else{
+    
+                        // sumatoria
+                        $tiempoTotal = $o->hora_2 / 2;
+    
+                        $time1 = Carbon::parse($o->fecha_4);                         
+                        $horaEstimada = $time1->addMinute($tiempoTotal)->format('Y-m-d H:i:s');                     
+                        $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
+                                        
+                        $d1 = new DateTime($horaEstimada);
+                        $d2 = new DateTime($today);
+        
+                        if ($d1 > $d2){
+                            // tiempo aun no superado
+    
+                        }else{
+                            // supero tiempo estimada de entrega maxima
+    
+                            $seguro = true;
+    
+                            $total = $total + 1;
+        
+                            $fecha = Carbon::now('America/El_Salvador');
+        
+                            $osp = new OrdenesUrgentesCuatro;
+                            $osp->ordenes_id = $o->id; 
+                            $osp->fecha = $fecha;
+                            $osp->activo = 1;
+                            $osp->tipo = 1;
+                            $osp->save();
+                        }
+                    }
+                }                
+            }           
+
+            if($seguro){
+
+                // ENVIAR NOTIFICACIONES
+                $administradores = DB::table('administradores')
+                ->where('activo', 1)
+                ->where('disponible', 1)
+                ->get();
+
+                $pilaAdministradores = array();
+                foreach($administradores as $p){
+                    if(!empty($p->device_id)){
+                        
+                        if($p->device_id != "0000"){
+                            array_push($pilaAdministradores, $p->device_id);
+                        }
+                    }
+                } 
+
+                //si no esta vacio
+                if(!empty($pilaAdministradores)){
+                    $titulo = "Orden Sin Motorista";
+                    $mensaje = $total . " Orden supero mitad de tiempo";
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
+                    } catch (Exception $e) {
+                        
+                    }                                                
+                }
+            }
+        }
+
+        //*********************************** */
+
+        // se activa cuando hay ordenes sin contestar y no han sido canceladas
+        // se le agrega 2 minutos extra, sino se activara el registro y notificacion
 
         $ordenhoy = DB::table('ordenes')
         ->where('estado_2', 0) // aun no han contestado
@@ -188,7 +428,7 @@ class VerificarOrdenes extends Command
                         $fecha = Carbon::now('America/El_Salvador');
 
                         $osp = new OrdenesPendienteContestar;
-                        $osp->ordenes_id = $o->id; 
+                        $osp->ordenes_id = $o->id;
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
                         $osp->tipo = 1;
