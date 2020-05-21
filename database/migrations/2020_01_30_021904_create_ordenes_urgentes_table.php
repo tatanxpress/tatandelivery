@@ -7,7 +7,7 @@ use Illuminate\Database\Migrations\Migration;
 class CreateOrdenesUrgentesTable extends Migration
 {
     /**
-     * Run the migrations.
+     * ordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el propietario + 2 min extra. 
      *
      * @return void
      */
@@ -18,7 +18,6 @@ class CreateOrdenesUrgentesTable extends Migration
             $table->bigInteger('ordenes_id')->unsigned();
             $table->dateTime('fecha');
             $table->boolean('activo');
-            $table->integer('tipo');
 
             $table->foreign('ordenes_id')->references('id')->on('ordenes');
         });

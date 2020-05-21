@@ -1551,9 +1551,6 @@ class PropietarioController extends Controller
                         $titulo = "Orden aceptada";
                         $mensaje = "Revisar tiempo aproximado de entrega";
 
-                        //Ordenes::where('id', $request->ordenid)->update(['estado_2' => 1,
-                        //'fecha_2' => $fecha, 'hora_2' => $request->tiempo]);    no ira
-
                         // mandar notificacion al cliente
                         $usuario = User::where('id', $or->users_id)->first();
                         $pilaUsuarios = $usuario->device_id;
@@ -2170,7 +2167,7 @@ class PropietarioController extends Controller
                                 array_push($pilaUsuarios, $p->device_id);
                             }                            
                         }
-                    }
+                    } 
 
                     // GUARDAR REGISTRO
 

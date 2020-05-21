@@ -18,7 +18,6 @@ class CreateOrdenesUrgentesDosTable extends Migration
             $table->bigInteger('ordenes_id')->unsigned();
             $table->dateTime('fecha');
             $table->boolean('activo');
-            $table->integer('tipo');
  
             $table->foreign('ordenes_id')->references('id')->on('ordenes');
         });

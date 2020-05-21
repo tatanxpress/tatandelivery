@@ -6,11 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class OrdenesPendiente extends Model
 {
-    // NO UTILIZADO 19/05/2020
-    protected $table = 'ordenes_pendiente';
+    protected $table = 'ordenes_problemas';
     public $timestamps = false;
-
-   
-      
-} 
- 
+}

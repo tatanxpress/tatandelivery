@@ -63,7 +63,7 @@ Route::post('usuario/proceso/orden/productos', 'Api\ProcesadorOrdenesController@
 Route::post('usuario/proceso/orden/producto/individual', 'Api\ProcesadorOrdenesController@ordenProductosIndividual'); // ver producto de la orden
 Route::post('usuario/proceso/ver/motorista', 'Api\ProcesadorOrdenesController@motoristaAsignado'); // ver motorista de la orden
 Route::post('usuario/proceso/calificar/motorista', 'Api\ProcesadorOrdenesController@calificarMotorista'); // calificar motorista
-  
+   
 Route::post('usuario/proceso/orden/cancelar', 'Api\ProcesadorOrdenesController@cancelarOrden'); // cancelar orden 
 Route::post('usuario/proceso/borrar/vista/orden', 'Api\ProcesadorOrdenesController@borrarVistaOrden'); // borrar vista
  
@@ -73,7 +73,7 @@ Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@p
     
 Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
  
- 
+  
   
 // PROPIETARIOS  
   
@@ -174,48 +174,50 @@ Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago')
 // REVISADOR DE PAGOS
 
 Route::post('revisador/login', 'Api\PagaderoController@loginRevisador'); // login revisador
- 
-// cambiar contrasena el revisador
-Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); // login revisador
-
- 
-// ver ordenes pendiente de pago
-Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago'); // 
- 
-// confirmar pago
+Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); // cambiar contrasena el revisador
+Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago');// ver ordenes pendiente de pago
 Route::post('revisador/confirmar/pago', 'Api\PagaderoController@confirmarPago'); // confirmar revisador
-
-// extras
 Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas'); // ver motorista
-
-// historial de una fecha a otra 
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); // ver historial
- 
-// ver fecha de recorte
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
  
 
 // APP ADMINISTRADORES
-Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login revisador
 
-
- 
-
-
-// ver ordenes de solo hoy
-Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); 
-  
-// ordenes urgente, tarea programada
-Route::post('adminapp/ordenes/programada', 'Api\AdminAppController@verOrdenesProgramada');
-
-// ocultar una orden de ordenes_urgentes
-Route::post('adminapp/ordenes/pro/ocultar', 'Api\AdminAppController@ocultarurgente');
-  
- 
-// ordenes sin contestacion, tarea programada
-Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion');
-
-
-Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');// ocultar una orden de ordenes sin contestacion
+Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login administrador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // cambio de contrasena
 
+Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); // solo ordenes de hoy
+
+// ordenes sin contestar con 1 minutos extra
+Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion'); // ordenes sin contestacion
+Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');// ocultar una orden de ordenes sin contestacion
+
+// paso la mitar del tiempo que el propietario dijo que entregaria la orden
+// y ningun motorista agarrado esta orden
+Route::post('adminapp/ordenes/urgentes-cuatro', 'Api\AdminAppController@verOrdenesUrgenteCuatro'); // ver ordenes_urgentes_cuatro
+Route::post('adminapp/urgentes/cuatro/ocultar', 'Api\AdminAppController@ocultarOrdenesCuatro'); // ocultar ordenes_urgentes_cuatro
+ 
+
+// ordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el propietario + 2 min extra. 
+Route::post('adminapp/ordenes/urgentes-uno', 'Api\AdminAppController@verOrdenesUrgenteUno'); // ver ordenes_urgentes_uno
+Route::post('adminapp/urgentes/uno/ocultar', 'Api\AdminAppController@ocultarUrgenteUno'); // ocultar ordenes_urgentes_uno 
+
+// propietario termino de preparar la orden y ningun motorista agarro la orden
+Route::post('adminapp/ordenes/urgentes-dos', 'Api\AdminAppController@verOrdenesUrgenteDos'); // ver ordenes_urgentes_dos
+Route::post('adminapp/urgentes/dos/ocultar', 'Api\AdminAppController@ocultarUrgenteDos'); // ocultar ordenes_urgentes_dos 
+
+// paso el tiempo hora de entrega del cliente sumandole + 5 minutos
+// hora que dio el propietario + hora extra de zona + 5 minutos
+Route::post('adminapp/ordenes/urgentes-tres', 'Api\AdminAppController@verOrdenesUrgenteTres'); // ver ordenes_urgentes_tres
+Route::post('adminapp/urgentes/tres/ocultar', 'Api\AdminAppController@ocultarUrgenteTres'); // ocultar ordenes_urgentes_tres 
+
+/* los 4 estados que puede tener problemas una orden
+1- propietario ninguno disponible en una nueva orden
+2- orden nueva y no hay motorista disponible para este servicio
+3- orden inicio preparacion y no tiene motoristas disponibles
+4- orden termino de prepararse y no tiene motorista asignado esta orden
+*/ 
+
+Route::post('adminapp/ordenes/estado-problema', 'Api\AdminAppController@verEstados'); // ver estados de problema de ordenes
+Route::post('adminapp/ocultar/estado-problema', 'Api\AdminAppController@ocultarEstados'); // ocultar estados

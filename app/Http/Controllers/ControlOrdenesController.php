@@ -8,7 +8,6 @@ use App\Ordenes;
 use App\OrdenesDirecciones;
 use App\OrdenesDescripcion;
 use App\Motoristas;
-use App\OrdenesPendiente;
 use App\OrdenesCupones;
 use App\Cupones;
 use App\AplicaCuponUno;

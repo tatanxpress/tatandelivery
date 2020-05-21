@@ -95,7 +95,7 @@ class VerificarOrdenes extends Command
                         $osp->ordenes_id = $o->id; 
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
-                        $osp->tipo = 1;
+                        //$osp->tipo = 1;
                         $osp->save();
 
                         }
@@ -143,7 +143,7 @@ class VerificarOrdenes extends Command
 
         $orden2 = DB::table('ordenes')
         ->where('estado_5', 1) // terminada de preparar
-        ->where('estado_7', 0) // aun no ha sido entregada
+        ->where('estado_6', 0) // aun no ha sido entregada
         ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
         ->orderBy('id', 'ASC')
         ->get();
@@ -158,17 +158,21 @@ class VerificarOrdenes extends Command
                     // esta orden ya la agarro motorista
                 }else{
                     // registrar pues que no la agarrado y la orden ya esta preparada
-                   
-                    $seguro = true;
-                    $total = $total + 1;
 
-                    $fecha = Carbon::now('America/El_Salvador');
-                    $osp = new OrdenesUrgentesDos;
-                    $osp->ordenes_id = $o->id; 
-                    $osp->fecha = $fecha;
-                    $osp->activo = 1;
-                    $osp->tipo = 1;
-                    $osp->save();
+                    if(OrdenesUrgentesDos::where('ordenes_id', $o->id)->first()){
+                        // no guardar
+                    }else{
+                        $seguro = true;
+                        $total = $total + 1;
+    
+                        $fecha = Carbon::now('America/El_Salvador');
+                        $osp = new OrdenesUrgentesDos;
+                        $osp->ordenes_id = $o->id; 
+                        $osp->fecha = $fecha;
+                        $osp->activo = 1;
+                        //$osp->tipo = 1;
+                        $osp->save();
+                    }                   
                 }
             }           
 
@@ -254,7 +258,7 @@ class VerificarOrdenes extends Command
                         $osp->ordenes_id = $o->id; 
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
-                        $osp->tipo = 1;
+                        //$osp->tipo = 1;
                         $osp->save();
                     }
                 }
@@ -280,7 +284,7 @@ class VerificarOrdenes extends Command
 
                 //si no esta vacio
                 if(!empty($pilaAdministradores)){
-                    $titulo = "Orden Sin Entregar";
+                    $titulo = "Orden Urgente";
                     $mensaje = $total . " Orden supero tiempo de entrega maxima";
                     try {
                         $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
@@ -342,7 +346,7 @@ class VerificarOrdenes extends Command
                             $osp->ordenes_id = $o->id; 
                             $osp->fecha = $fecha;
                             $osp->activo = 1;
-                            $osp->tipo = 1;
+                            //$osp->tipo = 1;
                             $osp->save();
                         }
                     }
@@ -408,7 +412,7 @@ class VerificarOrdenes extends Command
                     // preguntar si supera hora estimada, con la hora actual
                     $time1 = Carbon::parse($o->fecha_orden);
                     // 2 minutos mas despues de recibir la orden                   
-                    $horaAlerta = $time1->addMinute(2)->format('Y-m-d H:i:s'); // 2 min de advertencia
+                    $horaAlerta = $time1->addMinute(1)->format('Y-m-d H:i:s'); // 2 min de advertencia
                     
                     $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
                                     
@@ -431,7 +435,7 @@ class VerificarOrdenes extends Command
                         $osp->ordenes_id = $o->id;
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
-                        $osp->tipo = 1;
+                        //$osp->tipo = 1;
                         $osp->save();
 
                         // guardar device id

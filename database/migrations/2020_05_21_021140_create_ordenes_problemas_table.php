@@ -4,22 +4,22 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateOrdenesPendienteTable extends Migration
+class CreateOrdenesProblemasTable extends Migration
 {
     /**
-     * NO UTILIZADO 19/05/20
+     * Run the migrations.
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('ordenes_pendiente', function (Blueprint $table) {
+        Schema::create('ordenes_problemas', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('ordenes_id')->unsigned();
             $table->dateTime('fecha');
             $table->boolean('activo');
             $table->integer('tipo');
-
+ 
             $table->foreign('ordenes_id')->references('id')->on('ordenes');
         });
     }
@@ -31,6 +31,6 @@ class CreateOrdenesPendienteTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ordenes_pendiente');
+        Schema::dropIfExists('ordenes_problemas');
     }
 }
