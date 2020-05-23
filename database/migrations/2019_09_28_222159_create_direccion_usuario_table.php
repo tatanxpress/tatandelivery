@@ -19,7 +19,6 @@ class CreateDireccionUsuarioTable extends Migration
             $table->string('direccion', 400);
             $table->string('numero_casa', 30);
             $table->string('punto_referencia', 400);
-            $table->string('telefono', 20);
             $table->boolean('seleccionado');
             $table->string('latitud', 50);
             $table->string('longitud', 50);

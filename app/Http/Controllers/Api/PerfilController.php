@@ -299,8 +299,7 @@ class PerfilController extends Controller
                 'nombre' => 'required|max:100',
                 'direccion' => 'required|max:400',
                 'numero_casa' => 'max:30',
-                'punto_referencia' => 'max:400',                
-                'telefono' => 'required|max:20',
+                'punto_referencia' => 'max:400',
                 'zona_id' => 'required',
             );    
     
@@ -312,9 +311,8 @@ class PerfilController extends Controller
                 'direccion.max' => '400 caracteres máximo direccion',
                 'numero_casa.max' => 'Máximo 30 caracteres.',
                 'punto_referencia.max' => 'Máximo 400 caracteres.',
-                'zona_id.required' => 'El id de la zona es requerido.',                
-                'telefono.required' => 'Teléfono es requerido.',
-                'telefono.max' => '20 caracteres máximo para teléfono',
+                'zona_id.required' => 'El id de la zona es requerido.'             
+               
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
@@ -347,8 +345,7 @@ class PerfilController extends Controller
                     }else{
                         $direccion->punto_referencia = $request->punto_referencia;
                     }
-                    
-                    $direccion->telefono = $request->telefono;
+                                       
                     $direccion->zonas_id = $request->zona_id;                
                     $direccion->seleccionado = 1;
                     if($request->latitud == null){
