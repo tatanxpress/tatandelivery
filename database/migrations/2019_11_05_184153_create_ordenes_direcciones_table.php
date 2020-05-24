@@ -22,7 +22,6 @@ class CreateOrdenesDireccionesTable extends Migration
             $table->string('direccion', 400);
             $table->string('numero_casa', 30)->default('');
             $table->string('punto_referencia', 400)->default('');
-            $table->string('telefono', 20);
             $table->string('latitud', 50)->default('');
             $table->string('longitud', 50)->default('');                       
             
