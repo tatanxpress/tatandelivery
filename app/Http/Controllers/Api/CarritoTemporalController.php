@@ -46,12 +46,13 @@ class CarritoTemporalController extends Controller
             } 
             
            
-
+            // sin direccion seleccionada
             if(!Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first())
             {
-                return [
-                    'success' => 6 // usuario sin direccion seleccionada
-                ];
+
+                $mensaje = "Para agregar este producto, es necesario agregar una dirección. Gracias.";
+
+                return ['success' => 6, 'mensaje' => $mensaje];
             }
           
             DB::beginTransaction();
@@ -192,7 +193,7 @@ class CarritoTemporalController extends Controller
                 DB::rollback();
 
                 return [
-                    'success' => 6 //error
+                    'success' => 9
                 ];
             }
         } 
