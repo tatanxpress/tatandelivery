@@ -8,6 +8,7 @@ use App\Servicios;
 use App\ServiciosTipo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use App\Direccion;
 
 class BuscadorController extends Controller
 {
@@ -74,6 +75,11 @@ class BuscadorController extends Controller
                     'success' => 0, 
                     'message' => $validarDatos->errors()->all()
                 ];
+            }
+
+            if(!Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first())
+            {
+                return ['success' => 1];
             }
             
             // obtener todos los servicios de la direccion del usuario
