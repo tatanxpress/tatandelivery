@@ -447,7 +447,7 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('ordenes_direcciones AS o')
                 ->select('o.nombre', 'o.direccion',
-                        'o.numero_casa', 'o.punto_referencia', 'o.telefono',
+                        'o.numero_casa', 'o.punto_referencia',
                         'o.latitud', 'o.longitud')
                 ->where('o.ordenes_id', $request->ordenid)
                 ->first();
@@ -1071,7 +1071,7 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('ordenes_direcciones AS o')
                 ->select('o.nombre', 'o.direccion',
-                        'o.numero_casa', 'o.punto_referencia', 'o.telefono',
+                        'o.numero_casa', 'o.punto_referencia',
                         'o.latitud', 'o.longitud')
                 ->where('o.ordenes_id', $request->ordenid)
                 ->first();
