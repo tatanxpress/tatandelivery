@@ -881,7 +881,6 @@ class ProcesadorOrdenesController extends Controller
                     $dDireccion = $datoDir->direccion;
                     $dNumero = $datoDir->numero_casa;
                     $dPunto = $datoDir->punto_referencia;
-                    $dTelefono = $datoDir->telefono;
                     $dLati = $datoDir->latitud;
                     $dLong = $datoDir->longitud;
                     $dZona = $datoDir->zonas_id;
@@ -921,7 +920,6 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->direccion = $dDireccion;
                     $nuevaDir->numero_casa = $dNumero;
                     $nuevaDir->punto_referencia = $dPunto;
-                    $nuevaDir->telefono = $dTelefono;
                     $nuevaDir->latitud = $dLati;
                     $nuevaDir->longitud = $dLong;                   
                     $nuevaDir->latitud_real = $dLatiReal;
