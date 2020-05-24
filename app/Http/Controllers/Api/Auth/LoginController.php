@@ -121,7 +121,7 @@ class LoginController extends Controller
                 } catch (Exception  $e) {                     
                       // por cualquier error, notificar a la app y no guardar el contador                       
                       DB::rollback();
-                      return ['success' => 4, 'correo' => $correo];
+                      return ['success' => 3, 'correo' => $correo];
                 }
             }
         }
