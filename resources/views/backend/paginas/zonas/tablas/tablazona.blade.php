@@ -7,6 +7,7 @@
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             
                 <tr>
+                  <th style="width: 10%">ID</th>
                   <th style="width: 10%">Nombre</th>
                   <th style="width: 22%">Descripcion</th>
                   <th style="width: 10%">Saturación</th>
@@ -20,6 +21,7 @@
                 <tbody>
                 @foreach($zonas as $dato)
                 <tr>
+                  <td>{{ $dato->id }}</td>
                   <td>{{ $dato->nombre }}</td> 
                   <td>{{ $dato->descripcion }}</td> 
                   <td> 

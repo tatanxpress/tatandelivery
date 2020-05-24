@@ -273,8 +273,7 @@ class PerfilController extends Controller
 
                 $direccion = DB::table('direccion_usuario AS dir')            
             ->join('zonas AS z', 'z.id', '=', 'dir.zonas_id')
-            ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia',
-            'dir.telefono', 'dir.seleccionado', 'z.nombre AS nombreZona')
+            ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia', 'dir.seleccionado', 'z.nombre AS nombreZona')
             ->where('dir.user_id', $request->userid)
             ->get();
 
@@ -487,11 +486,13 @@ class PerfilController extends Controller
     // eliminar direccion del usuario
     public function eliminarDireccion(Request $request){
         if($request->isMethod('post')){  
-            $reglaDatos = array(                
+            $reglaDatos = array(    
+                'userid' => 'required',            
                 'dirid' => 'required',                
             );    
      
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array( 
+                'userid.required' => 'id del usuario es requerido',                                     
                 'dirid.required' => 'El id de la direccion es requerido.',                
                 );
 
@@ -504,16 +505,47 @@ class PerfilController extends Controller
                     'message' => $validarDatos->errors()->all()
                 ];
             }     
-            
-            if(Direccion::where('id', $request->dirid)->delete()){
-                return [
-                    'success' => 1 //eliminada                    
-                ];
+
+            // encontro la direccion a borrar
+            if(Direccion::where('id', $request->dirid)->first()){
+
+                DB::beginTransaction();
+
+                try {
+
+                    $total = Direccion::where('user_id', $request->userid)->count();
+
+                    if($total > 1){
+
+                        // verificar si esta direccion era la que estaba seleccionada, para poner una aleatoria
+                        $info = Direccion::where('id', $request->dirid)->first();
+
+                        // borrar direccion
+                        Direccion::where('id', $request->dirid)->delete();
+
+                        // si era la seleccionada poner aleatoria, sino no hacer nada
+                        if($info->seleccionado == 1){                           
+
+                            // volver a buscar la primera linea y poner seleccionado
+                            $datos = Direccion::where('user_id', $request->userid)->first();                            
+                            Direccion::where('id', $datos->id)->update(['seleccionado' => 1]); 
+                        }
+
+                        DB::commit();
+
+                        return ['success' => 1];
+                    }else{
+                        // no puede borrar la direccion
+                        return ['success' => 2];
+                    }
+                }catch(\Throwable $e){
+                    DB::rollback();
+                    return ['success' => 3];
+                }
+
             }else{
-                return [
-                    'success' => 2 // error                    
-                ];
-            }
+                return ['success' => 3];
+            }            
         }
     }
 

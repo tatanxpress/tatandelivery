@@ -44,14 +44,8 @@ class ServiciosController extends Controller
             }    
             // obtener zona segun id del usuario
             $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
-
-            $tengoDireccion = 0;
-            // sacar id zona del usuario
-            if(Direccion::where('user_id', $request->userid)
-            ->where('seleccionado', 1)->first())
-            {                 
-                $tengoDireccion = 1;           
-            }
+            
+            $mensaje = "Agregar una dirección para ver los Servicios. Gracias.";
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
@@ -64,7 +58,8 @@ class ServiciosController extends Controller
             return [
                 'success' => 1,                     
                 'servicios' => $servicios,
-                'haydireccion' => $tengoDireccion                  
+                'mensaje' => $mensaje,
+                'zona' => $idzona
             ];
         }
     }
