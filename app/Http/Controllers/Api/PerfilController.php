@@ -514,12 +514,7 @@ class PerfilController extends Controller
                 try {
 
                     $total = Direccion::where('user_id', $request->userid)->count();
-                   
-                   
-                    Direccion::where('id', $request->dirid)->delete();
-                    DB::commit();
-                    return ['success' => 1];
-
+              
                     if($total > 1){
 
                         // verificar si esta direccion era la que estaba seleccionada, para poner una aleatoria
