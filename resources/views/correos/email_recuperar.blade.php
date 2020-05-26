@@ -127,7 +127,7 @@
                 <tr>
                   <td bgcolor="#FFECD1" align="center" style="padding: 30px 30px 30px 30px; border-radius: 4px 4px 4px 4px; color: #666666; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px;" >
                     <h2 style="font-size: 20px; font-weight: 400; color: #111111; margin: 0;">Necesita ayuda?</h2>
-                    <p style="margin: 0;"><a href="http://www.tatanexpress.com" target="_blank" style="color: #1976d2;">Contactanos</a></p>
+                    <p style="margin: 0;"><a href="https://www.facebook.com/tatanexpress/" target="_blank" style="color: #1976d2;">Contactanos</a></p>
                   </td>
                 </tr>
             </table>            

@@ -564,13 +564,15 @@ class PropietarioController extends Controller
 
                 if($p->activo == 0){
                     return ['success'=> 1];    
-                }
+                } 
+
+                $data = Servicios::where('id', $p->servicios_id)->first();
 
                 $nombre = $p->nombre;
                 $correo = $p->correo;
-
-                return ['success'=> 2, 'nombre' => $nombre,
-                'correo'=> $correo];
+                $nombreservicio = $data->nombre;
+                
+                return ['success'=> 2, 'nombre' => $nombre, 'correo'=> $correo, 'nombreservicio' => $nombreservicio];
             }else{
                 return ['success'=> 2];
             }
@@ -979,7 +981,7 @@ class PropietarioController extends Controller
                     'message' => $validator->errors()->all()
                 ];
             }
-            
+             
             if($p = Propietarios::where('id', $request->id)->first()){
 
                 $estado = DB::table('servicios AS s')
