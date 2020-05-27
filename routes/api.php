@@ -128,7 +128,12 @@ Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona');
  
 
 // productos 
-Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos
+Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos vertical
+Route::post('propietario/productos-h', 'Api\PropietarioController@verProductosHorizontal'); // listado de productos horizontal
+Route::post('propietario/productos-h-seccion', 'Api\PropietarioController@buscarProductoSeccion'); // lista de productos "ver todos"
+
+
+
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda

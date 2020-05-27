@@ -32,6 +32,7 @@ use App\AplicaCuponCuatro;
 use App\AplicaCuponCinco;
 use App\MotoristaOrdenes;
 use App\Motoristas;
+use App\ServiciosTipo;
 
 class PropietarioController extends Controller
 {
@@ -1059,6 +1060,128 @@ class PropietarioController extends Controller
             }else{
                 return ['success'=> 3];
             }
+        }
+    }
+
+    // ver productos vista horizontal
+    public function verProductosHorizontal(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+
+                if($p->activo == 0){
+                    return ['success' => 1];
+                }
+
+                // buscar lista de productos
+                $tipo = DB::table('servicios_tipo AS st')
+                ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')
+                ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
+                ->where('st.servicios_1_id', $p->servicios_id)
+                ->orderBy('st.posicion', 'ASC')
+                ->where('st.activo', 1)
+                ->get();
+
+                // obtener total de productos por seccion
+                foreach ($tipo as $user){
+    
+                    // contar cada seccion
+                    $producto = DB::table('servicios_tipo AS st')
+                    ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
+                    ->select('st.id')
+                    ->where('p.activo', 1)                  
+                    ->where('p.es_promocion', 0)
+                    ->where('st.id', $user->tipoId)
+                    ->get();
+    
+                    $contador = count($producto);
+                    $user->total = $contador;    
+                }
+    
+                $resultsBloque = array();
+                $index = 0;
+    
+                foreach($tipo  as $secciones){
+                    array_push($resultsBloque,$secciones);
+                
+                    $subSecciones = DB::table('producto AS p')  
+                    ->select('p.id AS idProducto','p.nombre AS nombreProducto', 
+                            'p.descripcion AS descripcionProducto',
+                            'p.imagen AS imagenProducto', 'p.precio AS precioProducto',
+                            'p.unidades', 'p.utiliza_cantidad', 'p.utiliza_imagen', 'p.disponibilidad')
+                    ->where('p.servicios_tipo_id', $secciones->tipoId)
+                    ->where('p.activo', 1) // para inactivarlo solo administrador
+                    ->take(5) //maximo 5 productos por seccion
+                    ->orderBy('p.posicion', 'ASC')
+                    ->get();
+                    
+                    $resultsBloque[$index]->productos = $subSecciones;
+                    $index++;
+                }
+                                
+                return ['success'=> 2, 'productos'=> $tipo];
+            }else{
+                return ['success'=> 3];
+            }
+        }
+    }
+
+    // lista de productos por seccion
+    public function buscarProductoSeccion(Request $request){
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(               
+                'id' => 'required', 
+                'seccionid' => 'required',
+            );    
+                  
+            $mensajeDatos = array(   
+                'id.required' => 'id es requerido',                                   
+                'seccionid.required' => 'El id de la seccion es requerido',
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(Propietarios::where('id', $request->id)->first()){
+                if(ServiciosTipo::where('id', $request->seccionid)->first()){
+
+                    $productos = DB::table('producto AS p')
+                    ->select('p.id', 'p.nombre', 'p.imagen', 'p.precio', 'p.unidades', 'p.utiliza_cantidad', 'p.utiliza_imagen', 'p.activo', 'p.disponibilidad')
+                    ->where('p.servicios_tipo_id', $request->seccionid)
+                    ->where('p.activo', 1)
+                    ->get();
+                    
+                    return ['success' => 1, 'productos' => $productos];
+                }else{
+                    return ['success' => 2];
+                }
+            }else{
+                return ['success' => 2];
+            }
+
+           
         }
     }
 
