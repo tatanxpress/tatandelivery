@@ -78,7 +78,7 @@ class RegisterController extends Controller
             }
             
             $usuario->fecha = $fecha;
-            $usuario->zonas_id = 1; // Metapan servicios
+            $usuario->zonas_id = 2; // zona sin servicios, para que seleccionen una direccion
 
             if($usuario->save())
             {
