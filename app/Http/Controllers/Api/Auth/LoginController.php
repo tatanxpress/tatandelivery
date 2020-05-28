@@ -65,7 +65,6 @@ class LoginController extends Controller
                     $codigo .= $pattern{mt_rand(0,$max)};
                 }
 
-                //return ['success' => 1, 'correo' => $correo];
                
                 DB::beginTransaction();
                
@@ -121,7 +120,7 @@ class LoginController extends Controller
                 } catch (Exception  $e) {                     
                       // por cualquier error, notificar a la app y no guardar el contador                       
                       DB::rollback();
-                      return ['success' => 3, 'correo' => $correo];
+                      return ['success' => 4, 'correo' => $correo];
                 }
             }
         }
