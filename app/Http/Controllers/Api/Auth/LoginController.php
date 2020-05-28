@@ -114,7 +114,7 @@ class LoginController extends Controller
                           $numero,
                           array(                        
                               'from' =>  $twilioNumber,            
-                              'body' =>'Tu codigo Tatan Express es: '.$codigo
+                              'body' =>'Tu código Tatan Express es: '.$codigo
                           )
                       );
 
