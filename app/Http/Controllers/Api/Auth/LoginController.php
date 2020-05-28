@@ -98,6 +98,9 @@ class LoginController extends Controller
                     $n->fecha = $fecha;
                     $n->save();                   
                 }
+
+                // DESACTIVADO SMS
+                return ['success' => 3];
                
                 // envio del mensaje
                 $sid = "ACc68bf246c0d9be071f2367e81b686201";
