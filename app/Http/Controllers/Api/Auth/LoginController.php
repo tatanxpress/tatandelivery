@@ -72,7 +72,7 @@ class LoginController extends Controller
                 if($ns = NumeroSMS::where('area', $request->area)->where('numero', $request->telefono)->first()){
                                   
                         // verificar contador si permite mas intentos
-                        $limitecontador = 3;
+                        $limitecontador = 2;
                         $contador = $ns->contador;
 
                         if($contador >= $limitecontador){
