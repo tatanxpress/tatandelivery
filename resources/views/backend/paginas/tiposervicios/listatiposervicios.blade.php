@@ -165,7 +165,7 @@
       var ruta = "{{ URL::to('admin/tiposervicio/tablas/lista-tipo-servicio') }}";
       $('#tablaDatatable').load(ruta);
     });
- </script>
+ </script> 
 
 <script>
 
