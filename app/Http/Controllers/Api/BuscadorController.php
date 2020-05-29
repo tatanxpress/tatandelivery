@@ -150,6 +150,7 @@ class BuscadorController extends Controller
                 ->where('p.servicios_tipo_id', $request->seccionid)
                 ->where('p.activo', 1)
                 ->where('p.disponibilidad', 1)
+                ->orderBy('p.posicion', 'ASC')
                 ->get();
                 
                 return ['success' => 1, 'productos' => $productos];

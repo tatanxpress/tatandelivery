@@ -1025,7 +1025,7 @@ class PropietarioController extends Controller
 
                 if($p->activo == 0){
                     return ['success' => 1];
-                }
+                } 
 
                 // buscar lista de productos
                 $tipo = DB::table('servicios_tipo AS st')    
