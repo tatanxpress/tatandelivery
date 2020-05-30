@@ -88,6 +88,13 @@
 
               if(response.data.success == 1){
                 toastr.success('Actualizado');
+
+                var idzona = {{ $idzona }};
+                var idtipo = {{ $idtipo }};
+
+                var ruta = "{{ url('/admin/zonaservicios/tabla') }}/"+idzona+"/"+idtipo;
+                $('#tablaDatatable').load(ruta);
+
               }else{
                 toastr.error('No se actualizo');
               }
