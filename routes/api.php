@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-//Route::post('ejemplo', 'Api\Auth\LoginController@ejemplo');
+
 // USUARIOS  
 Route::post('verificar/telefono', 'Api\Auth\LoginController@verificarNumero'); // verificar si el telefono esta registrado
 Route::post('verificar-codigo-temporal', 'Api\Auth\LoginController@verificarCodigoTemporal'); // verificar telefono + codigo temporal.
@@ -32,7 +32,7 @@ Route::post('usuario/nueva/direccion', 'Api\PerfilController@guardarDireccion');
 Route::post('usuario/seleccionar/direccion', 'Api\PerfilController@seleccionarDireccion'); // seleccionar direccion
 Route::post('usuario/eliminar/direccion', 'Api\PerfilController@eliminarDireccion'); // eliminar una direccion
         
-// servicios 
+// servicios  
 Route::post('usuario/servicios/lista', 'Api\ServiciosController@getServiciosZona'); // lista de tipo servicio por zona
 Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoServicios'); // locales tipo cualquiera
 Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoProductoVistaComida'); // menu de local tipo comida
@@ -126,7 +126,7 @@ Route::post('propietarios/zonas/informacion', 'Api\PropietarioController@informa
 Route::post('propietarios/zonas/actualizar/zonahora', 'Api\PropietarioController@actualizarZonaHora'); //info de la zona que modificara el propietario
 Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona'); //info de la zona que modificara el propietario
  
- 
+  
 // productos 
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos vertical
 Route::post('propietario/productos-h', 'Api\PropietarioController@verProductosHorizontal'); // listado de productos horizontal

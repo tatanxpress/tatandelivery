@@ -92,10 +92,10 @@ class ServiciosController extends Controller
 
             if(User::where('id', $request->userid)->first()){
 
-                // obtener ciudad segun id del usuario
-            $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
+                // obtener zona segun id del usuario
+                $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
 
-            $nombreServicio = TipoServicios::where('id', $request->tipo)->pluck('nombre')->first();
+                $nombreServicio = TipoServicios::where('id', $request->tipo)->pluck('nombre')->first();
                
 
             // dia        
@@ -123,13 +123,13 @@ class ServiciosController extends Controller
                      's.logo', 's.tipo_vista', 's.cerrado_emergencia', 
                      'z.tiempo_limite', 'z.horario_inicio', 'z.horario_final', 's.privado', 'z.posicion')
             ->where('z.zonas_id', $idzona)
-            ->where('s.tipo_servicios_id', $request->tipo)
+            ->where('s.tipo_servicios_id', $request->tipo) // tipo restaurante por ejemplo
             ->where('z.activo', 1)
             ->where('s.activo', 1)
             ->orderBy('z.posicion', 'ASC')
             ->get();
            
-               // verificar si esta agregado a favoritos
+               
                foreach ($servicios as $user) {
 
                 // estos datos son para saver si el servicio privado dara adomicilio hasta una determinada
@@ -172,7 +172,7 @@ class ServiciosController extends Controller
 
                         $horario = DB::table('horario_servicio AS h')
                             ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
-                            ->where('h.segunda_hora', '1') // segunda hora habilitada
+                            ->where('h.segunda_hora', 1) // segunda hora habilitada
                             ->where('h.servicios_id', $user->idServicio) // id servicio
                             ->where('h.dia', $diaSemana) // dia
                             ->where(function ($query) use ($hora) {
@@ -191,14 +191,24 @@ class ServiciosController extends Controller
 
                     }else{
                             // verificar sin la segunda hora
-                            $horario = DB::table('horario_servicio AS h')
+                            /*$horario = DB::table('horario_servicio AS h')
                             ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                             ->where('h.segunda_hora', 0) // segunda hora habilitada
                             ->where('h.servicios_id', $user->idServicio) // id servicio
                             ->where('h.dia', $diaSemana)                                                     
                             ->where('h.hora1', '<=', $hora) 
                             ->where('h.hora2', '>=', $hora) 
-                            ->get();
+                            ->get();*/
+                            $horario = DB::table('horario_servicio AS h')
+                            ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
+                            ->where('h.segunda_hora', 0) // segunda hora habilitada
+                            ->where('h.servicios_id', $user->idServicio) // id servicio
+                            ->where('h.dia', $diaSemana) // dia
+                            ->where(function ($query) use ($hora) {
+                                $query->where('h.hora1', '<=' , $hora)
+                                    ->where('h.hora2', '>=' , $hora);
+                            }) 
+                        ->get();
 
                             if(count($horario) >= 1){
                                 $user->horarioLocal = 0;
