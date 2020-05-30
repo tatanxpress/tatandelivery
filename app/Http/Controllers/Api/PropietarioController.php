@@ -1034,7 +1034,8 @@ class PropietarioController extends Controller
                 ->where('st.servicios_1_id', $p->servicios_id)
                 ->orderBy('st.posicion', 'ASC')
                 ->where('st.activo', 1)
-                ->get();
+                ->where('st.activo_admin', 1) // activo por administrador
+                ->get(); 
     
                 $resultsBloque = array();
                 $index = 0;
@@ -1096,6 +1097,7 @@ class PropietarioController extends Controller
                 ->where('st.servicios_1_id', $p->servicios_id)
                 ->orderBy('st.posicion', 'ASC')
                 ->where('st.activo', 1)
+                ->where('st.activo_admin', 1) // activo por administrador
                 ->get();
 
                 // obtener total de productos por seccion

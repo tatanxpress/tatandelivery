@@ -13,6 +13,7 @@
                     <th style="width: 15%">Categoria</th>
                     <th style="width: 10%">Posicion</th>
                     <th style="width: 10%">Activo</th>   
+                    <th style="width: 15%">Activo Admin</th>
                     <th style="width: 15%">Opciones</th>     
                     </tr>
                   </thead>
@@ -26,6 +27,14 @@
             
                     <td> 
                       @if($dato->activo == 0)
+                      <span class="badge bg-danger">Desactivado</span>
+                      @else
+                      <span class="badge bg-success">Activado</span>
+                      @endif
+                    </td>
+                    
+                    <td> 
+                      @if($dato->activo_admin == 0)
                       <span class="badge bg-danger">Desactivado</span>
                       @else
                       <span class="badge bg-success">Activado</span>

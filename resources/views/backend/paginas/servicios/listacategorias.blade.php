@@ -102,6 +102,11 @@
                               </div>
 
                               <div class="form-group">
+                                  <label>Activo Administrador</label>
+                                  <input type="checkbox" id="cbadmin-editar">
+                              </div>
+
+                              <div class="form-group">
                                   <label>Fecha ingreso</label>
                                   <input type="text" disabled class="form-control" id="fecha-editar">
                               </div>
@@ -207,7 +212,7 @@
             })
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
-              
+               
                 if(response.data.success == 1){
                     $('#modalEditar').modal('show');
                     $('#id-editar').val(response.data.categoria.id);
@@ -219,6 +224,12 @@
                         $("#cbactivo-editar").prop("checked", false);
                     }else{
                         $("#cbactivo-editar").prop("checked", true);
+                    } 
+
+                    if(response.data.categoria.activo_admin == 0){
+                        $("#cbadmin-editar").prop("checked", false);
+                    }else{
+                        $("#cbadmin-editar").prop("checked", true);
                     } 
 
                 }else{
@@ -235,6 +246,7 @@
       var id = document.getElementById('id-editar').value;
       var nombre = document.getElementById('nombre-editar').value;
       var toggleactivo = document.getElementById('cbactivo-editar').checked;
+      var toggleadmin = document.getElementById('cbadmin-editar').checked;
       
       if(nombre === ''){
         toastr.error("nombre es requerido");
@@ -247,14 +259,21 @@
       }
 
       var toggle = 0;
+      var toggleadmin_1 = 0;
+
         if(toggleactivo){
             toggle = 1;
+        }
+
+        if(toggleadmin){
+            toggleadmin_1 = 1;
         }
 
       var spinHandle = loadingOverlay().activate();
       var formData = new FormData();
       formData.append('id', id);
       formData.append('toggle', toggle);
+      formData.append('toggleadmin', toggleadmin_1);
       formData.append('nombre', nombre);
 
       axios.post('/admin/categorias/editar', formData, {

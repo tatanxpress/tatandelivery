@@ -42,6 +42,7 @@ class VistaTipoTiendaController extends Controller
                 ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
                 ->where('st.servicios_1_id', $request->servicioid)
                 ->where('st.activo', 1)
+                ->where('st.activo_admin', 1)// vista activo administrador
                 ->orderBy('st.posicion', 'ASC')
                 ->get();
 

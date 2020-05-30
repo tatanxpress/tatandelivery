@@ -25,7 +25,7 @@ class CategoriasController extends Controller
         
         $servicio = DB::table('servicios_tipo AS st')
         ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')          
-        ->select('st.id', 's.identificador', 'st.nombre', 'st.fecha', 'st.posicion', 'st.activo')
+        ->select('st.id', 's.identificador', 'st.nombre', 'st.fecha', 'st.posicion', 'st.activo', 'st.activo_admin')
         ->where('st.servicios_1_id', $id)
         ->orderBy('st.posicion', 'ASC')
         ->get();
@@ -76,6 +76,7 @@ class CategoriasController extends Controller
             $ca->servicios_1_id = $request->id;
             $ca->posicion = $posicion;
             $ca->activo = 0;
+            $ca->activo_admin = 0;
             $ca->fecha = $fecha;
 
             if($ca->save()){
@@ -113,7 +114,7 @@ class CategoriasController extends Controller
 
             $categoria = DB::table('servicios_tipo AS st')
             ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')
-            ->select('st.id', 'st.nombre', 'st.activo', 'st.fecha', 's.nombre AS nombreServicio')
+            ->select('st.id', 'st.nombre', 'st.activo', 'st.activo_admin', 'st.fecha', 's.nombre AS nombreServicio')
             ->where('st.id', $request->id)
             ->first();
 
@@ -131,13 +132,15 @@ class CategoriasController extends Controller
             $rules = array( 
                 'id' => 'required',
                 'toggle' => 'required',
+                'toggleadmin' => 'required',
                 'nombre' => 'required',
             );
 
             $messages = array(   
                 'id.required' => 'El id es requerido',
                 'toggle.required' => 'El toggle es requerido',
-                'nombre.required' => 'El nombre es requerido',
+                'toggleadmin.required' => 'El toggle admin es requerido',
+                'nombre.required' => 'El nombre es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -156,7 +159,7 @@ class CategoriasController extends Controller
                       
                         'nombre' => $request->nombre,
                         'activo' => $request->toggle,
-                      
+                        'activo_admin' => $request->toggleadmin
                         ]);
               
                 return ['success' => 1];
