@@ -14,6 +14,7 @@
                         <th style="width: 15%">Cerrado Emergencia</th>
                         <th style="width: 10%">Activo</th>
                         <th style="width: 15%">Nombre Servicio</th>
+                        <th style="width: 15%">Posicion</th>
                      
                         </tr>
                     </thead>
@@ -39,7 +40,7 @@
                             @endif
                         </td>
                         <td>{{ $dato->nombreServicio }}</td> 
-                   
+                        <td>{{ $dato->posicion }}</td> 
 
                         </tr>
                         @endforeach

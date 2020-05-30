@@ -288,7 +288,7 @@ class ZonaServiciosController extends Controller
         ->join('tipo_servicios AS ts', 'ts.id', '=', 's.tipo_servicios_id') 
         ->join('zonas_servicios AS z', 'z.servicios_id', '=', 's.id')         
         ->select('z.id','s.nombre', 's.descripcion', 's.imagen', 
-        's.cerrado_emergencia', 'z.zonas_id', 's.tipo_servicios_id', 's.activo', 's.identificador', 'ts.nombre AS nombreServicio')
+        's.cerrado_emergencia', 'z.zonas_id', 'z.posicion', 's.tipo_servicios_id', 's.activo', 's.identificador', 'ts.nombre AS nombreServicio')
         ->where('z.zonas_id', $idzona)
         ->where('s.tipo_servicios_id', $idtipo)
         ->orderBy('z.posicion', 'ASC')
