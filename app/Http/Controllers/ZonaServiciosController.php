@@ -82,18 +82,6 @@ class ZonaServiciosController extends Controller
                 return ['success' => 1];
             }
 
-
-            // aqui ira revuelto, todos los servicios de la misma zona, sin importar el tipo, se agregara hasta posicion ultima
-            $conteo = ZonasServicios::where('zonas_id', $request->selectzona)->count();
-            $posicion = 1;
-
-            if($conteo >= 1){
-                // ya existe uno
-                $registro = ZonasServicios::where('zonas_id', $request->selectzona)->first();
-                $posicion = $registro->posicion;
-                $posicion++;
-            } 
-
             $fecha = Carbon::now('America/El_Salvador');
 
             $zona = new ZonasServicios();
@@ -103,7 +91,7 @@ class ZonaServiciosController extends Controller
             $zona->precio_envio = $request->precioenvio;
             $zona->activo = $request->cbactivo;
             $zona->ganancia_motorista = $request->ganancia;
-            $zona->posicion = $posicion;
+            $zona->posicion = 1;
             $zona->zona_envio_gratis = 0;
             $zona->mitad_precio = 0;
             $zona->tiempo_limite = 0;
