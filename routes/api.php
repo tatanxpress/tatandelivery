@@ -32,7 +32,7 @@ Route::post('usuario/nueva/direccion', 'Api\PerfilController@guardarDireccion');
 Route::post('usuario/seleccionar/direccion', 'Api\PerfilController@seleccionarDireccion'); // seleccionar direccion
 Route::post('usuario/eliminar/direccion', 'Api\PerfilController@eliminarDireccion'); // eliminar una direccion
         
-// servicios  
+// servicios   
 Route::post('usuario/servicios/lista', 'Api\ServiciosController@getServiciosZona'); // lista de tipo servicio por zona
 Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoServicios'); // locales tipo cualquiera
 Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoProductoVistaComida'); // menu de local tipo comida

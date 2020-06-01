@@ -102,12 +102,33 @@ class AfiliadosVersion2Controller extends Controller
             
             if($p = Propietarios::where('id', $request->id)->first()){
 
+
+                if($request->valor == 1){
+                     // obtener todos los productos de esa categoria
+                     $pL = DB::table('producto') 
+                     ->where('servicios_tipo_id', $request->idcategoria)
+                     ->get();
+ 
+                      $bloqueo = true;
+ 
+                      foreach($pL as $lista){
+                         if($lista->disponibilidad == 1){ // si hay al menos 1 producto activo, no se desactiva categoria
+                             $bloqueo = false;
+                         }
+                     }
+ 
+                     if($bloqueo){
+                         $mensaje = "Para activar la categoría, se necesita un producto disponible";
+                         return ['success' => 2, 'mensaje' => $mensaje];
+                    } 
+                }
+
                 // actualizar
                 ServiciosTipo::where('id', $request->idcategoria)->update(['activo' => $request->valor, 'nombre' => $request->nombre]);    
                                 
                 return ['success'=> 1];
             }else{
-                return ['success'=> 2];
+                return ['success'=> 0];
             }
         }
     }
@@ -197,19 +218,16 @@ class AfiliadosVersion2Controller extends Controller
                         Producto::where('id', $request->productoid)->update(['utiliza_nota' => 0]);
                     }
     
-                    // cambiar disponibilidad producto
-                    Producto::where('id', $request->productoid)->update(['disponibilidad' => $request->estadoproducto]);
-    
-                    // cambiar estado de utilizar unidades
-                    Producto::where('id', $request->productoid)->update(['utiliza_cantidad' => $request->estadounidades]);
+                    // cambiar disponibilidad producto y utiliza unidades
+                    Producto::where('id', $request->productoid)->update(['disponibilidad' => $request->estadoproducto, 'utiliza_cantidad' => $request->estadounidades]);
+                      
 
                     // verificar si es el ultimo producto de esta categoria para desactivarla
-                    
-                    // obtener todos los productos de esa categoria
+                               
                     $productosLista = DB::table('producto') 
                     ->where('servicios_tipo_id', $dataPro->servicios_tipo_id) // activo por administrador
                     ->get();
-                    
+
                     $seguro = true;
                     
                     // comprobar
