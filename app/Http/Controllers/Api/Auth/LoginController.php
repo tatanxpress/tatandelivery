@@ -100,7 +100,7 @@ class LoginController extends Controller
                 }
 
                 // DESACTIVADO SMS
-                return ['success' => 3];
+                //return ['success' => 3];
                
                 // envio del mensaje
                 $sid = "ACc68bf246c0d9be071f2367e81b686201";
