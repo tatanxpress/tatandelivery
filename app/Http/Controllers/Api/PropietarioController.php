@@ -2397,6 +2397,8 @@ class PropietarioController extends Controller
 
                         }else if($tipo->tipo_cupon_id == 4){
                             $o->tipocupon = 4;
+                            $d = AplicaCuponCuatro::where('ordenes_id', $o->id)->first();
+                            $o->producto = $d->producto;
                         }
                         else{
                             $o->tipocupon = 0;
