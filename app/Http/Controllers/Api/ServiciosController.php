@@ -27,7 +27,7 @@ class ServiciosController extends Controller
             // validaciones para los datos
             $reglaDatos = array(                
                 'userid' => 'required',               
-            );    
+            );
         
             $mensajeDatos = array(                                      
                 'userid.required' => 'El id del usuario es requerido.'
@@ -49,7 +49,7 @@ class ServiciosController extends Controller
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
-            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen', 't.tipos_id')
+            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen', 't.tipos_id', 't.descripcion')
             ->where('tz.zonas_id', $idzona)
             ->where('tz.activo', '1') //solo servicios disponibles
             ->orderBy('tz.posicion', 'ASC')
