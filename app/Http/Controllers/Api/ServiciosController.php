@@ -228,10 +228,9 @@ class ServiciosController extends Controller
                 }   
 
             // problema para enviar a esta zona, ejemplo motoristas sin disponibilidad
-            $zonaSa = DB::table('zonas')            
-            ->where('id', $idzona)
-            ->first();
+            $zonaSa = DB::table('zonas')->where('id', $idzona)->first();
             $zonaSaturacion = $zonaSa->saturacion;
+            $zonaMensaje = $zonaSa->mensaje;
 
             $horazona1 = date("h:i A", strtotime($zonaSa->hora_abierto_delivery));
             $horazona2 = date("h:i A", strtotime($zonaSa->hora_cerrado_delivery));
@@ -281,6 +280,7 @@ class ServiciosController extends Controller
                 'nombre' => $nombreServicio, // saver nombre del servicio, tienda, snack
                 'success' => 1, 
                 'zonasaturacion' => $zonaSaturacion,
+                'mensaje' => $zonaMensaje,
                 'horadelivery' => $horaEntrega,
                 'hayorden' => $tengoCarrito, // saver si tenemos carrito
                 'total' => number_format((float)$resultado, 2, '.', ''), //subtotal

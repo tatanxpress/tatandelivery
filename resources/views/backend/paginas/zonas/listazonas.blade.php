@@ -20,7 +20,7 @@
             </button>
 
        </div>
-     </section>
+     </section> 
 
 <section class="content">
     <div class="container-fluid">
@@ -170,6 +170,12 @@
                                         </div>
                                     </label>
                                 </div>  
+
+                                <div class="form-group">
+                                    <label>Mensaje del problema</label>
+                                    <input type="text" maxlength="100" class="form-control" id="mensaje-editar" placeholder="Mensaje del problema">
+                                </div>
+
                                 <div class="form-group" style="margin-left:20px">
                                     <label>Disponibilidad Zona</label><br>
                                     <label class="switch" style="margin-top:10px">
@@ -300,6 +306,7 @@
                     $('#horaabierto-editar').val(response.data.zona.hora_abierto_delivery);
                     $('#horacerrado-editar').val(response.data.zona.hora_cerrado_delivery);
                     $('#tiempoextra-editar').val(response.data.zona.tiempo_extra)
+                    $('#mensaje-editar').val(response.data.zona.mensaje)
                      
                     $('#latitud-editar').val(response.data.zona.latitud);
                     $('#longitud-editar').val(response.data.zona.longitud);
@@ -454,7 +461,7 @@
     }
 
     // editar zona
-    function editar() {     
+    function editar() {
         var id = document.getElementById('id-editar').value;
         var nombre = document.getElementById('nombre-editar').value;
         var descripcion = document.getElementById('descripcion-editar').value;
@@ -467,7 +474,8 @@
         var toggleactivo = document.getElementById('toggle-activo').checked;
         
         var latitud = document.getElementById("latitud-editar").value;  
-        var longitud = document.getElementById("longitud-editar").value;    
+        var longitud = document.getElementById("longitud-editar").value;
+        var mensaje = document.getElementById("mensaje-editar").value;
 
         
         if (latitud === '') {
@@ -488,6 +496,11 @@
 
         if(longitud.length > 50){
             toastr.error("50 caracter máximo latitud");
+            return false;
+        }
+
+        if(mensaje === ''){
+            toastr.error("Mensaje de zona es requerido");
             return false;
         }
                 
@@ -518,6 +531,7 @@
             formData.append('togglea', togglea);
             formData.append('latitud', latitud);
             formData.append('longitud', longitud);
+            formData.append('mensaje', mensaje);
 
             var spinHandle = loadingOverlay().activate();
 

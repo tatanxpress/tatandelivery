@@ -274,13 +274,11 @@ class ProcesadorOrdenesController extends Controller
                     }
                    
                     // sacar id de zona del carrito
-                    $zon = DB::table('zonas') 
-                    ->select('saturacion')
-                    ->where('id', $zonaidd)
-                    ->first();
+                    $zon = DB::table('zonas')->where('id', $zonaidd)->first();
                 
-                    // zona saturacion para no envio adomicilio
-                    $zonaSaturacion = $zon->saturacion;    
+                    // zona saturacion
+                    $zonaSaturacion = $zon->saturacion;
+                    $mensajeZona = $zon->mensaje;
 
                     // buscar el cerrado de emergencia
                     $emergencia = DB::table('servicios')
@@ -376,7 +374,7 @@ class ProcesadorOrdenesController extends Controller
                     // solo servicios publicos
                     if($privado == 0){
                         if($zonaSaturacion == 1 ){ // no hay entregas para esta zona por el momento*
-                            return ['success' => 5];
+                            return ['success' => 5, 'mensaje' => $mensajeZona];
                         }
                     }
 

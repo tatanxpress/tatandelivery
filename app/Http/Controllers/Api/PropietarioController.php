@@ -39,16 +39,6 @@ class PropietarioController extends Controller
     // login para propietario
     public function loginPropietario(Request $request){
 
-
-       /* $titulo = "Tiempo de preparación";
-        $mensaje = "Revisar tiempo de espera";
-        $pilaUsuarios = "8593a228-c92b-491a-96c7-4c219f388ad2";
-
-        $this->envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios);
-
-        return "llego";*/
- 
-
         if($request->isMethod('post')){   
             $rules = array(                
                 'phone' => 'required',
@@ -1033,7 +1023,6 @@ class PropietarioController extends Controller
                 ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
                 ->where('st.servicios_1_id', $p->servicios_id)
                 ->orderBy('st.posicion', 'ASC')
-                ->where('st.activo', 1)
                 ->where('st.activo_admin', 1) // activo por administrador
                 ->get(); 
     
@@ -1096,7 +1085,6 @@ class PropietarioController extends Controller
                 ->select('st.id AS tipoId', 'st.nombre AS nombreSeccion')
                 ->where('st.servicios_1_id', $p->servicios_id)
                 ->orderBy('st.posicion', 'ASC')
-                ->where('st.activo', 1)
                 ->where('st.activo_admin', 1) // activo por administrador
                 ->get();
 
@@ -1181,9 +1169,7 @@ class PropietarioController extends Controller
                 }
             }else{
                 return ['success' => 2];
-            }
-
-           
+            }           
         }
     }
 
@@ -1324,9 +1310,7 @@ class PropietarioController extends Controller
                 } 
             }else{
                 return ['success'=> 0];
-            }
-            
-                      
+            }         
         }
     } 
 

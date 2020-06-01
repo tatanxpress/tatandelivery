@@ -91,7 +91,9 @@
           })
           .then((response) => {
             loadingOverlay().cancel(spinHandle);
-            toastr.success('Actualizado');
+           
+            recargarVista();
+
           })
           .catch((error) => {           
             loadingOverlay().cancel(spinHandle);

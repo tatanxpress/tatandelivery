@@ -15,7 +15,7 @@ class MapaZonaController extends Controller
     {
         $this->middleware('auth:admin'); 
     }
-
+ 
     // lista de zonas
     public function index(){
         return view('backend.paginas.zonas.listazonas');
@@ -87,6 +87,7 @@ class MapaZonaController extends Controller
             $zona->hora_cerrado_delivery = $request->horacerrado;
             $zona->fecha = $fecha;            
             $zona->activo = 1;
+            $zona->mensaje = "-";
             $zona->tiempo_extra = $request->tiempoextra;
             
 
@@ -141,7 +142,8 @@ class MapaZonaController extends Controller
                 'togglea' => 'required',
                 'identificador' => 'required',
                 'latitud' => 'required',
-                'longitud' => 'required'
+                'longitud' => 'required',
+                'mensaje' => 'required'
             );    
 
             $messages = array(   
@@ -155,7 +157,8 @@ class MapaZonaController extends Controller
                 'togglea.required' => 'El valor toggle activo requerido.',
                 'identificador.required' => 'El identificador es requerido.',
                 'latitud.required' => 'Latitud es requerido.',
-                'longitud.required' => 'Longitud es requerido.'
+                'longitud.required' => 'Longitud es requerido.',
+                'mensaje.required' => 'Mensaje es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
@@ -181,7 +184,7 @@ class MapaZonaController extends Controller
                 'hora_cerrado_delivery' => $request->horacerrado, 
                 'tiempo_extra' => $request->tiempoextra, 'identificador' => $identificador, 
                 'saturacion' => $request->togglep, 'activo' => $request->togglea, 'latitud' => $request->latitud,
-                'longitud' => $request->longitud]);
+                'longitud' => $request->longitud, 'mensaje' => $request->mensaje]);
                 
                 return ['success' => 1];
             }else{

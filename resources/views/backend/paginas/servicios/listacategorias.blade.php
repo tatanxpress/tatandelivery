@@ -275,7 +275,7 @@
       formData.append('toggle', toggle);
       formData.append('toggleadmin', toggleadmin_1);
       formData.append('nombre', nombre);
-
+ 
       axios.post('/admin/categorias/editar', formData, {
       }) 
       .then((response) => {
@@ -309,6 +309,12 @@
 
     function producto(id){
         window.location.href="{{ url('/admin/productos/') }}/"+id;
+    }
+
+    function recargarVista(){
+        id = {{ $id }};
+          var ruta = "{{ url('/admin/categorias/tablas') }}/"+id;
+          $('#tablaDatatable').load(ruta);
     }
 
   </script>

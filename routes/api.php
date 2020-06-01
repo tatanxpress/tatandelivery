@@ -127,17 +127,31 @@ Route::post('propietarios/zonas/actualizar/zonahora', 'Api\PropietarioController
 Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona'); //info de la zona que modificara el propietario
  
   
-// productos 
+// productos  
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos vertical
 Route::post('propietario/productos-h', 'Api\PropietarioController@verProductosHorizontal'); // listado de productos horizontal
 Route::post('propietario/productos-h-seccion', 'Api\PropietarioController@buscarProductoSeccion'); // lista de productos "ver todos"
-
-
-
+ 
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
  
+    //** Version 2 para Afiliados*/
+
+Route::post('afiliado/productos/ver-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@verCategoriasProductos'); // lista de categorias
+Route::post('afiliado/productos/actualizar-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoria'); // desactivar categoria
+Route::post('afiliado/categoria/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoriaPosiciones'); // cambiar nombre a categoria
+Route::post('afiliado/categoria/productos-lista', 'Api\Afiliados\AfiliadosVersion2Controller@productosDeCategoria'); // lista de productos por categoria
+Route::post('afiliado/categoria/pro/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProductoPosiciones'); // cambiar nombre a categoria
+Route::post('afiliado/actualizar/producto', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProducto'); // actualizar producto
+
+
+    //** Fin Version 2 para Afiliados */
+
+
+
+
+
  
 // MOTORISTA  
  
@@ -213,7 +227,7 @@ Route::post('adminapp/ordenes/urgentes-dos', 'Api\AdminAppController@verOrdenesU
 Route::post('adminapp/urgentes/dos/ocultar', 'Api\AdminAppController@ocultarUrgenteDos'); // ocultar ordenes_urgentes_dos 
 
 // paso el tiempo hora de entrega del cliente sumandole + 5 minutos
-// hora que dio el propietario + hora extra de zona + 5 minutos
+// hora que dio el propietario + hora extra de zona + 5 minutos 
 Route::post('adminapp/ordenes/urgentes-tres', 'Api\AdminAppController@verOrdenesUrgenteTres'); // ver ordenes_urgentes_tres
 Route::post('adminapp/urgentes/tres/ocultar', 'Api\AdminAppController@ocultarUrgenteTres'); // ocultar ordenes_urgentes_tres 
 

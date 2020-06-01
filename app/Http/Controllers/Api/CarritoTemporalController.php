@@ -404,10 +404,9 @@ class CarritoTemporalController extends Controller
                         }
                         
                         // sacar datos de la zona
-                        $zon = DB::table('zonas AS z')->where('z.id', $cart->zonas_id)->first();
-
-                       
+                        $zon = DB::table('zonas AS z')->where('z.id', $cart->zonas_id)->first();                       
                         $zonaSaturacion = $zon->saturacion; // saver si tenemos adomicilio completo a esta zona
+                        $mensajeZona = $zon->mensaje;
 
                         // buscar el cerrado de emergencia
                         $emergencia = DB::table('servicios')->where('id', $servicioidC)->first();
@@ -471,7 +470,6 @@ class CarritoTemporalController extends Controller
                             $limiteentrega = 1; // cerrado
                         }
 
-
                         $horainicio = date("h:i A", strtotime($horainicio));
                         $horafinal = date("h:i A", strtotime($horafinal));
             
@@ -486,6 +484,7 @@ class CarritoTemporalController extends Controller
                             'cerrado' => $cerrado, // si es 1, el local esta cerrado hoy
                             'cerrado_emergencia' => $cerradoEmergencia, //local cerrado por emergencia
                             'zona_saturacion' => $zonaSaturacion, // sin adomicilio para esta zona,
+                            'mensaje' => $mensajeZona,
                             'tiempo_limite' => $tiempo_limite, // activacion de servicios privados
                             'limiteentrega' => $limiteentrega, // horario de zona para servicios privados
                             'privado' => $privado, // saver si servicio es privado o no

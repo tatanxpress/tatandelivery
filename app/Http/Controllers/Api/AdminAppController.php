@@ -270,13 +270,14 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('ou.id', 'ASC')
                 ->get();
  
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
                                       
                     $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
 
@@ -487,13 +488,14 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
+                    $o->fecha = date("h:i A", strtotime($o->fecha));
         
                     // hora que termino de preparar la orden
                     $o->fechatermino = date("h:i A", strtotime($o->fecha_5));
@@ -606,13 +608,15 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+
+                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
         
                     // hora que termino de preparar la orden
                     $o->fechatermino = date("h:i A d-m-Y", strtotime($o->fecha_5));
@@ -731,13 +735,14 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+                    $o->fecha = date("h:i A", strtotime($o->fecha));
 
                     // hora estimada de entrega
                     $time1 = Carbon::parse($o->fecha_4);                                
@@ -844,13 +849,14 @@ class AdminAppController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
                 ->select('o.id', 'ou.id AS idproblema', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
-                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'ou.tipo', 'o.estado_8')
+                        'o.estado_5', 'o.fecha_5', 'ou.activo', 'ou.tipo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
                                                                                
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;                   

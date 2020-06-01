@@ -10,6 +10,7 @@
                   <th style="width: 10%">ID</th>
                   <th style="width: 10%">Nombre</th>
                   <th style="width: 22%">Descripcion</th>
+                  <th style="width: 22%">Mensaje</th>
                   <th style="width: 10%">Saturación</th>
                   <th style="width: 10%">Estado</th>
                   <th style="width: 8%">Identificador</th>
@@ -24,6 +25,7 @@
                   <td>{{ $dato->id }}</td>
                   <td>{{ $dato->nombre }}</td> 
                   <td>{{ $dato->descripcion }}</td> 
+                  <td>{{ $dato->mensaje }}</td>
                   <td> 
                     @if($dato->saturacion == 0)
                     <span class="badge bg-danger">Desactivado</span>
