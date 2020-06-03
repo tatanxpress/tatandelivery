@@ -137,12 +137,24 @@ Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actual
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda
  
     //** Version 2 para Afiliados*/
-
+ 
 Route::post('afiliado/productos/ver-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@verCategoriasProductos'); // lista de categorias
-Route::post('afiliado/productos/actualizar-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoria'); // desactivar categoria
+Route::post('afiliado/productos/actualizar-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoria'); // actualizar categoria android
+Route::post('afiliado/productos/actualizar-categorias-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarNombreCategoria'); // actualizar categoria ios
+
+Route::post('afiliado/productos/categoria-activar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@activarCategoria'); // activar categoria ios
+Route::post('afiliado/productos/categoria-inactivar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@desactivarCategoria'); // desactivar categoria ios
+Route::post('afiliado/productos/categoria-editar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@editarCategoria'); // desactivar categoria ios
+
 Route::post('afiliado/categoria/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoriaPosiciones'); // cambiar nombre a categoria
+Route::post('afiliado/categoria/actualizar-posiciones-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoriaPosicionesIos'); // cambiar nombre a categoria
+
+
 Route::post('afiliado/categoria/productos-lista', 'Api\Afiliados\AfiliadosVersion2Controller@productosDeCategoria'); // lista de productos por categoria
 Route::post('afiliado/categoria/pro/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProductoPosiciones'); // cambiar nombre a categoria
+Route::post('afiliado/categoria/pro/actualizar-posiciones-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProductoPosicionesIos'); // cambiar nombre a categoria
+
+
 Route::post('afiliado/actualizar/producto', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProducto'); // actualizar producto
 
 

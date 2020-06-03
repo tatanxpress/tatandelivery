@@ -133,8 +133,189 @@ class AfiliadosVersion2Controller extends Controller
         }
     }
 
-     // actualizar producto
-     public function actualizarProducto(Request $request){
+    // activar categoria ios
+    public function activarCategoria(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idcategoria' => 'required'                
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idcategoria.required' => 'ID categoria es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+
+                // obtener todos los productos de esa categoria
+                $pL = DB::table('producto') 
+                ->where('servicios_tipo_id', $request->idcategoria)
+                ->get();
+
+                $bloqueo = true;
+
+                foreach($pL as $lista){
+                    if($lista->disponibilidad == 1){ // si hay al menos 1 producto activo, no se desactiva categoria
+                        $bloqueo = false;
+                    }
+                }
+
+                if($bloqueo){
+                    $mensaje = "Para activar la categoría, se necesita un producto disponible";
+                    return ['success' => 2, 'mensaje' => $mensaje];
+                } 
+
+                // actualizar
+                ServiciosTipo::where('id', $request->idcategoria)->update(['activo' => 1]);    
+                                
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 0];
+            }
+        }
+    }
+
+    // desactivar categoria ios
+    public function desactivarCategoria(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idcategoria' => 'required'                
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idcategoria.required' => 'ID categoria es requerido'                
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+               
+                // actualizar
+                ServiciosTipo::where('id', $request->idcategoria)->update(['activo' => 0]);    
+                                
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 0];
+            }
+        }
+    }
+
+    // editar categoria para ios
+    public function editarCategoria(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idcategoria' => 'required',
+                'nombre' => 'required'
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idcategoria.required' => 'ID categoria es requerido',
+                'nombre.required' => 'Nombre es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+              
+                // actualizar
+                ServiciosTipo::where('id', $request->idcategoria)->update(['nombre' => $request->nombre]);    
+                                
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 0];
+            }
+        }
+    }
+
+    // actualizar nombre de categoria para ios
+    public function actualizarNombreCategoria(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required',
+                'idcategoria' => 'required',
+                'nombre' => 'required',
+                'valor' => 'required'
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido',
+                'idcategoria.required' => 'ID categoria es requerido',
+                'nombre.required' => 'Nombre es requerido',
+                'valor.required' => 'Actualizar categoria'          
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+
+
+                if($request->valor == 1){
+                     // obtener todos los productos de esa categoria
+                     $pL = DB::table('producto') 
+                     ->where('servicios_tipo_id', $request->idcategoria)
+                     ->get();
+ 
+                      $bloqueo = true;
+ 
+                      foreach($pL as $lista){
+                         if($lista->disponibilidad == 1){ // si hay al menos 1 producto activo, no se desactiva categoria
+                             $bloqueo = false;
+                         }
+                     }
+ 
+                     if($bloqueo){
+                         $mensaje = "Para activar la categoría, se necesita un producto disponible";
+                         return ['success' => 2, 'mensaje' => $mensaje];
+                    } 
+                }
+
+                // actualizar
+                ServiciosTipo::where('id', $request->idcategoria)->update(['activo' => $request->valor, 'nombre' => $request->nombre]);    
+                                
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 0];
+            }
+        }
+    }
+
+    // actualizar producto
+    public function actualizarProducto(Request $request){
          
         if($request->isMethod('post')){   
             $rules = array(   
@@ -278,8 +459,8 @@ class AfiliadosVersion2Controller extends Controller
             
             if($p = Propietarios::where('id', $request->id)->first()){
 
-                //Log::info($request->all());
-
+               // Log::info($request->all());
+               
                 foreach($request->categoria as $key => $value){
 
                     $posicion = $value['posicion'];
@@ -287,6 +468,40 @@ class AfiliadosVersion2Controller extends Controller
                     ServiciosTipo::where('id', $key)->update(['posicion' => $posicion]); 
                 }
 
+                return ['success' => 1];
+            }
+        }
+    }
+
+     // actualizar posiciones de las categorias en ios
+     public function actualizarCategoriaPosicionesIos(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido'
+            );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+
+                foreach($request->categoria as $key => $value){
+
+                    $id = $value["id"];
+                    $posicion = $value['posicion'];
+
+                    ServiciosTipo::where('id', $id)->update(['posicion' => $posicion]); 
+                }
 
                 return ['success' => 1];
             }
@@ -361,6 +576,43 @@ class AfiliadosVersion2Controller extends Controller
                     $posicion = $value['posicion'];
 
                     Producto::where('id', $key)->update(['posicion' => $posicion]); 
+                }
+
+
+                return ['success' => 1];
+            }
+        }
+    }
+
+    // actualizar posiciones de los productos para ios
+    public function actualizarProductoPosicionesIos(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'
+            );
+ 
+            $messages = array(                                      
+                'id.required' => 'El id propietario es requerido'
+            );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+            
+            if($p = Propietarios::where('id', $request->id)->first()){
+
+
+                foreach($request->categoria as $key => $value){
+
+                    $id = $value["id"];
+                    $posicion = $value['posicion'];
+
+                    Producto::where('id', $id)->update(['posicion' => $posicion]); 
                 }
 
 
