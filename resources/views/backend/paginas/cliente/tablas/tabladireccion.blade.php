@@ -8,7 +8,6 @@
                 <thead>             
                 <tr>
                   <th style="width: 15%">Nombre</th>
-                  <th style="width: 15%">Teléfono</th>
                   <th style="width: 15%">Selecionado</th>
                   <th style="width: 15%">Zona identificador</th>
                   <th style="width: 15%">Opciones</th>            
@@ -18,7 +17,6 @@
                 @foreach($direccion as $dato)
                 <tr>
                   <td>{{ $dato->nombre }}</td> 
-                  <td>{{ $dato->telefono }}</td> 
                   <td> 
                     @if($dato->seleccionado == 0)
                     <span class="badge bg-danger">Inactivo</span>

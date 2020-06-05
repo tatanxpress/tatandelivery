@@ -229,7 +229,7 @@ class ClientesController extends Controller
     public function direccionesTabla($id){        
         $direccion = DB::table('direccion_usuario AS d')            
         ->join('zonas AS z', 'z.id', '=', 'd.zonas_id')              
-        ->select('d.id', 'd.nombre', 'd.telefono', 'd.seleccionado', 'z.nombre AS nombreZona')
+        ->select('d.id', 'd.nombre', 'd.seleccionado', 'z.nombre AS nombreZona')
         ->where('d.user_id', $id)
         ->orderBy('d.seleccionado', 'desc')
         ->get();

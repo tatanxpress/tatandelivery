@@ -1161,6 +1161,7 @@ class PropietarioController extends Controller
                     ->select('p.id', 'p.nombre', 'p.imagen', 'p.precio', 'p.unidades', 'p.utiliza_cantidad', 'p.utiliza_imagen', 'p.activo', 'p.disponibilidad')
                     ->where('p.servicios_tipo_id', $request->seccionid)
                     ->where('p.activo', 1)
+                    ->orderBy('p.posicion', 'ASC')
                     ->get();
                     
                     return ['success' => 1, 'productos' => $productos];

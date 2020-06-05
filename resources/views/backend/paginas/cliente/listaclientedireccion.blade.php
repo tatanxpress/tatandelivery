@@ -63,11 +63,7 @@
                 <br>                
                 <input id="referencia" disabled class="form-control"></label>
             </div>
-            <div class="form-group">
-                <label style="color:#191818">Teléfono</label>
-                <br>
-                <input id="telefono" disabled class="form-control"></label>
-            </div>  
+         
             <div class="form-group">
                 <label style="color:#191818">Latitud real</label>
                 <br>
@@ -164,7 +160,7 @@
                 $('#direccion').val(response.data.direccion.direccion);
                 $('#numero').val(response.data.direccion.numero_casa);
                 $('#referencia').val(response.data.direccion.punto_referencia);        
-                $('#telefono').val(response.data.direccion.telefono);  
+               
                 $('#latitudreal').val(response.data.direccion.latitud_real);        
                 $('#longitudreal').val(response.data.direccion.longitud_real);        
             }else{
