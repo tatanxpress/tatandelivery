@@ -13,6 +13,11 @@ use Illuminate\Support\Carbon;
 class ClientesController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('auth:admin');
+    } 
+
     // lista de usuarios cliente
     public function index(){
         return view('backend.paginas.cliente.listacliente');

@@ -9,6 +9,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ConfiguracionesController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:admin');
+    } 
+
     public function index(){
          
         $limite = DB::table('dinero_orden')->where('id', 1)->pluck('limite')->first();
