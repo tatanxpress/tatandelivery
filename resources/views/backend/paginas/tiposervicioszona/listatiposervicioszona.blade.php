@@ -370,8 +370,8 @@
             toastr.error('Validacion incorrecta');
         } else if (response.data.success == 1) {
             toastr.success('Tipo Servicio Zona actualizado');
-            var ruta = "{{ URL::to('admin/tiposerviciozona/tablas/lista-tipo-servicio-zona') }}";
-            $('#tablaDatatable').load(ruta);
+            //var ruta = "{{ URL::to('admin/tiposerviciozona/tablas/lista-tipo-servicio-zona') }}";
+            //$('#tablaDatatable').load(ruta);
             $('#modalEditar').modal('hide');      
         } else if (response.data.success == 2) {
             toastr.error('Tipo servicio zona no encontrado');
