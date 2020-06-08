@@ -643,7 +643,7 @@
                         $('#direccion').val(datos[index].direccion);
                         $('#numerocasa').val(datos[index].numero_casa);
                         $('#puntoreferencia').val(datos[index].punto_referencia);
-                        $('#telefono').val(datos[index].telefono);
+                      
                         $('#latitud').val(datos[index].latitud);
                         $('#longitud').val(datos[index].longitud);
                         $('#latitudreal').val(datos[index].latitud_real);

@@ -353,7 +353,7 @@ class OrdenesController extends Controller
                 ->join('users AS u', 'u.id', '=', 'od.users_id')
                 ->select('o.id', 'od.nombre', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
                 'od.latitud', 'od.longitud', 'od.latitud_real', 'od.longitud_real',
-                'od.telefono', 'od.copia_tiempo_orden', 'od.copia_envio',
+                'od.copia_tiempo_orden', 'od.copia_envio',
                 'u.phone', 'z.identificador', 'z.nombre AS nombrezona') 
                 ->where('o.id', $request->id)
                 ->get();
