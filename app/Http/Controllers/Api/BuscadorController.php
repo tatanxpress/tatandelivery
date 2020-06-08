@@ -46,6 +46,7 @@ class BuscadorController extends Controller
                 ->where('st.activo', 1) // categoria activa
                 ->where('p.es_promocion', 0) // ningun producto marcado como promocion
                 ->where('p.nombre', 'like', '%' . $request->nombre . '%')
+                ->where('p.descripcion', 'like', '%' . $request->nombre . '%')
                 ->get();
                 
                 return ['success' => 1, 'productos' => $productos];
