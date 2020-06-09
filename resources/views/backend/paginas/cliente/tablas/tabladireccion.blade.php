@@ -25,8 +25,7 @@
                     @endif                  
                   </td> 
                   <td>{{ $dato->nombreZona }}</td>
-                 
-                
+                                 
                   <td>
                     <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                     <i class="fas fa-eye" title="Informacion"></i>&nbsp; Información  

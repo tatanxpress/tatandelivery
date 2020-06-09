@@ -54,7 +54,7 @@
 
                                     <div class="form-group">
                                         <label>Clave Administrador</label>
-                                        <input type="text" maxlength="50" class="form-control" id="clave" placeholder="Clave">
+                                        <input type="text" maxlength="200" class="form-control" id="clave" placeholder="Clave">
                                     </div>  
 
                                     <div class="form-group">
