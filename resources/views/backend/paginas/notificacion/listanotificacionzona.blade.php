@@ -111,7 +111,7 @@
 
                                     <div class="form-group">
                                         <label>Mensaje</label>
-                                        <input type="text" maxlength="50" class="form-control" id="mensaje1" placeholder="Mensaje notificacion">
+                                        <input type="text" maxlength="200" class="form-control" id="mensaje1" placeholder="Mensaje notificacion">
                                     </div> 
 
                                     <div class="form-group">
