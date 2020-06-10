@@ -410,6 +410,13 @@ class MotoristaController extends Controller
 
                 } //end foreach
 
+
+                 // actualizar id, cada vez
+                 if($request->deviceid != null){
+                    if($request->deviceid != "0000")
+                    Motoristas::where('id', $request->id)->update(['device_id' => $request->deviceid]);
+                }
+
              
                 return ['success' => 2, 'ordenes' => $orden]; 
             }else{
@@ -1087,10 +1094,14 @@ class MotoristaController extends Controller
                
                 $horaEstimada = $time1->addMinute($or->hora_2)->format('h:i A');
                 $horaEstimada = $horaEstimada;              
+
+
+                // titulo que dira la notificacion, cuando se alerte al cliente que esta llegando su pedido.
+                $mensaje = "Su orden #" . $request->ordenid . " esta llegando";
                 
                 return ['success' => 1, 'ordenes' => $orden,
                  'servicio' => $servicio, 'hora' => $horaEstimada, 
-                 'estado' => $or->estado_6, 'cancelado' => $or->estado_8];
+                 'estado' => $or->estado_6, 'cancelado' => $or->estado_8, 'mensaje' => $mensaje];
             }else{
                 return ['success' => 2];
             }
@@ -1685,7 +1696,84 @@ class MotoristaController extends Controller
     } 
 
 
+    // notificar al cliente su orden esta cerca
+    public function notificarClienteOrden(Request $request){
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'ordenid' => 'required'
+            );
+
+            $mensajeDatos = array(                                      
+                'ordenid.required' => 'El orden id es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            // obtener usuario de la orden
+            if($o = Ordenes::where('id', $request->ordenid)->first()){
+                
+                $datos = User::where('id', $o->users_id)->first();
+                
+                if($datos->device_id != "0000"){
+
+                    $titulo = "Su orden esta cerca";
+                    $message = "El motorista se encuentra cerca de tu ubicación";
+
+                        // ver tipo de notiificacion, 
+                        // completado   .mp3 .wav
+                        // mensaje   .mp3  .wav
+
+                        $odd = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+
+                        if($odd->movil_orden == "3"){
+                            // cliente no tiene el nuevo sonido
+                            try {
+                                $this->envioNoticacionCliente($titulo, $message, $datos->device_id); 
+                            } catch (Exception $e) {
+                                
+                            }
+                        }else{
+                            // cliente ya tiene el nuevo sonido
+                            try {
+                                $this->envioNoticacionClienteAlerta($titulo, $message, $datos->device_id); 
+                            } catch (Exception $e) {
+                                
+                            }
+
+
+                            $mensaje = "Notificación enviada 111";
+                    
+                            return ['success' => 1, 'mensaje' => $mensaje];
+                        }
+                       
+
+                    $mensaje = "Notificación enviada";
+                    
+                    return ['success' => 1, 'mensaje' => $mensaje];
+                }else{
+
+                    $mensaje = "Notificación no se pudo enviar";
+
+                    return ['success' => 2, 'mensaje' => $mensaje];
+                }    
+            }
+        }
+    }
+
+
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionClienteAlerta($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionClienteAlerta($titulo, $mensaje, $pilaUsuarios);
     }
 } 

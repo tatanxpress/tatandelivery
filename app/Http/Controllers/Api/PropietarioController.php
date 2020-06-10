@@ -294,13 +294,13 @@ class PropietarioController extends Controller
                 if($p->activo == 0){
                     return ['success'=> 1];
                 }
-
              
                 $orden = DB::table('ordenes')                
                 ->select('id', 'precio_total', 'nota_orden', 'fecha_orden')
                 ->where('servicios_id', $p->servicios_id)
                 ->where('visible_p', 1)
                 ->get();
+                
             
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
@@ -335,6 +335,12 @@ class PropietarioController extends Controller
                     }else{
                         $o->aplicacupon = 0;
                     }                    
+                }
+
+                // actualizar id, cada vez
+                if($request->deviceid != null){
+                    if($request->deviceid != "0000")
+                    Propietarios::where('id', $request->id)->update(['device_id' => $request->deviceid]);
                 }
 
                 return ['success' => 2, 'ordenes' => $orden]; 

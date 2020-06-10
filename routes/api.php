@@ -201,6 +201,10 @@ Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
+// notificar al cliente que su orden esta cerca o afuera
+Route::post('motorista/notificar/cliente/orden', 'Api\MotoristaController@notificarClienteOrden');
+
+
  
 // REVISADOR DE PAGOS
 
