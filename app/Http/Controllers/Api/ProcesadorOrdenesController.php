@@ -909,6 +909,11 @@ class ProcesadorOrdenesController extends Controller
                     if(empty($dLongiReal)){
                         $dLongiReal = "";
                     }
+
+                    $dispositivo = "3"; // por defecto
+                    if($request->dispositivo != null){
+                        $dispositivo = $request->dispositivo;
+                    }
                     
                     $nuevaDir = new OrdenesDirecciones;
                     $nuevaDir->users_id = $dUser;
@@ -925,8 +930,17 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->copia_envio = $copiaenvio;
                     $nuevaDir->copia_min_gratis = $copiamingratis;
                     $nuevaDir->copia_tiempo_orden = $copiaTiempoOrden;
+                    $nuevaDir->movil_ordeno = $dispositivo; // si es 1, es ios, sino android
                     
                     $nuevaDir->save();
+
+                    // guardar notificacion id
+                    if($request->onesignalid != null){
+                        if($request->onesignalid != "0000"){
+                            User::where('id', $request->userid)->update(['device_id' => $request->onesignalid]);
+                        }
+                    }
+                    
                    
                     // BORRAR CARRITO TEMPORAL DEL USUARIO
                     

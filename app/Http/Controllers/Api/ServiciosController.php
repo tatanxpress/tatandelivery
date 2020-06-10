@@ -45,7 +45,7 @@ class ServiciosController extends Controller
             // obtener zona segun id del usuario
             $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
             
-            $mensaje = "Agregar una dirección para ver los Servicios. Gracias.";
+            $mensaje = "Agregar una dirección para ver los Servicios. Presionando el botón en la parte superior derecha. Gracias.";
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
