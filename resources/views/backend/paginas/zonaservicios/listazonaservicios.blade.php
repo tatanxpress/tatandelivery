@@ -432,9 +432,9 @@
             toastr.error('Esta zona servicio ya esta agregado');        
         } else if (response.data.success == 2) {
             toastr.success('Zona servicio agregado');
-            var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
-            $('#tablaDatatable').load(ruta);
-            $('#modalAgregar').modal('hide');      
+           // var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+           // $('#tablaDatatable').load(ruta);
+           // $('#modalAgregar').modal('hide');      
         } else if (response.data.success == 3) {
             toastr.error('Error al crear');
         } else {
