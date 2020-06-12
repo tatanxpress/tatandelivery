@@ -52,7 +52,7 @@ class VerificarOrdenes extends Command
     {
 
         // ordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el 
-        // propietario + 2 min extra.
+        // propietario + 5 min extra.
         // tabla: ordenes_urgentes
 
         $orden = DB::table('ordenes')
@@ -73,7 +73,7 @@ class VerificarOrdenes extends Command
                 }else{
 
                     $time1 = Carbon::parse($o->fecha_4);                         
-                    $horaEstimada = $time1->addMinute($o->hora_2 + 2)->format('Y-m-d H:i:s');                     
+                    $horaEstimada = $time1->addMinute($o->hora_2 + 5)->format('Y-m-d H:i:s');                     
                     $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
                                     
                     $d1 = new DateTime($horaEstimada);

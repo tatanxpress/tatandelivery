@@ -1749,7 +1749,7 @@ class MotoristaController extends Controller
                             }
 
 
-                            $mensaje = "Notificación enviada 111";
+                            $mensaje = "Notificación enviada";
                     
                             return ['success' => 1, 'mensaje' => $mensaje];
                         }

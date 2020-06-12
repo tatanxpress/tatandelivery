@@ -152,6 +152,7 @@ class AdminAppController extends Controller
                     'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4', 'o.estado_5', 'o.estado_6',
                     'o.estado_7', 'o.estado_8')
                 ->whereDate('o.fecha_orden', $fecha)
+                ->orderBy('o.id', 'DESC')
                 ->get();
       
                 $estado = "";
