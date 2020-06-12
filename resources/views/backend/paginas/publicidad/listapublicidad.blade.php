@@ -1010,7 +1010,7 @@ $(function() {
             return false;
         }
 
-        if(descripcion === ''){
+        /*if(descripcion === ''){
             toastr.error("descripcion es requerido");
             return;
         }
@@ -1018,7 +1018,7 @@ $(function() {
         if(descripcion.length > 100){
             toastr.error("100 caracter máximo descripcion");
             return false;
-        }
+        }*/
 
         if(fechainicio === ''){
             toastr.error("fecha inicio es requerido");
