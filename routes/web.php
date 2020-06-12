@@ -215,6 +215,10 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/pagoservicios/lista', 'MotoristaPagoController@index2');  
   Route::get('/buscarservicio/{id}/{id1}/{id2}/{d3}', 'MotoristaPagoController@buscador'); // buscar ordenes completas del servicio
   Route::get('/generar/reporte3/{id}/{id2}/{id3}/{d4}', 'MotoristaPagoController@reporte'); // reporte de ordenes completas
+  // solo saca las tablas
+  Route::get('/generar/reporte3-tablas/{id}/{id2}/{id3}/{d4}', 'MotoristaPagoController@reporteTablas'); // reporte de ordenes completas
+
+  
   Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido'); // reporte de productos vendidos

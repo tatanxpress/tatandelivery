@@ -419,7 +419,7 @@ class MotoristaPagoController extends Controller
             foreach($orden as $o){
                 //sumar 
                 $totalDinero = $totalDinero + $o->precio_total;
-                $o->fecha_orden = date("d-m-Y h:i A", strtotime($o->fecha_orden));
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
             }
 
             $data = Servicios::where('id', $idservicio)->first();
@@ -435,6 +435,228 @@ class MotoristaPagoController extends Controller
             $suma = number_format((float)$suma, 2, '.', ''); // dinero que se restara al total de ordenes 
     
             $view =  \View::make('backend.paginas.reportes.servicios.reportepagoservicio', compact(['orden', 'comision', 'suma', 'totalDinero', 'nombre', 'pagar', 'f1', 'f2']))->render();
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');     
+            return $pdf->stream();
+
+        }else if($cupon == 1){ // Envio gratis
+            $orden = DB::table('ordenes AS o')
+            ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
+            ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
+            ->select('o.id', 'o.fecha_orden')
+            ->where('o.servicios_id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
+            ->where('c.tipo_cupon_id', 1) // cupon envio gratis
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get(); 
+ 
+            $enviototal = 0;
+            // obtener el precio de zona que era
+            foreach($orden as $o){
+                $precio = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('copia_envio')->first();
+                $o->copia_envio = $precio;
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+                $enviototal = $enviototal + $precio;
+            }
+        
+            $enviototal = number_format((float)$enviototal, 2, '.', ''); 
+            $nombre = Servicios::where('id', $idservicio)->pluck('nombre')->first();
+    
+            $view =  \View::make('backend.paginas.reportes.servicios.reportepagoserviciocupon1', compact(['orden', 'enviototal', 'nombre', 'f1', 'f2']))->render();
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
+            return $pdf->stream();
+            
+        }else if($cupon == 2){ // Descuento dinero
+            $orden = DB::table('ordenes AS o')
+            ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
+            ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
+            ->select('o.id', 'o.fecha_orden', 'o.precio_total')
+            ->where('o.servicios_id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
+            ->where('c.tipo_cupon_id', 2) // cupon descuento dinero
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get();
+
+            $totalorden = 0; // total de la orden
+            $totaldescuento = 0; // total de descuento por los cupones
+            $totalenvio = 0; // total solo donde aplico el envio zona
+          
+            // conocer que tipo de cupon es
+            foreach($orden as $o){
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+
+                $info = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                $precio = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('copia_envio')->first();
+                $o->copia_envio = $precio; // copia del envio a esa zona
+                $o->descuento = $info->dinero; // lo que se descuenta
+                                                
+                $descuento = $o->precio_total - $info->dinero; // restar precio de orden - descuento
+                if($descuento <= 0){ // evitar numeros negativos
+                    $descuento = 0;
+                }
+  
+                if($info->aplico_envio_gratis == 1){
+                    $o->aplica = 1; // si aplico, mostrara copia envio zona en reporte
+                    $totalenvio = $totalenvio + $precio;
+                }else{
+                    $o->aplica = 0;
+                }
+                
+                $o->total = number_format((float)$descuento, 2, '.', '');
+                $totalorden = $totalorden + $o->precio_total;
+                $totaldescuento = $totaldescuento + $info->dinero;   
+            }
+
+            $totalorden = number_format((float)$totalorden, 2, '.', '');
+            $totaldescuento = number_format((float)$totaldescuento, 2, '.', '');
+            $totalenvio = number_format((float)$totalenvio, 2, '.', '');
+
+
+            $nombre = Servicios::where('id', $idservicio)->pluck('nombre')->first();
+    
+            $view =  \View::make('backend.paginas.reportes.servicios.reportepagoserviciocupon2', compact(['orden', 'totalorden', 'totaldescuento', 'totalenvio', 'nombre', 'f1', 'f2']))->render();
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
+            return $pdf->stream();
+            
+        }else if($cupon == 3){ // Descuento porcentaje
+            
+            $orden = DB::table('ordenes AS o')
+            ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
+            ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
+            ->select('o.id', 'o.fecha_orden', 'o.precio_total')
+            ->where('o.servicios_id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
+            ->where('c.tipo_cupon_id', 3) // cupon descuento dinero
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get();
+
+            $totalorden = 0; // total de la orden
+            $totaldescontado = 0; // total de la orden, afectado por porcentaje
+            $sumardescuento = 0;
+            // conocer que tipo de cupon es
+            foreach($orden as $o){
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+
+                $porcentaje= AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                $o->porcentaje = $porcentaje; // copia del envio a esa zona
+                
+                $resta = $o->precio_total * ($porcentaje / 100);                
+                $o->descuento = number_format((float)$resta, 2, '.', '');
+                $sumardescuento = $sumardescuento + $resta;
+                $total = $o->precio_total - $resta;
+
+                if($total <= 0){ 
+                    $total = 0;
+                }               
+                
+                $o->total = number_format((float)$total, 2, '.', '');// ya descontado el porcentaje
+                $sumardescuento = number_format((float)$sumardescuento, 2, '.', '');
+                $totalorden = $totalorden + $o->precio_total; // total orden   
+                $totaldescontado = $totaldescontado + $total;                   
+            }
+
+            $totalorden = number_format((float)$totalorden, 2, '.', '');
+            $totaldescontado = number_format((float)$totaldescontado, 2, '.', '');
+            
+            $nombre = Servicios::where('id', $idservicio)->pluck('nombre')->first();
+    
+            $view =  \View::make('backend.paginas.reportes.servicios.reportepagoserviciocupon3', compact(['orden', 'sumardescuento', 'totalorden', 'totaldescontado', 'nombre', 'f1', 'f2']))->render();
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
+            return $pdf->stream();
+            
+        }else if($cupon == 4){ // Producto Gratis
+         
+            $orden = DB::table('ordenes AS o')
+            ->join('ordenes_cupones AS oc', 'oc.ordenes_id', '=', 'o.id')
+            ->join('cupones AS c', 'c.id', '=', 'oc.cupones_id')
+            ->select('o.id', 'o.fecha_orden', 'o.precio_total')
+            ->where('o.servicios_id', $idservicio)
+            ->where('o.estado_5', 1) // ordenes completadas
+            ->where('o.estado_8', 0) // no canceladas, no afecta cuando se cancela por panel de control
+            ->where('c.tipo_cupon_id', 4) // cupon descuento dinero
+            ->whereBetween('o.fecha_orden', array($date1, $date2))          
+            ->get();
+
+            $totalorden = 0; // total de la orden
+            $totaldescontado = 0; // total de la orden, afectado por porcentaje
+            // conocer que tipo de cupon es
+            foreach($orden as $o){
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+
+                $info = AplicaCuponCuatro::where('ordenes_id', $o->id)->first();
+                $o->minimo = $info->dinero_carrito; // minimo a comprar para aplicar cupon
+                $o->producto = $info->producto;               
+            }
+            
+            $nombre = Servicios::where('id', $idservicio)->pluck('nombre')->first();
+    
+            $view =  \View::make('backend.paginas.reportes.servicios.reportepagoserviciocupon4', compact(['orden', 'nombre', 'f1', 'f2']))->render();
+            $pdf = \App::make('dompdf.wrapper');
+            $pdf->loadHTML($view)->setPaper('carta', 'portrait');    
+            return $pdf->stream(); 
+ 
+        }
+    }
+
+
+    // unicamente tablas
+    // reporte de ordenes completadas para pagar a servicios
+    function reporteTablas($idservicio, $fecha1, $fecha2, $cupon){
+
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
+
+        if($cupon == 0){ // Ninguno
+
+            // obtener todas las ordenes id para evitar agarrar esas
+            $todas = DB::table('ordenes_cupones AS oc')
+            ->join('ordenes AS o', 'o.id', '=', 'oc.ordenes_id')
+            ->whereBetween('o.fecha_orden', array($date1, $date2)) 
+            ->get();
+
+            $pilaOrden = array();
+            foreach($todas as $p){
+                array_push($pilaOrden, $p->ordenes_id);
+            }
+
+            $orden = DB::table('ordenes')
+            ->select('id', 'precio_total', 'fecha_orden')
+            ->where('servicios_id', $idservicio) // ordenes de este servicio
+            ->where('estado_5', 1) // ordenes completadas
+            ->where('estado_8', 0) // no canceladas
+            ->whereBetween('fecha_orden', array($date1, $date2)) // unicamente esta fecha
+            ->whereNotIn('id', $pilaOrden)
+            ->get(); 
+         
+            $totalDinero = 0;
+            foreach($orden as $o){
+                //sumar 
+                $totalDinero = $totalDinero + $o->precio_total;
+                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+            }
+
+            $data = Servicios::where('id', $idservicio)->first();
+            $nombre = $data->nombre; // nombre servicio
+            $comision = $data->comision; // comision del servicio
+
+            $totalDinero = number_format((float)$totalDinero, 2, '.', '');
+            
+            $suma = ($totalDinero * $comision) / 100; // dinero restado
+
+            $pagar = ($totalDinero - $suma); // restar dinero al total de todas las ordenes
+            $pagar = number_format((float)$pagar, 2, '.', ''); // poner decimales 
+            $suma = number_format((float)$suma, 2, '.', ''); // dinero que se restara al total de ordenes 
+    
+            $view =  \View::make('backend.paginas.reportes.servicios.reportepagoservicio-tablas', compact(['orden', 'comision', 'suma', 'totalDinero', 'nombre', 'pagar', 'f1', 'f2']))->render();
             $pdf = \App::make('dompdf.wrapper');
             $pdf->loadHTML($view)->setPaper('carta', 'portrait');     
             return $pdf->stream();

@@ -71,14 +71,6 @@
 
 </style>
     <!-- cabecera -->
-    <div class="row"> 
-            <center><p class="titulo">
-            PAGO DE ORDENES<br>
-            <p><font size="3">Del: {{ $f1 }}  Al: {{ $f2 }}</font></p>
-            {{ $nombre }}
-            </p>
-           </center>           
-    </div>  
 
         <table id="customers">
           <tr>
@@ -90,7 +82,7 @@
           @foreach($orden as $dato)
             <tr>
               <td>{{$dato->id }}</td>             
-              <td>${{$dato->precio_total}}</td>
+              <td>{{$dato->precio_total}}</td>
               <td>{{$dato->fecha_orden}}</td>
 
             </tr> 
@@ -116,11 +108,6 @@
         
         </table>
 
-
-        <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
-        </p>
 
         
 

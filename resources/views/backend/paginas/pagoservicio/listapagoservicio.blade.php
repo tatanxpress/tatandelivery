@@ -186,7 +186,8 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="reporte()">Buscar</button>
+                <button type="button" class="btn btn-primary" onclick="reporte()">Completo</button>
+                <button type="button" class="btn btn-primary" onclick="reporteTablas()">Solo Tablas</button>
             </div>          
         </div>        
     </div>      
@@ -441,6 +442,19 @@
 
         if(retorno){
             window.open("{{ URL::to('admin/generar/reporte3') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta + "/" + cupon);
+        }
+    }
+
+    function reporteTablas(){
+        var servicioid = document.getElementById('servicioid-reporte').value;
+        var fechadesde = document.getElementById('fechadesde-reporte').value;
+        var fechahasta = document.getElementById('fechahasta-reporte').value;     
+        var cupon = document.getElementById('tipocupon1').value;
+        
+        var retorno = validarNuevo(fechadesde, fechahasta);
+
+        if(retorno){
+            window.open("{{ URL::to('admin/generar/reporte3-tablas') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta + "/" + cupon);
         }
     }
 
