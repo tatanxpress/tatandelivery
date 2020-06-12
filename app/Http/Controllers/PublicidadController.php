@@ -158,7 +158,7 @@ class PublicidadController extends Controller
 
             $regla = array( 
                 'nombre' => 'required', 
-                //'descripcion' => 'required',
+                'descripcion' => 'required',
                 'identificador' => 'required',
                 'fechainicio' => 'required',
                 'fechafin' => 'required',
@@ -180,7 +180,7 @@ class PublicidadController extends Controller
 
             $mensaje = array(
                 'nombre.required' => 'Nombre es requerido',
-               // 'descripcion.required' => 'Descripcion es requerida',
+                'descripcion.required' => 'Descripcion es requerida',
                 'identificador.required' => 'identificador es requerido',
                 'fechainicio.required' => 'fecha inicio es requerido',
                 'fechafin.required' => 'fecha fin es requerida',
@@ -262,7 +262,7 @@ class PublicidadController extends Controller
                 $p->visitanos = $request->visitanos;
                 $p->fecha_inicio = $request->fechainicio;
                 $p->fecha_fin = $request->fechafin;
- 
+
                 if($p->save()){
                     return ['success' => 1];
                 }else{
