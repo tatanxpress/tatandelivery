@@ -652,6 +652,7 @@ class MotoristaPagoController extends Controller
             
             $suma = ($totalDinero * $comision) / 100; // dinero restado
 
+            //$pagar = number_format((float)$pagar, 2, '.', '');
             $pagar = ($totalDinero - $suma); // restar dinero al total de todas las ordenes
             $pagar = number_format((float)$pagar, 2, '.', ''); // poner decimales 
             $suma = number_format((float)$suma, 2, '.', ''); // dinero que se restara al total de ordenes 

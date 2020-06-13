@@ -944,8 +944,8 @@ class ProcesadorOrdenesController extends Controller
                    
                     // BORRAR CARRITO TEMPORAL DEL USUARIO
                     
-                    CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->delete();
-                    CarritoTemporalModelo::where('users_id', $request->userid)->delete();
+                    //CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->delete();
+                    //CarritoTemporalModelo::where('users_id', $request->userid)->delete();
                     
                     // NOTIFICACIONES AL PROPIETARIO
                     // obtener todos los propietarios registrado al servicio
