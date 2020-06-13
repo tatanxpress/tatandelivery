@@ -1177,7 +1177,7 @@ class MotoristaPagoController extends Controller
         ->select('or.ordenes_id', 'or.revisador_id', 'o.precio_total', 'o.precio_envio', 'r.nombre', 'r.identificador', 'o.fecha_orden',  'or.fecha')
         ->where('or.revisador_id', $id)
         ->whereBetween('or.fecha', array($date1, $date2))
-        ->orderBy('o.fecha', 'ASC')
+        ->orderBy('or.fecha', 'ASC')
         ->get();
  
         $sum = 0.0;
