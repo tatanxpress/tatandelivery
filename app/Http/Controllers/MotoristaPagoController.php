@@ -419,7 +419,7 @@ class MotoristaPagoController extends Controller
             foreach($orden as $o){
                 //sumar 
                 $totalDinero = $totalDinero + $o->precio_total;
-                $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+                $o->fecha_orden = date("d-m-Y h:i A", strtotime($o->fecha_orden));
             }
 
             $data = Servicios::where('id', $idservicio)->first();

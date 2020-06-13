@@ -83,7 +83,7 @@
         <table id="customers">
           <tr>
             <th># Orden</th>   
-            <th>Total</th>
+            <th>Total</th> 
             <th>Fecha</th>
           </tr>
 
@@ -98,20 +98,23 @@
  
           <tr>
             <td>Total:</td>
-            <td></td>
             <td>${{ $totalDinero }}</td>
+            <td></td>
+           
           </tr>
           
           <tr>
             <td>Comisión: {{ $comision }}%</td>
-            <td></td>
             <td>${{ $suma }}</td>
+            <td></td>
+           
           </tr>
 
           <tr>
             <td>Pagar:</td>
-            <td></td>
             <td>${{ $pagar }}</td>
+            <td></td>
+            
           </tr>
         
         </table>
