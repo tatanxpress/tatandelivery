@@ -82,7 +82,7 @@
           @foreach($orden as $dato)
             <tr>
               <td>{{$dato->id }}</td>             
-              <td>{{$dato->precio_total}}</td>
+              <td>${{$dato->precio_total}}</td>
               <td>{{$dato->fecha_orden}}</td>
 
             </tr> 
@@ -90,14 +90,14 @@
  
           <tr>
             <td>Total:</td>
-            <td></td>
             <td>${{ $totalDinero }}</td>
+            <td></td>           
           </tr>
           
           <tr>
             <td>Comisión: {{ $comision }}%</td>
-            <td></td>
             <td>${{ $suma }}</td>
+            <td></td>           
           </tr>
 
           <tr>
