@@ -81,19 +81,14 @@
 
         <table id="customers">
           <tr>
-            <th style="width:2px;">Nro</th>
             <th style="width:6px;"># Orden</th>           
-            <th style="width:6px;">Fecha Orden</th>
-            <th style="width:6px;">Fecha Confirmada</th>
+            <th style="width:6px;">Fecha Recivido</th>
             <th style="width:5px;">Total $</th>
           </tr>
  
-          {{ $i = 1 }}
           @foreach($orden as $dato)
             <tr>
-              <td>{{ $i++ }} </td>
               <td>{{ $dato->ordenes_id }}</td>             
-              <td>{{ $dato->fecha_orden }}</td>
               <td>{{ $dato->fecha }}</td>
               <td>${{ $dato->precio }}</td>
             </tr> 
@@ -101,11 +96,14 @@
 
           
          
+          <tr>           
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
 
           <tr>
-            <td>Total:</td>
-            <td></td>
-            <td></td>
+            <td>Total:</td>           
             <td></td>
             <td>${{ $suma }}</td>
           </tr>
