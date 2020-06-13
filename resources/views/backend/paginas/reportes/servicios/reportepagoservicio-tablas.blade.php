@@ -102,8 +102,8 @@
 
           <tr>
             <td>Pagar:</td>
-            <td></td>
             <td>${{ $pagar }}</td>
+            <td></td>            
           </tr>
         
         </table>
