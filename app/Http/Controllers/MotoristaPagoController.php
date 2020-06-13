@@ -325,7 +325,7 @@ class MotoristaPagoController extends Controller
                    
                     $o->total = number_format((float)$total, 2, '.', '');
                 }
-
+ 
                 return view('backend.paginas.pagoservicio.tablas.tablalistapagoserviciocupondescuentop', compact('orden'));
                 
             }else if($cupon == 5){ // Producto Gratis
@@ -1177,7 +1177,7 @@ class MotoristaPagoController extends Controller
         ->select('or.ordenes_id', 'or.revisador_id', 'o.precio_total', 'o.precio_envio', 'r.nombre', 'r.identificador', 'o.fecha_orden',  'or.fecha')
         ->where('or.revisador_id', $id)
         ->whereBetween('or.fecha', array($date1, $date2))
-        ->orderBy('o.id', 'ASC')
+        ->orderBy('o.fecha', 'ASC')
         ->get();
  
         $sum = 0.0;
