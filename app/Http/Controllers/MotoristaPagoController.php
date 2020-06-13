@@ -1183,9 +1183,12 @@ class MotoristaPagoController extends Controller
         $sum = 0.0;
         $conteo = 0;
         foreach($orden as $o){
-            $fecha = date("d-m-Y h:i A", strtotime($o->fecha_orden));
-            $o->fecha_orden = $fecha;
-            $o->fecha = $fecha;   
+            $fechaorden = date("d-m-Y", strtotime($o->fecha_orden));
+            $fechaconfirmada = date("d-m-Y h:i A", strtotime($o->fecha));
+            $o->fecha_orden = $fechaorden;
+                        
+            // fecha de confirmada la orden
+            $o->fecha = $o->fechaconfirmada;   
             
             $precioenvio = $o->precio_envio;
 
