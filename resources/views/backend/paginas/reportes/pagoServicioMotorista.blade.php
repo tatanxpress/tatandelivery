@@ -83,7 +83,7 @@
         <table id="customers">
           <tr>
             <th># Orden</th>
-            <th>Fecha</th>
+            <th>Fecha orden</th>
             <th>Ganancia envío</th>
           </tr>
 
