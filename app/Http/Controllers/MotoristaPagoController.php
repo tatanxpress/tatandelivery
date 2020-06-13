@@ -1188,7 +1188,7 @@ class MotoristaPagoController extends Controller
             $o->fecha_orden = $fechaorden;
                         
             // fecha de confirmada la orden
-            $o->fecha = $o->fechaconfirmada;   
+            $o->fecha = $fechaconfirmada;   
             
             $precioenvio = $o->precio_envio;
 
