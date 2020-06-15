@@ -1724,8 +1724,8 @@ class MotoristaController extends Controller
                 
                 if($datos->device_id != "0000"){
 
-                    $titulo = "Su orden esta cerca";
-                    $message = "El motorista se encuentra cerca de tu ubicación";
+                    $titulo = "El motorista se encuentra cerca de tu ubicación";
+                    $message = "Su orden esta cerca";
 
                         // ver tipo de notiificacion, 
                         // completado   .mp3 .wav
