@@ -609,9 +609,9 @@
             toastr.error('Validacion incorrecta');
         } else if (response.data.success == 1) {
             toastr.success('Zona servicio actualizado');
-            var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
-            $('#tablaDatatable').load(ruta);
-            $('#modalEditar').modal('hide');      
+           // var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+           // $('#tablaDatatable').load(ruta);
+           // $('#modalEditar').modal('hide');      
         } else if (response.data.success == 2) {
             toastr.error('Zona servicio no encontrado');
         }

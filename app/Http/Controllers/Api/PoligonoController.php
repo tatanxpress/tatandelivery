@@ -43,12 +43,27 @@ class PoligonoController extends Controller
                 ->where('users.id', $request->userid)
                 ->get();
 
-                $tablas = DB::table('zonas AS z')
-                ->select('z.id AS idZona', 'z.nombre AS nombreZona')
+                $rr = DB::table('zonas AS z')
+                ->join('poligono_array AS p', 'p.zonas_id', '=', 'z.id') 
+                ->select('z.id')
                 ->where('z.activo', 1)
+                ->groupBy('id')
                 ->get();
 
-                $resultsBloque = array();        
+               
+
+                // meter zonas que si tienen poligonos
+                $pila = array();
+                foreach($rr as $p){
+                    array_push($pila, $p->id);
+                }
+        
+                $tablas = DB::table('zonas')
+                ->select('id AS idZona', 'nombre AS nombreZona')
+                ->whereIn('id', $pila)
+                ->get();
+               
+                $resultsBloque = array();
                 $index = 0;
 
                 foreach($tablas  as $secciones){

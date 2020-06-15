@@ -54,12 +54,14 @@ class ServiciosController extends Controller
             ->where('tz.activo', '1') //solo servicios disponibles
             ->orderBy('tz.posicion', 'ASC')
             ->get();
+
+            // version de aplicacion cliente
                                  
             return [
                 'success' => 1,                     
                 'servicios' => $servicios,
                 'mensaje' => $mensaje,
-                'zona' => $idzona
+                'zona' => $idzona                
             ];
         }
     }
