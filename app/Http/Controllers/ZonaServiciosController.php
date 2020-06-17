@@ -315,4 +315,43 @@ class ZonaServiciosController extends Controller
 
         return ['success' => 1];
     }
+
+    // cambiar precio envio por zona
+    public function precioEnvioPorZona(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'zonaid' => 'required',
+                'preciozona' => 'required'               
+            );
+
+            $messages = array(   
+                'zonaid.required' => 'El zona id es requerido',
+                'preciozona.required' => 'El precio zona es requerido'                              
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            if(ZonasServicios::where('zonas_id', $request->zonaid)->first()){                        
+
+                ZonasServicios::where('zonas_id', $request->zonaid)->update([
+                    'precio_envio' => $request->preciozona                    
+                    ]);
+              
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+        }
+
+    }
+
+
 }

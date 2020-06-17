@@ -94,7 +94,12 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/zonaservicios/ordenar', 'ZonaServiciosController@ordenar'); 
   Route::post('/zonaservicios/enviogratis', 'ZonaServiciosController@setearEnvioGratis'); 
   Route::post('/zonaservicios/mitadprecio', 'ZonaServiciosController@setearMitadPrecio'); 
-   
+  
+  // cambiar precio de envio a todos los servicios por zona
+  Route::post('/zonaservicios/nuevo-precio-varios', 'ZonaServiciosController@precioEnvioPorZona'); 
+
+
+  
      
   // productos 
   Route::get('/productos/{id}', 'ProductoController@index');  

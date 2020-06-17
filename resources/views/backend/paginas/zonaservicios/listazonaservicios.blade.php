@@ -33,6 +33,12 @@
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para mitad de precio por zonas (Servicio Publico)
             </button>
+
+            <button type="button" style="margin-left" onclick="modalPrecio()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Modificar precios de envio por zona
+            </button>
+
           </div>
         </div>
       </div>
@@ -55,6 +61,56 @@
         </div>
     </div>
 </section>
+
+
+<!-- modal precio envio -->
+<div class="modal fade" id="modalPrecio">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Modificar precio envio por zona</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-precio">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                                <div class="form-group">
+                                
+                                    <label style="color:#191818">Siempre mover el select, para obtener el ID</label>
+
+                                    <label style="color:#191818">Zonas identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control selectpicker" data-live-search="true" required id="select-precio">   
+                                            @foreach($zonas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group">                          
+                                <br>
+                                    <label>Precio Envío $</label>
+                                    <input type="number" step="any" id="precio-zona">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="modificarPrecio()">Guardar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
 
 
 <!-- modal nuevo -->
@@ -603,6 +659,8 @@
         });
     }
 
+   
+
     // respuesta al editar 
     function respuestaEditar(response){
         if (response.data.success == 0) {
@@ -619,6 +677,53 @@
             toastr.error('Error desconocido');
         }
     } 
+
+    // modificar precio por zona servicio
+    function modificarPrecio(){
+        var zonaid = document.getElementById('select-precio').value;
+        var preciozona = document.getElementById('precio-zona').value;
+
+        if(zonaid === ''){
+            toastr.error('id de zona es requerido');
+            return;
+        }
+
+        if(preciozona === ''){
+            toastr.error('precio para el servicio es requerido');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        formData.append('zonaid', zonaid);
+        formData.append('preciozona', preciozona);
+        
+        axios.post('/admin/zonaservicios/nuevo-precio-varios', formData, {
+        })
+        .then((response) => {
+            loadingOverlay().cancel(spinHandle);
+            
+            if(response.data.success == 1) {
+                toastr.success('Actualizado');
+                var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+                $('#tablaDatatable').load(ruta);               
+            }
+            else {
+                toastr.error('Error desconocido');
+            }
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
+    }
+
+
+    // abrir modal precio
+    function modalPrecio(){
+        document.getElementById("formulario-precio").reset();
+        $('#modalPrecio').modal('show');
+    }
 
     // filtros
     function abrirModalFiltro(){
