@@ -2169,7 +2169,7 @@ class ProcesadorOrdenesController extends Controller
                 ->first()){
                 $foto = $motoAsignado->imagen;
                 $nombre = $motoAsignado->nombre;
-                $telefono = $motoAsignado->telefono;
+                $telefono = "-"; // no mostrar numero de motorista al cliente
                 $vehiculo = $motoAsignado->vehiculo;
                 $placa = $motoAsignado->placa;
                 return ['success' => 1, 'foto' => $foto, 'nombre' => $nombre, 'telefono' => $telefono, 'vehiculo' => $vehiculo, 'placa' => $placa];

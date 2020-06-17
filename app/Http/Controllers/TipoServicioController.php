@@ -21,7 +21,7 @@ class TipoServicioController extends Controller
     // carga tipos servicios
     public function index(){
 
-        $tipos = Tipos::where('id', 1)->get(); // solo tipo servicio locales 28/05/2020
+        $tipos = Tipos::all(); // solo tipo servicio locales 28/05/2020
  
         return view('backend.paginas.tiposervicios.listatiposervicios', compact('tipos'));
     }

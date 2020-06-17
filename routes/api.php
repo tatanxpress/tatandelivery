@@ -59,6 +59,11 @@ Route::post('usuario/servicios/buscar/global', 'Api\BuscadorController@buscarPro
 // proceso   
 Route::post('usuario/proceso/ver/ordenes', 'Api\ProcesadorOrdenesController@verOrdenes'); // ver orden hecha por mismo usuario
 Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@verOrdenPorID'); // ver orden por id
+
+// version mejorada para android
+Route::post('usuario/proceso/ver/ordenes-android', 'Api\Clientes\InformacionOrdenClienteController@verOrdenesInfo'); // ver orden hecha por mismo usuario
+
+
 Route::post('usuario/proceso/orden/productos', 'Api\ProcesadorOrdenesController@ordenProductos'); // ver lista de producto de orden
 Route::post('usuario/proceso/orden/producto/individual', 'Api\ProcesadorOrdenesController@ordenProductosIndividual'); // ver producto de la orden
 Route::post('usuario/proceso/ver/motorista', 'Api\ProcesadorOrdenesController@motoristaAsignado'); // ver motorista de la orden

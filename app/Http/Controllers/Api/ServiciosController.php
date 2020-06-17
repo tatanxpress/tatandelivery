@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use Carbon\Carbon;
 use DateTime;
+use App\VersionesApp;
 
 class ServiciosController extends Controller
 {
@@ -56,12 +57,24 @@ class ServiciosController extends Controller
             ->get();
 
             // version de aplicacion cliente
+            $datos = VersionesApp::where('id', 1)->first();
+            $activoApp = $datos->activo;
+            $androidApp = $datos->android;
+            $iphoneApp = $datos->iphone;
+
+            $titulo = "Nota";
+            $mensaje = "Nueva actualizacion";
                                  
             return [
                 'success' => 1,                     
                 'servicios' => $servicios,
                 'mensaje' => $mensaje,
-                'zona' => $idzona                
+                'zona' => $idzona,
+                'activo' => $activoApp,
+                'android' => $androidApp,
+                'iphone' => $iphoneApp,
+                'titulo' => $titulo,
+                'mensaje' => $mensaje     
             ];
         }
     }

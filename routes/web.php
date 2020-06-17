@@ -270,6 +270,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/dinero/limite', 'ConfiguracionesController@index'); 
   Route::post('/dinero/limite/informacion', 'ConfiguracionesController@informacion');
   Route::post('/dinero/limite/actualizar', 'ConfiguracionesController@actualizar');
+  Route::post('/informacion/de/aplicacion', 'ConfiguracionesController@informacionApp');
+  Route::post('/actualizar/versiones/app', 'ConfiguracionesController@actualizarAppVersion');
+  
 
   // numeros temporales
   Route::get('/numeros/temporales', 'ClientesController@index2'); 
