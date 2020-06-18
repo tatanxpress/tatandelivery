@@ -338,11 +338,11 @@ class PropietarioController extends Controller
                 }
 
                 // actualizar id, cada vez
-                if($request->deviceid != null){
+               /* if($request->deviceid != null){
                     if($request->deviceid != "0000"){
                         Propietarios::where('id', $request->id)->update(['device_id' => $request->deviceid]);
                     }                    
-                }
+                }*/
 
                 return ['success' => 2, 'ordenes' => $orden]; 
             }else{
