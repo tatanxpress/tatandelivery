@@ -394,7 +394,7 @@ class AdminAppController extends Controller
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.estado_2', 'o.estado_8')
                 ->where('p.activo', 1)
-                ->orderBy('o.id', 'ASC')
+                ->orderBy('o.id', 'DESC')
                 ->get();
 
                 foreach($orden as $o){
@@ -491,7 +491,7 @@ class AdminAppController extends Controller
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
-                ->orderBy('o.id', 'ASC')
+                ->orderBy('o.id', 'DESC')
                 ->get();
 
                 foreach($orden as $o){
@@ -611,7 +611,7 @@ class AdminAppController extends Controller
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
-                ->orderBy('o.id', 'ASC')
+                ->orderBy('o.id', 'DESC')
                 ->get();
 
                 foreach($orden as $o){
@@ -738,7 +738,7 @@ class AdminAppController extends Controller
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
-                ->orderBy('o.id', 'ASC')
+                ->orderBy('o.id', 'DESC')
                 ->get();
 
                 foreach($orden as $o){
@@ -852,7 +852,7 @@ class AdminAppController extends Controller
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'ou.tipo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
-                ->orderBy('o.id', 'ASC')
+                ->orderBy('o.id', 'DESC')
                 ->get();
 
                 foreach($orden as $o){
