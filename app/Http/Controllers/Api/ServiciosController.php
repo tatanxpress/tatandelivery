@@ -58,23 +58,25 @@ class ServiciosController extends Controller
 
             // version de aplicacion cliente
             $datos = VersionesApp::where('id', 1)->first();
-            $activoApp = $datos->activo;
+            $activoAndroid = $datos->activo;
+            $activoIphoneApp = $datos->activo_iphone;
+            // versiones
             $androidApp = $datos->android;
-            $iphoneApp = $datos->iphone;
+            $iphoneApp = $datos->iphohone;
 
-            $titulo = "Nota";
-            $mensaje = "Agregar una nueva Dirección";
-                                 
+          
+            // para agregar una nueva direccion
+            $mensaje = "Agregar una nueva Dirección, en el botón superior derecho.";
+
             return [
                 'success' => 1,                     
-                'servicios' => $servicios,
-                'mensaje' => $mensaje,
-                'zona' => $idzona,
-                'activo' => $activoApp,
-                'android' => $androidApp,
-                'iphone' => $iphoneApp,
-                'titulo' => $titulo,
-                'mensaje' => $mensaje     
+                'servicios' => $servicios, 
+                'mensaje' => $mensaje, // una nueva direccion
+                'zona' => $idzona, 
+                'activo' => $activoAndroid, // activo android
+                'activo_iphone' => $activoIphoneApp, // activo iphone
+                'android' => $androidApp, // version android
+                'iphone' => $iphoneApp // version iphone
             ];
         }
     }

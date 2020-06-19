@@ -934,7 +934,7 @@ class ProcesadorOrdenesController extends Controller
                     
                     $nuevaDir->save();
 
-                    // guardar notificacion id
+                    // guardar notificacion id, solo utilizado para iphone
                     if($request->onesignalid != null){
                         if($request->onesignalid != "0000"){
                             User::where('id', $request->userid)->update(['device_id' => $request->onesignalid]);
