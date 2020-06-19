@@ -1749,11 +1749,13 @@ class ProcesadorOrdenesController extends Controller
                         $total = number_format((float)$total, 2, '.', '');
     
                         $o->precio_total = $total;
-                    }
-                    
+                    }                    
                 }
 
-                return ['success' => 1, 'ordenes' => $orden];
+                // mensaje para que el usuario vea como tocar la tarjeta
+                $mensaje = "Tocar la NOTA para ver estado de orden";
+
+                return ['success' => 1, 'ordenes' => $orden, 'mensaje' => $mensaje];
             }else{
                 return ['success' => 2];
             }            
@@ -2145,7 +2147,7 @@ class ProcesadorOrdenesController extends Controller
             );
         
             $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id de la orden es requerido'
+                'ordenid.required' => 'El ordenid de la orden es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);

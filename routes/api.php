@@ -31,7 +31,7 @@ Route::post('usuario/zonas/lista', 'Api\PoligonoController@getListaZonas'); // l
 Route::post('usuario/nueva/direccion', 'Api\PerfilController@guardarDireccion'); // nueva direccion
 Route::post('usuario/seleccionar/direccion', 'Api\PerfilController@seleccionarDireccion'); // seleccionar direccion
 Route::post('usuario/eliminar/direccion', 'Api\PerfilController@eliminarDireccion'); // eliminar una direccion
-        
+         
 // servicios   
 Route::post('usuario/servicios/lista', 'Api\ServiciosController@getServiciosZona'); // lista de tipo servicio por zona
 Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoServicios'); // locales tipo cualquiera
@@ -60,7 +60,7 @@ Route::post('usuario/servicios/buscar/global', 'Api\BuscadorController@buscarPro
 Route::post('usuario/proceso/ver/ordenes', 'Api\ProcesadorOrdenesController@verOrdenes'); // ver orden hecha por mismo usuario
 Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@verOrdenPorID'); // ver orden por id
 
-// version mejorada para android
+// version mejorada para android, pero ya no utilizada en nueva actualizacion
 Route::post('usuario/proceso/ver/ordenes-android', 'Api\Clientes\InformacionOrdenClienteController@verOrdenesInfo'); // ver orden hecha por mismo usuario
 
 
@@ -80,7 +80,7 @@ Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verifica
  
   
   
-// PROPIETARIOS  
+// PROPIETARIOS   
   
 Route::post('propietario/login', 'Api\PropietarioController@loginPropietario'); // login propietario 
 Route::post('propietario/password/recuperacion', 'Api\PropietarioController@codigoCorreo'); // enviar codigo recuperacion
@@ -232,7 +232,7 @@ Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); // sol
 // ordenes sin contestar con 1 minutos extra
 Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion'); // ordenes sin contestacion
 Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');// ocultar una orden de ordenes sin contestacion
-
+ 
 // paso la mitar del tiempo que el propietario dijo que entregaria la orden
 // y ningun motorista agarrado esta orden
 Route::post('adminapp/ordenes/urgentes-cuatro', 'Api\AdminAppController@verOrdenesUrgenteCuatro'); // ver ordenes_urgentes_cuatro

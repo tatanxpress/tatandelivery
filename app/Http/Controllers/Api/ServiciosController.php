@@ -63,7 +63,7 @@ class ServiciosController extends Controller
             $iphoneApp = $datos->iphone;
 
             $titulo = "Nota";
-            $mensaje = "Nueva actualizacion";
+            $mensaje = "Agregar una nueva Dirección";
                                  
             return [
                 'success' => 1,                     
