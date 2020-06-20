@@ -82,7 +82,9 @@ class LoginController extends Controller
                         }else{
                             $contador = $contador + 1;
                             // aun tiene intentos sms, enviar codigo
-                            NumeroSMS::where('id', $ns->id)->update(['contador' => $contador, 'codigo' => $codigo]);                          
+                            NumeroSMS::where('id', $ns->id)->update(['contador' => $contador, 'codigo' => $codigo]);  
+                            
+                            DB::commit();                        
                         }                       
 
                 }else{ 
@@ -98,7 +100,7 @@ class LoginController extends Controller
                     $n->fecha = $fecha;
                     $n->save();                   
                 }
-
+                DB::commit();
                 // DESACTIVADO SMS
                 //return ['success' => 3];
                

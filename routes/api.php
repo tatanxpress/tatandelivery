@@ -39,7 +39,7 @@ Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoP
 Route::post('usuario/servicios/info/producto', 'Api\ServiciosController@getProductoIndividual'); // informacion de producto individual
 Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPublicidad'); // ver promocionales
        
-// vista tipo tienda  
+// vista tipo tienda   
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
      
 // carrito 

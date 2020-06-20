@@ -115,7 +115,7 @@
                             <div class="col-md-12">
 
                                 <div class="form-group" style="margin-left:20px">
-                                    <label>Estado Versiones de App</label><br>
+                                    <label>Estado Versiones de App Android</label><br>
                                     <label class="switch" style="margin-top:10px">
                                         <input type="checkbox" id="boolVersiones">
                                         <div class="slider round">
@@ -127,7 +127,7 @@
 
                                 
                                 <div class="form-group" style="margin-left:20px">
-                                    <label>Estado Versiones de App</label><br>
+                                    <label>Estado Versiones de App Iphone</label><br>
                                     <label class="switch" style="margin-top:10px">
                                         <input type="checkbox" id="boolVersionesIphone">
                                         <div class="slider round">

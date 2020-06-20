@@ -79,7 +79,7 @@ class VistaTipoTiendaController extends Controller
                     ->take(5) //maximo 5 productos por seccion
                     ->orderBy('p.posicion', 'ASC') // ordenados
                     ->get(); 
-                    
+
                     $resultsBloque[$index]->productos = $subSecciones;
                     $index++;
                 }

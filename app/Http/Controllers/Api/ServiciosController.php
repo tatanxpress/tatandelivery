@@ -62,7 +62,7 @@ class ServiciosController extends Controller
             $activoIphoneApp = $datos->activo_iphone;
             // versiones
             $androidApp = $datos->android;
-            $iphoneApp = $datos->iphohone;
+            $iphoneApp = $datos->iphone;
 
           
             // para agregar una nueva direccion
@@ -361,6 +361,12 @@ class ServiciosController extends Controller
                     ->where('p.es_promocion', 0)
                     ->orderBy('p.posicion', 'ASC')
                     ->get(); 
+
+                    foreach($subSecciones as $s){
+                        if($s->descripcionProducto == "."){
+                            $s->descripcionProducto = "";
+                        }
+                    }
                     
                     $resultsBloque[$index]->productos = $subSecciones; //agregar los productos en la sub seccion
                     $index++;
@@ -444,6 +450,12 @@ class ServiciosController extends Controller
             'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 'p.utiliza_imagen', 'p.utiliza_cantidad', 'p.utiliza_nota', 'p.nota')
             ->where('p.id', $request->productoid)
             ->get();
+
+            foreach($producto as $s){
+                if($s->descripcion == "."){
+                    $s->descripcion = "";
+                }
+            }
              
                 return ['success' => 1, 'producto' => $producto];
 
