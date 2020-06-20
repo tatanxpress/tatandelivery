@@ -757,7 +757,7 @@ class OrdenesController extends Controller
             $dinero = $dinero + $o->ganancia_motorista;
 
     
-            $o->fecha_orden = date("d-m-Y h:i A", strtotime($o->fecha_orden));
+            $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
         } 
 
         $nombre = Motoristas::where('id', $idmoto)->pluck('nombre')->first();
