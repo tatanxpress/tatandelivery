@@ -11,7 +11,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-3">
-          <h1>Números registrados</h1>
+          <h1>Números registrados (ultimos 100)</h1>
           </div>
           <div class="col-sm-2">
             <button type="button" onclick="abrirModal()" class="btn btn-info btn-sm">

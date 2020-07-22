@@ -7,6 +7,8 @@ use App\Zonas;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use App\Poligono;
+use Illuminate\Support\Facades\DB; 
+
 
 class MapaZonaController extends Controller
 {
@@ -274,5 +276,39 @@ class MapaZonaController extends Controller
         $poligono = Poligono::where('zonas_id', $id)->get();
 
         return view('backend.paginas.zonas.mapapoligono', compact('poligono'));
+    }
+
+    // actualizar todas las zonas, abierto o cerrado
+    public function actualizarMarcados(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'toggle' => 'required'                
+            );
+
+            $messages = array(                                      
+                'toggle.required' => 'El toggle es requerido.'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if($validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+                // desactivar
+            if($request->toggle == 0){
+                Zonas::whereNotIn('id', [1,2])->update(['mensaje' => $request->mensaje, 'saturacion' => 0]);                
+            }else{
+                // activar
+                Zonas::whereNotIn('id', [1,2])->update(['mensaje' => $request->mensaje, 'saturacion' => 1]);
+            }
+
+            return ['success'=> 1];
+        }
     }
 }

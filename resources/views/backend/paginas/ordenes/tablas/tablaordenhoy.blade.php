@@ -15,9 +15,10 @@
                     <th style="width: 15%">Hora</th>                     
                     <th style="width: 15%">Sub Total</th>
                     <th style="width: 15%">ID Zona</th>
+                    <th style="width: 15%">Verificado</th>
                     <th style="width: 15%">Estado</th>
                                              
-                </tr>
+                </tr> 
                 </thead>
                 <tbody> 
                 @foreach($orden as $dato)
@@ -27,7 +28,8 @@
                     <td>{{ $dato->nombre }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->precio_total }}</td>                   
-                    <td>{{ $dato->zonaidenti }}</td>               
+                    <td>{{ $dato->zonaidenti }}</td>     
+                    <td>{{ $dato->verificado }}</td>            
                     <td>{{ $dato->estado }}</td>
                     </tr>            
      

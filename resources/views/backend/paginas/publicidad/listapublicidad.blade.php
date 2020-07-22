@@ -164,10 +164,12 @@
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12">
+
                                 <div class="form-group">
                                     <label>Identificador unico</label>
                                     <input type="text" maxlength="50" class="form-control" id="identificador-pu" placeholder="Identificador unico">
                                 </div>
+
                                 <div class="form-group">
                                     <label>Nombre</label>
                                     <input type="text" maxlength="100" class="form-control" id="nombre-pu" placeholder="Nombre">
@@ -300,6 +302,11 @@
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label>Identificador</label>                                    
+                                    <input type="text" maxlength="50" class="form-control" id="identificador-editar" placeholder="Identificador">
+                                </div>
                                 
                                 <div class="form-group">
                                     <label>Nombre</label>
@@ -389,6 +396,11 @@
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label>Identificador unico</label>
+                                    <input type="text" maxlength="50" class="form-control" id="identificador-editar-e" placeholder="Identificador unico">
+                                </div>
                                 
                                 <div class="form-group">
                                     <label>Nombre</label>
@@ -781,11 +793,6 @@ $(function() {
                 }
             }else{
 
-                if(urlfacebook.length > 0){
-                    // no tocar texto
-                }else{
-                    urlfacebook = "-";
-                }
             }
 
 
@@ -796,11 +803,7 @@ $(function() {
                     return;
                 }
             }else{
-                if(urlyoutube.length > 0){
-                    // no tocar texto
-                }else{
-                    urlyoutube = "-";
-                }
+               
             }
 
             if(cbinstagram){
@@ -810,11 +813,7 @@ $(function() {
                     return;
                 }
             }else{
-                if(urlinstagram.length > 0){
-                    // no tocar texto
-                }else{
-                    urlinstagram = "-";
-                }
+               
             }
 
             if(cbdescripcion){
@@ -838,11 +837,7 @@ $(function() {
                     return;
                 }
             }else{
-                if(telefono.length > 0){
-                    // no tocar texto
-                }else{
-                    telefono = "-";
-                }              
+                          
             }
 
             if(cbvisitanos){
@@ -853,11 +848,7 @@ $(function() {
                     return;
                 }
             }else{
-                if(visitanos.length > 0){
-                    // no tocar texto
-                }else{
-                    visitanos = "-";
-                } 
+               
             }
 
             if(cbtitulo){
@@ -868,11 +859,7 @@ $(function() {
                     return;
                 }
             }else{
-                if(titulo.length > 0){
-                    // no tocar texto
-                }else{
-                    titulo = "-";
-                }
+               
             }
 
             var spinHandle = loadingOverlay().activate();
@@ -889,7 +876,7 @@ $(function() {
             formData.append('cbdescripcion', cbdescripcion_1);
             formData.append('cbtelefono', cbtelefono_1);
             formData.append('cbvisitanos', cbvisitanos_1);
-            formData.append('cbtitulo', cbtitulo_1);
+            formData.append('cbtitulo', cbtitulo_1); 
             formData.append('urlfacebook', urlfacebook);
             formData.append('urlyoutube', urlyoutube);
             formData.append('urlinstagram', urlinstagram);
@@ -920,7 +907,7 @@ $(function() {
       if (response.data.success == 0) {
             toastr.error('Validacion incorrecta'); 
         } else if (response.data.success == 1) {
-            toastr.success('Publicidad agregada');           
+            toastr.success('Publicidad agregada');
            
             var ruta = "{{ url('/admin/publicidad/tabla/lista') }}";
             $('#tablaDatatable').load(ruta);
@@ -999,7 +986,7 @@ $(function() {
         return true;
     }
     
-    function validarNuevoPu2(nombre, descripcion, logo, imagen, fechainicio, fechafin){
+    function validarNuevoPu2(nombre, descripcion, logo, imagen, fechainicio, fechafin, identificador){
         if(nombre === ''){
             toastr.error("nombre es requerido");
             return;
@@ -1007,6 +994,16 @@ $(function() {
          
         if(nombre.length > 100){
             toastr.error("100 caracter máximo nombre");
+            return false;
+        }
+
+        if(identificador === ''){
+            toastr.error("identificador es requerido");
+            return;
+        }
+         
+        if(identificador.length > 50){
+            toastr.error("50 caracter máximo identificador");
             return false;
         }
 
@@ -1061,7 +1058,7 @@ $(function() {
         spinHandle = loadingOverlay().activate();
        
         axios.post('/admin/publicidad/informacion',{
-        'id': id 
+        'id': id  
             })
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
@@ -1072,6 +1069,8 @@ $(function() {
                     if(response.data.publicidad.tipo_publicidad == 1){                     
                         
                         $('#modalEditarPromocion').modal('show');
+                        
+                        $('#identificador-editar').val(response.data.publicidad.identificador);
                         $('#idpromo-editar').val(response.data.publicidad.id);
                         $('#nombre-editar').val(response.data.publicidad.nombre);
                         $('#descripcion-editar').val(response.data.publicidad.descripcion);
@@ -1086,6 +1085,7 @@ $(function() {
                     }else{
                         // publicidad 
                         $('#modalEditarPublicidad').modal('show');
+                        $('#identificador-editar-e').val(response.data.publicidad.identificador);
                         $('#idpromo-editar').val(response.data.publicidad.id);
                         $('#nombre-e').val(response.data.publicidad.nombre);
                         $('#descripcion-e').val(response.data.publicidad.descripcion);
@@ -1170,7 +1170,9 @@ $(function() {
       var fechafin = document.getElementById('fechafin-editar').value;
       var activo = document.getElementById('activo-editar').checked;
 
-      var retorno = validarEditarPromo(nombre, descripcion, fechainicio, fechafin, imagen, logo);
+      var identificador = document.getElementById('identificador-editar').value;
+
+      var retorno = validarEditarPromo(nombre, descripcion, fechainicio, fechafin, imagen, logo, identificador);
 
         if(retorno){
 
@@ -1189,6 +1191,7 @@ $(function() {
             formData.append('fechainicio', fechainicio);
             formData.append('fechafin', fechafin);
             formData.append('activo', activo_1);
+            formData.append('identificador', identificador);
 
             axios.post('/admin/publicidad/editar-promo', formData, {
             })
@@ -1204,7 +1207,7 @@ $(function() {
         }     
     } 
 
-    function validarEditarPromo(nombre, descripcion, fechainicio, fechafin, imagen, logo){
+    function validarEditarPromo(nombre, descripcion, fechainicio, fechafin, imagen, logo, identificador){
  
         if(nombre === ''){
             toastr.error("nombre es requerido");
@@ -1215,6 +1218,17 @@ $(function() {
             toastr.error("100 caracter máximo nombre");
             return false;
         }
+
+        if(identificador === ''){
+            toastr.error("identificador es requerido");
+            return;
+        }
+      
+        if(identificador.length > 50){
+            toastr.error("50 caracter máximo identificador");
+            return false;
+        }
+
 
         if(descripcion === ''){
             toastr.error("descripcion es requerido");
@@ -1296,7 +1310,9 @@ $(function() {
         var fechainicio = document.getElementById('fechainicio-e').value;
         var fechafin = document.getElementById('fechafin-e').value;
 
-        var retorno = validarNuevoPu2(nombre, descripcion, logo, imagen, fechainicio, fechafin);
+        var identificador = document.getElementById('identificador-editar-e').value;
+
+        var retorno = validarNuevoPu2(nombre, descripcion, logo, imagen, fechainicio, fechafin, identificador);
 
         if(retorno){
 
@@ -1439,6 +1455,7 @@ $(function() {
             formData.append('telefono', telefono);
             formData.append('visitanos', visitanos);
             formData.append('activo', activo_1);
+            formData.append('identificador', identificador);
 
             formData.append('fechainicio', fechainicio);
             formData.append('fechafin', fechafin);

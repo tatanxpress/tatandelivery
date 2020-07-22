@@ -45,6 +45,8 @@
                       <i class="fas fa-eye" title="Motorista"></i>&nbsp; Motorista
                       </button>
 
+                      </br> </br>
+
                       <button type="button" class="btn btn-primary btn-xs" onclick="producto({{ $dato->id }})">
                       <i class="fas fa-eye" title="Productos"></i>&nbsp; Productos
                       </button> 

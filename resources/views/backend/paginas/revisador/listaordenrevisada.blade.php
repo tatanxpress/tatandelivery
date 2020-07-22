@@ -17,11 +17,21 @@
                     Buscar ordenes revisadas
           </button>    
 
+          <button type="button" onclick="modalBuscar4()" class="btn btn-primary btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Buscar ordenes Encargo revisadas
+          </button>    
+
           <button type="button" onclick="modalBuscar2()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Filtro Ordenes No Revisadas
+                    Filtro Ordenes No Revisadas a Motorista
           </button>  
-      </div>
+
+          <button type="button" onclick="modalBuscar3()" class="btn btn-primary btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Filtro Encargos No Revisadas a Motorista
+          </button>  
+      </div> 
     </section>
     
   <!-- seccion frame -->
@@ -93,13 +103,62 @@
     </div>      
 </div>
 
+<!-- modal buscar ordenes encargo revisadas -->
+<div class="modal fade" id="modalBuscar4">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Buscar ordenes encargo revisadas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-buscar4">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+                                
+                            <div class="form-group">
+                                    <label style="color:#191818">Revisador identificador</label>
+                                    <br>
+                                    <div>
+                                        <select id="revisador-buscar4" class="form-control" data-live-search="true" required>   
+                                            @foreach($revisador as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group">
+                                    <label>Fecha desde</label>
+                                    <input type="date" class="form-control" id="fechadesde-buscar4">
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha hasta</label>
+                                    <input type="date" class="form-control" id="fechahasta-buscar4">
+                                </div>                               
+                            
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="reporte4()">Buscar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
 
 <!-- modal buscar ordenes donde motorista aun no ha depositado-->
 <div class="modal fade" id="modalBuscar2">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Motoristas falta de entregar dinero</h4>
+                <h4 class="modal-title">Motoristas ordenes sin entregar</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -135,6 +194,47 @@
     </div>      
 </div>
 
+<!-- modal buscar encargos donde motorista aun no ha depositado-->
+<div class="modal fade" id="modalBuscar3">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Motoristas encargos sin depositar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-buscar3">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+                                
+                            <div class="form-group">
+                                    <label style="color:#191818">Motorista identificador</label>
+                                    <br>
+                                    <div>
+                                        <select id="moto-buscar3" class="form-control" data-live-search="true" required>   
+                                            @foreach($motorista as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div> 
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="buscar3()">Buscar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
 
 @extends('backend.menus.inferior')
 
@@ -155,10 +255,19 @@
         $('#modalBuscar').modal('show');
     } 
 
+    function modalBuscar4(){
+        document.getElementById("formulario-buscar4").reset();
+        $('#modalBuscar4').modal('show');
+    } 
     
     function modalBuscar2(){
         document.getElementById("formulario-buscar2").reset();
         $('#modalBuscar2').modal('show');
+    } 
+
+    function modalBuscar3(){
+        document.getElementById("formulario-buscar3").reset();
+        $('#modalBuscar3').modal('show');
     } 
 
     function buscar(){
@@ -191,10 +300,32 @@
         } 
     } 
 
+    // reporte de ordenes encargo revisadas
+    function reporte4(){
+        var revisador = document.getElementById('revisador-buscar4').value;
+        var fechadesde = document.getElementById('fechadesde-buscar4').value;
+        var fechahasta = document.getElementById('fechahasta-buscar4').value;
+        
+        var retorno = validarNuevo(fechadesde, fechahasta);
+
+        if(retorno){
+
+            window.open("{{ URL::to('admin/ordenrevisada-reporte-encargo') }}/" + revisador + "/" + fechadesde + "/" + fechahasta);
+   
+        } 
+    } 
+
     function buscar2(){
         var moto = document.getElementById('moto-buscar2').value;
         $('#modalBuscar2').modal('hide');
         var ruta = "{{ url('/admin/ordenrevisada2') }}/"+moto
+        $('#tablaDatatable').load(ruta);
+    }
+
+    function buscar3(){
+        var moto = document.getElementById('moto-buscar3').value;
+        $('#modalBuscar3').modal('hide');
+        var ruta = "{{ url('/admin/ordenrevisada-encargos') }}/"+moto
         $('#tablaDatatable').load(ruta);
     }
 

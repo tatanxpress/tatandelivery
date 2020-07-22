@@ -28,7 +28,7 @@ class ServiciosController extends Controller
             // validaciones para los datos
             $reglaDatos = array(                
                 'userid' => 'required',               
-            );
+            ); 
         
             $mensajeDatos = array(                                      
                 'userid.required' => 'El id del usuario es requerido.'
@@ -358,7 +358,7 @@ class ServiciosController extends Controller
                     ->where('p.servicios_tipo_id', $secciones->tipoId)
                     ->where('p.activo', 1) // para inactivarlo solo para administrador
                     ->where('p.disponibilidad', 1) // para inactivarlo pero el propietario
-                    ->where('p.es_promocion', 0)
+                    //->where('p.es_promocion', 0)
                     ->orderBy('p.posicion', 'ASC')
                     ->get(); 
 
@@ -509,7 +509,7 @@ class ServiciosController extends Controller
 
                 foreach($zonaPublicidad as $secciones){
 
-                    array_push($resultsBloque,$secciones);
+                    array_push($resultsBloque,$secciones); 
                 
                         $subSecciones = DB::table('publicidad_producto AS p')
                         ->join('producto AS pro', 'pro.id', '=', 'p.producto_id')
@@ -518,7 +518,7 @@ class ServiciosController extends Controller
                         ->where('publicidad_id', $secciones->publiid)
                         ->where('pro.disponibilidad', 1)
                         ->where('pro.activo', 1)
-                        ->get();
+                        ->get(); 
                         
                         $resultsBloque[$index]->productos = $subSecciones;
                         $index++;
@@ -531,5 +531,12 @@ class ServiciosController extends Controller
             }
         }
     }
+
+
+
+
+
+
+
 
 }

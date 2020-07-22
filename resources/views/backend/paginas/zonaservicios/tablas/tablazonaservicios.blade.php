@@ -8,14 +8,14 @@
                 <thead>             
                 <tr> 
                   <th style="width: 15%">Zona identificador</th>
-                  <th style="width: 20%">Nombre servicio</th>
                   <th style="width: 20%">Servicio identificador</th>
                   <th style="width: 10%">Activo</th>
                   <th style="width: 15%">Precio envío</th>  
                   <th style="width: 10%">Servicio</th>
                   <th style="width: 15%">Ganancia Motorista</th>   
                   <th style="width: 10%">Envio Gratis</th>     
-                  <th style="width: 10%">Mitad Precio</th>          
+                  <th style="width: 10%">Mitad Precio</th> 
+                  <th style="width: 12%">Min envio gratis</th>         
                   <th style="width: 20%">Opciones</th>            
                 </tr>
                 </thead>
@@ -23,7 +23,6 @@
                 @foreach($servicio as $dato)
                 <tr>
                   <td>{{ $dato->identificador }}</td>
-                  <td>{{ $dato->nombre }}</td>
                   <td>{{ $dato->idenServicio }}</td>
                   <td> 
                     @if($dato->activo == 0)
@@ -55,6 +54,15 @@
                     <span class="badge bg-warning">SI</span> 
                     @endif                  
                   </td>
+
+                  <td> 
+                    @if($dato->min_envio_gratis == 0)
+                    <span class="badge bg-success">NO</span>
+                    @else
+                    <span class="badge bg-warning">SI</span> 
+                    @endif                  
+                  </td>
+
                   <td>
                     <button type="button" class="btn btn-primary btn-xs" onclick="verInformacion({{ $dato->id }})">
                     <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar                  

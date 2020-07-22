@@ -137,6 +137,11 @@
                             <div class="col-md-12">
 
                                 <div class="form-group">
+                                    <label>Identificador</label>
+                                    <input type="text" maxlength="50" class="form-control" id="identificador-editar" placeholder="Identificador unico">
+                                </div>
+
+                                <div class="form-group">
                                     <label>Nombre</label>
                                     <input type="hidden" id="id-editar">
                                     <input type="text" maxlength="50" class="form-control" id="nombre-editar" placeholder="Nombre">
@@ -194,6 +199,12 @@
                                 <div class="form-group">
                                     <label>Fecha ingreso</label>
                                     <input type="text" disabled class="form-control" id="fecha">
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label>Si se activa, se resetea password a '12345678'</label>
+                                    <input type="checkbox" id="password-editar">
                                 </div>
                               
                             </div>
@@ -451,7 +462,8 @@
                     $('#correo-editar').val(response.data.motorista.correo);
                     $('#tipovehiculo-editar').val(response.data.motorista.tipo_vehiculo);
                     $('#numerovehiculo-editar').val(response.data.motorista.numero_vehiculo);
-                   
+                    $('#identificador-editar').val(response.data.motorista.identificador);
+
                     $('#fecha').val(response.data.motorista.fecha);
                     
                     $('#dinero-editar').val(response.data.motorista.limite_dinero);
@@ -486,11 +498,19 @@
         var correo = document.getElementById('correo-editar').value;
         var tipovehiculo = document.getElementById('tipovehiculo-editar').value;
         var numerovehiculo = document.getElementById('numerovehiculo-editar').value;
-           
+        var identificador = document.getElementById('identificador-editar').value;
+                   
         var cbactivo = document.getElementById('activo-editar').checked;
         var imagen = document.getElementById('imagen-editar');
         var dinero = document.getElementById('dinero-editar').value;
         var privado = document.getElementById('privado-editar').checked;
+
+        var check = document.getElementById('password-editar').checked;
+
+        if(identificador === ''){
+            toastr.error('Identificador es requerido');
+            return;
+        }
 
         var retorno = validarEditar(dinero, nombre, telefono, correo, tipovehiculo, numerovehiculo, imagen);
  
@@ -498,6 +518,7 @@
 
             var cbactivo_1 = 0;
             var privado_1 = 0;
+            var check_1 = 0;
 
             if(cbactivo){
                 cbactivo_1 = 1;
@@ -505,6 +526,10 @@
 
             if(privado){
                 privado_1 = 1;
+            }
+
+            if(check){
+                check_1 = 1;
             }
 
             var spinHandle = loadingOverlay().activate();
@@ -519,6 +544,9 @@
             formData.append('cbactivo', cbactivo_1);
             formData.append('dinero', dinero);
             formData.append('privado', privado_1);
+            formData.append('identificador', identificador);
+            formData.append('checkpassword', check_1);
+            
 
             axios.post('/admin/motoristas/editar', formData, {
             })
@@ -552,7 +580,9 @@
             toastr.error('ID no encontrado');
         } else if(response.data.success == 5){
             toastr.error('El Telefono ya existe');
-        } 
+        } else if(response.data.success == 6){ 
+            toastr.error('El identificador ya existe');
+        }
         else {
             toastr.error('Error desconocido');
         }

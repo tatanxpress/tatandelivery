@@ -67,7 +67,7 @@
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
                                             @endforeach
                                         </select>
-                                    </div>  
+                                    </div>   
                                 </div>  
  
                                  <div class="form-group">
@@ -151,7 +151,12 @@
                                     <br>
                                     <input type="checkbox" id="bloqueado">
                                 </div>
-                               
+
+                                <div class="form-group">
+                                    <label>Si se activa, se resetea password a '12345678'</label>
+                                    <input type="checkbox" id="password-editar">
+                                </div>
+                                 
                              </div>
                          </div>
                      </div>
@@ -296,6 +301,7 @@
  
     function informacion(id){
         spinHandle = loadingOverlay().activate();
+        document.getElementById("formulario-editar").reset();
        
         axios.post('/admin/propietarios/informacion',{
         'id': id 
@@ -356,18 +362,24 @@
         var correo = document.getElementById('correo-editar').value; 
         var activo = document.getElementById('activo-editar').checked;
         var bloqueado = document.getElementById('bloqueado').checked;
+        var passcheck = document.getElementById('password-editar').checked;
 
         var retorno = validarNuevo(nombre, telefono, correo);
 
         if(retorno){
             var activo_1 = 0;
             var bloqueado_1 = 0;
+            var passcheck_1 = 0;
             if(activo){
                 activo_1 = 1;
             }
 
-            if(bloqueado){
+            if(bloqueado){ 
                 bloqueado_1 = 1;
+            }
+
+            if(passcheck){
+                passcheck_1 = 1;
             }
 
             var spinHandle = loadingOverlay().activate();
@@ -379,6 +391,7 @@
             formData.append('correo', correo);
             formData.append('activo', activo_1);
             formData.append('bloqueado', bloqueado_1);
+            formData.append('passcheck', passcheck_1);
         
             axios.post('/admin/propietarios/editar', formData, { 
                     })

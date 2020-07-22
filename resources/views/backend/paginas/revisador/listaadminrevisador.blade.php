@@ -17,6 +17,7 @@
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Admin revisador
           </button>       
+
       </div>
     </section>
     
@@ -125,6 +126,8 @@
         </div>        
     </div>      
 </div> 
+
+
 
 <!-- modal reseteo -->
 <div class="modal fade" id="modalReseteo">
@@ -333,7 +336,6 @@
                     loadingOverlay().cancel(spinHandle);
                     toastr.error('Error');
                 });
-        
     } 
 
     function respuestaEditar(response){
@@ -381,6 +383,9 @@
             toastr.error('Error desconocido');
         }
     } 
+
+
+
 
   </script>
  

@@ -38,10 +38,12 @@ Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoS
 Route::post('usuario/servicios/todo/producto', 'Api\ServiciosController@getTodoProductoVistaComida'); // menu de local tipo comida
 Route::post('usuario/servicios/info/producto', 'Api\ServiciosController@getProductoIndividual'); // informacion de producto individual
 Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPublicidad'); // ver promocionales
-       
+        
+  
+
 // vista tipo tienda   
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
-     
+      
 // carrito 
 Route::post('usuario/carrito/producto/agregar', 'Api\CarritoTemporalController@agregarProducto'); 
 Route::post('usuario/carrito/ver/orden', 'Api\CarritoTemporalController@verCarritoCompras'); // ver la orden
@@ -50,7 +52,7 @@ Route::post('usuario/carrito/ver/producto', 'Api\CarritoTemporalController@verPr
 Route::post('usuario/carrito/borrar/orden', 'Api\CarritoTemporalController@eliminarCarritoCompras'); // eliminar carrito de compras
 Route::post('usuario/carrito/cambiar/cantidad', 'Api\CarritoTemporalController@cambiarCantidad'); // cambiar cantidad de este producto
 Route::post('usuario/carrito/ver/proceso', 'Api\CarritoTemporalController@verProcesarOrden'); // ver info para procesar la orden
-   
+     
 // buscador
 Route::post('usuario/servicios/buscar/producto', 'Api\BuscadorController@buscarProducto'); // buscador
 Route::post('usuario/productos/ver/seccion', 'Api\BuscadorController@buscarProductoSeccion'); // lista de productos "ver todos"
@@ -63,7 +65,7 @@ Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@ver
 // version mejorada para android, pero ya no utilizada en nueva actualizacion
 Route::post('usuario/proceso/ver/ordenes-android', 'Api\Clientes\InformacionOrdenClienteController@verOrdenesInfo'); // ver orden hecha por mismo usuario
 
-
+ 
 Route::post('usuario/proceso/orden/productos', 'Api\ProcesadorOrdenesController@ordenProductos'); // ver lista de producto de orden
 Route::post('usuario/proceso/orden/producto/individual', 'Api\ProcesadorOrdenesController@ordenProductosIndividual'); // ver producto de la orden
 Route::post('usuario/proceso/ver/motorista', 'Api\ProcesadorOrdenesController@motoristaAsignado'); // ver motorista de la orden
@@ -80,6 +82,37 @@ Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verifica
  
   
   
+// seccion encargos
+Route::post('usuario/encargos/por-zona', 'Api\EncargosController@encargosPorZona'); // lista de encargos
+Route::post('usuario/encargos/categorias-vertical', 'Api\EncargosController@listaDeCategorias'); // lista de categorias con productos verticales
+Route::post('usuario/encargos/categorias-horizontal', 'Api\EncargosController@listaDeCategoriasHorizontal'); // lista de categorias con productos horizontales
+Route::post('usuario/encargos/categorias-horizontal-seccion', 'Api\EncargosController@listaDeCategoriasHorizontalSeccion'); // lista de categorias con productos horizontales
+
+  
+Route::post('usuario/encargos/producto-individual', 'Api\EncargosController@productoIndividual'); // producto individual del encargo
+Route::post('usuario/encargos/agregar-producto', 'Api\EncargosController@agregarProductoEncargo'); // agregar producto de encargo
+Route::post('usuario/encargos/ver-carrito', 'Api\EncargosController@verCarritoDeCompras'); // ver carrito de compras
+
+Route::post('usuario/encargos/carrito/producto-individual', 'Api\EncargosController@verProductoDeCarrito'); // ver producto del carrito encargo
+Route::post('usuario/encargos/carrito/producto-individual-update', 'Api\EncargosController@verProductoDeCarritoActualizar'); // actualizar
+
+
+Route::post('usuario/encargos/carrito/borrar-producto', 'Api\EncargosController@eliminarProductoEncargo'); // eliminar producto individual del encargo      
+Route::post('usuario/encargos/carrito/borrar-carrito', 'Api\EncargosController@eliminarCarritoEncargo'); // eliminar carrito encargos
+Route::post('usuario/encargos/guardar-modoespera', 'Api\EncargosController@guadarEncargoModoEspera'); // guardar encargo temporal
+Route::post('usuario/encargos/ver-lista', 'Api\EncargosController@verListaDeEncargos'); // ver lista de encargos
+Route::post('usuario/encargos/buscador-productos', 'Api\EncargosController@buscadorProductoPorEncargo'); // buscador productos
+
+Route::post('usuario/encargos/ver-lista-productos', 'Api\EncargosController@verListaProductosDeEncargo'); // ver lista de productos del encargo
+Route::post('usuario/encargos/ver-lista-productos-individual', 'Api\EncargosController@verProductoDelEncargoIndividual'); // ver producto individual del encargo
+Route::post('usuario/encargos/actualizar-producto', 'Api\EncargosController@actualizarProductoDelEncargo'); // actualizar producto del encargo
+Route::post('usuario/encargos/cancelar-encargo', 'Api\EncargosController@cancelarEncargo'); // cancelar un encargo
+Route::post('usuario/encargos/completar-encargo', 'Api\EncargosController@completarEncargo'); // completar encargo
+
+
+
+
+   
 // PROPIETARIOS   
   
 Route::post('propietario/login', 'Api\PropietarioController@loginPropietario'); // login propietario 
@@ -114,7 +147,7 @@ Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@ca
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes completadas
 Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes completadas hoy
-    
+     
  
 // configuraciones
 Route::post('propietario/horarios', 'Api\PropietarioController@verHorarios'); // ver horarios 
@@ -131,7 +164,7 @@ Route::post('propietarios/zonas/informacion', 'Api\PropietarioController@informa
 Route::post('propietarios/zonas/actualizar/zonahora', 'Api\PropietarioController@actualizarZonaHora'); //info de la zona que modificara el propietario
 Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona'); //info de la zona que modificara el propietario
  
-   
+    
 // productos  
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos vertical
 Route::post('propietario/productos-h', 'Api\PropietarioController@verProductosHorizontal'); // listado de productos horizontal
@@ -146,28 +179,37 @@ Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarPro
 Route::post('afiliado/productos/ver-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@verCategoriasProductos'); // lista de categorias
 Route::post('afiliado/productos/actualizar-categorias', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoria'); // actualizar categoria android
 Route::post('afiliado/productos/actualizar-categorias-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarNombreCategoria'); // actualizar categoria ios
-
 Route::post('afiliado/productos/categoria-activar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@activarCategoria'); // activar categoria ios
 Route::post('afiliado/productos/categoria-inactivar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@desactivarCategoria'); // desactivar categoria ios
 Route::post('afiliado/productos/categoria-editar-ios', 'Api\Afiliados\AfiliadosVersion2Controller@editarCategoria'); // desactivar categoria ios
-
 Route::post('afiliado/categoria/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoriaPosiciones'); // cambiar nombre a categoria
 Route::post('afiliado/categoria/actualizar-posiciones-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarCategoriaPosicionesIos'); // cambiar nombre a categoria
-
-
 Route::post('afiliado/categoria/productos-lista', 'Api\Afiliados\AfiliadosVersion2Controller@productosDeCategoria'); // lista de productos por categoria
 Route::post('afiliado/categoria/pro/actualizar-posiciones', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProductoPosiciones'); // cambiar nombre a categoria
 Route::post('afiliado/categoria/pro/actualizar-posiciones-ios', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProductoPosicionesIos'); // cambiar nombre a categoria
-
-
 Route::post('afiliado/actualizar/producto', 'Api\Afiliados\AfiliadosVersion2Controller@actualizarProducto'); // actualizar producto
+ 
+// encargos
+Route::post('afiliado/encargos/ver-mis-asignados', 'Api\Afiliados\AfiliadosVersion2Controller@verMisEncargos');
+Route::post('afiliado/encargos/ver-mis-asignados-lista', 'Api\Afiliados\AfiliadosVersion2Controller@verOrdenesEncargosLista');
+Route::post('afiliado/encargos/ocultar-tarjeta', 'Api\Afiliados\AfiliadosVersion2Controller@ocultarLaTarjetaEncargo');
+Route::post('afiliado/encargos/iniciar/orden-encargo', 'Api\Afiliados\AfiliadosVersion2Controller@iniciarOrdenEncargoPropietario');
+Route::post('afiliado/encargos/finalizar/orden-encargo', 'Api\Afiliados\AfiliadosVersion2Controller@finalizarOrdenEncargoPropietario');
+Route::post('afiliado/encargos/orden/ver-productos', 'Api\Afiliados\AfiliadosVersion2Controller@verProductoOrdenEncargo');
+Route::post('afiliado/encargos/orden/ver-productos-individual', 'Api\Afiliados\AfiliadosVersion2Controller@verProductoIndividualOrdenEncargo');
+
+Route::post('afiliado/encargos/ver/finalizados-hoy', 'Api\Afiliados\AfiliadosVersion2Controller@verEncargosFinalizadosHoy');
+
+Route::post('afiliado/encargos/ver/historia-encargos', 'Api\Afiliados\AfiliadosVersion2Controller@verHistorialDeEncargosFinalizados');
+
+
 
 
     //** Fin Version 2 para Afiliados */
 
 
-
-
+ 
+ 
 
  
 // MOTORISTA  
@@ -178,7 +220,7 @@ Route::post('motorista/revisar/codigo', 'Api\MotoristaController@revisarCodigoCo
 Route::post('motorista/cambiar/password', 'Api\MotoristaController@nuevaPassword'); // cambio de contraseña
 Route::post('motorista/buscar/telefono', 'Api\MotoristaController@buscarTelefono'); // buscar telefono
      
-// nueva ordenes 
+// nueva ordenes  
 Route::post('motorista/nueva/ordenes', 'Api\MotoristaController@nuevaOrdenes'); // ver nuevas ordenes
 Route::post('motorista/ver/orden/id', 'Api\MotoristaController@verOrdenPorID'); // ver estados orden por id
 Route::post('motorista/ver/productos', 'Api\MotoristaController@verProductosOrden'); // ver productos de la orden
@@ -202,7 +244,7 @@ Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizar
  
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
 
-
+ 
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
@@ -210,13 +252,49 @@ Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago')
 Route::post('motorista/notificar/cliente/orden', 'Api\MotoristaController@notificarClienteOrden');
 
 
- 
-// REVISADOR DE PAGOS
+// Seccion encargos motoristas 
+Route::post('motorista/encargo/nuevos', 'Api\MotoristaController@verNuevosOrdenesEncargos'); // ver nuevos encargos
+Route::post('motorista/encargo/aceptar-entrega', 'Api\MotoristaController@aceptarOrdenEncargo'); // seleccionar el encargo
+
+Route::post('motorista/encargo/en-proceso', 'Api\MotoristaController@verNuevosOrdenesEncargosProceso'); // ver encargos en proceso   
+Route::post('motorista/encargo/en-proceso-estados', 'Api\MotoristaController@verNuevosOrdenesEncargosProcesoEstado'); // ver encargos en proceso   
+Route::post('motorista/encargo/iniciar-entrega', 'Api\MotoristaController@iniciarEntregaEncargo');   
+Route::post('motorista/encargo/borrar/vista-entrega', 'Api\MotoristaController@ocultarOrdenEncargoMotorista'); // oculta la orden que va iniciar porque se cancelo 
+Route::post('motorista/encargo/lista-en-entrega', 'Api\MotoristaController@listaEncargosEnEntrega'); // lista de encargos en entrega
+
+Route::post('motorista/encargo/ver-estado-finalizar', 'Api\MotoristaController@verEstadoOrdenEncargoAFinalizar'); // ver esado del encargo a finalizar
+Route::post('motorista/encargo/finalizar-entrega', 'Api\MotoristaController@finalizarEntregaEncargo'); // finalizar entrega del encargo
+Route::post('motorista/encargo/notificar-cliente', 'Api\MotoristaController@notificarClienteDelEncargo'); // mandar notificacion al cliente del encargo
+
+Route::post('motorista/encargos/ver/historial-encargos', 'Api\MotoristaController@verHistorialEncargosCompletados'); // historial encargo cmpletado
+
+Route::post('motorista/encargo/lista-productos', 'Api\MotoristaController@verListaDeProductosDeEncargo'); // ver lista de producto del encargo   
+Route::post('motorista/encargo/lista-productos-individual', 'Api\MotoristaController@verListaDeProductosDeEncargoIndividual'); // ver producto del encargo individual 
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+// REVISADOR DE PAGOS 
 
 Route::post('revisador/login', 'Api\PagaderoController@loginRevisador'); // login revisador
 Route::post('revisador/actualizar/password', 'Api\PagaderoController@reseteo'); // cambiar contrasena el revisador
 Route::post('revisador/pendiente/pago', 'Api\PagaderoController@pendientePago');// ver ordenes pendiente de pago
 Route::post('revisador/confirmar/pago', 'Api\PagaderoController@confirmarPago'); // confirmar revisador
+ 
+Route::post('revisador/pendiente-encargo/pago', 'Api\PagaderoController@pendienteEncargoPago');// ver ordenes encargo pendiente de pago
+Route::post('revisador/confirmar/pago-encargo', 'Api\PagaderoController@confirmarPagoEncargo'); // confirmar revisador
+
+
 Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas'); // ver motorista
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); // ver historial
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
@@ -228,7 +306,8 @@ Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // cambio de contrasena
 
 Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); // solo ordenes de hoy
-
+Route::post('adminapp/encargos/ordenes/hoy', 'Api\AdminAppController@ordenesEncargoHoy'); // solo ordenes de hoy
+  
 // ordenes sin contestar con 1 minutos extra
 Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion'); // ordenes sin contestacion
 Route::post('adminapp/ordenes/ocultar/nocontestadas', 'Api\AdminAppController@ocultarOrdenSinContestacion');// ocultar una orden de ordenes sin contestacion
@@ -261,3 +340,5 @@ Route::post('adminapp/urgentes/tres/ocultar', 'Api\AdminAppController@ocultarUrg
 
 Route::post('adminapp/ordenes/estado-problema', 'Api\AdminAppController@verEstados'); // ver estados de problema de ordenes
 Route::post('adminapp/ocultar/estado-problema', 'Api\AdminAppController@ocultarEstados'); // ocultar estados
+Route::post('adminapp/ver/productos-ordenes', 'Api\AdminAppController@verProductosOrden'); // ver productos de la orden
+Route::post('adminapp/ver/productos-encargos', 'Api\AdminAppController@verProductosOrdenEncargo'); // ver productos del encargo

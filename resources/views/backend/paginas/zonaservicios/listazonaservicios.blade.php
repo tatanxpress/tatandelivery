@@ -13,7 +13,7 @@
         <div class="row mb-2">
           <div class="col-sm-12">
           <h1>Zona servicios</h1>
-          </div>
+          </div> 
           <div style="margin-top:15px;">
             <button type="button" onclick="abrirModalAgregar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
@@ -34,9 +34,23 @@
                     Filtro para mitad de precio por zonas (Servicio Publico)
             </button>
 
+            </br>
+            </br>
+
             <button type="button" style="margin-left" onclick="modalPrecio()" class="btn btn-info btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Modificar precios de envio por zona
+            </button>
+
+            
+            <button type="button" style="margin-left" onclick="modalGanancia()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Modificar precios de ganancia motorista por zona
+            </button>
+
+            <button type="button" style="margin-left" onclick="modalMinGratis()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Filtro minimo para envio gratis
             </button>
 
           </div>
@@ -111,7 +125,53 @@
     </div>      
 </div>
 
+<!-- modal ganancia -->
+<div class="modal fade" id="modalGanancia">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Modificar ganancia motorista por zona</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-ganancia">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                                <div class="form-group">
+                                
+                                    <label style="color:#191818">Siempre mover el select, para obtener el ID</label>
 
+                                    <label style="color:#191818">Zonas identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control selectpicker" data-live-search="true" required id="select-ganancia">   
+                                            @foreach($zonas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group">                          
+                                <br>
+                                    <label>Precio Ganancia $</label>
+                                    <input type="number" step="any" id="ganancia-zona">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="modificarGanancia()">Guardar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
 
 <!-- modal nuevo -->
 <div class="modal fade" id="modalAgregar">
@@ -381,6 +441,8 @@
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12"> 
+                               
+                               
                                 <div class="form-group">
                                     <label style="color:#191818">Zonas identificador</label>
                                     <br>
@@ -391,7 +453,21 @@
                                             @endforeach                                         
                                         </select>
                                     </div>  
-                                </div>    
+                                </div>  
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicios identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="servicios-filtro3" multiple="multiple" >   
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div>  
+                                </div> 
+
+
                                 <div class="form-group">
                                     <label>Mitad de precio a todas las zonas con servicio publico</label>
                                     <input type="checkbox" id="cbzonapublico2">
@@ -404,6 +480,79 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtrar3()">Filtrar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+
+<!-- modal filtro minimo de envio gratis, por zona y servicios -->
+<div class="modal fade" id="modalFiltro4">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Filtro minimo para envio gratis</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div> 
+            <div class="modal-body">
+                <form id="formulario-filtro4">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                               
+                               
+                                <div class="form-group">
+                                    <label style="color:#191818">Zonas identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="selectzona-filtro4" multiple="multiple" >   
+                                            @foreach($zonas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div>  
+                                </div>  
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicios identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="servicios-filtro4" multiple="multiple" >   
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div>  
+                                </div> 
+
+
+                                <div class="form-group">                                
+                                    <label>Minimo de compra para aplicar nuevo tipo de cargo</label>
+                                    <input type="number" step="0.01" id="minenvio-filtro4">
+                                </div>
+
+                                <div class="form-group">                                
+                                    <label>Nuevo Cargo a aplicar si supera la x cantidad</label>
+                                    <input type="number" step="0.01" id="nuevocargo-filtro4">
+                                </div>
+
+
+
+                                <div class="form-group">
+                                    <label>Activar o Desactivar</label>
+                                    <input type="checkbox" id="check4">
+                                </div> 
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="filtrar4()">Filtrar</button>
             </div>          
         </div>        
     </div>      
@@ -659,8 +808,6 @@
         });
     }
 
-   
-
     // respuesta al editar 
     function respuestaEditar(response){
         if (response.data.success == 0) {
@@ -706,7 +853,9 @@
             if(response.data.success == 1) {
                 toastr.success('Actualizado');
                 var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
-                $('#tablaDatatable').load(ruta);               
+                $('#tablaDatatable').load(ruta);  
+                $('#modalPrecio').modal('hide');    
+                   
             }
             else {
                 toastr.error('Error desconocido');
@@ -718,11 +867,56 @@
         });
     }
 
+    function modificarGanancia(){
+        var zonaid = document.getElementById('select-ganancia').value;
+        var preciozona = document.getElementById('ganancia-zona').value;
+
+        if(zonaid === ''){
+            toastr.error('id de zona es requerido');
+            return;
+        }
+
+        if(preciozona === ''){
+            toastr.error('precio ganancia para el servicio es requerido');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        formData.append('zonaid', zonaid);
+        formData.append('preciozona', preciozona);
+        
+        axios.post('/admin/zonaservicios/nuevo-precio-ganancia', formData, {
+        })
+        .then((response) => {
+            loadingOverlay().cancel(spinHandle);
+            
+            if(response.data.success == 1) {
+                toastr.success('Actualizado');
+                var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+                $('#tablaDatatable').load(ruta);  
+                $('#modalGanancia').modal('hide');    
+                   
+            }
+            else {
+                toastr.error('Error desconocido');
+            }
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
+    }
 
     // abrir modal precio
     function modalPrecio(){
         document.getElementById("formulario-precio").reset();
         $('#modalPrecio').modal('show');
+    }
+
+    function modalGanancia(){
+        document.getElementById("formulario-ganancia").reset();
+        $('#modalGanancia').modal('show');
     }
 
     // filtros
@@ -739,6 +933,11 @@
         document.getElementById("formulario-filtro3").reset();
         $('#modalFiltro3').modal('show');
     }
+
+    function modalMinGratis(){
+        document.getElementById("formulario-filtro4").reset();
+        $('#modalFiltro4').modal('show');
+    } 
 
     function filtrar(){
         var idzona = document.getElementById('selectzona-filtro').value;
@@ -777,7 +976,9 @@
             if(response.data.success == 1) {
                 toastr.success('Actualizado');
                 var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
-                $('#tablaDatatable').load(ruta);               
+                $('#tablaDatatable').load(ruta); 
+                $('#modalFiltro2').modal('hide');  
+                         
             }
             else {
                 toastr.error('Error desconocido');
@@ -791,15 +992,22 @@
 
     function filtrar3(){
         var values = $('#selectzona-filtro3').val();  
+        var servicios = $('#servicios-filtro3').val();  
+
         var cbzonapublico = document.getElementById('cbzonapublico2').checked;
                 
         var cbzonapublico_1 = 0;        
         if(cbzonapublico){
             cbzonapublico_1 = 1;
-        }
+        } 
 
         if(values.length == null || values.length == 0){
             toastr.error('Seleccionar mínimo 1 zona');
+            return;
+        }
+
+        if(servicios.length == null || servicios.length == 0){
+            toastr.error('Seleccionar mínimo 1 servicio');
             return;
         }
 
@@ -808,6 +1016,10 @@
         for (var i = 0; i < values.length; i++) {
             formData.append('idzonas[]', values[i]);
         }
+        for (var i = 0; i < servicios.length; i++) {
+            formData.append('idservicios[]', servicios[i]);
+        }
+
         formData.append('cbzonapublico', cbzonapublico_1);       
         
         axios.post('/admin/zonaservicios/mitadprecio', formData, {
@@ -818,7 +1030,75 @@
             if(response.data.success == 1) {
                 toastr.success('Actualizado');
                 var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
-                $('#tablaDatatable').load(ruta);               
+                $('#tablaDatatable').load(ruta);
+                $('#modalFiltro3').modal('hide');  
+            }
+            else {
+                toastr.error('Error desconocido');
+            }
+        })
+        .catch((error) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.error('Error');
+        });
+    }
+
+
+    function filtrar4(){
+        var values = $('#selectzona-filtro4').val();  
+        var servicios = $('#servicios-filtro4').val();  
+        var mincompra = document.getElementById("minenvio-filtro4").value;
+        var nuevocargo = document.getElementById("nuevocargo-filtro4").value;
+        var cbzonapublico = document.getElementById('check4').checked;
+                
+        var cbzonapublico_1 = 0;        
+        if(cbzonapublico){
+            cbzonapublico_1 = 1;
+        } 
+
+        if(values.length == null || values.length == 0){
+            toastr.error('Seleccionar mínimo 1 zona');
+            return;
+        }
+
+        if(servicios.length == null || servicios.length == 0){
+            toastr.error('Seleccionar mínimo 1 servicio');
+            return;
+        }
+
+        if(mincompra === ''){
+            toastr.error('minimo de compra es requerido');
+            return;
+        }
+
+        if(nuevocargo === ''){
+            toastr.error('nuevo cargo aplicar es requerido');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        for (var i = 0; i < values.length; i++) {
+            formData.append('idzonas[]', values[i]);
+        }
+        for (var i = 0; i < servicios.length; i++) {
+            formData.append('idservicios[]', servicios[i]);
+        }
+
+        formData.append('cbzonapublico', cbzonapublico_1); 
+        formData.append('mincompra', mincompra); 
+        formData.append('nuevocargo', nuevocargo); 
+        
+        axios.post('/admin/zonaservicios/modificar-min-gratis', formData, {
+        })
+        .then((response) => {
+            
+            loadingOverlay().cancel(spinHandle);
+            if(response.data.success == 1) {
+                toastr.success('Actualizado');
+                var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+                $('#tablaDatatable').load(ruta);    
+                $('#modalFiltro4').modal('hide');           
             }
             else {
                 toastr.error('Error desconocido');

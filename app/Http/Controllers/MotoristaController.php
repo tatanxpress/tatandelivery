@@ -18,7 +18,7 @@ class MotoristaController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-    }
+    } 
  
     // lista de motoristas
     public function index(){
@@ -170,7 +170,7 @@ class MotoristaController extends Controller
                 'dinero' => 'required',
                 'privado' => 'required'
             );
-
+ 
             $mensaje = array(
                 'id.required' => 'id es requerido',
                 'nombre.required' => 'Nombre es requerido',
@@ -203,6 +203,11 @@ class MotoristaController extends Controller
                     return ['success' => 5];  
                 }
 
+                if(Motoristas::where('identificador', $request->identificador)->where('id', '!=', $request->id)->first()){
+                    return ['success' => 6];  
+                }
+                
+
                 if($request->hasFile('imagen')){
 
                     $cadena = Str::random(15);
@@ -225,11 +230,22 @@ class MotoristaController extends Controller
                             'numero_vehiculo' => $request->numerovehiculo,
                             'imagen' => $nombreFoto,                         
                             'activo' => $request->cbactivo,
-                            'privado' =>$request->privado
+                            'privado' =>$request->privado,
+                            'identificador' => $request->identificador
                             ]);
                             if(Storage::disk('usuario')->exists($imagenOld)){
                                 Storage::disk('usuario')->delete($imagenOld);                                
                             } 
+
+                            // actualizar su password
+                            if($request->checkpassword == 1){
+                                Motoristas::where('id', $request->id)->update([
+                                    'password' => bcrypt('12345678')                  
+                                    ]);
+                            }
+
+
+
                             return ['success' => 2];
                     }else{
                         return ['success' => 3];
@@ -245,8 +261,16 @@ class MotoristaController extends Controller
                         'numero_vehiculo' => $request->numerovehiculo, 
                         'activo' => $request->cbactivo,
                         'limite_dinero' => $request->dinero,
-                        'privado' =>$request->privado
+                        'privado' =>$request->privado,
+                        'identificador' => $request->identificador
                         ]);
+
+                        // actualizar password
+                        if($request->checkpassword == 1){
+                            Motoristas::where('id', $request->id)->update([
+                                'password' => bcrypt('12345678')                  
+                                ]);
+                        }
  
                         return ['success' => 2];
                 }    

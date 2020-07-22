@@ -92,6 +92,10 @@
                     <div class="card-body">
                         <div class="row">  
                             <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <input type="hidden" id="id-orden">
+                                </div>
                                 
                                 <div class="form-group">
                                     <label>Nombre Cliente</label>
@@ -124,13 +128,14 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Telefono de Direccion</label>
-                                    <input type="text" disabled class="form-control" id="telefono">
-                                </div>
-
-                                <div class="form-group">
                                     <label>Telefono Registrado en la App</label>
                                     <input type="text" disabled class="form-control" id="telefonoreal">
+                                </div>
+
+                                
+                                <div class="form-group">
+                                    <label>Pidio desde</label>
+                                    <input type="text" disabled class="form-control" id="versionapp">
                                 </div>
 
                                 <div class="form-group">
@@ -143,6 +148,13 @@
                                     <input type="text" disabled class="form-control" id="longitud">
                                 </div>
 
+                             
+
+                                <button type="button" onclick="mapa()" class="btn btn-success btn-sm">
+                                    <i class="fas fa-pencil-alt"></i>
+                                        Mapa
+                                </button>  
+
                                 <div class="form-group">
                                     <label>Latitud Real</label>
                                     <input type="text" disabled class="form-control" id="latitudreal">
@@ -152,6 +164,13 @@
                                     <label>Longitud real</label>
                                     <input type="text" disabled class="form-control" id="longitudreal">
                                 </div>
+
+                               
+
+                                <button type="button" onclick="mapa2()" class="btn btn-success btn-sm">
+                                    <i class="fas fa-pencil-alt"></i>
+                                        Mapa
+                                </button>  
 
                             </div>
                         </div>
@@ -468,7 +487,7 @@
                                     <input type="text" disabled class="form-control" id="c5total">
                                 </div>
                                
-
+ 
                             </div>
                         </div>
                     </div>
@@ -636,13 +655,23 @@
 
                     datos.forEach(function(value, index) {
                        
-                        // informacion del cliente                        
+                        // informacion del cliente        
+                        $('#id-orden').val(datos[index].id);
+                        
                         $('#nombrecliente').val(datos[index].nombre);
                         $('#zonaidentificador').val(datos[index].identificador);
                         $('#nombrezona').val(datos[index].nombrezona);
                         $('#direccion').val(datos[index].direccion);
                         $('#numerocasa').val(datos[index].numero_casa);
                         $('#puntoreferencia').val(datos[index].punto_referencia);
+
+                        if(datos[index].movil_ordeno == 1){ 
+                            $('#versionapp').val("Iphone");
+                        }else if(datos[index].movil_ordeno == 2){
+                            $('#versionapp').val("Android");
+                        }else{
+                            $('#versionapp').val("No ha actualizado");
+                        }
                       
                         $('#latitud').val(datos[index].latitud);
                         $('#longitud').val(datos[index].longitud);
@@ -885,7 +914,7 @@
         });
     }
 
-    function infomotorista(id){
+    function infomotorista(id){ 
         document.getElementById("formulario-infomotorista").reset();
         spinHandle = loadingOverlay().activate();
        
@@ -920,6 +949,40 @@
     function producto(id){
         window.location.href="{{ url('/admin/ordenes/listaproducto') }}/"+id;
     }
+
+    
+
+    // latitud y longitud del puntero gps
+    function mapa(){
+        var id = document.getElementById('id-orden').value;
+
+        // comprobar que latitud y longitud no esten vacios
+        var la = document.getElementById('latitud').value;
+        var lo = document.getElementById('longitud').value;
+
+        if(la === '' || lo === ''){
+            toastr.error('Latitud o Longitud estan vacios'); 
+            return;
+        }
+
+        window.location.href="{{ url('/admin/mapa/orden/cliente/direccion') }}/"+id;
+    }
+
+    // latitud y longitud real donde guardo la direccion
+    function mapa2(){
+        var id = document.getElementById('id-orden').value;
+
+        var la = document.getElementById('latitudreal').value;
+        var lo = document.getElementById('longitudreal').value;
+
+        if(la === '' || lo === ''){
+            toastr.error('Latitud o Longitud estan vacios'); 
+            return;
+        }  
+
+        window.location.href="{{ url('/admin/mapa/orden/cliente/direccion-real') }}/"+id;
+    }
+ 
  
    </script>
   

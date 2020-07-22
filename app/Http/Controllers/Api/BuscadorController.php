@@ -36,6 +36,8 @@ class BuscadorController extends Controller
 
             if(Servicios::where('id', $request->servicioid)->first()){
 
+                $a = $request->nombre;
+
                 $productos = DB::table('servicios AS s')    
                 ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
@@ -45,8 +47,11 @@ class BuscadorController extends Controller
                 ->where('p.activo', 1) // producto activo
                 ->where('st.activo', 1) // categoria activa
                 ->where('p.es_promocion', 0) // ningun producto marcado como promocion
-                ->where('p.nombre', 'like', '%' . $request->nombre . '%')
-                //->where('p.descripcion', 'like', '%' . $request->nombre . '%')
+                //->where('p.nombre', 'like', '%' . $request->nombre . '%')
+                ->where(function ($query) use ($a) {
+                    $query->where('p.nombre', 'like', '%' . $a . '%')
+                          ->orWhere('p.descripcion', 'like', '%' . $a . '%');
+                })
                 ->get();
                 
                 return ['success' => 1, 'productos' => $productos];
@@ -104,6 +109,8 @@ class BuscadorController extends Controller
                     array_push($pilaIDServicio, $id); 
                 }
 
+                $a = $request->nombre;
+
                 $productos = DB::table('servicios AS s')    
                 ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
                 ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
@@ -114,8 +121,12 @@ class BuscadorController extends Controller
                 ->where('st.activo', 1) // la categoria esta activa
                 ->where('p.activo', 1) // producto activo
                 ->where('p.disponibilidad', 1) // producto disponible
-                ->where('p.es_promocion', 0) // ningun producto marcado como promocion
-                ->where('p.nombre', 'like', '%' . $request->nombre . '%')
+                //->where('p.es_promocion', 0) // ningun producto marcado como promocion
+                //->where('p.nombre', 'like', '%' . $request->nombre . '%')
+                ->where(function ($query) use ($a) {
+                    $query->where('p.nombre', 'like', '%' . $a . '%')
+                          ->orWhere('p.descripcion', 'like', '%' . $a . '%');
+                })
                 ->orderBy('s.id', 'ASC')            
                 ->get();
 

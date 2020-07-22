@@ -2458,7 +2458,7 @@ class PropietarioController extends Controller
                 ->where('servicios_id', $p->servicios_id)
                 ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
                 ->get(); 
-              
+               
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A ", strtotime($o->fecha_orden));
 

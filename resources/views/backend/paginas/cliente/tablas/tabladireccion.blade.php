@@ -32,7 +32,11 @@
                     </button>
                     <button type="button" class="btn btn-info btn-xs" onclick="verMapa({{ $dato->id }})">
                       <i class="fas fa-map" title="Mapa"></i>&nbsp; Mapa
-                    </button>                
+                    </button>     
+
+                      <button type="button" class="btn btn-info btn-xs" onclick="verMapa2({{ $dato->id }})">
+                      <i class="fas fa-map" title="Mapa"></i>&nbsp; Mapa Real
+                    </button>           
                   </td>      
                   
                                 

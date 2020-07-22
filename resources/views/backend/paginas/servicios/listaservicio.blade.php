@@ -21,7 +21,7 @@
           @endcan
           </div>
         </div>
-      </div>
+      </div> 
 </section>
 
 <section class="content">
@@ -73,11 +73,11 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Descripción corta No Mostrada en la App</label>
-                                            <input type="text" maxlength="300" class="form-control" id="descripcion-nuevo" placeholder="Descripción servicio">
+                                            <input type="text" maxlength="100" class="form-control" id="descripcioncorta-nuevo" placeholder="Descripción servicio">
                                         </div>
                                         <div class="form-group">
-                                            <label>Descripción Corta</label>
-                                            <input type="text" maxlength="100" class="form-control" id="descripcioncorta-nuevo" placeholder="Descripción corta">
+                                            <label>Descripción</label>
+                                            <input type="text" maxlength="300" class="form-control" id="descripcion-nuevo" placeholder="Descripción">
                                         </div>
                                         <div class="form-group">
                                             <div>
@@ -184,7 +184,7 @@
                                                 <label>Horario abre Lunes</label>
                                                 <input type="time" class="form-control" id="horalunes1">
                                             </div>
-                                            <div class="form-group">
+                                            <div class="form-group"> 
                                                 <label>Horario cierra Lunes</label>
                                                 <input type="time" class="form-control" id="horalunes2">
                                             </div>
@@ -433,7 +433,7 @@
                                 <input type="text" maxlength="50" class="form-control" id="identificador-editar" placeholder="Identificador unico">
                             </div>
                             <div class="form-group">
-                                <label>Descripción del servicio</label>
+                                <label>Descripción</label>
                                 <input type="text" maxlength="300" class="form-control" id="descripcion-editar" placeholder="Descripción servicio">
                             </div>
                             <div class="form-group">
@@ -766,7 +766,7 @@
 <script src="{{ asset('js/frontend/toastr.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/frontend/axios.min.js') }}" type="text/javascript"></script>
 <script src="{{ asset('js/frontend/loadingOverlay.js') }}" type="text/javascript"></script>
-
+ 
  <script type="text/javascript">
     $(document).ready(function(){
       var ruta = "{{ URL::to('admin/servicios/tabla/lista') }}";
@@ -1389,7 +1389,7 @@
         var id = document.getElementById('id-editar').value;
         spinHandle = loadingOverlay().activate();
 
-        axios.post('/admin/servicios/informacion/servicio',{
+        axios.post('/admin/ordenes/buscar-su-motorista',{
         'id': id 
             })
             .then((response) => {
@@ -1400,6 +1400,7 @@
                     $('#comision-editar').val(response.data.servicio.comision);
                     $('#multa-editar').val(response.data.servicio.multa);
                     $('#nombre-editar').val(response.data.servicio.nombre);
+
                     $('#descripcion-editar').val(response.data.servicio.descripcion);
                     $('#descripcioncorta-editar').val(response.data.servicio.descripcion_corta);
 

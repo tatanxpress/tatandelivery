@@ -13,7 +13,7 @@
                   <th style="width: 10%">Zona actual</th>
                   <th style="width: 10%">Activo</th>
                   <th style="width: 15%">Fecha Registro</th>
-                  <th style="width: 15%">Opciones</th>            
+                     
                 </tr>
                 </thead>
                 <tbody>
@@ -31,15 +31,7 @@
                     @endif                  
                   </td> 
                   <td>{{ $dato->fecha }}</td>
-                  <td>
-                    <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
-                    <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar  
-                    </button>
-                    <button type="button" class="btn btn-info btn-xs" onclick="verDirecciones({{ $dato->id }})">
-                      <i class="fas fa-map" title="Direccion"></i>&nbsp; Dirección
-                    </button>                
-                  </td>      
-                  
+                
                                 
                 </tr>
                 @endforeach            

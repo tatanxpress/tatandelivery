@@ -34,6 +34,7 @@ use App\AplicaCuponCuatro;
 use App\AplicaCuponTres;
 use App\AplicaCuponDos; 
 use App\AplicaCuponCinco;
+use App\OrdenesEncargoRevisadas;
 
 class PagaderoController extends Controller
 {
@@ -159,8 +160,14 @@ class PagaderoController extends Controller
 
                 $totalcobro = 0;
 
-                foreach($orden as $o){                    
-                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_7));
+                foreach($orden as $o){
+
+                    if($o->fecha_7 == null){
+                        $o->fecha_orden = "Sin completar aun";
+                    }else{
+                        $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_7));
+                    }
+                    
                     
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
@@ -194,7 +201,7 @@ class PagaderoController extends Controller
                             // precio modificado con el descuento dinero
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
-                            $totalcobro = $totalcobro + $suma;   
+                            $totalcobro = $totalcobro + $suma; 
 
                         }else if($tipo->tipo_cupon_id == 3){
                             $o->tipocupon = 3;
@@ -538,6 +545,122 @@ class PagaderoController extends Controller
                 return ['success' => 2];  
             }
         }  
+    }
+
+
+
+     // ordene encargo pediente de pago
+     public function pendienteEncargoPago(Request $request){
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'id' => 'required',
+                'motoristaid' => 'required'
+            );
+
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id revisador es requerido.',
+                'motoristaid.required' => 'El motorista id es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            
+            if(Revisador::where('id', $request->id)->first()){
+
+                // estas ordenes ya fueron revisadas
+                $noquiero = DB::table('ordenes_encargo_revisadas')->get();
+
+                $pilaOrden = array();
+                foreach($noquiero as $p){
+                    array_push($pilaOrden, $p->ordenes_encargo_id);
+                }
+
+                $orden = DB::table('motorista_ordenes_encargo AS mo')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                ->select('o.id', 'o.fecha_3', 'mo.motoristas_id', 'o.precio_subtotal', 'o.precio_envio')
+                ->where('mo.motoristas_id', $request->motoristaid)               
+                ->where('o.estado_3', 1) // ordenes que motorista completo la entrega
+                ->whereNotIn('o.id', $pilaOrden) // filtro para no ver ordenes encargo revisadas
+                ->get();
+
+                $totalcobro = 0;
+
+                foreach($orden as $o){                    
+                    $o->fecha_3 = date("h:i A d-m-Y", strtotime($o->fecha_3)); // fecha completo la orden 
+                        
+                    $cobro = $o->precio_subtotal + $o->precio_envio;
+                    $o->precio_total = number_format((float)$cobro, 2, '.', '');
+
+                    $totalcobro = $totalcobro + $cobro;    
+                }
+                
+                // sumar ganancia de esta fecha
+                $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+                
+                return ['success' => 1, 'orden' => $orden, 'debe' => $totalcobro];
+            }
+        }
+    }
+
+     // confirmar pago encargo
+     public function confirmarPagoEncargo(Request $request){
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'id' => 'required',
+                'ordenid' => 'required',
+                'codigo' => 'required'
+            );
+
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id revisador es requerido.',
+                'ordenid.required' => 'El id orden es requerido.',
+                'codigo.required' => 'El codigo es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            } 
+
+            if($r = Revisador::where('id', $request->id)->first()){
+                
+                // verificar si ya existe el registro                 
+                if(OrdenesEncargoRevisadas::where('ordenes_encargo_id', $request->ordenid)->first()){
+                    return ['success' => 1];
+                }
+                
+                if($r->codigo == $request->codigo){
+                   
+                    $fecha = Carbon::now('America/El_Salvador');
+
+                    $nueva = new OrdenesEncargoRevisadas();
+                    $nueva->ordenes_encargo_id = $request->ordenid;
+                    $nueva->fecha = $fecha;
+                    $nueva->revisador_id = $request->id;
+                    
+                    if($nueva->save()){
+                        return ['success' => 2];
+                    }else{
+                        return ['success' => 3];
+                    }
+                }else{
+                    return ['success' => 4]; // codigo incorrecto
+                }
+            }
+        }
     }
 
 

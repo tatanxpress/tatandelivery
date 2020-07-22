@@ -7,42 +7,63 @@
     
 @stop  
 
-    <section class="content-header">
-      <div class="container-fluid">
-          <div class="col-sm-12">
-            <h1>Notificacion a propietarios</h1>
-          </div>  
-
-          <div class="form-group" style="width: 25%">
-              <label>Buscar por identificador de Servicio</label>
-              <input type="text" class="form-control" id="identificador" placeholder="Identificador Servicio">
-          </div> 
-
-          <button type="button" onclick="buscar()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Buscar
-          </button>          
-
-      </div>
-    </section>
-     
-  <!-- seccion frame -->
-  <section class="content">
+<section class="content">
     <div class="container-fluid">
-      <div class="card card-primary">
-          <div class="card-header">
-            <h3 class="card-title">Tabla de ordenes</h3>
-          </div>
-          <div class="card-body">
-            <div class="row">
-                <div class="col-md-12">
-                <div id="tablaDatatable"></div>
-              </div>
+        <form class="form-horizontal" id="form1">
+            <div class="card card-info">
+                    <div class="card-header">
+                    <h3 class="card-title">Notificacion a propietarios y motoristas</h3>
+                    </div>
+                    
+                <div class="card-body">
+                    <div class="row">           
+                        <div class="col-md-6">
+
+
+                        <div class="form-group" style="width: 75%">
+                            <label>Buscar por identificador de Servicio</label>
+                            <input type="text" class="form-control" id="identificador" placeholder="Identificador Servicio">
+                        </div> 
+
+                        
+                        <button type="button" onclick="buscar()" class="btn btn-success btn-sm">
+                            <i class="fas fa-pencil-alt"></i>
+                                Buscar propietarios
+                        </button>     
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-success" onclick="modalMotorista()">Notificación a Motorista</button>
+                </div>  
+                
             </div>
-          </div>
-		  </div>
-	  </div>
-	</section>
+        </form>
+    </div>
+</section>
+
+
+<!-- seccion frame -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Tabla de propietarios</h3>
+            </div>
+
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="tablaDatatable">
+                        </div>
+                    </div>
+                </div>
+            </div>
+	    </div>
+	</div>
+</section>
 
     <!-- modal notificacion -->
 <div class="modal fade" id="modal">
@@ -88,7 +109,58 @@
     </div>      
 </div>
 
+<!-- modal motorista -->
+<div class="modal fade" id="modalMotorista">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Notificación a Motorista</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-motorista">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
 
+                                <div class="form-group">
+                                    <label style="color:#191818">Motoristas</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-motorista">
+                                                <option value="0" selected>Seleccionar</option>
+                                            @foreach($motoristas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach   
+                                        </select>
+                                    </div> 
+                                </div> 
+
+
+                                <div class="form-group">
+                                    <label>Título</label>
+                                    <input type="text" maxlength="100" class="form-control" id="titulo-motorista" placeholder="Título">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" maxlength="100" class="form-control" id="descripcion-motorista" placeholder="Descripción">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarNotificacion()">Enviar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
 
 @extends('backend.menus.inferior')
 
@@ -187,8 +259,63 @@
             loadingOverlay().cancel(spinHandle);
             toastr.error('Error');
         });
+  }
+
+ 
+  function modalMotorista(){
+    document.getElementById("formulario-motorista").reset();
+    $('#modalMotorista').modal('show');
+  }
+
+  function enviarNotificacion(){
+
+    var id = document.getElementById('select-motorista').value;
+    var titulo = document.getElementById('titulo-motorista').value;
+    var descripcion = document.getElementById('descripcion-motorista').value;
+
+    if(titulo === ''){
+        toastr.error('Título es requerido');   
+        return; 
+    }
+
+    if(descripcion === ''){
+        toastr.error('Descripción es requerido');
+        return;
+    }
+
+    var spinHandle = loadingOverlay().activate();
+    var formData = new FormData();
+    
+    formData.append('id', id);
+    formData.append('titulo', titulo);
+    formData.append('descripcion', descripcion);
+            
+    axios.post('/admin/control/motorista/notificacion ', formData, {
+    })
+    .then((response) => {
+        
+        loadingOverlay().cancel(spinHandle);
+
+        if(response.data.success == 1) {
+            toastr.success('Enviado');
+        } else if(response.data.success == 2){
+            toastr.error('No se puede enviar, device 0000');
+        } else if(response.data.success == 3){
+            toastr.error('Motorista no encontrado');
+        }
+        else {
+            toastr.error('Error desconocido');
+        } 
+
+        $('#modalMotorista').modal('hide');
+    })
+    .catch((error) => {
+        loadingOverlay().cancel(spinHandle);
+        toastr.error('Error');
+    });
 
   }
+
 
  </script>
 

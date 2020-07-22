@@ -20,6 +20,10 @@ use App\AplicaCuponTres;
 use App\AplicaCuponCuatro;
 use App\AplicaCuponCinco;
 use App\OrdenesDirecciones;
+use App\EncargoAsignadoServicio;
+use App\Encargos;
+use App\OrdenesEncargo;
+use App\OrdenesEncargoRevisadas;
 
 class MotoristaPagoController extends Controller
 {
@@ -1458,6 +1462,157 @@ class MotoristaPagoController extends Controller
            }              
         }        
     }
-   
-} 
+
+    // generar reporte de ordenes encargo completado por el servicio
+    function reporteOrdenesEncargo($idservicio, $fecha1, $fecha2){
+
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
+
+        // obtener lista de encargos asignado a este servicio
+        $lista = EncargoAsignadoServicio::where('servicios_id', $idservicio)->get();
+
+        $pila = array();
+        foreach($lista as $p){
+            array_push($pila, $p->encargos_id);
+        }
+ 
+        $orden = DB::table('ordenes_encargo')
+        ->select('id', 'precio_subtotal', 'fecha_orden', 'fecha_1')
+        ->where('estado_1', 1) // propietario completo la orden
+        ->whereBetween('fecha_1', array($date1, $date2)) // unicamente esta fecha
+        ->whereIn('encargos_id', $pila)
+        ->get(); 
+        
+        $totalDinero = 0; 
+        foreach($orden as $o){
+            //sumar 
+            $totalDinero = $totalDinero + $o->precio_subtotal;
+            $o->fecha_1 = date("d-m-Y h:i A", strtotime($o->fecha_1));
+        }
+
+        $data = Servicios::where('id', $idservicio)->first();
+        $nombre = $data->nombre; // nombre servicio
+        $comision = $data->comision; // comision del servicio
+        
+        $suma = ($totalDinero * $comision) / 100; 
+        $suma = number_format((float)$suma, 2, '.', ''); // redondear
+     
+        $pagar = ($totalDinero - $suma); 
+        
+        $totalDinero = number_format((float)$totalDinero, 2, '.', '');
+        $pagar = number_format((float)$pagar, 2, '.', '');
+ 
+        $view =  \View::make('backend.paginas.reportes.servicios.reporteordenesencargo', compact(['orden', 'comision', 'suma', 'totalDinero', 'nombre', 'pagar', 'f1', 'f2']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');     
+        return $pdf->stream();
+    }
+
+
+     // filtro de ordenes encargo de motorista que aun no han pagado
+     public function ordenesEncargoMotoristaSinEntregar($id){
+
+        // sacar todos los id de ordenes revisadas
+        $revisada = DB::table('ordenes_encargo_revisadas')
+        ->get();
+
+        $pilaOrdenid = array();
+        foreach($revisada as $p){ 
+            array_push($pilaOrdenid, $p->ordenes_encargo_id);
+        } 
+             
+        $ordenid = DB::table('motorista_ordenes_encargo AS mo')
+        ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+        ->select('mo.motoristas_id', 'mo.ordenes_encargo_id', 'mo.fecha_agarrada', 'm.identificador',
+         'o.precio_subtotal', 'o.precio_envio', 'mo.fecha_agarrada')
+        ->where('mo.motoristas_id', $id)
+        ->where('o.estado_3', 1) // encargo completado
+        ->where('o.revisado', '!=', 5) // no este en modo cancelado 
+        ->whereNotIn('mo.ordenes_encargo_id', $pilaOrdenid)
+        ->get(); 
+
+        $sincompletar = 0;
+        $sum = 0.0;      
+        foreach($ordenid as $o){
+            $precioenvio = $o->precio_envio;
+            $subtotal = $o->precio_subtotal;
+            
+            $o->fecha_agarrada = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));   
+ 
+            $precio = $subtotal + $precioenvio;
+                        
+            // sumar precio            
+            $o->total = number_format((float)$precio, 2, '.', '');
+
+            $o->precio = $precio;
+
+            $sincompletar = $sincompletar + 1;
+            $sum = $sum + $precio;
+        }   
+
+        $suma = number_format((float)$sum, 2, '.', '');
+
+        return view('backend.paginas.revisador.tablas.tablaencargosnopagadosmoto', compact('ordenid', 'sincompletar', 'suma'));
+    }
+
+
+    // reporte de ordenes encargos revisados por el cobrador
+    public function reporteOrdenRevisadaEncargo($id, $fecha1, $fecha2){
+
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d'); 
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y'); 
+
+        $orden = DB::table('ordenes_encargo_revisadas AS or')
+        ->join('ordenes_encargo AS o', 'o.id', '=', 'or.ordenes_encargo_id')
+        ->join('revisador AS r', 'r.id', '=', 'or.revisador_id')
+        ->select('or.ordenes_encargo_id', 'or.revisador_id', 'o.precio_subtotal',
+        'o.precio_envio', 'r.nombre', 'r.identificador', 'o.fecha_orden',  'or.fecha')
+        ->where('or.revisador_id', $id)
+        ->whereBetween('or.fecha', array($date1, $date2))
+        ->orderBy('or.fecha', 'ASC')
+        ->get();
+
+        $sum = 0.0;
+        $conteo = 0;
+        foreach($orden as $o){
+         
+            $o->fecha = date("d-m-Y", strtotime($o->fecha));
+            $subtotal = 0;
+            $subtotal = $o->precio_subtotal;
+            $precio = $subtotal + $o->precio_envio;
+
+             // sumar precio            
+             $o->total = number_format((float)$precio, 2, '.', ''); 
+             $o->precio = number_format((float)$precio, 2, '.', ''); 
+             $sum = $sum + $precio;
+        }
+ 
+        $suma = number_format((float)$sum, 2, '.', '');
+
+        $nombre = Revisador::where('id', $id)->pluck('nombre')->first();
+        
+        $view =  \View::make('backend.paginas.reportes.reporteordenencargorevisada', compact(['orden', 'conteo', 'suma', 'nombre', 'f1', 'f2']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+  
+        return $pdf->stream();
+    }
+
+
+
+
+
+
+
+
+
+}  
   

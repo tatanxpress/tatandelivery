@@ -24,7 +24,7 @@
                  <div class="row">                  
                      <div class="container">
                          <div class="col-md-12">
-                             <iframe width="100%" height="400" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={{$mapa->latitud}},{{$mapa->longitud}}&amp;key={{$api}}"></iframe>
+                             <iframe width="100%" height="400" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={{$latitud}},{{$longitud}}&amp;key={{$api}}"></iframe>
                          </div>
                      </div>             
                  </div>

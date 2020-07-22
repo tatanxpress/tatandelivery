@@ -52,7 +52,7 @@ class ControlOrdenesController extends Controller
     }
  
     // tabla de lista de ordenes, ultimas 100
-    public function tablaHoy(){
+    public function tablaHoy(){ 
 
         $fecha = Carbon::now('America/El_Salvador');
 
@@ -63,13 +63,20 @@ class ControlOrdenesController extends Controller
             'o.estado_7', 'o.estado_8')
         ->whereDate('o.fecha_orden', $fecha)
         ->get();
-
+ 
         $estado = "";
         foreach($orden as $o){        
             $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
 
             $od = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
             $o->zonaidenti = Zonas::where('id', $od->zonas_id)->pluck('identificador')->first();
+
+            $verificado = "No";
+            if($od->verificado == 1){
+                $verificado = "Si";
+            }
+
+            $o->verificado = $verificado;
             
             if($o->estado_2 == 0){
                 $estado = "Orden sin contestacion del propietario";
@@ -111,7 +118,10 @@ class ControlOrdenesController extends Controller
 
     // index notificaciones
     public function indexNotificacion(){
-        return view('backend.paginas.notificacion.listanotificacion');
+
+        $motoristas = Motoristas::all();
+ 
+        return view('backend.paginas.notificacion.listanotificacion', compact('motoristas'));
     }
 
     public function tablaPropiNoti($id){
@@ -180,6 +190,56 @@ class ControlOrdenesController extends Controller
             return ['success' => 1];
         }
     }
+
+    // envio de notificacion motorista
+    public function envarNotificacionMotorista(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required',
+                'titulo' => 'required',
+                'descripcion' => 'required'       
+            );
+        
+            $mensajeDatos = array(                                  
+                'id.required' => 'Device id es requerido.',
+                'titulo.required' => 'Titulo es requerido',
+                'descripcion.required' => 'Descripcion es requerido'            
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($m = Motoristas::where('id', $request->id)->first()){
+
+                if($m->device_id == "0000" || $m->device_id == null){
+                   
+                    return ['success' => 2];
+
+                }else{
+
+                    try {
+                        $this->envioNoticacionMotorista($request->titulo, $request->descripcion, $m->device_id);                               
+                    } catch (Exception $e) {} 
+
+
+                    return ['success' => 1]; // enviado
+ 
+                } 
+            }else{
+                return ['success' => 3]; // motorista no encontrado
+            }            
+        }
+    }
+
 
     public function devicePropietario(Request $request){
         if($request->isMethod('post')){ 
@@ -359,6 +419,8 @@ class ControlOrdenesController extends Controller
         } 
     }
 
+
+
     public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
     }
@@ -367,5 +429,11 @@ class ControlOrdenesController extends Controller
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
     }
+
+    public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
+    }
+
+
 }
  

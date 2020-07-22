@@ -26,7 +26,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-              <li class="breadcrumb-item active">Resumen de publicaciones</li>
+              <li class="breadcrumb-item active">Resumen</li>
             </ol>
           </div>
         </div>
@@ -36,17 +36,9 @@
 
     <section class="content-header">
       <div class="container-fluid">
-          <div class="col-sm-12">
-            <p>Total dinero ordenes completas: <strong>${{ $totaldineroordenes }}</strong></p>
-            <p>Total dinero generado en envios: <strong>${{ $totaldineroenvios }}</strong></p>
-            <p>Total pagado a servicios: <strong>${{ $totalpagoservicio }}</strong></p>
-            <p>Total pagado a motoristas: <strong>${{ $totalpagomotorista }}</strong></p>
+          <div class="col-sm-12">    
+
             <p>Total productos agregado: <strong>{{ $totalproducto }}</strong></p>
-            <p>Total servicios agregados: <strong>{{ $totalservicio }}</strong></p>
-            <p>Total servicios inactivos: <strong>{{ $totalservicioinactivo }}</strong></p>
-            <p>Total motorista agregados: <strong>{{ $totalmotorista }}</strong></p>
-            <p>Total ordenes cancelada por cliente: <strong>{{ $totalordencanceladacliente }}</strong></p>
-            <p>Total ordenes cancelada por propietario: <strong>{{ $totalordencanceladapropietario }}</strong></p>
                        
           </div>  
       </div>

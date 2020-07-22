@@ -44,13 +44,22 @@ class OrdenesController extends Controller
 
         $orden = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->select('o.id', 's.identificador', 'o.precio_total', 'o.fecha_orden', 'o.estado_7', 'o.estado_8')
+        ->select('o.id', 's.identificador', 'o.precio_total', 
+        'o.fecha_orden', 'o.estado_7', 'o.estado_8')
         ->latest('o.id')
-        ->take(100)       
+        ->take(100)
         ->get(); 
 
         foreach($orden as $o){
-            $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));;  
+            $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+
+            // buscar motorista
+            $motorista = "Sin motorista";
+            if($m = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                $motorista = Motoristas::where('id', $m->motoristas_id)->pluck('identificador')->first();
+            }
+ 
+            $o->motorista = $motorista;
 
             $cupon = "";
             if(OrdenesCupones::where('ordenes_id', $o->id)->first()){
@@ -353,7 +362,7 @@ class OrdenesController extends Controller
                 ->join('users AS u', 'u.id', '=', 'od.users_id')
                 ->select('o.id', 'od.nombre', 'od.direccion', 'od.numero_casa', 'od.punto_referencia',
                 'od.latitud', 'od.longitud', 'od.latitud_real', 'od.longitud_real',
-                'od.copia_tiempo_orden', 'od.copia_envio',
+                'od.copia_tiempo_orden', 'od.copia_envio', 'od.movil_ordeno',
                 'u.phone', 'z.identificador', 'z.nombre AS nombrezona') 
                 ->where('o.id', $request->id)
                 ->get();
@@ -853,7 +862,140 @@ class OrdenesController extends Controller
         }
     }
 
+    // latitud y longitud de la orden
+    public function mapaOrdenGPS1($id){
+        
+        $mapa = OrdenesDirecciones::where('ordenes_id', $id)->first();
+        $api = env("API_GOOGLE_MAPS", "");
 
+        $latitud = $mapa->latitud;
+        $longitud = $mapa->longitud; 
+
+        return view('backend.paginas.ordenes.mapacliente', compact('latitud', 'longitud', 'api'));
+    } 
+ 
+      // latitud real y longitud real de la orden
+      public function mapaOrdenGPS2($id){
+        
+        $mapa = OrdenesDirecciones::where('ordenes_id', $id)->first();
+        $api = env("API_GOOGLE_MAPS", "");
+
+        $latitud = $mapa->latitud_real;
+        $longitud = $mapa->longitud_real;  
+
+        return view('backend.paginas.ordenes.mapacliente', compact('latitud', 'longitud', 'api'));
+    }
+
+
+    // reporte de encargos completados por el motorista
+     function reporteEncargoMotorista($idmoto, $fecha1, $fecha2){
+
+        $date1 = Carbon::parse($fecha1)->format('Y-m-d');
+        $date2 = Carbon::parse($fecha2)->addDays(1)->format('Y-m-d');
+
+        $f1 = Carbon::parse($fecha1)->format('d-m-Y');
+        $f2 = Carbon::parse($fecha2)->format('d-m-Y');
+
+
+
+        $ordenFiltro = DB::table('motorista_ordenes_encargo AS mo')
+        ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+        ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
+        ->select('o.id', 'o.fecha_3', 'mo.motoristas_id', 'o.ganancia_motorista')
+        ->where('mo.motoristas_id', $idmoto) 
+        ->where('o.estado_3', 1) // entregados al cliente
+        ->whereBetween('o.fecha_3', array($date1, $date2)) // fecha entrego el encargo          
+        ->get();
+
+        $dinero = 0;
+        foreach($ordenFiltro as $o){
+
+            //sumar 
+            $dinero = $dinero + $o->ganancia_motorista;    
+            $o->fecha_3 = date("d-m-Y", strtotime($o->fecha_3));
+        } 
+
+        $nombre = Motoristas::where('id', $idmoto)->pluck('nombre')->first();
+        
+        $totalDinero = number_format((float)$dinero, 2, '.', '');
+
+        $view =  \View::make('backend.paginas.reportes.pagoMotoristaEncargos', compact(['ordenFiltro', 'totalDinero', 'nombre', 'f1', 'f2']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+ 
+        return $pdf->stream();
+    }
+
+
+    // buscar motorista a esta orden para poder cambiarselo
+    public function buscarSuMotorista(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array(  
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+          if($mo = MotoristaOrdenes::where('ordenes_id', $request->id)->first()){
+
+            $motoristas = Motoristas::all();
+
+            return ['success' => 1, 'motoristas' => $motoristas, 'idmoto' => $mo->motoristas_id]; 
+          }else{
+            return ['success' => 2];
+          }
+        }
+    }
+
+
+    // cambiar motorista a la orden
+    public function editarMotoristaASuOrden(Request $request){
+        if($request->isMethod('post')){  
+
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido'
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+
+            if(Ordenes::where('id', $request->id)->first()){
+
+                MotoristaOrdenes::where('ordenes_id', $request->id)
+                ->update(['motoristas_id' => $request->motorista]);
+
+                return ['success' => 1];
+            }else{
+
+                return ['success' => 2];
+            }          
+        } 
+    }
+ 
     
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);

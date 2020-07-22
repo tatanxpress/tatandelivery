@@ -365,6 +365,7 @@ class PerfilController extends Controller
                     if($request->longitudreal != null){
                         $direccion->longitud_real = $request->longitudreal;
                     }
+                    $direccion->revisado = 0;
                     
                     if($direccion->save()){
 

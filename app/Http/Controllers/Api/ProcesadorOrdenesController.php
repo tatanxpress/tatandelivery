@@ -885,6 +885,7 @@ class ProcesadorOrdenesController extends Controller
                     $dUser = $datoDir->user_id;
                     $dLatiReal = $datoDir->latitud_real;
                     $dLongiReal = $datoDir->longitud_real;
+                    $revisado = $datoDir->revisado;
 
                     if(empty($dNumero)){
                         $dNumero = "";
@@ -931,6 +932,7 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->copia_min_gratis = $copiamingratis;
                     $nuevaDir->copia_tiempo_orden = $copiaTiempoOrden;
                     $nuevaDir->movil_ordeno = $dispositivo; // si es 1, es ios, sino android
+                    $nuevaDir->revisado = $revisado;
                     
                     $nuevaDir->save();
 

@@ -17,18 +17,15 @@ class ServiciosController extends Controller
     public function __construct()
     {
         $this->middleware('auth:admin');
-    } 
+    }  
 
     public function index(){
 
-        // lista tipo servicios
-        $tiposervicio =  DB::table('tipo_servicios')
-        ->where('tipos_id', '!=', 2)   // promociones y publicidad 
-        ->where('tipos_id', '!=', 3)   // buscador  
-        ->get();
-
+  
+        $tiposervicio = TipoServicios::whereNotIn('id', [3,4,19])->get(['id','nombre']);
+        
         return view('backend.paginas.servicios.listaservicio', compact('tiposervicio'));
-    }
+    } 
 
     // tabla para ver codigo temporales
     public function serviciotabla(){
@@ -37,7 +34,7 @@ class ServiciosController extends Controller
         ->join('tipo_servicios AS ts', 'ts.id', '=', 's.tipo_servicios_id')          
         ->select('s.id','s.nombre', 's.descripcion', 's.imagen', 
         's.cerrado_emergencia', 's.activo', 's.identificador', 'ts.nombre AS nombreServicio')
-        ->get();
+        ->get(); 
 
         return view('backend.paginas.servicios.tablas.tablaservicio', compact('servicio'));
     }
@@ -277,7 +274,7 @@ class ServiciosController extends Controller
                     $hora1->hora2 = $request->horalunes2;
                     $hora1->hora3 = $request->horalunes3;
                     $hora1->hora4 = $request->horalunes4;
-                    $hora1->dia = 1;
+                    $hora1->dia = 2; 
                     $hora1->servicios_id = $idservicio;
                     $hora1->segunda_hora = $request->cblunessegunda;
                     $hora1->cerrado = $request->cbcerradolunes;
@@ -288,7 +285,7 @@ class ServiciosController extends Controller
                     $hora2->hora2 = $request->horamartes2;
                     $hora2->hora3 = $request->horamartes3;
                     $hora2->hora4 = $request->horamartes4;
-                    $hora2->dia = 2;
+                    $hora2->dia = 3;
                     $hora2->servicios_id = $idservicio;
                     $hora2->segunda_hora = $request->cbmartessegunda;
                     $hora2->cerrado = $request->cbcerradomartes;
@@ -299,7 +296,7 @@ class ServiciosController extends Controller
                     $hora3->hora2 = $request->horamiercoles2;
                     $hora3->hora3 = $request->horamiercoles3;
                     $hora3->hora4 = $request->horamiercoles4;
-                    $hora3->dia = 3;
+                    $hora3->dia = 4;
                     $hora3->servicios_id = $idservicio;
                     $hora3->segunda_hora = $request->cbmiercolessegunda;
                     $hora3->cerrado = $request->cbcerradomiercoles;
@@ -310,7 +307,7 @@ class ServiciosController extends Controller
                     $hora4->hora2 = $request->horajueves2;
                     $hora4->hora3 = $request->horajueves3;
                     $hora4->hora4 = $request->horajueves4;
-                    $hora4->dia = 4;
+                    $hora4->dia = 5;
                     $hora4->servicios_id = $idservicio;
                     $hora4->segunda_hora = $request->cbjuevessegunda;
                     $hora4->cerrado = $request->cbcerradojueves;
@@ -321,7 +318,7 @@ class ServiciosController extends Controller
                     $hora5->hora2 = $request->horaviernes2;
                     $hora5->hora3 = $request->horaviernes3;
                     $hora5->hora4 = $request->horaviernes4;
-                    $hora5->dia = 5;
+                    $hora5->dia = 6;
                     $hora5->servicios_id = $idservicio;
                     $hora5->segunda_hora = $request->cbviernessegunda;
                     $hora5->cerrado = $request->cbcerradoviernes;
@@ -332,7 +329,7 @@ class ServiciosController extends Controller
                     $hora6->hora2 = $request->horasabado2;
                     $hora6->hora3 = $request->horasabado3;
                     $hora6->hora4 = $request->horasabado4;
-                    $hora6->dia = 6;
+                    $hora6->dia = 7;
                     $hora6->servicios_id = $idservicio;
                     $hora6->segunda_hora = $request->cbsabadosegunda;
                     $hora6->cerrado = $request->cbcerradosabado;
@@ -343,7 +340,7 @@ class ServiciosController extends Controller
                     $hora7->hora2 = $request->horadomingo2;
                     $hora7->hora3 = $request->horadomingo3;
                     $hora7->hora4 = $request->horadomingo4;
-                    $hora7->dia = 7;
+                    $hora7->dia = 1;
                     $hora7->servicios_id = $idservicio;
                     $hora7->segunda_hora = $request->cbdomingosegunda;
                     $hora7->cerrado = $request->cbcerradodomingo;

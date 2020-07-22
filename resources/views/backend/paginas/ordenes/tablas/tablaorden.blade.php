@@ -15,8 +15,9 @@
                     <th style="width: 15%">Fecha orden</th>
                     <th style="width: 15%">Estado</th>
                     <th style="width: 10%">Cupon</th>
+                    <th style="width: 15%">Opción</th>
                                              
-                </tr>
+                </tr> 
                 </thead>
                 <tbody> 
                 @foreach($orden as $dato)
@@ -25,15 +26,19 @@
                     <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->precio_total }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
-                    @if($dato->estado_7 == 0)
-                    <td>Orden en proceso</td>
-                    @elseif($dato->estado_7 == 1)
-                    <td>Orden completada</td>
-                    @elseif($dato->estado_8 == 1)
-                    <td>Orden Cancelada</td>              
-                    @endif
+                    <td>{{ $dato->motorista }}</td> 
                     <td>{{ $dato->cupon }}</td>
-                    </tr>            
+
+                  
+                    <td>
+                      <button type="button" class="btn btn-info btn-xs" onclick="verModal({{ $dato->id }})">
+                      <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
+                      </button> 
+                    </td> 
+
+                    </tr>    
+
+                  </tr>             
      
                 @endforeach            
                 </tbody>            

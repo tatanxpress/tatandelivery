@@ -55,7 +55,7 @@ class VistaTipoTiendaController extends Controller
                     ->select('st.id')
                     ->where('p.activo', 1)
                     ->where('p.disponibilidad', 1)
-                    ->where('p.es_promocion', 0)
+                    //->where('p.es_promocion', 0)
                     ->where('st.id', $user->tipoId)
                     ->get();
     

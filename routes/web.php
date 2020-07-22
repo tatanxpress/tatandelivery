@@ -35,6 +35,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/zona/nuevo-poligono','MapaZonaController@crearPoligono');
   Route::post('/zona/borrar-poligono','MapaZonaController@borrarPoligono');
   Route::get('/zona/ver-poligonos/{id}', 'MapaZonaController@verMapa');
+  Route::post('/zona/actualizar-marcados','MapaZonaController@actualizarMarcados');
+  
+ 
   // tipos
   Route::get('/tipos/lista-tipos', 'TipoServicioController@index2');
   Route::get('/tipos/tablas/lista-tipos', 'TipoServicioController@tipostabla');
@@ -58,15 +61,25 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/tiposerviciozona/tabla/{id}', 'TipoServicioZonaController@tablaFiltrado'); // tabla filtrado
   Route::post('/tiposerviciozona/ordenar', 'TipoServicioZonaController@ordenar');     
   // clientes 
-  Route::get('/cliente/lista-clientes', 'ClientesController@index');
+  Route::get('/cliente/lista-clientes', 'ClientesController@index'); 
   Route::get('/cliente/tablas/cliente', 'ClientesController@clienteTabla');
   Route::post('/cliente/informacion','ClientesController@informacion');
+  Route::post('/cliente/historial-cliente','ClientesController@historialCliente'); // historial de compras
+
+ 
   Route::post('/cliente/editar','ClientesController@editar');
   Route::get('/cliente/direcciones/{id}', 'ClientesController@direccionesCliente');
   Route::get('/cliente/tablas/direccion/{id}', 'ClientesController@direccionesTabla'); 
   Route::post('/cliente/direcciones/informacion','ClientesController@infoDireccion');
   Route::get('/cliente/ubicacion/{id}', 'ClientesController@clienteUbicacion');
-
+  Route::get('/cliente/ubicacion-real/{id}', 'ClientesController@clienteUbicacion2');
+ 
+ 
+  Route::get('/cliente/vista-buscar-cliente', 'ClientesController@vistaBuscarCliente'); 
+  Route::get('/cliente/info-buscar-cliente/{id}','ClientesController@buscarClienteConNumero');
+  Route::post('/cliente/actualizar-info-direccion','ClientesController@actualizarDireccionCliente');
+    
+ 
   // servicios locales
   Route::get('/servicios/lista', 'ServiciosController@index'); 
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');
@@ -88,19 +101,21 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/zonaservicios/tabla/lista', 'ZonaServiciosController@serviciotabla');
   Route::post('/zonaservicios/nuevo', 'ZonaServiciosController@nuevo');
   Route::post('/zonaservicios/informacion', 'ZonaServiciosController@informacion');
-  Route::post('/zonaservicios/editar', 'ZonaServiciosController@editarServicio');
+  Route::post('/zonaservicios/editar', 'ZonaServiciosController@editarServicio'); 
   Route::get('/zonaservicios/{id}/{id1}', 'ZonaServiciosController@filtrado');
   Route::get('/zonaservicios/tabla/{id}/{id1}', 'ZonaServiciosController@tablaFiltrado');
   Route::post('/zonaservicios/ordenar', 'ZonaServiciosController@ordenar'); 
   Route::post('/zonaservicios/enviogratis', 'ZonaServiciosController@setearEnvioGratis'); 
   Route::post('/zonaservicios/mitadprecio', 'ZonaServiciosController@setearMitadPrecio'); 
-  
+   
   // cambiar precio de envio a todos los servicios por zona
   Route::post('/zonaservicios/nuevo-precio-varios', 'ZonaServiciosController@precioEnvioPorZona'); 
-
-
+  // aplicar nuevo cargo de envio por zona y servicios
+  Route::post('/zonaservicios/modificar-min-gratis', 'ZonaServiciosController@aplicarNuevoCargoZonaServicio'); 
+  // cambiar precio ganancia motorista a todos los servicios por zona
+  Route::post('/zonaservicios/nuevo-precio-ganancia', 'ZonaServiciosController@precioGananciaPorZona'); 
   
-     
+      
   // productos 
   Route::get('/productos/{id}', 'ProductoController@index');  
   Route::get('/productos/tablas/{id}', 'ProductoController@tablaProductos');
@@ -114,8 +129,10 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/publicidad/lista-inactivo', 'PublicidadController@indexinactivo');
   Route::get('/publicidad/tabla/lista-inactivo', 'PublicidadController@publicidadtablainactivo');
   Route::post('/publicidad/nuevo-promocion', 'PublicidadController@nuevoPromocion');
+  
   Route::post('/publicidad/nuevo-publicidad', 'PublicidadController@nuevoPublicidad');
   Route::post('/publicidad/informacion', 'PublicidadController@informacion'); 
+ 
   Route::post('/publicidad/editar-promo', 'PublicidadController@editarPromo');
   Route::post('/publicidad/editar-publi', 'PublicidadController@editarPubli');
   // zona publicidad
@@ -123,7 +140,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/zonapublicidad/tabla/lista', 'ZonaPublicidadController@tablazona');
   Route::post('/zonapublicidad/nuevo', 'ZonaPublicidadController@nuevo'); 
   Route::post('/zonapublicidad/borrar', 'ZonaPublicidadController@borrar');
-  Route::get('/zonapublicidad/{id}', 'ZonaPublicidadController@filtrado');
+  Route::get('/zonapublicidad/{id}', 'ZonaPublicidadController@filtrado'); 
   Route::get('/zonapublicidad/tabla/{id}', 'ZonaPublicidadController@tablaFiltrado');
   Route::post('/zonapublicidad/ordenar', 'ZonaPublicidadController@ordenar'); 
   // producto a promocion 
@@ -147,7 +164,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/motoristas/informacion', 'MotoristaController@informacion');
   Route::post('/motoristas/editar', 'MotoristaController@editar');
   Route::post('/motoristas/promedio', 'MotoristaController@promedio');
- 
+  
   // motorista servicios
   Route::get('/motoristasservicio/lista', 'MotoristaController@index2');
   Route::get('/motoristasservicio/tabla/lista', 'MotoristaController@motoserviciotabla');
@@ -172,12 +189,19 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/revisadorbitacora/informacion', 'RevisadorController@infobitacora');
   Route::post('/revisadorbitacora/editar', 'RevisadorController@editarbitacora');
   // ver ordenes
-  Route::get('/ordenes/lista', 'OrdenesController@index');
+  Route::get('/ordenes/lista', 'OrdenesController@index'); 
   Route::get('/ordenes/tabla/lista', 'OrdenesController@tablaorden'); // ultimas 100 ordenes
-  //Route::post('/ordenes/informacion', 'OrdenesController@informacion'); // no utilizada
   Route::get('/ordenes/ubicacion/{id}', 'OrdenesController@entregaUbicacion'); 
   Route::get('/ordenes/listaproducto/{id}', 'OrdenesController@listaproducto'); 
   Route::get('/ordenes/tabla/producto/{id}', 'OrdenesController@productos'); 
+
+  // buscar motorista de esta orden para cambiar
+  Route::post('/ordenes/buscar-su-motorista', 'OrdenesController@buscarSuMotorista'); 
+  Route::post('/ordenes/cambiar-su-motorista', 'OrdenesController@editarMotoristaASuOrden'); 
+
+
+
+
   // motorista ordenes   
   Route::get('/motoorden/lista', 'OrdenesController@index2');
   Route::get('/motoorden/tabla/lista', 'OrdenesController@tablamotoorden');
@@ -192,10 +216,17 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // calificacion global del motorista
   Route::post('/moto/calficacion-global', 'OrdenesController@calificacionGlobal');
   
-
+ 
   // buscar numero de orden
   Route::get('/buscar/numero/orden', 'OrdenesController@index6');
   Route::get('/buscar/num/orden/{id}', 'OrdenesController@buscarNumOrden');
+
+  // ubicacion
+  Route::get('/mapa/orden/cliente/direccion/{id}', 'OrdenesController@mapaOrdenGPS1');
+  Route::get('/mapa/orden/cliente/direccion-real/{id}', 'OrdenesController@mapaOrdenGPS2');
+
+ 
+
 
   Route::post('/buscar3/orden/servicio', 'OrdenesController@buscador3');
 
@@ -209,7 +240,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
    
 
   Route::post('/buscar/orden/filtraje', 'OrdenesController@filtro');
-  Route::get('/generar/reporte2/{id}/{id2}/{id3}', 'OrdenesController@reporte1'); // reporte de pago a motoristas
+  Route::get('/generar/reporte2/{id}/{id2}/{id3}', 'OrdenesController@reporte1'); // reporte de pago ordenes a motoristas
+  Route::get('/generar/reporte-motorista-encargo/{id}/{id2}/{id3}', 'OrdenesController@reporteEncargoMotorista'); // reporte de pago encargos a motoristas
+
   // guardar registro de pago motorista
   Route::get('/motopago/lista', 'MotoristaPagoController@index');
   Route::get('/motopago/tabla/lista', 'MotoristaPagoController@tablapago'); // datos de pagos a motoristas
@@ -224,11 +257,12 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/generar/reporte3-tablas/{id}/{id2}/{id3}/{d4}', 'MotoristaPagoController@reporteTablas'); // reporte de ordenes completas
 
   
-  Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
+  //Route::get('/generar/reporte4/{id}/{id2}/{id3}', 'MotoristaPagoController@reporte2');
   Route::get('/generar/reporte5/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteordencancelada');
   Route::get('/generar/reporte7/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteproductovendido'); // reporte de productos vendidos
+  Route::get('/generar/reporte-encargo/{id}/{id2}/{id3}', 'MotoristaPagoController@reporteOrdenesEncargo'); // reporte de ordenes encargo
 
-     
+      
   // reporte por tipos de cargo de envio
   Route::get('/generar/tipocargo/{id}/{id2}/{id3}/{d4}', 'MotoristaPagoController@reporteTipoCargoRevuelto'); // servicio uso min de $$ para envio gratis
    
@@ -236,8 +270,13 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // ver ordenes revisadas 
   Route::get('/ordenrevisada/lista', 'MotoristaPagoController@index3'); 
   Route::get('/ordenrevisada/{id}/{id1}/{id2}', 'MotoristaPagoController@buscarOrdenRevisada');
-  Route::get('/ordenrevisada2/{id}', 'MotoristaPagoController@buscarOrdenRevisada2');
-  Route::get('/ordenrevisada3/{id}/{id1}/{id2}', 'MotoristaPagoController@reporteordenrevisada');
+  Route::get('/ordenrevisada2/{id}', 'MotoristaPagoController@buscarOrdenRevisada2'); // ordenes de motorista sin depositar
+  Route::get('/ordenrevisada-encargos/{id}', 'MotoristaPagoController@ordenesEncargoMotoristaSinEntregar'); // ordenes encargo de motorista sin depositar
+
+ 
+  Route::get('/ordenrevisada3/{id}/{id1}/{id2}', 'MotoristaPagoController@reporteordenrevisada'); // buscar ordenes revisadas
+  Route::get('/ordenrevisada-reporte-encargo/{id}/{id1}/{id2}', 'MotoristaPagoController@reporteOrdenRevisadaEncargo'); // reporte de ordenes revisadas por cobrador
+ 
   // ordenes pendiente sin motorista
   Route::get('/ordenpendite/lista', 'OrdenesController@index5');
   Route::get('/ordenpendite/tabla/lista', 'OrdenesController@tablaordenpendiente');
@@ -255,6 +294,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/adminrevisador/nuevo', 'AdminController@nuevoadmin');
   Route::post('/adminrevisador/editar', 'AdminController@editar');  
   Route::post('/adminrevisador/reseteo', 'AdminController@reseteo'); 
+ 
+
+
   // editar datos de administrador
   Route::get('/editarinfo', 'AdminController@index4'); 
   Route::post('/editar-datos', 'AdminController@editardatos');
@@ -267,6 +309,95 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/registropromo/reporte2/{id}', 'ZonaPublicidadController@reporte2'); // buscar promo por vencer
   Route::post('/registropromo/informacion', 'ZonaPublicidadController@informacion');
   Route::post('/registropromo/editar', 'ZonaPublicidadController@editar');
+
+  // Encargos
+  Route::get('/encargos/lista', 'EncargosWebController@verListaActivos'); 
+  Route::get('/encargos/tabla/lista', 'EncargosWebController@verListaActivosTabla');
+  Route::post('/encargos/ver-informacion', 'EncargosWebController@informacionEncargos');
+  Route::post('/encargos/nuevo', 'EncargosWebController@nuevoEncargo');
+  Route::post('/encargos/editar-encargos', 'EncargosWebController@editarEncargo');
+  Route::get('/encargos/lista-finalizo', 'EncargosWebController@verListaFinalizado'); 
+  Route::get('/encargos/tabla/lista-finalizo', 'EncargosWebController@verListaFinalizadoTabla');
+  Route::post('/encargos/asignar-servicio', 'EncargosWebController@asignarServicioAlEncargo');
+
+
+
+
+  Route::post('/encargos/activarlo', 'EncargosWebController@activarEncargo');
+  Route::get('/encargos/lista-negocios', 'EncargosWebController@verListaNegocios'); 
+  Route::get('/encargos/tabla/lista-negocios', 'EncargosWebController@VerListaNegociosTabla');
+  Route::post('/encargos/nuevo-negocio', 'EncargosWebController@nuevoNegocio');
+  Route::post('/encargos/negocios-informacion', 'EncargosWebController@informacionNegocio');
+  Route::post('/encargos/editar-negocios', 'EncargosWebController@editarNegocio');
+  Route::get('/encargos/negocios/categorias/{id}', 'EncargosWebController@verCategoriasNegocio'); 
+  Route::get('/encargos/tabla/negocio-categorias/{id}', 'EncargosWebController@verCategoriasNegocioTabla'); 
+  Route::post('/encargos/negocios/nueva-categoria', 'EncargosWebController@guardarCategoria');
+  Route::post('/encargos/negocios/categorias-informacion', 'EncargosWebController@informacionCategoria');
+  Route::post('/encargos/negocios/categorias-editar', 'EncargosWebController@editarCategoria');
+  Route::get('/encargos/negocios/categorias-productos/{id}', 'EncargosWebController@verProductosCategoriasNegocio'); 
+  Route::get('/encargos/tabla/negocios/categorias-productos/{id}', 'EncargosWebController@verProductosCategoriasNegocioTabla'); 
+  Route::post('/encargos/negocios/categorias/productos-nuevo', 'EncargosWebController@guadarProductoCategoriaNegocio');
+  Route::post('/encargos/negocios/categorias/productos-informacion', 'EncargosWebController@informacionProductoCategoria');
+  Route::post('/encargos/negocios/categorias/productos-editar', 'EncargosWebController@editarProductoCategoria');
+
+  Route::get('/encargos/zonas-lista/{id}', 'EncargosWebController@verListaZonasEncargo'); 
+  Route::get('/encargos/tabla/zonas-lista/{id}', 'EncargosWebController@verListaZonasEncargoTabla'); 
+  
+  Route::post('/encargos/zonas/zona-borrar', 'EncargosWebController@borrarZonaEncargo');
+  Route::post('/encargos/zonas/zona-nuevo', 'EncargosWebController@nuevoEncargoZona');
+  Route::post('/encargos/zonas/zona-informacion', 'EncargosWebController@informacionZonaEncargo');  
+  Route::post('/encargos/zonas/zona-editar', 'EncargosWebController@editarZonaEncargo');
+          
+         
+  Route::get('/encargos/lista-categorias/{id}', 'EncargosWebController@listadoCategoriasEncargo'); 
+  Route::get('/encargos/tabla/lista-categorias/{id}', 'EncargosWebController@listadoCategoriasEncargoTabla'); 
+  Route::post('/encargos/lista/buscador-categoria', 'EncargosWebController@buscadorCategoriaNegocio');
+  Route::post('/encargos/info/lista-encargo-categoria', 'EncargosWebController@infoListaEncargoCategoria');
+
+  Route::post('/encargos/lista/editar', 'EncargosWebController@editarListaEncargo');
+  Route::post('/encargos/lista-nuevo', 'EncargosWebController@nuevaListaEncargo');
+ 
+  Route::get('/encargos/lista/ver-productos/{id}', 'EncargosWebController@verListaDeProductosCategorias'); 
+  Route::get('/encargos/lista/ver-productos-tabla/{id}', 'EncargosWebController@verListaDeProductosCategoriasTabla'); 
+
+  Route::post('/encargos/lista/producto/guardar', 'EncargosWebController@guardarProductoEnLista');
+  Route::post('/encargos/lista/ordenar', 'EncargosWebController@ordenarListaCategorias'); 
+  Route::post('/encargos/lista/ordenar-productos', 'EncargosWebController@ordenarListaCategoriasProducto'); 
+  Route::post('/encargos/lista/producto/activar-desactivar', 'EncargosWebController@activarDesactivarListaProducto'); 
+
+  
+ 
+
+  Route::get('/encargos/ordenes-lista/{id}', 'EncargosWebController@verOrdenesEncargoPendientes'); 
+  Route::get('/encargos/tabla/ordenes-lista/{id}', 'EncargosWebController@verOrdenesEncargoPendientesTabla'); 
+  Route::post('/encargos/ordenes/informacion', 'EncargosWebController@informacionOrdenesEncargo'); 
+  Route::get('/encargos/ordenes/direccion/mapa-gps/{id}', 'EncargosWebController@mapaGPS'); // latitud y longitud de direccion encargo
+  Route::get('/encargos/ordenes/direccion/mapa-gps-real/{id}', 'EncargosWebController@mapaGPS2'); // lati real y longi real de direccion encargo
+
+
+  Route::get('/encargos/ordenes/productos-ver/{id}', 'EncargosWebController@verProductoDeOrdenesEncargo'); 
+  Route::get('/encargos/ordenes/tabla-productos-ver/{id}', 'EncargosWebController@verProductoDeOrdenesEncargoTabla'); 
+  Route::post('/encargos/ordenes/ver-motorista-asignado', 'EncargosWebController@verMotoristaAgarroEncargo'); 
+  Route::post('/encargos/ordenes/cancelamiento', 'EncargosWebController@cancelarOrdenEncargo'); 
+  Route::post('/encargos/ordenes/confirmar', 'EncargosWebController@confirmarOrdenEncargo'); 
+
+  Route::get('/encargos/asignar/motorista-encargo/{id}', 'EncargosWebController@asignarMotoristaAlEncargo'); 
+  Route::get('/encargos/asignar/tabla/motorista-encargo/{id}', 'EncargosWebController@asignarMotoristaAlEncargoTabla'); 
+  Route::post('/encargos/ordenes/motorista-asignando-encargo', 'EncargosWebController@asignandoMotoristaAlEncargo'); 
+  Route::post('/encargos/ordenes/motorista-asignando-encargo-borrar', 'EncargosWebController@asignandoMotoristaAlEncargoBorrar'); 
+
+  // Encargos
+  Route::post('/encargos/asignar-motorista', 'EncargosWebController@asignarMotoristaEncargo');
+  Route::get('/encargos/buscar/numero/orden-encargo', 'EncargosWebController@indexVistaNumEncargo');
+  Route::get('/encargos/buscar/num/encargo/{id}', 'EncargosWebController@buscarNumeroOrdenEncargo');
+  Route::post('/encargos/buscar/encargo/infocliente', 'EncargosWebController@informacionOrdenEncargo');
+  
+
+   
+
+
+ 
+  
   
   // cancelacion de una orden por panel de control
   Route::post('/cancelarorden/panel', 'OrdenesController@cancelarOrdenPanel');
@@ -360,7 +491,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // control de ordenes
   Route::get('/control/lista/ordeneshoy', 'ControlOrdenesController@indexHoy'); 
   Route::get('/control/tabla/ordeneshoy', 'ControlOrdenesController@tablaHoy');
- 
+  
   // notificaciones 
   Route::get('/control/lista/notificacion', 'ControlOrdenesController@indexNotificacion'); 
 
@@ -369,6 +500,10 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/control/propi/device', 'ControlOrdenesController@devicePropietario');
   Route::post('/control/propi/notificacion', 'ControlOrdenesController@enviarNotiPropi');
 
+  // notificacion a motorista
+  Route::post('/control/motorista/notificacion', 'ControlOrdenesController@envarNotificacionMotorista');
+ 
+
   // notificacion a clientes por zona
   Route::get('/control/lista/notificacioncliente', 'ControlOrdenesController@indexNotiCliente'); 
   Route::post('/control/buscar/clienteszona', 'ControlOrdenesController@buscarClientes');
@@ -376,6 +511,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/control/buscar/cliente', 'ControlOrdenesController@buscarCliente');
   Route::post('/control/enviarnoti/clienteunico', 'ControlOrdenesController@enviarNotiIndividual');
 
+
+
+  
 
 
   

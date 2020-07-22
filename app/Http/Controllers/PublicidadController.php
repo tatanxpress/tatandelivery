@@ -157,47 +157,11 @@ class PublicidadController extends Controller
         if($request->isMethod('post')){  
 
             $regla = array( 
-                'nombre' => 'required', 
-                'descripcion' => 'required',
-                'identificador' => 'required',
-                'fechainicio' => 'required',
-                'fechafin' => 'required',
-                'cbfacebook' => 'required',
-                'cbyoutube' => 'required',
-                'cbinstagram' => 'required',
-                'cbdescripcion' => 'required',
-                'cbtelefono' => 'required',
-                'cbvisitanos' => 'required',
-                'cbtitulo' => 'required',
-                'urlfacebook' => 'required',
-                'urlyoutube' => 'required',
-                'urlinstagram' => 'required', 
-                'titulo' => 'required',
-                'titulodescripcion' => 'required',
-                'telefono' => 'required',
-                'visitanos' => 'required',
+                'nombre' => 'required'
             );
 
             $mensaje = array(
-                'nombre.required' => 'Nombre es requerido',
-                'descripcion.required' => 'Descripcion es requerida',
-                'identificador.required' => 'identificador es requerido',
-                'fechainicio.required' => 'fecha inicio es requerido',
-                'fechafin.required' => 'fecha fin es requerida',
-                'cbfacebook.required' => 'check facebook requerido',
-                'cbyoutube.required' => 'check youtube requerido',
-                'cbinstagram.required' => 'check instagram requerido',
-                'cbdescripcion.required' => 'check descripcion requerido',
-                'cbtelefono.required' => 'check telefono requerido',
-                'cbvisitanos.required' => 'check visitanos requerido',
-                'cbtitulo.required' => 'check titulo requerido',
-                'urlfacebook.required' => 'url facebook requerido',
-                'urlyoutube.required' => 'url youtube requerido',
-                'urlinstagram.required' => 'url instagram requerido',
-                'titulo.required' => 'titulo requerido',
-                'titulodescripcion.required' => 'titulo descripcion requerido',
-                'telefono.required' => 'telefono requerido',
-                'visitanos.required' => 'visitanos requerido',
+                'nombre.required' => 'Nombre es requerido'                
                 );
 
             $validar = Validator::make($request->all(), $regla, $mensaje );
@@ -237,7 +201,42 @@ class PublicidadController extends Controller
             if($upload && $upload2){
 
                 $identi = str_replace(' ', '_', $request->identificador);
+
+                $facebook = "";
+                if($request->urlfacebook != null){                    
+                    $facebook = $request->urlfacebook;
+                }
+
+                $youtube = "";
+                if($request->urlyoutube != null){
+                    $youtube = $request->urlyoutube;
+                }
+
+                $instagram = "";
+                if($request->urlinstagram != null){
+                    $instagram = $request->urlinstagram;
+                }
  
+                $titulo = "";
+                if($request->titulo != null){
+                    $titulo = $request->titulo;
+                }
+
+                $titulodescripcion = "";
+                if($request->titulodescripcion != null){
+                    $titulodescripcion = $request->titulodescripcion;
+                }
+
+                $telefono = "";
+                if($request->telefono != null){
+                    $telefono = $request->telefono;
+                }
+
+                $visitanos = "";
+                if($request->visitanos != null){
+                    $visitanos = $request->visitanos;
+                }
+
                 $p = new Publicidad();
                 $p->nombre = $request->nombre;
                 $p->descripcion = $request->descripcion;
@@ -245,24 +244,24 @@ class PublicidadController extends Controller
                 $p->logo = $nombreFoto2;
                 $p->identificador = $identi;
                 $p->tipo_publicidad = 2;
-                $p->url_facebook = $request->urlfacebook;
+                $p->url_facebook = $facebook;
                 $p->utiliza_facebook = $request->cbfacebook;
-                $p->url_youtube = $request->urlyoutube;
+                $p->url_youtube = $youtube;
                 $p->utiliza_youtube = $request->cbyoutube;
-                $p->url_instagram = $request->urlinstagram;
+                $p->url_instagram = $instagram;
                 $p->utiliza_instagram = $request->cbinstagram;
-                $p->titulo = $request->titulo;
+                $p->titulo = $titulo;
                 $p->utiliza_titulo = $request->cbtitulo;
-                $p->titulo_descripcion = $request->titulodescripcion;
+                $p->titulo_descripcion = $titulodescripcion;
                 $p->utiliza_descripcion = $request->cbdescripcion;
-                $p->telefono = $request->telefono;
+                $p->telefono = $telefono;
                 $p->utiliza_telefono = $request->cbtelefono;
                 $p->activo = 1;
                 $p->utiliza_visitanos = $request->cbvisitanos;
-                $p->visitanos = $request->visitanos;
+                $p->visitanos = $visitanos;
                 $p->fecha_inicio = $request->fechainicio;
-                $p->fecha_fin = $request->fechafin;
-
+                $p->fecha_fin = $request->fechafin; 
+ 
                 if($p->save()){
                     return ['success' => 1];
                 }else{
@@ -399,7 +398,8 @@ class PublicidadController extends Controller
                         'descripcion' => $request->descripcion,
                         'fecha_inicio' => $request->fechainicio,
                         'fecha_fin' => $request->fechafin,
-                        'activo' => $request->activo
+                        'activo' => $request->activo,
+                        'identificador' => $request->identificador
                         ]);
 
                     DB::commit();  
@@ -552,6 +552,7 @@ class PublicidadController extends Controller
                             'visitanos' => $request->visitanos,
                             'fecha_inicio' => $request->fechainicio,
                             'fecha_fin' => $request->fechafin,
+                            'identificador' => $request->identificador
                             ]);
 
                         DB::commit();  

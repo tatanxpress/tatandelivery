@@ -107,12 +107,7 @@
                                     <input type="checkbox" id="cbcantidad-nuevo">
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Es promocion (solo aparecera en promociones)</label>
-                                    <br>
-                                    <input type="checkbox" id="cbpromocion-nuevo">
-                                </div>
-                                    
+                               
                                 <div class="form-group">
                                     <label>Limite por orden</label>
                                     <br>
@@ -312,7 +307,7 @@
         var cbdisponibilidad = document.getElementById('cbdisponibilidad-nuevo').checked;
         var cbactivo = document.getElementById('cbactivo-nuevo').checked;
         var cbcantidad = document.getElementById('cbcantidad-nuevo').checked;
-        var cbpromocion = document.getElementById('cbpromocion-nuevo').checked;
+       
 
         var cblimite = document.getElementById('cblimite-nuevo').checked;
         var cantidadorden = document.getElementById('cantidadorden-nuevo').value;
@@ -331,12 +326,9 @@
             var cblimite_1 = 0;
             var cbnota_1 = 0;
             var cbimagen_1 = 0;
-            var cbpromocion_1 = 0;
+         
 
-            if(cbpromocion){
-                cbpromocion_1 = 1;
-            }
-
+          
             if(cbdisponibilidad){
                 cbdisponibilidad_1 = 1;
             }
@@ -369,7 +361,7 @@
             formData.append('cbdisponibilidad', cbdisponibilidad_1);
             formData.append('cbactivo', cbactivo_1);
             formData.append('cbcantidad', cbcantidad_1);
-            formData.append('cbpromocion', cbpromocion_1);
+            formData.append('cbpromocion', 0); // por defecto no se utilizara
             formData.append('cblimite', cblimite_1);
             formData.append('cantidadorden', cantidadorden);
             formData.append('cbnota', cbnota_1);
@@ -526,12 +518,6 @@
                         $("#cbcantidad-editar").prop("checked", true);
                     }
 
-                    if(response.data.producto.es_promocion == 0){
-                        $("#cbpromocion-editar").prop("checked", false);
-                    }else{
-                        $("#cbpromocion-editar").prop("checked", true);
-                    }
-
                     if(response.data.producto.utiliza_imagen == 0){
                         $("#cbimagen-editar").prop("checked", false);
                     }else{
@@ -574,7 +560,7 @@
         var cbdisponibilidad = document.getElementById('cbdisponibilidad-editar').checked;
         var cbactivo = document.getElementById('cbactivo-editar').checked;
         var cbcantidad = document.getElementById('cbcantidad-editar').checked;
-        var cbpromocion = document.getElementById('cbpromocion-editar').checked;
+       
         var cblimite = document.getElementById('cblimite-editar').checked;
         var cbutilizanota = document.getElementById('cbutilizanota-editar').checked;
         var nota = document.getElementById('nota-editar').value;
@@ -589,7 +575,7 @@
             var cbdisponibilidad_1 = 0;
             var cbactivo_1 = 0;
             var cbcantidad_1 = 0;
-            var cbpromocion_1 = 0;
+            
             var cblimite_1 = 0;
             var cbutilizanota_1 = 0;
             var cbimagen_1 = 0;
@@ -603,9 +589,7 @@
             if(cbcantidad){
                 cbcantidad_1 = 1;
             }
-            if(cbpromocion){
-                cbpromocion_1 = 1;
-            }
+           
             if(cblimite){
                 cblimite_1 = 1;
             }
@@ -628,7 +612,7 @@
             formData.append('cbdisponibilidad', cbdisponibilidad_1);
             formData.append('cbactivo', cbactivo_1);
             formData.append('cbcantidad', cbcantidad_1);
-            formData.append('cbpromocion', cbpromocion_1);
+            formData.append('cbpromocion', 0); // por defecto no se utilizara
             formData.append('cblimite', cblimite_1);
             formData.append('cbutilizanota', cbutilizanota_1);
             formData.append('cbimagen', cbimagen_1);

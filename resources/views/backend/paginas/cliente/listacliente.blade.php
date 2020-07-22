@@ -32,10 +32,10 @@
                     <div id="tablaDatatable">
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </section>
 
 
@@ -75,9 +75,9 @@
         </div>
       </div>      
     </div>        
-  </div>
+</div>
 
-
+ 
 
 @extends('backend.menus.inferior')
 @section('content-admin-js')	
@@ -95,7 +95,7 @@
     });
  </script>
 
-<script>
+<script> 
 
     // modal nuevo tipo servicio
     function abrirModalAgregar(){
@@ -106,9 +106,13 @@
     function verDirecciones(id){
       window.location.href="{{ url('/admin/cliente/direcciones') }}/"+id;
     }
-
+ 
     // informacion del cliente
     function informacion(id){
+
+        $('#id-editar').val("");
+        $('#codigo').val("");
+
         spinHandle = loadingOverlay().activate();
         
         axios.post('/admin/cliente/informacion',{
@@ -181,6 +185,9 @@
             toastr.error('Error desconocido');
         }
     }
+
+ 
+ 
 
 </script>
  

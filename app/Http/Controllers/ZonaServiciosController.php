@@ -21,10 +21,9 @@ class ZonaServiciosController extends Controller
     // lista de zonas servicios
     public function index(){ 
 
-        $zonas = Zonas::all();
-        $servicios = DB::table('servicios AS s')
-        ->select('s.id', 's.identificador')
-        ->get();
+        $zonas = Zonas::whereNotIn('id', [1,2])->get();
+
+        $servicios = Servicios::all();
 
         $serviciostipo = TipoServicios::all();
 
@@ -39,7 +38,7 @@ class ZonaServiciosController extends Controller
         ->join('servicios AS s', 's.id', '=', 'zs.servicios_id')
         ->select('zs.id', 'z.identificador', 's.identificador AS idenServicio', 
         's.nombre', 'zs.activo', 's.privado', 'zs.precio_envio', 
-        'zs.ganancia_motorista', 'zs.zona_envio_gratis', 'zs.mitad_precio')
+        'zs.ganancia_motorista', 'zs.zona_envio_gratis', 'zs.mitad_precio', 'zs.min_envio_gratis')
         ->orderBy('s.id', 'ASC')
         ->get();  
  
@@ -161,9 +160,9 @@ class ZonaServiciosController extends Controller
                 'cbmingratis' => 'required',
                 'minenvio' => 'required',
                 'nuevocargo' => 'required'
-            );
+            ); 
 
-            $messages = array(   
+            $messages = array(
                 'id.required' => 'El id es requerido',
                 'toggle.required' => 'El toggle es requerido',
                 'precioenvio.required' => 'El precio envio es requerido',
@@ -183,7 +182,7 @@ class ZonaServiciosController extends Controller
                 ];
             } 
 
-            if(ZonasServicios::where('id', $request->id)->first()){                        
+            if(ZonasServicios::where('id', $request->id)->first()){
 
                 ZonasServicios::where('id', $request->id)->update([
                     'precio_envio' => $request->precioenvio,
@@ -249,7 +248,9 @@ class ZonaServiciosController extends Controller
              ->select('z.id')
              ->where('s.privado', 0) // unicamente servicios publicos
              ->whereIn('z.zonas_id', $request->idzonas)
-             ->get();   
+             ->whereIn('z.servicios_id', $request->idservicios)
+             ->get(); 
+
  
             $pilaArray = array();
             foreach($publicos as $p){
@@ -259,7 +260,7 @@ class ZonaServiciosController extends Controller
             // recorrer cada uno para actualizar
             foreach($pilaArray as $p){
                 ZonasServicios::where('id', $p)->update([               
-                    'mitad_precio' => $request->cbzonapublico              
+                    'mitad_precio' => $request->cbzonapublico            
                 ]);
             }       
             
@@ -350,8 +351,76 @@ class ZonaServiciosController extends Controller
                 return ['success' => 2];
             }
         }
-
     }
 
+    public function precioGananciaPorZona(Request $request){
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'zonaid' => 'required',
+                'preciozona' => 'required'               
+            );
+
+            $messages = array(   
+                'zonaid.required' => 'El zona id es requerido',
+                'preciozona.required' => 'El precio zona es requerido'                              
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ( $validator->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+
+            if(ZonasServicios::where('zonas_id', $request->zonaid)->first()){                        
+
+                ZonasServicios::where('zonas_id', $request->zonaid)->update([
+                    'ganancia_motorista' => $request->preciozona                    
+                    ]);
+              
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    // aplicar nuevo cargo de envio por zona y servicio
+    public function aplicarNuevoCargoZonaServicio(Request $request){
+        
+        if(is_array( $request->idzonas)){            
+            
+            $publicos = DB::table('servicios AS s')
+             ->join('zonas_servicios AS z', 'z.servicios_id', '=', 's.id')       
+             ->select('z.id')
+             ->where('s.privado', 0) // unicamente servicios publicos
+             ->whereIn('z.zonas_id', $request->idzonas)
+             ->whereIn('z.servicios_id', $request->idservicios)
+             ->get(); 
+
+ 
+            $pilaArray = array();
+            foreach($publicos as $p){
+                array_push($pilaArray, $p->id);
+            }
+    
+            // recorrer cada uno para actualizar
+            foreach($pilaArray as $p){
+                ZonasServicios::where('id', $p)->update([               
+                    'min_envio_gratis' => $request->cbzonapublico,
+                    'costo_envio_gratis' => $request->mincompra,
+                    'nuevo_cargo' => $request->nuevocargo            
+                ]); 
+            }
+            
+            return ['success' => 1];
+         } 
+        
+         return ['success' => 2];
+    }
 
 }

@@ -9,7 +9,7 @@
  @stop
  
  <section class="content-header">
-       <div class="container-fluid">
+       <div class="container-fluid"> 
            <div class="col-sm-12">
              <h1>Generar pagos a servicios</h1>
            </div>  
@@ -37,6 +37,14 @@
                 <i class="fas fa-pencil-alt"></i>
                     Reporte Tipo cargo de envio que se aplico
           </button> 
+          
+          </br>
+          </br>
+          <button type="button" onclick="modalReporte7()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Reporte Encargos Finalizados
+          </button> 
+
 
        </div>
      </section>
@@ -369,7 +377,56 @@
     </div>      
 </div>
 
+<!-- modal reporte7 -->
+<div class="modal fade" id="modalReporte7">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Reporte Encargos Finalizados</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-reporte7">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
 
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicios identificador</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control selectpicker" id="servicioid-reporte7" data-live-search="true" required>   
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha desde</label>
+                                    <input type="date" class="form-control" id="fechadesde-reporte7">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha hasta</label>
+                                    <input type="date" class="form-control" id="fechahasta-reporte7">
+                                </div>
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="reporte7()">Buscar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
 
  
  @extends('backend.menus.inferior')
@@ -413,6 +470,12 @@
     function modalReporte6(){
         document.getElementById("formulario-reporte6").reset();
         $('#modalReporte6').modal('show');
+    }
+
+    // reporte de ordenes encargo finalizados
+    function modalReporte7(){
+        document.getElementById("formulario-reporte7").reset();
+        $('#modalReporte7').modal('show');
     }
 
     // lista de ordenes completadas
@@ -536,6 +599,21 @@
         if(retorno){
 
            
+        }
+    }
+
+    // reporte de ordenes encargo
+    function reporte7(){
+        var servicioid = document.getElementById('servicioid-reporte7').value;
+        var fechadesde = document.getElementById('fechadesde-reporte7').value;
+        var fechahasta = document.getElementById('fechahasta-reporte7').value;            
+        
+        var retorno = validarNuevo(fechadesde, fechahasta);
+
+        if(retorno){
+
+            window.open("{{ URL::to('admin/generar/reporte-encargo') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta);
+
         }
     }
 

@@ -67,7 +67,14 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/cliente/lista-clientes') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Ver Clientes</p>
+                  <p>Clientes Hoy</p>
+                </a>
+              </li> 
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/cliente/vista-buscar-cliente') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Buscar Cliente</p>
                 </a>
               </li> 
 
@@ -120,12 +127,6 @@
                 </a>
               </li>
            
-              <li class="nav-item">
-                <a href="{{ url('/admin/serviciopago/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Registro pagos a Servicios</p>
-                </a>
-              </li>
             </ul>
           </li>
 
@@ -161,17 +162,61 @@
                   <p>Zona publicidad</p>
                 </a>
               </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/registropromo/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Registro de Pago Publicidad</p>
-                </a>
-              </li>
-                           
+       
             </ul>
           </li>
           @endcan
+
+        
+          <li class="nav-item has-treeview">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fa fa fa-globe"></i>
+              <p>
+                Encargos
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="{{ url('/admin/encargos/lista') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Activos</p>
+                </a> 
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/encargos/lista-finalizo') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Finalizados</p>
+                </a> 
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/zonapublicidad/lista') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Zona Encargos</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/encargos/lista-negocios') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Negocios</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/encargos/buscar/numero/orden-encargo') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Buscar # Encargo</p>
+                </a>
+              </li>
+
+                           
+            </ul>
+          </li>
+         
+
 
          
             <li class="nav-item has-treeview">
@@ -197,12 +242,7 @@
                   </a>
                 </li>
                 @endcan
-                <li class="nav-item">
-                  <a href="{{ url('/admin/motopago/lista') }}" target="frameprincipal" class="nav-link">
-                    <i class="far fa-circle nav-icon"></i>
-                    <p>Registro de pagos</p>
-                  </a>
-                </li>    
+             
               </ul>
             </li>
           
@@ -229,14 +269,7 @@
                   <i class="far fa-circle nav-icon"></i>
                   <p>Revisador motorista</p>
                 </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/revisadorbitacora/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Bitacora revisador</p>
-                </a>
-              </li>
+              </li> 
 
               <li class="nav-item">
                 <a href="{{ url('/admin/ordenrevisada/lista') }}" target="frameprincipal" class="nav-link">
@@ -248,7 +281,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/adminrevisador/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Admin revisador</p>
+                  <p>Crear Admin App</p>
                 </a>
               </li>
                            
@@ -273,28 +306,22 @@
                   <p>Ordenes HOY</p>
                 </a>
               </li>
-
+ 
+  
               <li class="nav-item">
                 <a href="{{ url('/admin/ordenes/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Ultimas 100</p>
                 </a>
               </li>
-  
+
               <li class="nav-item">
                 <a href="{{ url('/admin/buscar/numero/orden') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Buscar # Orden</p>
                 </a>
               </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/motoorden/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Motorista ordenes Agarradas</p>
-                </a>
-              </li>
-
+        
               <li class="nav-item">
                 <a href="{{ url('/admin/motoexpe/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -305,7 +332,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/buscar/moto/ordenes') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Buscador Orden Motorista</p>
+                  <p>Reporte Pago Motorista</p>
                 </a>
               </li>
    
@@ -331,7 +358,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/control/lista/notificacion') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Notificacion a Propietarios</p>
+                  <p>Noti. a Propi. y Motorista</p>
                 </a>
               </li>
 

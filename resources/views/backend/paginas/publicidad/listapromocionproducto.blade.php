@@ -109,7 +109,7 @@
     function modalBorrar(id){
       $('#id-borrar').val(id);      
       $('#modalBorrar').modal('show');
-    }
+    } 
  
     // borrar producto promocion
     function borrar(){

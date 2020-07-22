@@ -10,13 +10,18 @@
 <section class="content-header">
        <div class="container-fluid">
            <div class="col-sm-12">
-           <h1>Lista de Zonas</h1>  
+           <h1>Lista de Zonas</h1>   
            </div>  
            <p>Para evitar recibir ORDENES, hay que activar estado SATURACION</p>
           
             <button type="button" onclick="abrirModalAgregar()" class="btn btn-info btn-sm">
             <i class="fas fa-pencil-alt"></i>
                 Nueva Zona
+            </button>
+
+            <button type="button" onclick="modalOpcion()" class="btn btn-info btn-sm">
+            <i class="fas fa-pencil-alt"></i>
+                Cerrar o Abrir Zonas
             </button>
 
        </div>
@@ -262,6 +267,49 @@
     </div>        
 </div>
 
+<!-- modal para abrir o cerrar zonas -->
+<div class="modal fade" id="modalOpcion">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Abrir o cerrar todas las zonas</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-opcion">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+                                <div class="form-group">
+                                    <label>Mensaje de Cerrado</label>
+                                    <input type="text" maxlength="50" class="form-control" id="mensaje-cerrado" value="Cerrado por lluvias">
+                                </div>
+
+                                <div class="form-group" style="margin-left:20px">
+                                        <label>Zona Problema de envío</label><br>
+                                        <label class="switch" style="margin-top:10px">
+                                        <input type="checkbox" id="toggle-cerrado-abierto">
+                                        <div class="slider round">
+                                            <span class="on">Abrir</span>
+                                            <span class="off">Cerrar</span>
+                                        </div>
+                                    </label>
+                                </div>  
+                            </div>                    
+                        </div>
+                    </div>  
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="cerrarAbrir()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @extends('backend.menus.inferior')
 @section('content-admin-js')	
 
@@ -283,6 +331,11 @@
     function abrirModalAgregar(){
         document.getElementById("formulario-nuevo").reset();
         $('#modalAgregar').modal('show');
+    }
+
+    function modalOpcion(){
+        document.getElementById("formulario-opcion").reset();
+        $('#modalOpcion').modal('show');
     }
 
     // informacion zona
@@ -737,6 +790,50 @@
     function verPoligono(id){
         window.location.href="{{ url('/admin/zona/ver-poligonos') }}/"+id;
     }
+
+    // cerrar o abrir todas las zonas
+    function cerrarAbrir(){
+        var toggle = document.getElementById('toggle-cerrado-abierto').checked;        
+        var mensaje = document.getElementById("mensaje-cerrado").value; 
+        
+        if (mensaje === '') {
+            toastr.error("Mensaje es requerido");
+            return false;
+        }
+
+        var toggle_1 = 0;
+        if(toggle){
+            toggle_1 = 1;
+        }
+
+        let me = this;
+        let formData = new FormData();
+        formData.append('toggle', toggle_1);
+        formData.append('mensaje', mensaje);
+        
+        var spinHandle = loadingOverlay().activate();
+
+        axios.post('/admin/zona/actualizar-marcados', formData, {
+        })
+            .then((response) => {
+                loadingOverlay().cancel(spinHandle);                    
+                
+                if (response.data.success == 1) {
+                    toastr.success('Actualizado');
+                    var ruta = "{{ URL::to('admin/zona/tablas/zona') }}";
+                    $('#tablaDatatable').load(ruta);
+                    $('#modalOpcion').modal('hide');  
+                } else {
+                    toastr.error('Error desconocido');
+                }
+            })
+            .catch((error) => {
+                toastr.error('Error del servidor');
+                loadingOverlay().cancel(spinHandle);
+        });
+    }
+
+
 
  </script>
 

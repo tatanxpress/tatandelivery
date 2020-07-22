@@ -45,7 +45,7 @@
 	</section>
 
 @extends('backend.menus.inferior')
-
+ 
 @section('content-admin-js') 
 
     <script src="{{ asset('js/backend/jquery.dataTables.js') }}" type="text/javascript"></script>

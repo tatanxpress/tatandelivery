@@ -32,7 +32,12 @@ use App\AplicaCuponCuatro;
 use App\AplicaCuponTres;
 use App\AplicaCuponDos;
 use App\AplicaCuponCinco;
-
+use App\MotoristaOrdenEncargo;
+use App\OrdenesEncargoDireccion;
+use App\OrdenesEncargoProducto;
+use App\OrdenesEncargo;
+use App\EncargoAsignadoServicio;
+use App\Encargos;
 
 class MotoristaController extends Controller
 {
@@ -412,11 +417,6 @@ class MotoristaController extends Controller
 
 
                  // actualizar id, cada vez
-                 if($request->deviceid != null){
-                    if($request->deviceid != "0000")
-                    Motoristas::where('id', $request->id)->update(['device_id' => $request->deviceid]);
-                }
-
              
                 return ['success' => 2, 'ordenes' => $orden]; 
             }else{
@@ -512,7 +512,7 @@ class MotoristaController extends Controller
             $producto = DB::table('ordenes AS o')
                         ->join('ordenes_descripcion AS od', 'od.ordenes_id', '=', 'o.id')
                         ->join('producto AS p', 'p.id', '=', 'od.producto_id')
-                        ->select('od.id AS productoID', 'p.nombre', 'p.imagen', 'p.utiliza_imagen', 'od.precio', 'od.cantidad')
+                        ->select('od.id AS productoID', 'p.nombre', 'od.nota', 'p.imagen', 'p.utiliza_imagen', 'od.precio', 'od.cantidad')
                         ->where('o.id', $request->ordenid)
                         ->get();
             
@@ -1748,7 +1748,6 @@ class MotoristaController extends Controller
                                 
                             }
 
-
                             $mensaje = "Notificación enviada";
                     
                             return ['success' => 1, 'mensaje' => $mensaje];
@@ -1767,6 +1766,762 @@ class MotoristaController extends Controller
             }
         }
     }
+
+
+    public function verNuevosOrdenesEncargos(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+           
+            if(Motoristas::where('id', $request->id)->first()){
+                                
+
+                $noquiero = MotoristaOrdenEncargo::all();
+
+                $pilaOrden = array();
+                foreach($noquiero as $p){
+                    array_push($pilaOrden, $p->ordenes_encargo_id);
+                } 
+
+                // una vez el ordenes_encargo tenga permiso para motorista,
+                // lo podra agarrar, pero solo iniciara si ya fue completada,
+                // por un propietario
+               
+                $orden = DB::table('ordenes_encargo AS oe')
+                ->join('encargos AS e', 'e.id', '=', 'oe.encargos_id')
+                ->join('motorista_encargo_asignado AS m', 'm.encargos_id', '=', 'e.id')
+                ->select('oe.id', 'e.nombre', 'e.fecha_entrega', 'oe.encargos_id', 'oe.precio_subtotal', 'oe.precio_envio')
+                ->where('e.permiso_motorista', 1) // ya tiene permiso de ver todas las ordenes de ese encargo
+                ->where('oe.visible_motorista', 1) // visible a motorista
+                ->where('m.motoristas_id', $request->id) 
+                ->where('oe.revisado', 2) // solo ordenes en proceso 
+                ->whereNotIn('oe.id', $pilaOrden) // no ver las ordenes ya tomadas
+                ->get();
+
+                // # orden, nombre encargo, direccion, total, ver gps, fecha estimada de entrega al cliente
+          
+                foreach($orden as $o){
+                  
+                    $o->fecha_entrega = date("h:i A d-m-Y", strtotime($o->fecha_entrega));          
+                   
+                    $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
+               
+                    $o->direccion = $dd->direccion;
+                    $o->latitud = $dd->latitud;
+                    $o->longitud = $dd->longitud;
+
+                    $suma = $o->precio_subtotal + $o->precio_envio;
+                    $o->total = number_format((float)$suma, 2, '.', '');
+
+                    $servicio = "Encargo Privado";
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    }
+
+                    $o->servicio = $servicio;
+               
+                }
+                
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    public function verListaDeProductosDeEncargo(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(OrdenesEncargo::where('id', $request->id)->first()){
+
+                $producto = DB::table('ordenes_encargo_producto AS o')
+                ->join('producto_categoria_negocio AS p', 'p.id', '=', 'o.producto_cate_nego_id')
+                ->select('o.id', 'p.imagen', 'o.nombre', 'o.descripcion', 'o.cantidad', 'o.precio')
+                ->where('o.ordenes_encargo_id', $request->id)
+                ->get();
+
+                foreach($producto as $p){
+                    $cantidad = $p->cantidad;
+                    $precio = $p->precio;
+                    $multi = $cantidad * $precio;
+                    $p->multiplicado = number_format((float)$multi, 2, '.', '');
+                }
+
+                return ['success' => 1, 'productos' => $producto];
+            }else{
+                return ['success' => 2];
+            }
+        }        
+    }
+
+
+    public function verListaDeProductosDeEncargoIndividual(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(OrdenesEncargoProducto::where('id', $request->id)->first()){
+
+                $producto = DB::table('ordenes_encargo_producto AS o')
+                ->join('producto_categoria_negocio AS p', 'p.id', '=', 'o.producto_cate_nego_id')
+                ->select('o.id', 'p.imagen', 'o.nombre', 'o.nota', 'o.descripcion', 'o.cantidad', 'o.precio')
+                ->where('o.id', $request->id)
+                ->get();
+
+                foreach($producto as $p){
+                    $cantidad = $p->cantidad;
+                    $precio = $p->precio;
+                    $multi = $cantidad * $precio;
+                    $p->multiplicado = number_format((float)$multi, 2, '.', '');
+                }
+
+                return ['success' => 1, 'productos' => $producto];
+            }else{
+                return ['success' => 2];
+            }
+        }    
+    }
+
+    public function aceptarOrdenEncargo(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required',
+                'idencargo' => 'required'             
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id  es requerido.',
+                'idencargo.required' => 'el id del encargo es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(MotoristaOrdenEncargo::where('ordenes_encargo_id', $request->idencargo)->first()){
+                return ['success' => 1];
+            }
+            
+            if($dd = MotoristaOrdenEncargo::where('ordenes_encargo_id', $request->idencargo)->first()){
+                
+                if($dd->revisado == 5){ // orden cancelada
+                    return ['success' => 2];
+                }
+            }
+
+            $fecha = Carbon::now('America/El_Salvador');
+
+            $nueva = new MotoristaOrdenEncargo;
+            $nueva->ordenes_encargo_id = $request->idencargo;
+            $nueva->motoristas_id = $request->id;
+            $nueva->fecha_agarrada = $fecha;
+            
+            if($nueva->save()){
+                return ['success' => 3];
+            }else{
+                return ['success' => 4];
+            }
+        }  
+    }
+
+    public function verNuevosOrdenesEncargosProceso(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            ); 
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(Motoristas::where('id', $request->id)->first()){
+                
+                // mostrar si fue cancelada para despues setear visible_m
+
+                $orden = DB::table('motorista_ordenes_encargo AS mo')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 'o.encargos_id', 'o.revisado')
+                ->where('o.visible_motorista', 1)
+                ->where('o.estado_2', 0) // aun no han salido a entregarse 
+                ->where('mo.motoristas_id', $request->id)
+                ->get();
+
+                foreach($orden as $o){
+
+                    $servicio = "Encargo Privado";
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    }
+
+                    $ee = Encargos::where('id', $o->encargos_id)->first();
+
+                    $o->nombreencargo = $ee->nombre;
+                    $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
+
+                    $suma = $o->precio_envio + $o->precio_subtotal;
+                    $o->total = number_format((float)$suma, 2, '.', ''); 
+ 
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    public function verNuevosOrdenesEncargosProcesoEstado(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(OrdenesEncargo::where('id', $request->id)->first()){
+                
+                // mostrar si fue cancelada para despues setear visible_m
+
+                $orden = DB::table('motorista_ordenes_encargo AS mo')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 
+                'o.encargos_id', 'o.revisado')
+                ->where('o.estado_3', 0) // aun sin entregar al cliente
+                //->where('o.visible_motorista', 1) // no es necesario aqui
+                ->where('o.estado_2', 0) // aun no han salido a entregarse
+                ->where('o.id', $request->id)
+                ->get();
+
+                foreach($orden as $o){
+
+                    $servicio = "Encargo Privado";
+                    $ubicacion = "";
+                    $latiservicio = "";
+                    $longiservicio = "";
+
+                    $sihayservicio = 0;
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $info = Servicios::where('id', $dd->servicios_id)->first();
+                        
+                        $servicio = $info->nombre;
+                        $ubicacion = $info->direccion;
+                        $latiservicio = $info->latitud;
+                        $longiservicio = $info->longitud;
+                        $sihayservicio = 1;
+                    }
+
+                    $o->sihayservicio = $sihayservicio;
+                    $o->ubicacion = $ubicacion;
+                    $o->latiservicio = $latiservicio;
+                    $o->longiservicio = $longiservicio;
+
+                    $ee = Encargos::where('id', $o->encargos_id)->first();
+
+                    $o->nombreencargo = $ee->nombre;
+                    $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
+
+                    $o->servicio = $servicio;
+
+                    $suma = $o->precio_envio + $o->precio_subtotal;
+                    $o->total = number_format((float)$suma, 2, '.', '');
+ 
+                    $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
+
+                    $o->nombrecliente = $dd->nombre;
+                    $o->direcion = $dd->direccion;
+                    $o->numerocasa = $dd->numero_casa;
+                    $o->puntoreferencia = $dd->punto_referencia;
+                    $o->latitud = $dd->latitud;
+                    $o->longitud = $dd->longitud;
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    public function iniciarEntregaEncargo(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if($oo = OrdenesEncargo::where('id', $request->id)->first()){
+
+                // cancelado
+                if($oo->revisado == 5){
+                    return ['success' => 1];
+                }
+
+                // orden aun no lista para ser entregada
+                if($oo->estado_1 == 0){
+                    return ['success' => 2];
+                }
+
+                $fecha = Carbon::now('America/El_Salvador');
+
+                if($oo->estado_2 == 0){
+                     // actualizar estado, motorista va en camino
+                    OrdenesEncargo::where('id', $request->id)->update(['estado_2' => 1, 'fecha_2' => $fecha, 'revisado' => 3]);
+
+                    // envio de notificacion al cliente
+
+
+                }
+
+                return ['success' => 3];
+
+            }else{
+                return ['success' => 0];
+            }
+        }
+    }
+
+
+    public function ocultarOrdenEncargoMotorista(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if($oo = OrdenesEncargo::where('id', $request->id)->first()){
+
+                // sino esta cancelada, no se puede ocultar
+                if($oo->revisado != 5){
+                    return ['success' => 1];
+                }
+
+                OrdenesEncargo::where('id', $request->id)->update(['visible_motorista' => 0]);
+
+                return ['success' => 2];
+
+            }else{
+                return ['success' => 0];
+            }
+        }
+    }
+
+
+    public function listaEncargosEnEntrega(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'idmoto' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'idmoto.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(Motoristas::where('id', $request->idmoto)->first()){
+                
+                // mostrar si fue cancelada para despues setear visible_m
+
+                $orden = DB::table('motorista_ordenes_encargo AS mo')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 'o.encargos_id', 'o.revisado')
+                ->where('o.estado_3', 0) // aun sin entregar al cliente
+                ->where('o.visible_motorista', 1) // aun visible al motorista
+                ->where('o.estado_2', 1) // ya salio a entregarse
+                ->where('o.revisado', 3) // en modo entrega
+                ->where('mo.motoristas_id', $request->idmoto) // todas las que agarro este motorista
+                ->get();
+
+                foreach($orden as $o){
+
+                    $servicio = "Encargo Privado";
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    }
+
+                    $o->servicio = $servicio;
+
+                    $ee = Encargos::where('id', $o->encargos_id)->first();
+
+                    $o->nombreencargo = $ee->nombre;
+                    $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
+
+                    $suma = $o->precio_envio + $o->precio_subtotal;
+                    $o->total = number_format((float)$suma, 2, '.', ''); 
+ 
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    // ver estado del encargo a finalizar. 
+    public function verEstadoOrdenEncargoAFinalizar(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(OrdenesEncargo::where('id', $request->id)->first()){
+                
+                $orden = DB::table('motorista_ordenes_encargo AS mo')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 
+                'o.encargos_id', 'o.revisado')
+                ->where('o.id', $request->id)
+                ->get();
+
+                foreach($orden as $o){
+
+                    $servicio = "Encargo Privado";
+                    $ubicacion = "";
+                    $latiservicio = "";
+                    $longiservicio = "";
+
+                    $sihayservicio = 0;
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $info = Servicios::where('id', $dd->servicios_id)->first();
+                        
+                        $servicio = $info->nombre;
+                        $ubicacion = $info->direccion;
+                        $latiservicio = $info->latitud;
+                        $longiservicio = $info->longitud;
+                        $sihayservicio = 1;
+                    }
+
+                    $o->sihayservicio = $sihayservicio;
+                    $o->ubicacion = $ubicacion;
+                    $o->latiservicio = $latiservicio;
+                    $o->longiservicio = $longiservicio;
+
+                    $ee = Encargos::where('id', $o->encargos_id)->first();
+
+                    $o->nombreencargo = $ee->nombre;
+                    $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
+
+                    $o->servicio = $servicio;
+
+                    $suma = $o->precio_envio + $o->precio_subtotal;
+                    $o->total = number_format((float)$suma, 2, '.', '');
+ 
+                    $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
+
+                    $o->nombrecliente = $dd->nombre;
+                    $o->direcion = $dd->direccion;
+                    $o->numerocasa = $dd->numero_casa;
+                    $o->puntoreferencia = $dd->punto_referencia;
+                    $o->latitud = $dd->latitud;
+                    $o->longitud = $dd->longitud;
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    // finalizar entrega del encargo
+    public function finalizarEntregaEncargo(Request $request){
+      
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del encargo es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if($oo = OrdenesEncargo::where('id', $request->id)->first()){     
+
+                $fecha = Carbon::now('America/El_Salvador');
+
+                if($oo->estado_3 == 0){
+                    OrdenesEncargo::where('id', $request->id)->update(['estado_3' => 1, 
+                    'fecha_3' => $fecha, 'visible_motorista' => 0, 'revisado' => 4]);
+                    // notificar al cliente que su encargo a sido entregado
+                }
+
+
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    // mandar notificacion al cliente del encargo
+    public function notificarClienteDelEncargo(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del encargo es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if(OrdenesEncargo::where('id', $request->id)->first()){     
+
+                // mandar notificacion
+
+
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+
+    // historial de encargos completados
+    public function verHistorialEncargosCompletados(Request $request){
+
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'id' => 'required', 
+                'fecha1' => 'required',
+                'fecha2' => 'required'
+            );
+
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id motorista es requerido.',
+                'fecha1.required' => 'La fecha1 es requerido.',
+                'fecha2.required' => 'La fecha2 es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+ 
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+                $start = Carbon::parse($request->fecha1)->startOfDay(); 
+                $end = Carbon::parse($request->fecha2)->endOfDay();
+                
+                $orden = DB::table('motorista_ordenes_encargo AS m')
+                ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
+                'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id')
+                ->where('o.estado_3', 1) // solo completadas
+                ->where('m.motoristas_id', $request->id) // del motorista
+                ->whereBetween('o.fecha_3', [$start, $end]) 
+                ->orderBy('o.id', 'DESC')
+                ->get();
+
+
+                foreach($orden as $o){
+                   
+                    $o->fecha_3 = date("h:i A d-m-Y", strtotime($o->fecha_3));
+                    
+                    $servicio = "Encargo Privado";
+                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
+                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    }
+
+                    $o->servicio = $servicio;
+
+                    $suma = $o->precio_subtotal + $o->precio_envio;
+                    $o->total = number_format((float)$suma, 2, '.', '');
+                }
+
+                // sumar ganancia de motorista de esta fecha
+                $suma = collect($orden)->sum('ganancia_motorista');
+                $ganado = number_format((float)$suma, 2, '.', '');
+                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
 
 
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){

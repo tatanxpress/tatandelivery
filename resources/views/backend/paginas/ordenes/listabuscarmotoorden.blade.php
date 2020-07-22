@@ -15,17 +15,24 @@
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para ordenes del Motorista
-          </button>  
+          </button>   
 
           <button type="button" style="margin-left:15px" onclick="modalFiltro()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Filtro para Datos Basicos
+                    Filtro para datos basicos
           </button>  
 
           <button type="button" style="margin-left:15px" onclick="reportePago()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Reporte pago motorista
+                    Reporte pago de ordenes
           </button>
+
+
+          <button type="button" style="margin-left:15px" onclick="reportePagoEncargos()" class="btn btn-primary btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Reporte pago de encargos 
+          </button>
+
        </div>
      </section>
      
@@ -310,6 +317,59 @@
     </div>      
 </div>
 
+<!-- modal filtro para conocer datos de los servicios a cobrar -->
+<div class="modal fade" id="modalReportePagoEncargos">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Generar reporte de encargos completados</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-reportepago-encargos">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                            <div class="form-group">
+                                    <label style="color:#191818">Motorista identificador</label>
+                                    <br>
+                                    <div>  
+
+                                        <select class="form-control selectpicker" id="motoid-reportepago-encargos" data-live-search="true" required>   
+                                            @foreach($moto as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group">
+                                    <label>Fecha desde</label>
+                                    <input type="date" class="form-control" id="fechadesde-reportepago-encargos">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha hasta</label>
+                                    <input type="date" class="form-control" id="fechahasta-reportepago-encargos">
+                                </div>
+
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="filtroReportePagoEncargos()">Generar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
 <!-- modal cancelar -->
 <div class="modal fade" id="modalCancelar">
     <div class="modal-dialog">
@@ -402,6 +462,11 @@
     function reportePago(){
         document.getElementById("formulario-reportepago").reset();
         $('#modalReportePago').modal('show');
+    }
+
+    function reportePagoEncargos(){
+        document.getElementById("formulario-reportepago-encargos").reset();
+        $('#modalReportePagoEncargos').modal('show');
     }
  
     function filtro(){
@@ -679,6 +744,19 @@
 
         if(retorno){
             window.open("{{ URL::to('admin/generar/reporte2') }}/" + idmoto + "/" + fechadesde + "/" + fechahasta);
+        }
+    }
+
+
+    function filtroReportePagoEncargos(){
+        var idmoto = document.getElementById('motoid-reportepago-encargos').value;
+        var fechadesde = document.getElementById('fechadesde-reportepago-encargos').value;
+        var fechahasta = document.getElementById('fechahasta-reportepago-encargos').value;            
+       
+        var retorno = validarNuevo(fechadesde, fechahasta);
+
+        if(retorno){
+            window.open("{{ URL::to('admin/generar/reporte-motorista-encargo') }}/" + idmoto + "/" + fechadesde + "/" + fechahasta);
         }
     }
  

@@ -175,6 +175,13 @@ class PropiController extends Controller
                     'activo' => $request->activo,
                     'bloqueado' => $request->bloqueado
                     ]);
+
+                // actualizar password
+                if($request->passcheck == 1){
+                    Propietarios::where('id', $request->id)->update([
+                        'password' => bcrypt('12345678')                  
+                        ]);
+                }
     
                 return ['success' => 2];
             }else{

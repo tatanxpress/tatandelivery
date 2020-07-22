@@ -16,7 +16,7 @@
                     <th style="width: 15%">Activo Admin</th>
                     <th style="width: 15%">Opciones</th>     
                     </tr>
-                  </thead>
+                  </thead> 
                   <tbody id="tablecontents">
                     @foreach($servicio as $dato)
                     <tr class="row1" data-id="{{ $dato->id }}">
