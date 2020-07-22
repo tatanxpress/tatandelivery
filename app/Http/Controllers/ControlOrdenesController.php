@@ -72,7 +72,7 @@ class ControlOrdenesController extends Controller
             $o->zonaidenti = Zonas::where('id', $od->zonas_id)->pluck('identificador')->first();
 
             $verificado = "No";
-            if($od->verificado == 1){
+            if($od->revisado == 1){
                 $verificado = "Si";
             }
 

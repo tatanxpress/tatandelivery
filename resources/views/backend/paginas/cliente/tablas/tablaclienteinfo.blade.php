@@ -39,6 +39,8 @@
                       <i class="fas fa-map" title="Direccion"></i>&nbsp; Dirección
                     </button>     
 
+                    </br></br>
+
                     <button type="button" class="btn btn-success btn-xs" onclick="verHistorial({{ $dato->id }})">
                       <i class="fas fa-map" title="Historia"></i>&nbsp; Historial
                     </button>             
