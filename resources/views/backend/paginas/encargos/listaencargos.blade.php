@@ -272,11 +272,7 @@
                                     </div> 
                                 </div> 
 
-                                <div class="form-group">
-                                    <label>Si se activa, se borrara la asignacion</label>
-                                    <br>
-                                    <input type="checkbox" id="checkservicio">
-                                </div>  
+                               
 
                             </div>
                         </div>
@@ -664,18 +660,11 @@
     function guardarAsignacion(){
         var idencargo = document.getElementById('idencargo-servicio').value;
         var servicio = document.getElementById('select-servicio').value;
-        var checkBorrar = document.getElementById('checkservicio').checked;
- 
-        var checkBorrar_1 = 0;
-        if(checkBorrar){
-            checkBorrar_1 = 1;
-        }
-
+     
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
         formData.append('idencargo', idencargo);
         formData.append('idservicio', servicio);
-        formData.append('checkborrar', checkBorrar_1);
                     
         axios.post('/admin/encargos/asignar-servicio', formData, {
         })

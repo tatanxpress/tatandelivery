@@ -340,7 +340,7 @@ class PublicidadController extends Controller
 
                 DB::beginTransaction();
            
-                try { 
+                try {  
 
                     if($request->hasFile('imagen')){
 
@@ -392,7 +392,7 @@ class PublicidadController extends Controller
                             return ['success' => 1]; // error subir imagen
                         }
                     }
-
+                    
                     Publicidad::where('id', $request->id)->update([
                         'nombre' => $request->nombre,
                         'descripcion' => $request->descripcion,
@@ -401,14 +401,14 @@ class PublicidadController extends Controller
                         'activo' => $request->activo,
                         'identificador' => $request->identificador
                         ]);
-
+ 
                     DB::commit();  
 
                     return ['success' => 2];
 
-                } catch(\Throwable $e){
+                } catch(\Throwable $e){ 
                     DB::rollback();
-                    return ['success' => "error" . $e];
+                    return ['success' => 4, 'error' => $e];
                 }
             }else{
                 return ['success' => 4]; // promocion no encontrado 

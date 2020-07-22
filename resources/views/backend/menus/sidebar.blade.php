@@ -72,6 +72,13 @@
               </li> 
 
               <li class="nav-item">
+                <a href="{{ url('/admin/cliente/lista-clientes-todos') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Clientes Todos</p>
+                </a>
+              </li> 
+
+              <li class="nav-item">
                 <a href="{{ url('/admin/cliente/vista-buscar-cliente') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Buscar Cliente</p>

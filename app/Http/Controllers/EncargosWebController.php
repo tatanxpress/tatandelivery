@@ -373,26 +373,15 @@ class EncargosWebController extends Controller
             // si se encuentra, se editara o borrar
             if($po = EncargoAsignadoServicio::where('encargos_id', $request->idencargo)->first()){
 
-                // borrar
-                if($request->checkborrar == 1){
-                    EncargoAsignadoServicio::where('id', $po->id)->delete();
-
-                    return ['success' => 1]; // borrado la asignacion
-                }else{
                     // editar
                     EncargoAsignadoServicio::where('id', $po->id)->update([
                         'servicios_id' => $request->idservicio
                         ]);
 
                         return ['success' => 2]; // editado
-                }
+                
             }else{
-
-                // crear registro 
-                if($request->checkborrar == 1){
-                    return ['success' => 6];
-                }
-
+               
                 // verificar que no haya ninguno igual
                 if(EncargoAsignadoServicio::where('encargos_id', $request->idencargo)->first()){
                     return ['success' => 3]; // ya existe una asignacion

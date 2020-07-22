@@ -63,6 +63,10 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // clientes 
   Route::get('/cliente/lista-clientes', 'ClientesController@index'); 
   Route::get('/cliente/tablas/cliente', 'ClientesController@clienteTabla');
+
+  Route::get('/cliente/lista-clientes-todos', 'ClientesController@indexTodos'); 
+  Route::get('/cliente/tablas/cliente-todos', 'ClientesController@clienteTablaTodos');
+ 
   Route::post('/cliente/informacion','ClientesController@informacion');
   Route::post('/cliente/historial-cliente','ClientesController@historialCliente'); // historial de compras
 
@@ -133,9 +137,9 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/publicidad/nuevo-publicidad', 'PublicidadController@nuevoPublicidad');
   Route::post('/publicidad/informacion', 'PublicidadController@informacion'); 
  
-  Route::post('/publicidad/editar-promo', 'PublicidadController@editarPromo');
+  Route::post('/publicidad/editar-promo', 'PublicidadController@editarPromo'); 
   Route::post('/publicidad/editar-publi', 'PublicidadController@editarPubli');
-  // zona publicidad
+  // zona publicidad 
   Route::get('/zonapublicidad/lista', 'ZonaPublicidadController@index');
   Route::get('/zonapublicidad/tabla/lista', 'ZonaPublicidadController@tablazona');
   Route::post('/zonapublicidad/nuevo', 'ZonaPublicidadController@nuevo'); 
@@ -321,7 +325,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/encargos/asignar-servicio', 'EncargosWebController@asignarServicioAlEncargo');
 
 
-
+ 
 
   Route::post('/encargos/activarlo', 'EncargosWebController@activarEncargo');
   Route::get('/encargos/lista-negocios', 'EncargosWebController@verListaNegocios'); 

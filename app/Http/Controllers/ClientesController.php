@@ -25,6 +25,8 @@ class ClientesController extends Controller
         return view('backend.paginas.cliente.listacliente');
     }
 
+   
+
     // tabla para ver clientes
     public function clienteTabla(){
         
@@ -39,6 +41,20 @@ class ClientesController extends Controller
 
         return view('backend.paginas.cliente.tablas.tablacliente', compact('cliente'));
     } 
+
+    public function indexTodos(){
+        return view('backend.paginas.cliente.listaclientetodos'); 
+    }
+
+    public function clienteTablaTodos(){
+        $cliente = DB::table('users AS u')
+        ->join('zonas AS z', 'z.id', '=', 'u.zonas_id')
+        ->select('u.id','u.name AS nombre', 'u.activo', 'z.identificador', 
+        'u.phone AS telefono', 'u.email AS correo', 'u.fecha')
+        ->get();
+
+        return view('backend.paginas.cliente.tablas.tablaclientetodos', compact('cliente'));
+    }
  
      // lista de numeros registrados
      public function index2(){
