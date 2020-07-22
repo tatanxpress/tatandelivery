@@ -18,7 +18,7 @@
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Servicio
             </button>
-          @endcan
+          @endcan 
           </div>
         </div>
       </div> 
@@ -1389,11 +1389,14 @@
         var id = document.getElementById('id-editar').value;
         spinHandle = loadingOverlay().activate();
 
-        axios.post('/admin/ordenes/buscar-su-motorista',{
+        axios.post('/admin/servicios/informacion/servicio',{
         'id': id 
-            })
+            }) 
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
+
+               
+
                 if(response.data.success == 1){
                      
                     $('#modalServicio').modal('show');

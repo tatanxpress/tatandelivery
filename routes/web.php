@@ -84,7 +84,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/servicios/lista', 'ServiciosController@index'); 
   Route::get('/servicios/tabla/lista', 'ServiciosController@serviciotabla');
   Route::post('/servicios/nuevo', 'ServiciosController@nuevo'); 
-  Route::post('/servicios/informacion/servicio', 'ServiciosController@informacionServicio');
+  Route::post('/servicios/informacion/servicio', 'ServiciosController@informacionServicio'); 
   Route::post('/servicios/informacion-horario/servicio', 'ServiciosController@informacionHorario');
   Route::post('/servicios/editar-servicio', 'ServiciosController@editarServicio');
   Route::post('/servicios/editar-horas', 'ServiciosController@editarHoras'); 
