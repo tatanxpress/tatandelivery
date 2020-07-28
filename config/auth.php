@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'api',
+        'guard' => 'admin',
         'passwords' => 'users',
     ],
 
@@ -45,13 +45,7 @@ return [
         'propi' => [
             'driver'   => 'session',
             'provider' => 'propis',
-        ],
-
-        /*'api' => [
-            'driver' => 'jwt',
-            'provider' => 'users',
-        ],*/
-
+        ]
     ],
 
     /*
@@ -80,12 +74,7 @@ return [
         'propis' => [
             'driver' => 'eloquent',
             'model' => App\Propi::class,
-        ],
-        
-       /* 'users' => [
-            'driver' => 'eloquent',
-            'model' => App\User::class,
-        ],*/
+        ]
     ],
 
     /*
@@ -112,8 +101,7 @@ return [
         'propis' => [
             'provider' => 'propis',            
             'expire' => 120,
-        ],
-
+        ]
     ],
 
 ];

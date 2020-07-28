@@ -167,7 +167,7 @@ return [
          */
         Spatie\Permission\PermissionServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-       // Laravel\Passport\PassportServiceProvider::class,
+     
         /*
          * Application Service Providers...
          */
@@ -176,7 +176,6 @@ return [
         App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        //Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
 
     ],
 
@@ -229,9 +228,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
-        //'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
-        //'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class
-        
+    
 
     ],
 

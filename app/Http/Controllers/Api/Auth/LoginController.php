@@ -17,24 +17,8 @@ use App\NumeroSMS;
 use Illuminate\Support\Carbon;
 use App\DineroOrden;
 
-//use JWTAuth;
-
 class LoginController extends Controller
 {
-
-    // solciitar Token JWT, a los usuarios ya logeados.
-    /*public function solicitarToken(Request $request){
-    
-        if($user = User::where('id', $request->id)->first()){
-
-            $token = JWTAuth::fromUser($user);
-            return $token;
- 
-        }else{
-            return ['success' => 2];
-        }
-    }*/
-
     // verificar si el numero esta registrado o no, envio SMS
     public function verificarNumero(Request $request){
         
@@ -203,10 +187,10 @@ class LoginController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() )
+            if ( $validator->fails() ) 
             {
                 return [
-                    'success' => 0,
+                    'success' => 0, 
                     'message' => $validator->errors()->all()
                 ];
             }
@@ -216,18 +200,17 @@ class LoginController extends Controller
 
                 if($u->activo == 0){
                     return ['success' => 3]; // usuario desactivado
-                }
+                } 
                 
                 if (Hash::check($request->password, $u->password)) {
                     
-                    $id = $u->id;                
+                    $id = $u->id;
 
                     // actualizar device_id
                     if($request->device_id != null){
                         User::where('id', $id)->update(['device_id' => $request->device_id]);
                     }
-
-
+                    
                     return ['success'=>1,'usuario_id' => $id];
                      
                 }else{
@@ -238,7 +221,7 @@ class LoginController extends Controller
             }
         }
     }
-    
+
     // recuperacion de contraseña por correo electronico
     public function codigoCorreo(Request $request){
         
@@ -260,7 +243,7 @@ class LoginController extends Controller
                     'success' => 0, 
                     'message' => $validator->errors()->all()
                 ];
-            } 
+            }
 
             // verificar si correo esta registrado
             if(User::where('phone', $request->telefono)->first()){
@@ -334,62 +317,4 @@ class LoginController extends Controller
             }
         }
     }
-
-
-    // login con token JWT
-    public function loginUsuarioToken(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'phone' => 'required',
-                'password' => 'required|max:16',
-            );
-
-            $messages = array(                                      
-                'phone.required' => 'El telefono es requerido.',
-                
-                'password.required' => 'La contraseña es requerida.',
-                'password.max' => '16 caracteres máximo para contraseña',
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages );
-
-            if ( $validator->fails() )
-            {
-                return [
-                    'success' => 0,
-                    'message' => $validator->errors()->all()
-                ];
-            }
-
-            // verificar credenciales
-            if($u = User::where('phone', $request->phone)->first()){
-
-                if($u->activo == 0){
-                    return ['success' => 3]; // usuario desactivado
-                }
-                
-                if (Hash::check($request->password, $u->password)) {
-                    
-                    $id = $u->id;
-
-                    // actualizar device_id
-                    if($request->device_id != null){
-                        User::where('id', $id)->update(['device_id' => $request->device_id]);
-                    }
-
-                   // $token = JWTAuth::fromUser($u);
-                    
-                    return ['success'=>1,'usuario_id' => $id];
-                     
-                }else{ 
-                    return ['success' => 2]; // contraseña incorrecta
-                }
-            } else {
-                return ['success' => 2]; // telefono no encontrado
-            }
-        }
-    }
-
-  
-
 }

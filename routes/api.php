@@ -13,24 +13,15 @@ use Illuminate\Http\Request;
 |
 */
 
-// a los usuarios ya logeados, este solicitaran su token de seguridad
-// TOKEN JWT
-Route::post('usuario/solicitar/token', 'Api\Auth\LoginController@solicitarToken');
-
- 
 // USUARIOS  
 Route::post('verificar/telefono', 'Api\Auth\LoginController@verificarNumero'); // verificar si el telefono esta registrado
 Route::post('verificar-codigo-temporal', 'Api\Auth\LoginController@verificarCodigoTemporal'); // verificar telefono + codigo temporal.
 Route::post('usuario/login', 'Api\Auth\LoginController@loginUsuario'); // login usuario
-
-
-
 Route::post('usuario/codigo-correo', 'Api\Auth\LoginController@codigoCorreo'); // enviar codigo al correo para recuperacion
 Route::post('usuario/revisar-codigo', 'Api\Auth\LoginController@revisarCodigoCorreo'); // revisar codigo del correo
 Route::post('usuario/registro', 'Api\Auth\RegisterController@registroUsuario'); // registro usuario
 Route::post('usuario/nueva-password', 'Api\PerfilController@nuevaPassword'); // cambia contraseña con correo
-   
-
+    
 // perfil  
 Route::post('usuario/informacion', 'Api\PerfilController@infoPerfil'); // cambia contraseña en perfil
 Route::post('usuario/editar-perfil', 'Api\PerfilController@editarPerfil'); // cambiar datos del perfil
@@ -367,7 +358,4 @@ Route::post('adminapp/ver/lista-servicios-propietarios', 'Api\AdminAppController
 Route::post('adminapp/ver/notificacion/propietario', 'Api\AdminAppController@enviarNotificacionPropietario');
 Route::post('adminapp/ver/lista-motoristas', 'Api\AdminAppController@verListaMotoristas');
 Route::post('adminapp/ver/notificacion/motorista', 'Api\AdminAppController@enviarNotificacionMotorista');
-
-
-
 

@@ -38,11 +38,6 @@ use App\AplicaCuponTres;
 use App\AplicaCuponDos; 
 use App\AplicaCuponCinco;
 
-use JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTExceptions;
-use Illuminate\Support\Facades\Auth;
-
-
 class AdminAppController extends Controller
 {
     // login
@@ -1342,28 +1337,6 @@ class AdminAppController extends Controller
             }
         }
     } 
-
-
-    public function prueba(Request $request){
-
-        $credentials = $request->only('phone', 'password');
-
-        try{
-            if(!$token = JWTAuth::attempt($credentials)){
-                return response()->json(['error' => 'invalida credenciales'], 401);
-            }
-        }catch(JWTException $e){
-            return response()->json(['error' => 'no_created_token'], 500);
-        }
-
-        $response = compact("token");
-        $response['user'] = Auth::user();
-
-        return $response;
-
-    }
-
-
 
     public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
