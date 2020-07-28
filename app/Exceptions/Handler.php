@@ -50,12 +50,12 @@ class Handler extends ExceptionHandler
     {
 
         // sin autorizacion para la api token
-        if($request->expectsJson()) 
+        /*if($request->expectsJson()) 
         {
             if($exception instanceof UnauthorizedHttpException) {
                 return response()->json(['success' => 100, 'message' => 'Sin Autorización API']);             
             }
-        }
+        }*/
 
         return parent::render($request, $exception);
     }
