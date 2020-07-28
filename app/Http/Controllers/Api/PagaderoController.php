@@ -170,10 +170,13 @@ class PagaderoController extends Controller
                         $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_7));
                     }
                     
+                    $aplicacupon = 0;
                     
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
                      
+                        $aplicacupon = 1;
+
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
@@ -338,6 +341,8 @@ class PagaderoController extends Controller
                         }
                          
                     }
+
+                    $o->aplicacupon = $aplicacupon;
                 }
                 
                 // sumar ganancia de esta fecha
