@@ -167,7 +167,7 @@ return [
          */
         Spatie\Permission\PermissionServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-        Laravel\Passport\PassportServiceProvider::class,
+       // Laravel\Passport\PassportServiceProvider::class,
         /*
          * Application Service Providers...
          */
