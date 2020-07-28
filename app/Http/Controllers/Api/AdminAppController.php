@@ -358,6 +358,9 @@ class AdminAppController extends Controller
     // ordenes encargos hoy
     public function ordenesEncargoHoy(Request $request){
 
+
+        return ['success' => 2];
+
         if($request->isMethod('post')){   
             $rules = array(                
                 'id' => 'required'                
