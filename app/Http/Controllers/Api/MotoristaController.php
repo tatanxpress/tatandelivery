@@ -1519,7 +1519,7 @@ class MotoristaController extends Controller
                     'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.pago_a_propi')
                     ->where('o.estado_7', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
-                    ->where('o.pago_a_propi')
+                    ->where('o.pago_a_propi', 1)
                     ->whereBetween('o.fecha_orden', [$start, $end]) 
                     ->orderBy('o.id', 'DESC')
                     ->get();
@@ -1534,7 +1534,7 @@ class MotoristaController extends Controller
                     ->orderBy('o.id', 'DESC')
                     ->get();
                 }
-                
+                 
                 
 
                 foreach($orden as $o){
