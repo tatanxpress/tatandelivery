@@ -379,7 +379,7 @@ class AdminAppController extends Controller
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
-                return "entro";
+               
 
                 $fecha = Carbon::now('America/El_Salvador');
 
@@ -393,6 +393,8 @@ class AdminAppController extends Controller
                 ->whereDate('e.fecha_entrega', $fecha)                
                 ->orderBy('o.id', 'DESC')
                 ->get();
+
+                return "entro 2";
       
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
                 foreach($orden as $o){        
