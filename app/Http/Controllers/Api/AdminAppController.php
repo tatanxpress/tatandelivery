@@ -386,12 +386,12 @@ class AdminAppController extends Controller
                 $orden = DB::table('encargos AS e')
                 ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
                
-                //->where('o.revisado', '!=', 5) // no ver cancelados
+                ->where('o.revisado', '!=', 5) // no ver cancelados
                 //->whereDate('e.fecha_entrega', $fecha)                
                 //->orderBy('o.id', 'DESC')
                 ->get();
 
-                return "entro 2";
+                return "entro 3";
       
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
                 foreach($orden as $o){        
