@@ -385,10 +385,7 @@ class AdminAppController extends Controller
 
                 $orden = DB::table('encargos AS e')
                 ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
-                ->select('e.id AS idencargo', 'o.id', 'e.fecha_entrega', 'o.revisado', 'o.estado_0', 'o.fecha_0',
-                            'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
-                            'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
-                            'o.precio_envio')
+               
                 ->where('o.revisado', '!=', 5) // no ver cancelados
                 ->whereDate('e.fecha_entrega', $fecha)                
                 ->orderBy('o.id', 'DESC')
