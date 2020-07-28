@@ -47,10 +47,10 @@ return [
             'provider' => 'propis',
         ],
 
-        'api' => [
+        /*'api' => [
             'driver' => 'jwt',
             'provider' => 'users',
-        ],
+        ],*/
 
     ],
 
@@ -82,10 +82,10 @@ return [
             'model' => App\Propi::class,
         ],
         
-        'users' => [
+       /* 'users' => [
             'driver' => 'eloquent',
             'model' => App\User::class,
-        ],
+        ],*/
     ],
 
     /*

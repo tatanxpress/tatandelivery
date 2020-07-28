@@ -17,13 +17,13 @@ use App\NumeroSMS;
 use Illuminate\Support\Carbon;
 use App\DineroOrden;
 
-use JWTAuth;
+//use JWTAuth;
 
 class LoginController extends Controller
 {
 
     // solciitar Token JWT, a los usuarios ya logeados.
-    public function solicitarToken(Request $request){
+    /*public function solicitarToken(Request $request){
     
         if($user = User::where('id', $request->id)->first()){
 
@@ -33,7 +33,7 @@ class LoginController extends Controller
         }else{
             return ['success' => 2];
         }
-    }
+    }*/
 
     // verificar si el numero esta registrado o no, envio SMS
     public function verificarNumero(Request $request){
@@ -377,9 +377,9 @@ class LoginController extends Controller
                         User::where('id', $id)->update(['device_id' => $request->device_id]);
                     }
 
-                    $token = JWTAuth::fromUser($u);
+                   // $token = JWTAuth::fromUser($u);
                     
-                    return ['success'=>1,'usuario_id' => $id, 'token' => $token];
+                    return ['success'=>1,'usuario_id' => $id];
                      
                 }else{ 
                     return ['success' => 2]; // contraseña incorrecta
