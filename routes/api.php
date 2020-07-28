@@ -314,9 +314,7 @@ Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // cambio de contrasena
 
 Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); // solo ordenes de hoy
-Route::post('adminapp/ordenes-encargo/hoy', 'Api\AdminAppController@ordenesEncargoHoy'); // solo ordenes de hoy
-
-//Route::post('adminapp/encargos/ordenes/hoy', 'Api\AdminAppController@ordenesEncargoHoy'); // solo ordenes de hoy
+Route::post('adminapp/encargos/ordenes/hoy', 'Api\AdminAppController@ordenesEncargoHoy'); // solo ordenes de hoy
   
 // ordenes sin contestar con 1 minutos extra
 Route::post('adminapp/ordenes/nocontestadas', 'Api\AdminAppController@verOrdenesSinContestacion'); // ordenes sin contestacion

@@ -379,20 +379,18 @@ class AdminAppController extends Controller
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
-               
-
                 $fecha = Carbon::now('America/El_Salvador');
 
                 $orden = DB::table('encargos AS e')
                 ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
-               
-                ->whereNotIn('o.revisado', [5])
-                //->where('o.revisado', '!=', 5) // no ver cancelados
-                //->whereDate('e.fecha_entrega', $fecha)                
-                //->orderBy('o.id', 'DESC')
+                ->select('e.id AS idencargo', 'o.id', 'e.fecha_entrega', 'o.revisado', 'o.estado_0', 'o.fecha_0',
+                            'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
+                            'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
+                            'o.precio_envio')
+                ->where('o.revisado', '!=', 5) // no ver cancelados
+                ->whereDate('e.fecha_entrega', $fecha)                
+                ->orderBy('o.id', 'DESC')
                 ->get();
-
-                return "entro 6";
       
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
                 foreach($orden as $o){        

@@ -16,6 +16,7 @@ class CreateOrdenesEncargoTable extends Migration
         Schema::create('ordenes_encargo', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->bigInteger('users_id')->unsigned();
+            $table->integer('revisado');
             $table->bigInteger('encargos_id')->unsigned();
             $table->decimal('precio_subtotal', 10,2); //precio del servicio nomas 
             $table->decimal('precio_envio', 7,2); // 
