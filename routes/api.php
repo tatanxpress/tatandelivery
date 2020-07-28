@@ -244,7 +244,7 @@ Route::post('motorista/actualizar/password', 'Api\MotoristaController@actualizar
  
 Route::post('motorista/ver/historial', 'Api\MotoristaController@verHistorial'); // ver historial*/
 
- 
+  
 // ordenes pendiente de pagar
 Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago'); // pendientes de pago
 
@@ -351,7 +351,7 @@ Route::post('adminapp/ocultar/estado-problema', 'Api\AdminAppController@ocultarE
 Route::post('adminapp/ver/productos-ordenes', 'Api\AdminAppController@verProductosOrden'); // ver productos de la orden
 Route::post('adminapp/ver/productos-encargos', 'Api\AdminAppController@verProductosOrdenEncargo'); // ver productos del encargo
 
-
+ 
 // ver servicios lista
 Route::post('adminapp/ver/lista-servicios', 'Api\AdminAppController@verListaServicios');
 Route::post('adminapp/ver/lista-servicios-propietarios', 'Api\AdminAppController@verListaServiciosPropietarios');
