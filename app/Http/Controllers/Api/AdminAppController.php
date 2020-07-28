@@ -1276,7 +1276,7 @@ class AdminAppController extends Controller
                 }
  
                 $titulo = "Hola";
-                $mensaje = "Esta es una prueba";
+                $mensaje = "Porfavor revisa tu aplicación";
 
                 try {
                     $this->envioNoticacionPropietario($titulo, $mensaje, $pp->device_id);
