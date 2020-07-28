@@ -379,6 +379,8 @@ class AdminAppController extends Controller
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
+                return "entro";
+
                 $fecha = Carbon::now('America/El_Salvador');
 
                 $orden = DB::table('encargos AS e')
