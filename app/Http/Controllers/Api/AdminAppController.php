@@ -379,10 +379,6 @@ class AdminAppController extends Controller
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
-                if($aa->activo == 0){
-                    return ['success' => 1]; // desactivado
-                }
-             
                 $fecha = Carbon::now('America/El_Salvador');
 
                 $orden = DB::table('encargos AS e')
