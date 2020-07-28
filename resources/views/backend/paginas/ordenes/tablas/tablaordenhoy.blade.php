@@ -14,8 +14,9 @@
                     <th style="width: 15%">Nombre</th>
                     <th style="width: 15%">Hora</th>                     
                     <th style="width: 15%">Sub Total</th>
-                    <th style="width: 15%">ID Zona</th>
+                    <th style="width: 15%">Zona</th>
                     <th style="width: 15%">Verificado</th>
+                    <th style="width: 15%">Motorista</th>
                     <th style="width: 15%">Estado</th>
                                              
                 </tr> 
@@ -29,7 +30,8 @@
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->precio_total }}</td>                   
                     <td>{{ $dato->zonaidenti }}</td>     
-                    <td>{{ $dato->verificado }}</td>            
+                    <td>{{ $dato->verificado }}</td> 
+                    <td>{{ $dato->motorista }}</td>            
                     <td>{{ $dato->estado }}</td>
                     </tr>            
      
@@ -47,6 +49,7 @@
       $('#example2').DataTable({
         "paging": true,
         "lengthChange": true,
+        "pageLength": 100,
         "searching": true,
         "ordering": true,
         "info": true,

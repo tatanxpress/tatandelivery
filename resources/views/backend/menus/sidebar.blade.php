@@ -199,13 +199,6 @@
               </li>
 
               <li class="nav-item">
-                <a href="{{ url('/admin/zonapublicidad/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Zona Encargos</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
                 <a href="{{ url('/admin/encargos/lista-negocios') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Negocios</p>
@@ -365,7 +358,7 @@
               <li class="nav-item">
                 <a href="{{ url('/admin/control/lista/notificacion') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Noti. a Propi. y Motorista</p>
+                  <p>Notificacion Otros</p>
                 </a>
               </li>
 

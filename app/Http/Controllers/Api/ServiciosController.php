@@ -19,6 +19,8 @@ use Carbon\Carbon;
 use DateTime;
 use App\VersionesApp;
 
+use JWTAuth;
+
 class ServiciosController extends Controller
 {
    // buscar servicios (tienda, snack, restaurante) por id del usuario, obtiene zonas_id
@@ -64,9 +66,8 @@ class ServiciosController extends Controller
             $androidApp = $datos->android;
             $iphoneApp = $datos->iphone;
 
-          
             // para agregar una nueva direccion
-            $mensaje = "Agregar una nueva Dirección, en el botón superior derecho.";
+            $mensaje = "Agregar una nueva Dirección. Presione el botón +";
 
             return [
                 'success' => 1,                     
@@ -80,6 +81,135 @@ class ServiciosController extends Controller
             ];
         }
     }
+
+    // pedir una sola vez, para usuarios que ya iniciaron sesion, esto les dara el 
+    // token para rutas protegidas
+    public function getServiciosZonaToken(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(                
+                'userid' => 'required',               
+            ); 
+        
+            $mensajeDatos = array(                                      
+                'userid.required' => 'El id del usuario es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }    
+            // obtener zona segun id del usuario
+            $data = User::where('id', $request->userid)->first();
+            
+            $idzona = $data->zonas_id;
+
+            $mensaje = "Agregar una dirección para ver los Servicios. Presionando el botón en la parte superior derecha. Gracias.";
+                
+            $servicios = DB::table('tipo_servicios_zonas AS tz')
+            ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
+            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen', 't.tipos_id', 't.descripcion')
+            ->where('tz.zonas_id', $idzona)
+            ->where('tz.activo', '1') //solo servicios disponibles
+            ->orderBy('tz.posicion', 'ASC')
+            ->get();
+
+            // version de aplicacion cliente
+            $datos = VersionesApp::where('id', 1)->first();
+            $activoAndroid = $datos->activo;
+            $activoIphoneApp = $datos->activo_iphone;
+            // versiones
+            $androidApp = $datos->android;
+            $iphoneApp = $datos->iphone;
+
+          
+            // para agregar una nueva direccion
+            $mensaje = "Agregar una nueva Dirección. Presione el botón +";
+
+            $token = JWTAuth::fromUser($data);
+
+            return [
+                'success' => 1,                     
+                'servicios' => $servicios, 
+                'mensaje' => $mensaje, // una nueva direccion
+                'zona' => $idzona, 
+                'activo' => $activoAndroid, // activo android
+                'activo_iphone' => $activoIphoneApp, // activo iphone
+                'android' => $androidApp, // version android
+                'iphone' => $iphoneApp, // version iphone
+                'token' => $token
+            ];
+        }
+    }
+
+    // version mejorada, aqui entrara solo si tenemos token
+    public function getServiciosZonaMejorado(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(                
+                'userid' => 'required',               
+            ); 
+        
+            $mensajeDatos = array(                                      
+                'userid.required' => 'El id del usuario es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }    
+            // obtener zona segun id del usuario
+            $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
+            
+            $mensaje = "Agregar una dirección para ver los Servicios. Presionando el botón en la parte superior derecha. Gracias.";
+                
+            $servicios = DB::table('tipo_servicios_zonas AS tz')
+            ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
+            ->select('t.id AS tipoServicioID', 't.nombre', 't.imagen', 't.tipos_id', 't.descripcion')
+            ->where('tz.zonas_id', $idzona)
+            ->where('tz.activo', '1') //solo servicios disponibles
+            ->orderBy('tz.posicion', 'ASC')
+            ->get();
+
+            // version de aplicacion cliente
+            $datos = VersionesApp::where('id', 1)->first();
+            $activoAndroid = $datos->activo;
+            $activoIphoneApp = $datos->activo_iphone;
+            // versiones
+            $androidApp = $datos->android;
+            $iphoneApp = $datos->iphone;
+
+          
+            // para agregar una nueva direccion
+            $mensajeAndroid = "Agregar una nueva Dirección";
+            $mensajeIphone = "Agregar una nueva Dirección en el boton superior derecho (+)";
+
+            return [
+                'success' => 1,
+                'servicios' => $servicios, 
+                'mensaje' => $mensaje, // una nueva direccion,
+                'mensajeiphone' => $mensajeIphone,
+                'zona' => $idzona, 
+                'activo' => $activoAndroid, // activo android
+                'activo_iphone' => $activoIphoneApp, // activo iphone
+                'android' => $androidApp, // version android
+                'iphone' => $iphoneApp // version iphone
+            ];
+        }
+    }
+
 
     // retorna locales segun tipo servicio
     public function getTipoServicios(Request $request){

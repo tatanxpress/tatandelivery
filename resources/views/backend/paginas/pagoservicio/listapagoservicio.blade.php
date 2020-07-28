@@ -174,15 +174,18 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label style="color:#191818">Tipo Cupon</label>
+                                    <label style="color:#191818">Tipo de Busqueda</label>
                                     <br>
                                     <div>
                                         <select class="form-control selectpicker" id="tipocupon1" required>                                                                                         
-                                            <option value="0">Ninguno</option>                                          
+                                            <option value="0">Todos</option>                                          
                                             <option value="1">Envio Gratis</option>
                                             <option value="2">Descuento Dinero</option>
                                             <option value="3">Descuento Porcentaje</option>
-                                            <option value="4">Producto Gratis</option>    
+                                            <option value="4">Producto Gratis</option>
+                                            <option value="5">Donación</option>
+                                            <option value="6">Solo pagadas a Propietarios</option>
+                                            <option value="7">No pagadas a Propietarios</option>
                                         </select>
                                     </div> 
                                 </div>
@@ -505,7 +508,7 @@
 
         if(retorno){
             window.open("{{ URL::to('admin/generar/reporte3') }}/" + servicioid + "/" +  fechadesde + "/" + fechahasta + "/" + cupon);
-        }
+        } 
     }
 
     function reporteTablas(){

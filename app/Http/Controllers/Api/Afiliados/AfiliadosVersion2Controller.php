@@ -37,7 +37,7 @@ use App\OrdenesEncargoProducto;
 use App\OrdenesEncargo;
 use App\EncargoAsignadoServicio;
 use App\Encargos;
-
+use OneSignal;
 
 class AfiliadosVersion2Controller extends Controller
 {
@@ -861,6 +861,23 @@ class AfiliadosVersion2Controller extends Controller
                     // orden finalizada por el propietarios
                     OrdenesEncargo::where('id', $request->encargoid)->update(['estado_1' => 1, 
                     'fecha_1' => $fecha, 'visible_propietario' => 0]);
+
+
+                    if($moe = MotoristaOrdenEncargo::where('ordenes_encargo_id', $oo->id)->first()){
+
+                        // enviar notificacion a motorista que agarro el encargo
+                        $titulo = "Encargo #". $oo->id;
+                        $mensaje = "Listo para iniciar entrega";
+
+                        $dd = Motoristas::where('id', $moe->motoristas_id)->first();
+
+                        if($dd->device_id != "0000"){
+                            try {
+                                $this->envioNoticacionMotorista($titulo, $mensaje, $dd->device_id);                               
+                            } catch (Exception $e) {                              
+                            }  
+                        }                                            
+                    }
                 }
 
                 return ['success' => 1]; // encargo finalizo preparacion
@@ -1091,5 +1108,10 @@ class AfiliadosVersion2Controller extends Controller
         }
     }
     
+
+    public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
+    }
+
 
 }

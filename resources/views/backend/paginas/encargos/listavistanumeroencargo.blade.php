@@ -615,7 +615,6 @@
             }) 
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
-
              
                 if(response.data.success == 1){
 
@@ -641,7 +640,7 @@
                                          
                         $('#telefonoreal').val(datos[index].telefono);
                      
-                    });                  
+                    });
 
                 }else{
                     toastr.error('No encontrada'); 

@@ -62,60 +62,62 @@
 } 
 
 .oficina{
-    margin-top: 150px;
+    margin-top: 175px;
     font-size: 16px;   
-    padding-right: 0px;    
+    padding-right: 75px;    
     font-family: "Times New Roman", Times, serif;
-    text-align: left;
+    text-align: center;
 }
 
 </style>
     <!-- cabecera -->
     <div class="row"> 
             <center><p class="titulo">
-            REPORTE DE COBRO (CUPÓN DONACIÓN)<br>          
+            REPORTE DE ORDENES<br>
+            CLIENTE: {{ $nombre }}
             </p>
-            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
+            </center>           
     </div>  
 
         <table id="customers">
           <tr>
+            <th>#</th>
             <th># Orden</th>
-            <th>Fecha orden</th>
+            <th>Servicio</th>
+            <th>Fecha</th>
             <th>Sub Total</th>
-            <th>Cargo Envío</th>
-            <th>Donación</th>
-            <th>Institución</th>
+            <th>Envío</th>
+            <th>Cupón</th>
           </tr>
-
-          @foreach($orden as $dato)
+  
+          @foreach($ordenFiltro as $dato)
             <tr>
-              <td>{{$dato->id }}</td>             
-              <td>{{$dato->fecha_orden}}</td>
-              <td>${{$dato->precio_total}}</td>
-              <td>{{$dato->precio_envio}}</td>
-              <td>${{$dato->donacion}}</td>
-              <td>{{$dato->lugar}}</td>
+              <td>{{ $dato->conteo }}</td>             
+              <td>{{ $dato->id }}</td>
+              <td>{{ $dato->identificador }}</td>
+              <td>{{ $dato->fecha_orden }}</td>
+              <td>${{ $dato->precio_total }}</td>
+              <td>${{ $dato->precio_envio }}</td>
+              <td>{{ $dato->cupon }}</td>                          
+              
             </tr> 
           @endforeach  
-         
-          <tr>
-              <td>Total</td>             
-              <td></td>  
-              <td>${{ $total }}</td>  
-              <td>${{ $totalenvio }}</td>  
-              <td>${{ $totaldonacion }}</td>  
-              <td></td>  
-            </tr> 
 
+          <tr>
+            <td></td>
+            <td>Total:</td>
+            <td></td>
+            <td></td>
+            <td>${{ $subtotal }}</td>
+            <td>${{ $envio }}</td>
+            <td>{{ $conteocupon }}</td>
+          </tr>
+          
+        
+        
         </table>
 
-
-        <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
-        </p>
-
+        
 
 </body>
 </html> 

@@ -373,6 +373,12 @@
                 toastr.error('Error del servidor');    
         });
     }
+
+    function verPDF(id){
+        
+        window.open("{{ URL::to('admin/generar/reporte/cliente-ordenes') }}/" + id);
+
+    }
    
    </script>
   

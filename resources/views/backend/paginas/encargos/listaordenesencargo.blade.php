@@ -310,9 +310,6 @@
                     }else{
                         $('#revisado').val("Si revisada"); 
                     }
-
-                    
-
                 
                 }else{
                     toastr.error('Error de validacion'); 
@@ -468,14 +465,22 @@
 
     function respuestaConfirmar(response){
         if(response.data.success == 1){
-            toastr.success('Confirmado');  
+            toastr.success('Confirmado, y notificacion enviada');  
+            id = {{ $id }}; // id del encargo
+            
+            var ruta = "{{ url('/admin/encargos/tabla/ordenes-lista') }}/"+id;
+            $('#tablaDatatable').load(ruta);
+            $('#modalConfirmar').modal('hide');   
+            document.getElementById("formulario-confirmar").reset();              
+        }else if(response.data.success == 2){
+            toastr.success('Confirmado, pero notificacion no enviada');  
             id = {{ $id }}; // id del encargo
             
             var ruta = "{{ url('/admin/encargos/tabla/ordenes-lista') }}/"+id;
             $('#tablaDatatable').load(ruta);
             $('#modalConfirmar').modal('hide');   
             document.getElementById("formulario-confirmar").reset();
-              
+            
         }
         else{
             toastr.error('Error al guardar'); 

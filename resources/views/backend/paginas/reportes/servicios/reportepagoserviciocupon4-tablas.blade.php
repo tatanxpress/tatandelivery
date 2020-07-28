@@ -70,22 +70,15 @@
 }
 
 </style>
-    <!-- cabecera -->
-    <div class="row"> 
-            <center><p class="titulo">
-            REPORTE DE COBRO (CUPÓN DONACIÓN)<br>          
-            </p>
-            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
-    </div>  
+  
 
         <table id="customers">
           <tr>
             <th># Orden</th>
             <th>Fecha orden</th>
-            <th>Sub Total</th>
-            <th>Cargo Envío</th>
-            <th>Donación</th>
-            <th>Institución</th>
+            <th>Total orden</th>
+            <th>Minimo de compra</th>
+            <th>Producto Gratis</th>
           </tr>
 
           @foreach($orden as $dato)
@@ -93,28 +86,14 @@
               <td>{{$dato->id }}</td>             
               <td>{{$dato->fecha_orden}}</td>
               <td>${{$dato->precio_total}}</td>
-              <td>{{$dato->precio_envio}}</td>
-              <td>${{$dato->donacion}}</td>
-              <td>{{$dato->lugar}}</td>
+              <td>${{$dato->minimo}}</td>
+              <td>{{$dato->producto}}</td>
             </tr> 
           @endforeach  
          
-          <tr>
-              <td>Total</td>             
-              <td></td>  
-              <td>${{ $total }}</td>  
-              <td>${{ $totalenvio }}</td>  
-              <td>${{ $totaldonacion }}</td>  
-              <td></td>  
-            </tr> 
 
         </table>
 
-
-        <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
-        </p>
 
 
 </body>

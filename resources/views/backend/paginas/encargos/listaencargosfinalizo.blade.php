@@ -38,87 +38,7 @@
 
 
 
-<!-- modal nuevo -->
-<div class="modal fade" id="modalNuevo">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Nuevo Encargo</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-nuevo">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12"> 
-                                
-                                <div class="form-group">
-                                    <label>Identificador unico</label>
-                                    <input type="text" maxlength="100" class="form-control" id="identificador-nuevo" placeholder="Identificador unico" required>
-                                </div>
 
-                                <div class="form-group">
-                                    <label>Nombre</label>
-                                    <input type="text" maxlength="200" class="form-control" id="nombre-nuevo" placeholder="Nombre" required>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Descripción</label>
-                                    <textarea maxlength="500" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción"></textarea>
-                                </div>
-
-
-                                <div class="form-group">
-                                    <div>
-                                        <label>Imagen</label>
-                                        <p>600 x 300 pixeles</p>
-                                    </div> 
-                                    <br>
-                                    <div class="col-md-10">
-                                        <input type="file" style="color:#191818" id="imagen-nuevo" accept="image/jpeg, image/jpg, image/png"/>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha inicia</label>
-                                    <input type="date" class="form-control" id="fechainicio-nuevo">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha finaliza</label>
-                                    <input type="datetime-local" class="form-control" id="fechafin-nuevo">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Fecha entrega</label>
-                                    <input type="datetime-local" class="form-control" id="fechaentrega-nuevo">
-                                </div>
- 
-                                <div class="form-group">
-                                    <label style="color:#191818">Tipo de Vista</label>
-                                    <br>
-                                    <div>
-                                        <select id="tipovista-nuevo" class="form-control" required>   
-                                            <option value="0">Vista Vertical</option>
-                                            <option value="1">Vista Horizontal</option>
-                                        </select>
-                                    </div> 
-                                </div> 
-                              
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="nuevoEncargo()">Guardar</button>
-            </div>          
-        </div>        
-    </div>      
-</div>
 
 <!-- modal editar encargo -->
 <div class="modal fade" id="modalEditar">
@@ -404,8 +324,6 @@
         var checkmoto = document.getElementById('checkmotorista').checked;
         var checkpropi = document.getElementById('checkpropietario').checked;
 
-
-
         var activo_1 = 0;
         var vistacliente_1 = 0;
         var checkmoto_1 = 0;
@@ -532,119 +450,7 @@
         return true;
     }
     
-    function nuevoEncargo(){
-        var identificador = document.getElementById('identificador-nuevo').value;
-        var nombre = document.getElementById('nombre-nuevo').value;
-        var descripcion = document.getElementById('descripcion-nuevo').value;
-        var imagen = document.getElementById('imagen-nuevo'); 
-        var fechainicio = document.getElementById('fechainicio-nuevo').value;
-        var fechafin = document.getElementById('fechafin-nuevo').value;
-        var fechaentrega = document.getElementById('fechaentrega-nuevo').value;
-        var tipovista = document.getElementById('tipovista-nuevo').value;
-
-
-        var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega);
-        
-        if(retorno){
-            var spinHandle = loadingOverlay().activate();
-            var formData = new FormData();
-
-            formData.append('identificador', identificador);
-            formData.append('nombre', nombre);
-            formData.append('descripcion', descripcion);
-            formData.append('imagen', imagen.files[0]);
-            formData.append('fechainicio', fechainicio);
-            formData.append('fechafin', fechafin);
-            formData.append('fechaentrega', fechaentrega);
-            formData.append('tipovista', tipovista);
-
-            axios.post('/admin/encargos/nuevo', formData, { 
-                    })
-                    .then((response) => {
-                        loadingOverlay().cancel(spinHandle);
-                       
-                        if(response.data.success == 1){
-                            toastr.error('Identificador ya existe');
-                        }else if(response.data.success == 2){
-                            toastr.success('Guardado'); 
-
-                            var ruta = "{{ url('/admin/encargos/tabla/lista-finalizo') }}";
-                            $('#tablaDatatable').load(ruta);
-                            $('#modalNuevo').modal('hide'); 
-                        }
-                        else{
-                            toastr.error('Error de validacion'); 
-                        }
-
-                    })
-                    .catch((error) => {
-                        loadingOverlay().cancel(spinHandle);
-                        toastr.error('Error');
-                    });
-        }
-
-    }
-
-    function validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega){
-
-        if(identificador === ''){
-            toastr.error("identificador es requerido");
-            return;
-        }
-        
-        if(identificador.length > 100){
-            toastr.error("100 caracter máximo identificador");
-            return false;
-        }
-
-        if(nombre === ''){
-            toastr.error("nombre es requerido");
-            return;
-        }
-        
-        if(nombre.length > 200){
-            toastr.error("200 caracter máximo nombre");
-            return false;
-        }
-        
-        if(descripcion === ''){
-            // no hacer nada
-        }else{
-            if(descripcion.length > 500){
-                toastr.error("500 caracter máximo descripcion");
-                return false;
-            }
-        }
-        
-        if(imagen.files && imagen.files[0]){ // si trae imagen
-            if (!imagen.files[0].type.match('image/jpeg|image/jpeg|image/png')){      
-                toastr.error('Formato de imagen permitido: .png .jpg .jpeg');
-                return false;       
-            } 
-        }else{
-            toastr.error("imagen es requerido");
-            return false;
-        }
-
-        if(fechainicio === ''){
-            toastr.error("fecha inicio es requerido");
-            return;
-        }
-        
-
-        if(fechafin === ''){
-            toastr.error("fecha fin es requerido");
-            return;
-        }
-
-        if(fechaentrega === ''){
-            toastr.error("fecha entrega fin es requerido");
-            return;
-        }
-        
-
-        return true;
-    }
+    
   
     function zonas(id){
         window.location.href="{{ url('/admin/encargos/zonas-lista') }}/"+id;

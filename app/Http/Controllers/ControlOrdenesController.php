@@ -28,6 +28,7 @@ use App\User;
 use Exception;
 use App\Admin;
 use Auth; 
+use App\Administradores;
  
 class ControlOrdenesController extends Controller
 {
@@ -76,6 +77,12 @@ class ControlOrdenesController extends Controller
                 $verificado = "Si";
             }
 
+            $motorista = "";
+            if($mo = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                $motorista = Motoristas::where('id', $mo->motoristas_id)->pluck('nombre')->first();
+            }
+            $o->motorista = $motorista;
+
             $o->verificado = $verificado;
             
             if($o->estado_2 == 0){
@@ -120,8 +127,9 @@ class ControlOrdenesController extends Controller
     public function indexNotificacion(){
 
         $motoristas = Motoristas::all();
+        $administradores = Administradores::all();
  
-        return view('backend.paginas.notificacion.listanotificacion', compact('motoristas'));
+        return view('backend.paginas.notificacion.listanotificacion', compact('motoristas', 'administradores'));
     }
 
     public function tablaPropiNoti($id){
@@ -233,6 +241,53 @@ class ControlOrdenesController extends Controller
 
                     return ['success' => 1]; // enviado
  
+                } 
+            }else{
+                return ['success' => 3]; // motorista no encontrado
+            }            
+        }
+    }
+
+    // envio de notificacion administrador
+    public function envarNotificacionAdministradores(Request $request){
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required',
+                'titulo' => 'required',
+                'descripcion' => 'required'   
+            );
+        
+            $mensajeDatos = array(                                  
+                'id.required' => 'Device id es requerido.',
+                'titulo.required' => 'Titulo es requerido',
+                'descripcion.required' => 'Descripcion es requerido'            
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($m = Administradores::where('id', $request->id)->first()){
+
+                if($m->device_id == "0000" || $m->device_id == null){
+                   
+                    return ['success' => 2];
+
+                }else{
+
+                    try {
+                        $this->envioNoticacionAdministrador($request->titulo, $request->descripcion, $m->device_id);                               
+                    } catch (Exception $e) {} 
+
+                    return ['success' => 1]; // enviado 
                 } 
             }else{
                 return ['success' => 3]; // motorista no encontrado
@@ -432,6 +487,10 @@ class ControlOrdenesController extends Controller
 
     public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionAdministrador($titulo, $mensaje, $pilaUsuarios);
     }
 
 

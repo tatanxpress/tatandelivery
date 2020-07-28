@@ -30,6 +30,18 @@ use App\EncargoAsignadoServicio;
 use App\OrdenesEncargoDireccion;
 use App\MotoristaOrdenEncargo;
 use App\OrdenesEncargo;
+use App\OrdenesCupones;
+use App\Cupones;
+use OneSignal;
+use App\AplicaCuponCuatro;
+use App\AplicaCuponTres;
+use App\AplicaCuponDos; 
+use App\AplicaCuponCinco;
+
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTExceptions;
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminAppController extends Controller
 {
@@ -126,7 +138,7 @@ class AdminAppController extends Controller
 
         if($request->isMethod('post')){   
             $rules = array(                
-                'id' => 'required'                
+                'id' => 'required' 
             );
 
             $messages = array(                                      
@@ -157,7 +169,7 @@ class AdminAppController extends Controller
                     'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4', 
                     'o.estado_5', 'o.estado_6', 'o.estado_7', 'o.estado_8', 'o.users_id',
                     'o.mensaje_8', 'o.cancelado_cliente', 'o.cancelado_propietario',
-                    'o.fecha_8')
+                    'o.fecha_8', 'o.pago_a_propi', 'o.precio_envio', 'o.precio_total')
                 ->whereDate('o.fecha_orden', $fecha)
                 ->orderBy('o.id', 'DESC')
                 ->get();
@@ -169,9 +181,6 @@ class AdminAppController extends Controller
                     $od = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->zonanombre = Zonas::where('id', $od->zonas_id)->pluck('nombre')->first();
     
-                    $haymotorista = 0;
-                    $nombremotorista = "";
-
                     $estado4 = 0;
                     if($o->estado_4 == 1){
                         $estado4 = 1;
@@ -182,17 +191,74 @@ class AdminAppController extends Controller
                         $o->horaestimadacliente = $tiempoCliente;  
                     }
 
+                    $cupon = "";
+                    $pagaapropi = "";
+
+                    if($o->pago_a_propi == 1){
+                        $pagaapropi = "Orden se paga a propietario $".$o->precio_total;
+                    }
+
+                    $o->pagaapropi = $pagaapropi;
+
+                    $envio = $o->precio_envio;
+                    $o->subtotal = number_format((float)$o->precio_total, 2, '.', '');
+                    
+                    // verificar si utilizo algun cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        if($tipo->tipo_cupon_id == 1){
+                            $cupon = "Envio Gratis (si aplicado al envio)";
+                            $envio = 0;
+                        }else if($tipo->tipo_cupon_id == 2){
+                            $ac = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                            $descuento = $ac->dinero;                            
+
+                            if($ac->aplico_envio_gratis == 1){
+                                $envio = 0;
+                                $cupon = "Descuento Dinero de: $" . $descuento . " (no aplicado a sub total) + envio gratis (si aplicado al envio)";
+                            }else{
+                                $cupon = "Descuento Dinero de: $" . $descuento . " (no aplicado a sub total)";
+                            }
+
+                        }else if($tipo->tipo_cupon_id == 3){
+
+                            $ac = AplicaCuponTres::where('ordenes_id', $o->id)->first();
+                            $porcentaje = $ac->porcentaje;
+
+                            $cupon = "Descuento Porcentaje de: " . $porcentaje . "% (no aplicado a subtotal)";
+                        }
+                        else if($tipo->tipo_cupon_id == 4){
+                            $ac = AplicaCuponCuatro::where('ordenes_id', $o->id)->first();
+                            $producto = $ac->producto;
+
+                            $cupon = "Producto Gratis: " . $producto;
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+
+                            $ac = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
+                            $dinero = $ac->dinero;
+
+                            $cupon = "Donación de: $".$dinero . " (no sumado a subtotal)";
+                        }
+                    } 
+
+                  
+                    $o->envio = number_format((float)$envio, 2, '.', '');
+
+                    $o->cupon = $cupon;
+
                     $o->estado4 = $estado4;
+
+                    $nombremotorista = "";
     
                     if($motorista = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
-                        $haymotorista = 1;
     
                         $n = Motoristas::where('id', $motorista->motoristas_id)->first();
                         $nombremotorista = $n->nombre;
                     }
     
                     $o->motorista = $nombremotorista;
-                    $o->haymotorista = $haymotorista;
                     
                     if($o->estado_2 == 0){
                         $estado = "Orden sin contestacion del propietario";
@@ -328,14 +394,30 @@ class AdminAppController extends Controller
                 ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
                 ->select('e.id AS idencargo', 'o.id', 'e.fecha_entrega', 'o.revisado', 'o.estado_0', 'o.fecha_0',
                             'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
-                            'o.users_id', 'o.calificacion', 'o.mensaje')
-                ->whereDate('e.fecha_entrega', $fecha)
+                            'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
+                            'o.precio_envio')
+                ->where('o.revisado', '!=', 5) // no ver cancelados
+                ->whereDate('e.fecha_entrega', $fecha)                
                 ->orderBy('o.id', 'DESC')
                 ->get();
       
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
                 foreach($orden as $o){        
                     $o->fecha_entrega = date("h:i A", strtotime($o->fecha_entrega));
+
+                    $pagar = "";
+                    $p1 = number_format((float)$o->precio_subtotal, 2, '.', '');
+                    $suma = $o->precio_subtotal + $o->precio_envio;
+                    $suma = number_format((float)$suma, 2, '.', '');
+                    if($o->pago_a_propi == 1){
+                        
+                        $pagar = "Pagar a Propietario: $" . $p1 . " Y cobrar al cliente (con envio) $" . $suma;
+                    }else{
+                        $pagar = "Cobrar al cliente: (Sub total + envio) $" . $suma;
+                    }
+
+                    $o->pagar = $pagar;
+
                     $estado = "";
                     if($o->revisado == 1){
                         $estado = "Pendiente";
@@ -1143,8 +1225,152 @@ class AdminAppController extends Controller
             }else{
                 return ['success' => 2];
             }
-        }   
+        }
+    }
 
+
+    public function verListaServicios(Request $request){
+
+        $lista = Servicios::select('id', 'nombre')->orderBy('nombre')->get();
+        return ['success' => 1, 'servicios' => $lista];
+    } 
+
+    public function verListaMotoristas(Request $request){
+
+        $lista = Motoristas::select('id', 'nombre')
+        ->whereNotIn('id', [1,2,3,5,6])
+        ->orderBy('nombre')
+        ->get();
+
+        return ['success' => 1, 'servicios' => $lista];
+    } 
+
+    public function verListaServiciosPropietarios(Request $request){
+
+        $lista = Propietarios::where('servicios_id', $request->id)
+        ->select('id', 'nombre')      
+        ->orderBy('nombre')
+        ->get();
+ 
+        return ['success' => 1, 'servicios' => $lista];
+    }
+
+    public function enviarNotificacionPropietario(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if($pp = Propietarios::where('id', $request->id)->first()){
+
+                if($pp->device_id == "0000"){
+                   return ['success' => 1];
+                }
+ 
+                $titulo = "Hola";
+                $mensaje = "Esta es una prueba";
+
+                try {
+                    $this->envioNoticacionPropietario($titulo, $mensaje, $pp->device_id);
+                    } catch (Exception $e) {                              
+                } 
+                
+                return ['success' => 2];
+            }else{
+                return ['success' => 3];
+            }
+        }
+    } 
+
+    public function enviarNotificacionMotorista(Request $request){
+
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'                
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+
+            if($pp = Motoristas::where('id', $request->id)->first()){
+
+                if($pp->device_id == "0000"){
+                   return ['success' => 1];
+                }
+ 
+                $titulo = "Solicitud Nueva";
+                $mensaje = "Se necesita motorista";
+
+                try {
+                    $this->envioNoticacionMotorista($titulo, $mensaje, $pp->device_id);
+                    } catch (Exception $e) {                              
+                } 
+                
+                return ['success' => 2];
+            }else{
+                return ['success' => 3];
+            }
+        }
+    } 
+
+
+    public function prueba(Request $request){
+
+        $credentials = $request->only('phone', 'password');
+
+        try{
+            if(!$token = JWTAuth::attempt($credentials)){
+                return response()->json(['error' => 'invalida credenciales'], 401);
+            }
+        }catch(JWTException $e){
+            return response()->json(['error' => 'no_created_token'], 500);
+        }
+
+        $response = compact("token");
+        $response['user'] = Auth::user();
+
+        return $response;
+
+    }
+
+
+
+    public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
+    }
+
+    public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
     }
     
 }

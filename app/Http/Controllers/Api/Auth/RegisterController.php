@@ -83,7 +83,10 @@ class RegisterController extends Controller
             if($usuario->save())
             {
                 $insertedId = $usuario->id; 
-                return ['success'=>3, 'usuario_id'=> $insertedId];
+
+                $token = JWTAuth::fromUser($usuario);
+
+                return ['success'=>3, 'usuario_id'=> $insertedId, 'token' => $token];
                 
             }else{
                 return [

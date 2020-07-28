@@ -43,7 +43,11 @@
 
                     <button type="button" class="btn btn-success btn-xs" onclick="verHistorial({{ $dato->id }})">
                       <i class="fas fa-map" title="Historia"></i>&nbsp; Historial
-                    </button>             
+                    </button>
+
+                      <button type="button" class="btn btn-success btn-xs" onclick="verPDF({{ $dato->id }})">
+                      <i class="fas fa-map" title="PDF"></i>&nbsp; PDF Historial
+                    </button>      
                   </td>      
                   
                                 

@@ -211,7 +211,7 @@ class ServiciosController extends Controller
             if(Servicios::where('identificador', $request->identificador)->first()){
                 return ['success' => 4];
             }
-
+ 
             DB::beginTransaction();
            
             try { 
@@ -265,6 +265,9 @@ class ServiciosController extends Controller
                     $tipo->producto_visible = $request->cbproducto; //
                     $tipo->privado = $request->cbprivado;     
                     $tipo->compra_limite = $request->compra;
+                    $tipo->pago_a_ordenes = $request->pagar;
+                    $tipo->pago_a_encargos = $request->pagarencargos;
+
                     $tipo->save();
  
                     $idservicio = $tipo->id;
@@ -610,7 +613,10 @@ class ServiciosController extends Controller
                         'utiliza_minimo' => $request->cbminimo,
                         'producto_visible' => $request->cbproducto,
                         'compra_limite' => $request->compra,
-                        'privado' => $request->privado]);
+                        'privado' => $request->privado,
+                        'pago_a_ordenes' => $request->pagar,
+                        'pago_a_encargos' => $request->pagarencargos
+                        ]);
 
                     DB::commit();  
 

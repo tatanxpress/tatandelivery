@@ -38,21 +38,19 @@
                       <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                       <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
                       </button>  
-
-                      <button type="button" class="btn btn-warning btn-xs" onclick="modalServicio({{ $dato->id }})">
-                      <i class="fas fa-eye" title="Servicio"></i>&nbsp; Servicio
-                      </button>     
-                      </br>
-                      </br>
+                     
                       <button type="button" class="btn btn-primary btn-xs" onclick="zonas({{ $dato->id }})">
                       <i class="fas fa-eye" title="Zonas"></i>&nbsp; Zonas
                       </button>       
+
+                      
+                      </br>
+                      </br>
  
                       <button type="button" class="btn btn-success btn-xs" onclick="lista({{ $dato->id }})">
                       <i class="fas fa-eye" title="Lista"></i>&nbsp; Lista
                       </button>     
-                      </br>
-                      </br>
+                  
                       <button type="button" class="btn btn-success btn-xs" onclick="ordenes({{ $dato->id }})">
                       <i class="fas fa-eye" title="Ordenes"></i>&nbsp; Ordenes
                       </button> 

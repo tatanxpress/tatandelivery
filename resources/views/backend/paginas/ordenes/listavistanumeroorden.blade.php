@@ -184,6 +184,54 @@
     </div>      
 </div>
 
+<!-- modal editar latitud y longitud de esta orden-->
+<div class="modal fade" id="modalEditar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Editar</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-editar">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <input type="hidden" id="id-orden-editar">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Latitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="latitud-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Longitud</label>
+                                    <input type="text" maxlength="50" class="form-control" id="longitud-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Dirección</label>
+                                    <input type="text" maxlength="400" class="form-control" id="direccion-editar">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="editar()">Editar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+ 
 <!-- modal informacion de la orden-->
 <div class="modal fade" id="modalInfoOrden">
     <div class="modal-dialog">
@@ -623,6 +671,103 @@
         document.getElementById("formulario-buscar").reset();
         $('#modalBuscar').modal('show');
     }
+
+    // editar latitud y longitud de esta orden
+    function modalEditar(id){
+        document.getElementById("formulario-editar").reset();
+        spinHandle = loadingOverlay().activate();
+       
+        axios.post('/admin/buscar/orden/infocliente',{
+        'id': id 
+            })
+            .then((response) => {
+                loadingOverlay().cancel(spinHandle);
+             
+                if(response.data.success == 1){
+
+                    $('#modalEditar').modal('show');
+                    var datos = response.data.orden;
+
+                    datos.forEach(function(value, index) {
+                       
+                        // informacion del cliente        
+                        $('#id-orden-editar').val(datos[index].id);
+                      
+                        $('#latitud-editar').val(datos[index].latitud);
+                        $('#longitud-editar').val(datos[index].longitud);
+                        $('#direccion-editar').val(datos[index].direccion);           
+                    });                  
+
+                }else{
+                    toastr.error('No encontrada'); 
+                }
+            })
+            .catch((error) => {
+                loadingOverlay().cancel(spinHandle); 
+                toastr.error('Error del servidor');    
+        });
+    }
+
+    function editar(){
+        var id = document.getElementById('id-orden-editar').value;
+        var latitud = document.getElementById('latitud-editar').value;
+        var longitud = document.getElementById('longitud-editar').value;
+        var direccion = document.getElementById('direccion-editar').value;
+
+        if(latitud === ''){
+            toastr.error('Latitud es requerida'); 
+            return;
+        }
+
+        if(latitud.length > 50){
+            toastr.error('Latitud maximo 50 caracteres'); 
+            return;
+        }
+
+        if(longitud === ''){
+            toastr.error('Longitud es requerida'); 
+            return;
+        }
+
+        if(longitud.length > 50){
+            toastr.error('Longitud maximo 50 caracteres'); 
+            return;
+        } 
+
+        if(direccion === ''){
+            toastr.error('Direccion es requerida'); 
+            return;
+        }
+
+        if(direccion.length > 400){
+            toastr.error('Direccion maximo 400 caracteres'); 
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        formData.append('id', id);
+        formData.append('latitud', latitud);
+        formData.append('longitud', longitud);    
+        formData.append('direccion', direccion);      
+
+        axios.post('/admin/editar/orden/punto-gps', formData, {
+            })
+            .then((response) => {
+                loadingOverlay().cancel(spinHandle);
+                $('#modalEditar').modal('hide');
+                if(response.data.success == 1){
+                    toastr.success('Actualizado');
+                    
+                }else{
+                    toastr.error('Error al editar');  
+                }
+            })
+            .catch((error) => {
+                loadingOverlay().cancel(spinHandle);
+                toastr.error('Error');
+            });        
+    }
  
     function buscar(){
         var orden = document.getElementById('orden').value;
@@ -949,8 +1094,6 @@
     function producto(id){
         window.location.href="{{ url('/admin/ordenes/listaproducto') }}/"+id;
     }
-
-    
 
     // latitud y longitud del puntero gps
     function mapa(){

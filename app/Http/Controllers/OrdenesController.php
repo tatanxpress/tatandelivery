@@ -866,8 +866,8 @@ class OrdenesController extends Controller
     public function mapaOrdenGPS1($id){
         
         $mapa = OrdenesDirecciones::where('ordenes_id', $id)->first();
-        $api = env("API_GOOGLE_MAPS", "");
-
+        $api = "AIzaSyB-Iz6I6GtO09PaXGSQxZCjIibU_Li7yOM";
+ 
         $latitud = $mapa->latitud;
         $longitud = $mapa->longitud; 
 
@@ -878,7 +878,7 @@ class OrdenesController extends Controller
       public function mapaOrdenGPS2($id){
         
         $mapa = OrdenesDirecciones::where('ordenes_id', $id)->first();
-        $api = env("API_GOOGLE_MAPS", "");
+        $api = "AIzaSyB-Iz6I6GtO09PaXGSQxZCjIibU_Li7yOM";
 
         $latitud = $mapa->latitud_real;
         $longitud = $mapa->longitud_real;  
@@ -994,6 +994,122 @@ class OrdenesController extends Controller
                 return ['success' => 2];
             }          
         } 
+    }
+
+
+    // reporte a clientes de todas las ordenes que ha realizado
+    public function reporteClienteOrdenes($id){
+
+        $ordenFiltro = DB::table('ordenes AS o')
+        ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+        ->select('o.id', 's.identificador', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden')
+        ->where('o.estado_7', 1) // solo ordenes completadas por motorista
+        ->where('o.users_id', $id)            
+        ->get();
+
+        $nombre = User::where('id', $id)->pluck('name')->first();
+
+        $subtotal = 0;
+        $envio = 0;
+        $conteo = 0;
+        $conteocupon = 0;
+
+        foreach($ordenFiltro as $o){
+
+            $o->conteo = $conteo + 1;
+
+            $subtotal = $subtotal + $o->precio_total;
+            $envio = $envio + $o->precio_envio;    
+            $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));
+
+            $cupon = "";
+            if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                if($cc = Cupones::where('id', $oc->cupones_id)->first()){
+
+                    $conteocupon = $conteocupon + 1;
+
+                    if($cc->tipo_cupon_id == 1){
+                        $cupon = "Envío Gratis";
+                    }else if($cc->tipo_cupon_id == 2){                        
+                        $ac = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                       
+                        if($ac->aplico_envio_gratis == 1){
+                            $cupon = "Descuento Dinero de $" . $ac->dinero . " + Envío Gratis";
+                        }else{
+                            $cupon = "Descuento Dinero de $" . $ac->dinero;
+                        }                         
+                        
+                    }else if($cc->tipo_cupon_id == 3){
+
+                        $ac = AplicaCuponTres::where('ordenes_id', $o->id)->first();
+
+                        $cupon = "Descuento Porcentaje de: " . $ac->porcentaje . "%";
+                    }else if($cc->tipo_cupon_id == 4){
+
+                        $ac = AplicaCuponCuatro::where('ordenes_id', $o->id)->first();
+
+                        $cupon = "Producto Gratis: " . $ac->producto;
+                    }else if($cc->tipo_cupon_id == 5){
+
+                        $ac = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
+                        $nn = Instituciones::where('id', $ac->instituciones_id)->first();
+                        $cupon = "Donación de $" . $ac->dinero . " A: " . $nn->nombre;
+                    }
+                }
+            } 
+
+            $o->cupon = $cupon;
+        } 
+
+        
+        $subtotal = number_format((float)$subtotal, 2, '.', '');
+        $envio = number_format((float)$envio, 2, '.', '');
+      
+
+        $view =  \View::make('backend.paginas.reportes.reporteclientesordenes', compact(['ordenFiltro', 'conteocupon', 'nombre', 'subtotal', 'envio']))->render();
+        $pdf = \App::make('dompdf.wrapper');
+        $pdf->loadHTML($view)->setPaper('carta', 'portrait');
+ 
+        return $pdf->stream();
+    }
+
+
+    // editar coordenadas a la orden ya realizada
+    public function actualizarCoordenadasOrden(Request $request){
+
+        if($request->isMethod('post')){  
+
+            $regla = array(  
+                'id' => 'required', 
+            );
+ 
+            $mensaje = array(
+                'id.required' => 'id es requerido',                      
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }
+            
+          if(Ordenes::where('id', $request->id)->first()){
+
+                OrdenesDirecciones::where('ordenes_id', $request->id)->update([
+                    'latitud' => $request->latitud,
+                    'longitud' => $request->longitud,
+                    'direccion' => $request->direccion
+                    ]);  
+ 
+            return ['success' => 1]; 
+          }else{
+            return ['success' => 2];
+          }
+        }
     }
  
     

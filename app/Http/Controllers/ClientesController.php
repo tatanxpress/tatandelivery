@@ -39,6 +39,10 @@ class ClientesController extends Controller
         ->whereDate('u.fecha', $fecha)
         ->get();
 
+        foreach($cliente as $c){
+            $c->fecha = date("d-m-Y h:i A", strtotime($c->fecha));
+        }
+
         return view('backend.paginas.cliente.tablas.tablacliente', compact('cliente'));
     } 
 

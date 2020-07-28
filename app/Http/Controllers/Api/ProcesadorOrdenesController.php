@@ -182,6 +182,9 @@ class ProcesadorOrdenesController extends Controller
                     $minimo = $servicioConsumo->minimo;
                     $utilizaMinimo = $servicioConsumo->utiliza_minimo;
                     $privado = $servicioConsumo->privado;
+
+                    // con esto se sabe si se paga al propietario del servicio o no
+                    $pagoPropi = $servicioConsumo->pago_a_ordenes;
                   
                     $minimoConsumido = 0;
 
@@ -647,7 +650,8 @@ class ProcesadorOrdenesController extends Controller
                         'cancelado_propietario' => 0,
                         'visible_m' => $productovisible, // si es 1, puede ver los productos el motorista
                         'ganancia_motorista' => $gananciamotorista ,
-                        'tipo_cargo' => $tipocargo // hay 4 tipos                    
+                        'tipo_cargo' => $tipocargo, // hay 4 tipos,
+                        'pago_a_propi' => $pagoPropi  
                         ]
                     );
  
@@ -1693,6 +1697,8 @@ class ProcesadorOrdenesController extends Controller
                             if($total <= 0){
                                 $total = 0;
                             }
+
+                            // no es necesario verificar si aplico el envio gratis, ya que este setea el envio a 0.00
 
                             // precio modificado con el descuento dinero
                             $o->precio_total = number_format((float)$total, 2, '.', '');

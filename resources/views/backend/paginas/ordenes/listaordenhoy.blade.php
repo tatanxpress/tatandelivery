@@ -84,7 +84,7 @@
             recargar();
             countdown();
         }
-    }
+    } 
     tick();
   }
 

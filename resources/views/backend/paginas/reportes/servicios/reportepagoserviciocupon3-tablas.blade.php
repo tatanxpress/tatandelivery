@@ -70,77 +70,43 @@
 }
 
 </style>
-    <!-- cabecera -->
-    <div class="row"> 
-            <center><p class="titulo">
-            PAGO DE ORDENES<br>
-            <p><font size="3">Del: {{ $f1 }}  Al: {{ $f2 }}</font></p>
-            {{ $nombre }}
-            </p>
-           </center>           
-    </div>  
+   
 
         <table id="customers">
           <tr>
-            <th># Orden</th>   
-            <th>Total</th> 
-            <th>Fecha</th>
-            <th>Cupón</th>
-            <th>Paga a P.</th>
+            <th># Orden</th>
+            <th>Fecha orden</th>
+            <th>Total orden</th>
+            <th>Porcentaje</th>
+            <th>Descuento</th>
+            <th>Total</th>
           </tr>
 
           @foreach($orden as $dato)
             <tr>
               <td>{{$dato->id }}</td>             
-              <td>${{$dato->precio_total}}</td>
               <td>{{$dato->fecha_orden}}</td>
-              <td>{{$dato->cupon}}</td>
-              @if($dato->pago_a_propi == 1)
-              <td>Si</td>
-              @else
-              <td>No</td>
-              @endif
-
+              <td>${{$dato->precio_total}}</td>
+              <td>{{$dato->porcentaje}}%</td>
+              <td>${{$dato->descuento}}</td>
+              <td>${{$dato->total}}</td>
             </tr> 
           @endforeach  
- 
-          <tr>
-            <td>Total:</td>
-            <td>${{ $totalDinero }}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-           
-          </tr>
-          
-          <tr>
-            <td>Comisión: {{ $comision }}%</td>
-            <td>${{ $suma }}</td>
-            <td></td>
-            <td></td>
-            <td></td>
-           
-          </tr>
 
           <tr>
-            <td>Pagar:</td>
-            <td>${{ $pagar }}</td>
+            <td>Total:</td>
             <td></td>
+            <td>${{ $totalorden }}</td>
             <td></td>
-            <td></td>
-            
+            <td>${{ $sumardescuento }}</td>
+            <td>${{ $totaldescontado }}</td>
           </tr>
-        
+         
+
         </table>
 
 
-        <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
-        </p>
 
-        
 
 </body>
-
 </html> 

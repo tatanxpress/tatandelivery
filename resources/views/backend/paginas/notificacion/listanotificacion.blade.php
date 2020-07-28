@@ -12,13 +12,12 @@
         <form class="form-horizontal" id="form1">
             <div class="card card-info">
                     <div class="card-header">
-                    <h3 class="card-title">Notificacion a propietarios y motoristas</h3>
+                    <h3 class="card-title">Notificacion a propietarios, motoristas y administradores</h3>
                     </div>
                     
                 <div class="card-body">
                     <div class="row">           
                         <div class="col-md-6">
-
 
                         <div class="form-group" style="width: 75%">
                             <label>Buscar por identificador de Servicio</label>
@@ -30,6 +29,7 @@
                             <i class="fas fa-pencil-alt"></i>
                                 Buscar propietarios
                         </button>     
+                        
                             
                         </div>
                     </div>
@@ -38,6 +38,10 @@
                 <div class="modal-footer justify-content-between">
                     <button type="button" class="btn btn-success" onclick="modalMotorista()">Notificación a Motorista</button>
                 </div>  
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-success" onclick="modalAdmin()">Notificación al Administrador</button>
+                </div> 
                 
             </div>
         </form>
@@ -162,6 +166,61 @@
     </div>      
 </div>
 
+<!-- modal administradores -->
+<div class="modal fade" id="modalAdmin">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Notificación a Administrador</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-admin">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Administradores App</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-admin">
+                                                <option value="0" selected>Seleccionar</option>
+                                            @foreach($administradores as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                            @endforeach   
+                                        </select>
+                                    </div> 
+                                </div> 
+
+
+                                <div class="form-group">
+                                    <label>Título</label>
+                                    <input type="text" maxlength="100" value="Hola" class="form-control" id="titulo-admin" placeholder="Título">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Descripción</label>
+                                    <input type="text" maxlength="100" value="Esto es una prueba" class="form-control" id="descripcion-admin" placeholder="Descripción">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="enviarNotificacionAdmin()">Enviar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+
+
 @extends('backend.menus.inferior')
 
 @section('content-admin-js') 
@@ -263,8 +322,12 @@
 
  
   function modalMotorista(){
-    document.getElementById("formulario-motorista").reset();
+    
     $('#modalMotorista').modal('show');
+  }
+
+  function modalAdmin(){    
+    $('#modalAdmin').modal('show');
   }
 
   function enviarNotificacion(){
@@ -290,7 +353,7 @@
     formData.append('titulo', titulo);
     formData.append('descripcion', descripcion);
             
-    axios.post('/admin/control/motorista/notificacion ', formData, {
+    axios.post('/admin/control/motorista/notificacion', formData, {
     })
     .then((response) => {
         
@@ -313,7 +376,55 @@
         loadingOverlay().cancel(spinHandle);
         toastr.error('Error');
     });
+  }
 
+
+  // enviar notificacion a administrador
+  function enviarNotificacionAdmin(){
+    var id = document.getElementById('select-admin').value;
+    var titulo = document.getElementById('titulo-admin').value;
+    var descripcion = document.getElementById('descripcion-admin').value;
+
+    if(titulo === ''){
+        toastr.error('Título es requerido');
+        return; 
+    }
+
+    if(descripcion === ''){
+        toastr.error('Descripción es requerido');
+        return;
+    }
+
+    var spinHandle = loadingOverlay().activate();
+    var formData = new FormData();
+    
+    formData.append('id', id);
+    formData.append('titulo', titulo);
+    formData.append('descripcion', descripcion);
+            
+    axios.post('/admin/control/administradores/notificacion', formData, {
+    })
+    .then((response) => {
+        
+        loadingOverlay().cancel(spinHandle);
+
+        if(response.data.success == 1) {
+            toastr.success('Enviado');
+        } else if(response.data.success == 2){
+            toastr.error('No se puede enviar, device 0000');
+        } else if(response.data.success == 3){
+            toastr.error('Administrador no encontrado');
+        }
+        else {
+            toastr.error('Error desconocido');
+        } 
+
+        $('#modalAdmin').modal('hide');
+    })
+    .catch((error) => {
+        loadingOverlay().cancel(spinHandle);
+        toastr.error('Error');
+    });
   }
 
 

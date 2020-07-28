@@ -309,7 +309,8 @@ class MotoristaController extends Controller
                 $orden = DB::table('ordenes AS o')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4', 
-                'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 'o.hora_2', 'o.estado_6')
+                'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 
+                'o.hora_2', 'o.estado_6', 'o.pago_a_propi')
                 ->where('o.estado_6', 0) // nadie a seteado este
                 ->where('o.estado_4', 1) // inicia la orden
                 ->where('o.estado_8', 0) // orden no cancelada
@@ -318,18 +319,18 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
-
                     
-                    $servicio = DB::table('zonas AS z')
-                    ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
-                    ->select('z.nombre')                    
-                    ->where('zs.servicios_id', $o->servicios_id)
-                    ->first();
+                    $o->direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
 
-                    $nombre = $servicio->nombre;
-                    $o->zona = $nombre;
-
+                    $pagarPropi = "";  // para decile si paga a propietario o no                 
+                    $cupon = ""; // texto para decir que tipo de cupon aplico
                     
+                    if($o->pago_a_propi == 1){
+                        // pagar a propietario
+                        $pagarPropi = "Pagar a Propietario $" . $o->precio_total; // sub total
+                    }
+
+                    $o->tipo = $pagarPropi;
 
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
@@ -337,36 +338,45 @@ class MotoristaController extends Controller
 
                      // buscar si aplico cupon
                      if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
+                       
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $cupon = "Envío Gratis";
+                            
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis 
+                            // cobrar a cliente                          
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
+                           
                             // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
 
-                            $total = $o->precio_total - $descuento;
+                            $total = $o->precio_total - $dd->dinero;
                             if($total <= 0){
                                 $total = 0;
                             }
 
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
+                            // si aplico envio gratis
+                            if($dd->aplico_envio_gratis == 1){
+                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
+                                
+                            }else{
+                                $cupon = "Descuento dinero: $" . $dd->dinero;
+                            }
 
+                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
+                            // sumar el precio de envio
+                            $suma = $total + $o->precio_envio; 
+ 
                             // precio modificado con el descuento dinero
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
+                        }else if($tipo->tipo_cupon_id == 3){                          
 
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
@@ -376,41 +386,45 @@ class MotoristaController extends Controller
                                 $total = 0;
                             }
 
+                            $cupon = "Descuento de: " . $porcentaje . "%";
+
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
+                          
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $sumado = $o->precio_total + $o->precio_envio;
                             $sumado = number_format((float)$sumado, 2, '.', '');
+
+                            $cupon = "Producto Gratis: " . $producto;
     
                             $o->precio_total = $sumado;
-
-                            $o->producto = $producto;
                         }
                         else if($tipo->tipo_cupon_id == 5){ // donacion
-                            $o->tipocupon = 5;
+                           
                             $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $cupon = "Donación de: $" . $donacion;
 
                             // sumar
                             $suma = $o->precio_total + $o->precio_envio + $donacion;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }
-                        else{
-                            $o->tipocupon = 0;
+                        }else{
+                            $total = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');     
                         }
 
-                    }else{
-                        $o->aplicacupon = 0;    
-                        
+                    }else{                                            
                         $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                        $o->precio_total = number_format((float)$total, 2, '.', '');                        
                     }
+
+                    $o->cupon = $cupon;
 
 
                 } //end foreach
@@ -560,7 +574,7 @@ class MotoristaController extends Controller
     }
 
     // saver coordenadas del cliente 
-   public function coordenadascliente(Request $request){
+    public function coordenadascliente(Request $request){
         $reglaDatos = array(
             'ordenid' => 'required'               
         );
@@ -590,7 +604,7 @@ class MotoristaController extends Controller
     }
 
      // ver producto individual de la orden
-     public function ordenProductosIndividual(Request $request){
+    public function ordenProductosIndividual(Request $request){
         if($request->isMethod('post')){ 
 
             // validaciones para los datos
@@ -788,7 +802,8 @@ class MotoristaController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
-                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 's.id AS servicioid', 'o.estado_8', 'o.visible_m')
+                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 0) // aun no han salido a entregarse
@@ -797,19 +812,20 @@ class MotoristaController extends Controller
 
                 // sumar mas envio
                 foreach($orden as $o){
-                  
-                    $zona = DB::table('zonas AS z')
-                    ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
-                    ->select('z.nombre AS nombreZona')
-                    ->where('zs.servicios_id', $o->servicioid)
-                    ->first();
-                    
-                    $nombre = $zona->nombreZona;
-                    $o->zona = $nombre;                
 
                     $fechaOrden = Carbon::parse($o->fecha_4);
                     $horaEstimadaEntrega = $fechaOrden->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->fecharecoger = $horaEstimadaEntrega;
+
+                    $pagarPropi = "";  // para decile si paga a propietario o no                 
+                    $cupon = ""; // texto para decir que tipo de cupon aplico
+
+                    if($o->pago_a_propi == 1){
+                        // pagar a propietario
+                        $pagarPropi = "Pagar a Propietario $" . $o->precio_total; // sub total
+                    }
+
+                    $o->tipo = $pagarPropi;
 
 
                      // buscar si aplico cupon
@@ -821,20 +837,28 @@ class MotoristaController extends Controller
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-
+                           
+                            $cupon = "Envío Gratis";
                             // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                            // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                           
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
 
-                            $total = $o->precio_total - $descuento;
+                            $total = $o->precio_total - $dd->dinero;
                             if($total <= 0){
                                 $total = 0;
                             }
+
+                            // si aplico envio gratis
+                            if($dd->aplico_envio_gratis == 1){
+                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
+                            }else{
+                                $cupon = "Descuento dinero: $" . $dd->dinero;
+                            }
+
+                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
 
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
@@ -843,8 +867,7 @@ class MotoristaController extends Controller
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
-
+                            
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
                             $total = $o->precio_total - $resta;
@@ -853,43 +876,45 @@ class MotoristaController extends Controller
                                 $total = 0;
                             }
 
+                            $cupon = "Descuento de: " . $porcentaje . "%";
+
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
+                           
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $sumado = $o->precio_total + $o->precio_envio;
                             $sumado = number_format((float)$sumado, 2, '.', '');
-    
-                            $o->precio_total = $sumado;
 
-                            $o->producto = $producto;
+                            $cupon = "Producto Gratis: " . $producto;
+    
+                            $o->precio_total = $sumado;                          
                         }
                         else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
+                            
                             $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $cupon = "Donación de: $" . $donacion;
 
                             // sumar
                             $suma = $o->precio_total + $o->precio_envio + $donacion;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
+                        }else{
+                            $total = $o->precio_total + $o->precio_envio;                       
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
                         }
-                        else{
-                            $o->tipocupon = 0;
-                        }
-
                     }else{
-                        $o->aplicacupon = 0;    
                         
                         $total = $o->precio_total + $o->precio_envio;                       
                         $o->precio_total = number_format((float)$total, 2, '.', '');
                     }
 
-                   
+                    $o->cupon = $cupon;
                 }
                 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -929,7 +954,8 @@ class MotoristaController extends Controller
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
-                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 's.id AS servicioid', 'o.estado_8', 'o.visible_m')
+                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 1) // van a entregarse
@@ -937,63 +963,70 @@ class MotoristaController extends Controller
                 ->get();
 
                
-
                 // sumar mas envio
                 foreach($orden as $o){
 
                     // Tiempo dado por propietario + tiempo de zona extra
                     $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                    
-                    // obtener nombre de la zona donde se entregara
-                    $zona = DB::table('zonas AS z')
-                    ->join('zonas_servicios AS zs', 'zs.zonas_id', '=', 'z.id')
-                    ->select('z.nombre AS nombreZona')
-                    ->where('zs.servicios_id', $o->servicioid)
-                    ->first();
-                    
-                    $nombre = $zona->nombreZona;
-                    $o->zona = $nombre;
-                    
                     $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
                     $fechaOrden = Carbon::parse($o->fecha_4);
                     $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');                   
                     $o->fecharecoger = $horaEstimadaEntrega;
+
+                    $cupon = "";
+                    $tipo = "";
+
+                    if($o->pago_a_propi == 1){
+                        $tipo = "Pagar a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
+                    } 
+
+                    $o->tipo = $tipo;
                     
                     // ver si fue cancelado desde panel de control
                     $o->canceladoextra = $tiempo->cancelado_extra;
                   
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
+                                        
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            $cupon = "Envío Gratis";
+                            
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis 
+                            // cobrar a cliente                          
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
+                        
                             // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
 
-                            $total = $o->precio_total - $descuento;
+                            $total = $o->precio_total - $dd->dinero;
                             if($total <= 0){
                                 $total = 0;
                             }
 
+                            // si aplico envio gratis
+                            if($dd->aplico_envio_gratis == 1){
+                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
+                                
+                            }else{
+                                $cupon = "Descuento dinero: $" . $dd->dinero;
+                            }
+
+                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
                             // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
+                            $suma = $total + $o->precio_envio; 
 
                             // precio modificado con el descuento dinero
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
+                        }else if($tipo->tipo_cupon_id == 3){                          
 
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
@@ -1003,43 +1036,45 @@ class MotoristaController extends Controller
                                 $total = 0;
                             }
 
+                            $cupon = "Descuento de: " . $porcentaje . "%";
+
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
+                        
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $sumado = $o->precio_total + $o->precio_envio;
                             $sumado = number_format((float)$sumado, 2, '.', '');
 
-                            $o->precio_total = $sumado;
-
-                            $o->producto = $producto;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
-                            $info = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
-                           
-                            $sumado = $o->precio_total + $o->precio_envio + $info->dinero;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
+                            $cupon = "Producto Gratis: " . $producto;
 
                             $o->precio_total = $sumado;
                         }
-                        else{
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;    
+                        else if($tipo->tipo_cupon_id == 5){ // donacion
                         
+                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $cupon = "Donación de: $" . $donacion;
+
+                            // sumar
+                            $suma = $o->precio_total + $o->precio_envio + $donacion;
+
+                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+                        }else{
+                            $total = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');     
+                        }
+
+                    }else{                                            
                         $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
+                        $o->precio_total = number_format((float)$total, 2, '.', '');                        
                     }
 
-
+                    $o->cupon = $cupon;
                 }
                 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -1474,56 +1509,84 @@ class MotoristaController extends Controller
 
                 $start = Carbon::parse($request->fecha1)->startOfDay(); 
                 $end = Carbon::parse($request->fecha2)->endOfDay();
+
+                $orden;
+
+                if($request->filtro == 1){ // solo ordenes donde se le pago a propietario
+                    $orden = DB::table('motorista_ordenes AS m')
+                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.pago_a_propi')
+                    ->where('o.estado_7', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->where('o.pago_a_propi')
+                    ->whereBetween('o.fecha_orden', [$start, $end]) 
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }else{
+                    $orden = DB::table('motorista_ordenes AS m')
+                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.pago_a_propi')
+                    ->where('o.estado_7', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->whereBetween('o.fecha_orden', [$start, $end]) 
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }
                 
-                $orden = DB::table('motorista_ordenes AS m')
-                ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id')
-                ->where('o.estado_7', 1) // solo completadas
-                ->where('m.motoristas_id', $request->id) // del motorista
-                ->whereBetween('o.fecha_orden', [$start, $end]) 
-                ->orderBy('o.id', 'DESC')
-                ->get();
+                
 
                 foreach($orden as $o){
                    
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                     
                     // nombre servicio
-                    $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
-                    $o->servicio = $nombreservicio;
+                    $o->servicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
 
                     // sacar direccion guardada de la orden
-                    $pack = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-                    $o->direccion = $pack->direccion;
+                    $o->direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
+                    
+                    $cupon = "";
+                    $tipo = "";
 
-                    // sacar zona de envio
-                    $zona = Zonas::where('id', $pack->zonas_id)->pluck('descripcion')->first();
-                    $o->zona = $zona;
+                    if($o->pago_a_propi == 1){
+                        $tipo = "Se pago a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
+                    }
+                    $o->tipo = $tipo;
 
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
+                        
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-
+                             
+                            $cupon = "Envío Gratis";
                             // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+                      
 
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                            // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                        }else if($tipo->tipo_cupon_id == 2){                           
 
-                            $total = $o->precio_total - $descuento;
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+
+                            $total = $o->precio_total - $dd->dinero;
                             if($total <= 0){
                                 $total = 0;
                             }
+
+                            // si aplico envio gratis
+                            if($dd->aplico_envio_gratis == 1){
+                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
+                            }else{
+                                $cupon = "Descuento dinero: $" . $dd->dinero;
+                            }
+
+                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
 
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
@@ -1531,8 +1594,7 @@ class MotoristaController extends Controller
                             // precio modificado con el descuento dinero
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
+                        }else if($tipo->tipo_cupon_id == 3){                          
 
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
@@ -1542,41 +1604,46 @@ class MotoristaController extends Controller
                                 $total = 0;
                             }
 
+                            $cupon = "Descuento de: " . $porcentaje . "%";
+
                             // sumar el precio de envio
                             $suma = $total + $o->precio_envio;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
+                          
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $sumado = $o->precio_total + $o->precio_envio;
                             $sumado = number_format((float)$sumado, 2, '.', '');
+
+                            $cupon = "Producto Gratis: " . $producto;
     
                             $o->precio_total = $sumado;
-                            $o->producto = $producto;
-                            
                         }
-                        else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
+                        else if($tipo->tipo_cupon_id == 5){ // donacion
+                           
                             $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+
+                            $cupon = "Donación de: $" . $donacion;
 
                             // sumar
                             $suma = $o->precio_total + $o->precio_envio + $donacion;
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }
-                        else{
-                            $o->tipocupon = 0;
+                        }else{
+                            $total = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');     
                         }
 
                     }else{
-                        $o->aplicacupon = 0;    
                         
                         $total = $o->precio_total + $o->precio_envio;                       
                         $o->precio_total = number_format((float)$total, 2, '.', '');
                     }
+
+                    $o->cupon = $cupon;
                 }
 
                 // sumar ganancia de motorista de esta fecha
@@ -1783,7 +1850,7 @@ class MotoristaController extends Controller
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
             if($validarDatos->fails()) 
-            {
+            { 
                 return [
                     'success' => 0, 
                     'message' => $validarDatos->errors()->all()
@@ -1807,7 +1874,8 @@ class MotoristaController extends Controller
                 $orden = DB::table('ordenes_encargo AS oe')
                 ->join('encargos AS e', 'e.id', '=', 'oe.encargos_id')
                 ->join('motorista_encargo_asignado AS m', 'm.encargos_id', '=', 'e.id')
-                ->select('oe.id', 'e.nombre', 'e.fecha_entrega', 'oe.encargos_id', 'oe.precio_subtotal', 'oe.precio_envio')
+                ->select('oe.id', 'e.nombre', 'e.fecha_entrega', 'oe.encargos_id',
+                 'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi')
                 ->where('e.permiso_motorista', 1) // ya tiene permiso de ver todas las ordenes de ese encargo
                 ->where('oe.visible_motorista', 1) // visible a motorista
                 ->where('m.motoristas_id', $request->id) 
@@ -1819,18 +1887,25 @@ class MotoristaController extends Controller
           
                 foreach($orden as $o){
                   
-                    $o->fecha_entrega = date("h:i A d-m-Y", strtotime($o->fecha_entrega));          
-                   
+                    $o->fecha_entrega = date("h:i A d-m-Y", strtotime($o->fecha_entrega));
                     $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
                
                     $o->direccion = $dd->direccion;
                     $o->latitud = $dd->latitud;
                     $o->longitud = $dd->longitud;
+                    
+                    $tipo = "";
+                    if($o->pago_a_propi == 1){
+                        // pagar a propietario
+                        $tipo = "Pagar a Propietario $". $o->precio_subtotal;
+                    }
+
+                    $o->tipo = $tipo;
 
                     $suma = $o->precio_subtotal + $o->precio_envio;
                     $o->total = number_format((float)$suma, 2, '.', '');
 
-                    $servicio = "Encargo Privado";
+                    $servicio = "";
                     if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
                         $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
                     }
@@ -2017,7 +2092,8 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 'o.encargos_id', 'o.revisado')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 
+                'o.estado_1', 'o.encargos_id', 'o.revisado', 'o.pago_a_propi')
                 ->where('o.visible_motorista', 1)
                 ->where('o.estado_2', 0) // aun no han salido a entregarse 
                 ->where('mo.motoristas_id', $request->id)
@@ -2030,14 +2106,21 @@ class MotoristaController extends Controller
                         $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
                     }
 
+                    $tipo = "";
+                    if($o->pago_a_propi == 1){
+                        // pagar a propietario
+                        $tipo = "Pagar a Propietario $". $o->precio_subtotal;
+                    }
+
+                    $o->tipo = $tipo;
+
                     $ee = Encargos::where('id', $o->encargos_id)->first();
 
                     $o->nombreencargo = $ee->nombre;
                     $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
 
                     $suma = $o->precio_envio + $o->precio_subtotal;
-                    $o->total = number_format((float)$suma, 2, '.', ''); 
- 
+                    $o->total = number_format((float)$suma, 2, '.', '');
                 }
 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -2076,7 +2159,7 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 
+                ->select('o.id', 'o.estado_1', 
                 'o.encargos_id', 'o.revisado')
                 ->where('o.estado_3', 0) // aun sin entregar al cliente
                 //->where('o.visible_motorista', 1) // no es necesario aqui
@@ -2091,18 +2174,16 @@ class MotoristaController extends Controller
                     $latiservicio = "";
                     $longiservicio = "";
 
-                    $sihayservicio = 0;
+                   
                     if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
                         $info = Servicios::where('id', $dd->servicios_id)->first();
                         
                         $servicio = $info->nombre;
                         $ubicacion = $info->direccion;
                         $latiservicio = $info->latitud;
-                        $longiservicio = $info->longitud;
-                        $sihayservicio = 1;
+                        $longiservicio = $info->longitud;                      
                     }
 
-                    $o->sihayservicio = $sihayservicio;
                     $o->ubicacion = $ubicacion;
                     $o->latiservicio = $latiservicio;
                     $o->longiservicio = $longiservicio;
@@ -2113,9 +2194,6 @@ class MotoristaController extends Controller
                     $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
 
                     $o->servicio = $servicio;
-
-                    $suma = $o->precio_envio + $o->precio_subtotal;
-                    $o->total = number_format((float)$suma, 2, '.', '');
  
                     $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
 
@@ -2173,10 +2251,22 @@ class MotoristaController extends Controller
 
                 if($oo->estado_2 == 0){
                      // actualizar estado, motorista va en camino
-                    OrdenesEncargo::where('id', $request->id)->update(['estado_2' => 1, 'fecha_2' => $fecha, 'revisado' => 3]);
+                    OrdenesEncargo::where('id', $request->id)->update(['estado_2' => 1, 
+                    'fecha_2' => $fecha, 'revisado' => 3]);
 
                     // envio de notificacion al cliente
+                    $dd = User::where('id', $oo->users_id)->first();
+                    if($dd->device_id != "0000"){
 
+                        $titulo = "Encargo #" . $oo->id;
+                        $mensaje = "Su encargo va en camino";
+
+                        try {
+                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id); 
+                        } catch (Exception $e) {
+                            
+                        }
+                    }
 
                 }
 
@@ -2258,7 +2348,8 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 'o.encargos_id', 'o.revisado')
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1',
+                 'o.encargos_id', 'o.revisado', 'o.pago_a_propi')
                 ->where('o.estado_3', 0) // aun sin entregar al cliente
                 ->where('o.visible_motorista', 1) // aun visible al motorista
                 ->where('o.estado_2', 1) // ya salio a entregarse
@@ -2268,12 +2359,15 @@ class MotoristaController extends Controller
 
                 foreach($orden as $o){
 
-                    $servicio = "Encargo Privado";
-                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
-                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    $tipo = "";
+                    $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
+                    $o->servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    
+                    if($o->pago_a_propi == 1){
+                        $tipo = "Se Paga a Propietario $" . number_format((float)$o->precio_subtotal, 2, '.', '');
                     }
 
-                    $o->servicio = $servicio;
+                    $o->tipo = $tipo;
 
                     $ee = Encargos::where('id', $o->encargos_id)->first();
 
@@ -2327,23 +2421,19 @@ class MotoristaController extends Controller
 
                 foreach($orden as $o){
 
-                    $servicio = "Encargo Privado";
+                    $servicio = "";
                     $ubicacion = "";
                     $latiservicio = "";
                     $longiservicio = "";
 
-                    $sihayservicio = 0;
-                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
-                        $info = Servicios::where('id', $dd->servicios_id)->first();
-                        
-                        $servicio = $info->nombre;
-                        $ubicacion = $info->direccion;
-                        $latiservicio = $info->latitud;
-                        $longiservicio = $info->longitud;
-                        $sihayservicio = 1;
-                    }
+                    $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
+                    $info = Servicios::where('id', $dd->servicios_id)->first();
+                    
+                    $servicio = $info->nombre;
+                    $ubicacion = $info->direccion;
+                    $latiservicio = $info->latitud;
+                    $longiservicio = $info->longitud;                    
 
-                    $o->sihayservicio = $sihayservicio;
                     $o->ubicacion = $ubicacion;
                     $o->latiservicio = $latiservicio;
                     $o->longiservicio = $longiservicio;
@@ -2355,9 +2445,6 @@ class MotoristaController extends Controller
 
                     $o->servicio = $servicio;
 
-                    $suma = $o->precio_envio + $o->precio_subtotal;
-                    $o->total = number_format((float)$suma, 2, '.', '');
- 
                     $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
 
                     $o->nombrecliente = $dd->nombre;
@@ -2408,6 +2495,20 @@ class MotoristaController extends Controller
                     OrdenesEncargo::where('id', $request->id)->update(['estado_3' => 1, 
                     'fecha_3' => $fecha, 'visible_motorista' => 0, 'revisado' => 4]);
                     // notificar al cliente que su encargo a sido entregado
+
+
+                    $dd = User::where('id', $oo->users_id)->first();
+                    if($dd->device_id != "0000"){
+
+                        $titulo = "Encargo Completado";
+                        $mensaje = "Muchas Gracias por su Compra";
+
+                        try {
+                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id); 
+                        } catch (Exception $e) {
+                            
+                        }
+                    }
                 }
 
 
@@ -2417,7 +2518,6 @@ class MotoristaController extends Controller
             }
         }
     }
-
 
     // mandar notificacion al cliente del encargo
     public function notificarClienteDelEncargo(Request $request){
@@ -2442,9 +2542,31 @@ class MotoristaController extends Controller
                 ];
             }  
 
-            if(OrdenesEncargo::where('id', $request->id)->first()){     
+            if($o = OrdenesEncargo::where('id', $request->id)->first()){     
 
-                // mandar notificacion
+                $datos = User::where('id', $o->users_id)->first();
+                
+                if($datos->device_id != "0000"){
+
+                    $titulo = "El Motorista se encuentra cerca de tu ubicación";
+                    $message = "Su orden esta cerca";
+
+                        try {
+                            $this->envioNoticacionCliente($titulo, $message, $datos->device_id); 
+                        } catch (Exception $e) {
+                            
+                        }
+
+                    $mensaje = "Notificación enviada";
+            
+                    return ['success' => 1, 'mensaje' => $mensaje];
+
+                }else{
+
+                    $mensaje = "Notificación no se pudo enviar";
+
+                    return ['success' => 2, 'mensaje' => $mensaje];
+                }  
 
 
                 return ['success' => 1];
@@ -2485,31 +2607,53 @@ class MotoristaController extends Controller
 
                 $start = Carbon::parse($request->fecha1)->startOfDay(); 
                 $end = Carbon::parse($request->fecha2)->endOfDay();
-                
-                $orden = DB::table('motorista_ordenes_encargo AS m')
-                ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id')
-                ->where('o.estado_3', 1) // solo completadas
-                ->where('m.motoristas_id', $request->id) // del motorista
-                ->whereBetween('o.fecha_3', [$start, $end]) 
-                ->orderBy('o.id', 'DESC')
-                ->get();
 
+                $orden;
+
+                if($request->filtro == 1){ // ordenes encargo que motorista pago a propietario
+                    $orden = DB::table('motorista_ordenes_encargo AS m')
+                    ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
+                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi')
+                    ->where('o.estado_3', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->where('o.pago_a_propi', 1)
+                    ->whereBetween('o.fecha_3', [$start, $end]) 
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }else{
+
+                    // revueltos, pagado a propietario y no
+                    $orden = DB::table('motorista_ordenes_encargo AS m')
+                    ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
+                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi')
+                    ->where('o.estado_3', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->whereBetween('o.fecha_3', [$start, $end]) 
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }
 
                 foreach($orden as $o){
                    
                     $o->fecha_3 = date("h:i A d-m-Y", strtotime($o->fecha_3));
                     
                     $servicio = "Encargo Privado";
-                    if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
-                        $servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
-                    }
-
-                    $o->servicio = $servicio;
-
+                    $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
+                    $o->servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
+                    
+                    $tipo = "";
+                    if($o->pago_a_propi == 1){
+                        $tipo = "Se Pago a Propietario $" . number_format((float)$o->precio_subtotal, 2, '.', '');
+                    }                    
+                    $o->tipo = $tipo;
+                    
+                    // se cobro a cliente
                     $suma = $o->precio_subtotal + $o->precio_envio;
                     $o->total = number_format((float)$suma, 2, '.', '');
+
+                    $o->precio_envio = number_format((float)$o->precio_envio, 2, '.', '');
                 }
 
                 // sumar ganancia de motorista de esta fecha

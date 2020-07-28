@@ -108,6 +108,18 @@
                                         </select>
                                     </div> 
                                 </div> 
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicio</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-servicio">
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div> 
+                                </div> 
                               
                             </div>
                         </div>
@@ -186,6 +198,15 @@
                                 </div> 
 
                                 <div class="form-group">
+                                    <label style="color:#191818">Servicio</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-servicio-editar">                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group">
                                     <label>Activo</label>
                                     <br>
                                     <input type="checkbox" id="activo">
@@ -236,53 +257,6 @@
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="editarEncargo()">Guardar</button>
             </div>          
-        </div>        
-    </div>      
-</div>
-
-<!-- asignar servicio -->
-<div class="modal fade" id="modalServicio">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Asignar Servicio?</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-servicio">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12"> 
-
-                                <div class="form-group">
-                                    <input type="hidden" id="idencargo-servicio">
-                                </div>
-
-                                <div class="form-group">
-                                    <label style="color:#191818">Servicio</label>
-                                    <br>
-                                    <div>
-                                        <select class="form-control" id="select-servicio">
-                                            @foreach($servicios as $item)                                                
-                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div> 
-                                </div> 
-
-                               
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="guardarAsignacion()">Guardar</button>
-            </div>           
         </div>        
     </div>      
 </div>
@@ -342,6 +316,21 @@
                         $('#fechainicio-editar').val(val.fecha_inicia); 
                         $('#fechafin-editar').val(val.fecha_finaliza);
                         $('#fechaentrega-editar').val(val.fecha_entrega); 
+                        
+
+                        var tipo = document.getElementById("select-servicio-editar");
+                        // limpiar select
+                        document.getElementById("select-servicio-editar").options.length = 0;
+                 
+                        $.each(response.data.servicios, function( key, val1 ){ 
+                             
+                        if(val.idservicio == val1.id){
+                                $('#select-servicio-editar').append('<option value="' +val1.id +'" selected="selected">'+val1.identificador+'</option>');
+                        }else{
+                                $('#select-servicio-editar').append('<option value="' +val1.id +'">'+val1.identificador+'</option>');
+                            }
+                        });
+
 
                         if(val.tipo_vista == 1){
                             $('#tipovista-editar option')[1].selected = true;
@@ -392,8 +381,8 @@
         var vistacliente = document.getElementById('vistacliente').checked;
         var checkmoto = document.getElementById('checkmotorista').checked;
         var checkpropi = document.getElementById('checkpropietario').checked;
-
-
+        var servicio = document.getElementById('select-servicio-editar').value;
+        
 
         var activo_1 = 0;
         var vistacliente_1 = 0;
@@ -411,17 +400,17 @@
 
         if(checkmoto){
             checkmoto_1 = 1;
-        }
+        } 
 
         if(checkpropi){
             checkpropi_1 = 1;
         }
 
 
-        var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega);
+        var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega, servicio);
 
         if(retorno){
-
+ 
             var spinHandle = loadingOverlay().activate();
             var formData = new FormData();
             formData.append('id', id);
@@ -437,7 +426,8 @@
             formData.append('vistacliente', vistacliente_1);
             formData.append('permisomotorista', checkmoto_1);
             formData.append('visiblepropietario', checkpropi_1);
-                        
+            formData.append('servicio', servicio);
+                                    
             axios.post('/admin/encargos/editar-encargos', formData, {
             })
             .then((response) => {
@@ -464,7 +454,7 @@
         }       
     }
 
-    function validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega){
+    function validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega, servicio){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -484,6 +474,11 @@
         if(nombre.length > 200){
             toastr.error("200 caracter máximo nombre");
             return false;
+        }
+
+        if(servicio === ''){
+            toastr.error("ID servicio es requerido");
+            return;
         }
         
         if(descripcion === ''){
@@ -530,9 +525,9 @@
         var fechafin = document.getElementById('fechafin-nuevo').value;
         var fechaentrega = document.getElementById('fechaentrega-nuevo').value;
         var tipovista = document.getElementById('tipovista-nuevo').value;
+        var servicio = document.getElementById('select-servicio').value;
 
-
-        var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega);
+        var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega, servicio);
         
         if(retorno){
             var spinHandle = loadingOverlay().activate();
@@ -546,6 +541,7 @@
             formData.append('fechafin', fechafin);
             formData.append('fechaentrega', fechaentrega);
             formData.append('tipovista', tipovista);
+            formData.append('servicio', servicio);
 
             axios.post('/admin/encargos/nuevo', formData, { 
                     })
@@ -574,7 +570,7 @@
 
     }
 
-    function validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega){
+    function validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega, servicio){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -584,6 +580,11 @@
         if(identificador.length > 100){
             toastr.error("100 caracter máximo identificador");
             return false;
+        }
+
+        if(servicio === '' || servicio === '0'){
+            toastr.error("ID servicio es requerido");
+            return;
         }
 
         if(nombre === ''){
@@ -652,32 +653,6 @@
     }
 
 
-    function modalServicio(id){
-        $('#idencargo-servicio').val(id);
-        $('#modalServicio').modal('show');
-    } 
-    
-    function guardarAsignacion(){
-        var idencargo = document.getElementById('idencargo-servicio').value;
-        var servicio = document.getElementById('select-servicio').value;
-     
-        var spinHandle = loadingOverlay().activate();
-        var formData = new FormData();
-        formData.append('idencargo', idencargo);
-        formData.append('idservicio', servicio);
-                    
-        axios.post('/admin/encargos/asignar-servicio', formData, {
-        })
-        .then((response) => {
-            loadingOverlay().cancel(spinHandle);
-
-            respu(response);
-        })
-        .catch((error) => {
-            loadingOverlay().cancel(spinHandle);
-            toastr.error('Error');
-        });
-    }
 
     function respu(response){
         

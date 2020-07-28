@@ -71,10 +71,10 @@ class RouteServiceProvider extends ServiceProvider
              ->group(base_path('routes/api.php'));
 
         // para tener otro archivo api
-        /*Route::prefix('api2')
+        Route::prefix('apiv2')
         ->middleware('api')
         ->namespace($this->namespace)
-        ->group(base_path('routes/api2.php'));*/
+        ->group(base_path('routes/apiv2.php'));
              
     }
 }

@@ -5,6 +5,7 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -47,6 +48,15 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+
+        // sin autorizacion para la api token
+        if($request->expectsJson()) 
+        {
+            if($exception instanceof UnauthorizedHttpException) {
+                return response()->json(['success' => 100, 'message' => 'Sin Autorización API']);             
+            }
+        }
+
         return parent::render($request, $exception);
     }
 
@@ -60,8 +70,9 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+            return response()->json(['error' => 'Unauthenticated.'], 401);          
         }
+        
         $guard = array_get($exception->guards(), 0);
         switch ($guard) {
           case 'admin':
@@ -76,4 +87,6 @@ class Handler extends ExceptionHandler
         }
         return redirect()->guest(route($login));
     }
+
+  
 }

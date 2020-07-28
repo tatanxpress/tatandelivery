@@ -58,6 +58,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="col-md-12">
+
                                         <div class="form-group">
                                             <label>Comision (No Decimales)</label>
                                             <input type="number" step="1" value="1" min="1" max="100" class="form-control" id="comision-nuevo">
@@ -165,6 +166,28 @@
                                                 <select class="form-control" id="select-vista">
                                                     <option value="0" selected>Tipo Restaurante</option>
                                                     <option value="1">Tipo Tienda</option>
+                                                </select>
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group">
+                                            <label style="color:#191818">Pagar Ordenes a Servicio?</label>
+                                            <br>
+                                            <div>
+                                                <select class="form-control" id="select-pagar">
+                                                    <option value="0" selected>No se paga al recibir</option>
+                                                    <option value="1">Se paga al recibir</option>
+                                                </select>
+                                            </div>
+                                        </div> 
+
+                                        <div class="form-group">
+                                            <label style="color:#191818">Pagar Encargos Servicio?</label>
+                                            <br>
+                                            <div>
+                                                <select class="form-control" id="select-pagar-encargo">
+                                                    <option value="0" selected>No se paga al recibir</option>
+                                                    <option value="1">Se paga al recibir</option>
                                                 </select>
                                             </div>
                                         </div> 
@@ -511,6 +534,29 @@
                             </div> 
 
                             <div class="form-group">
+                                <label style="color:#191818">Pagar Ordenes a Servicio?</label>
+                                <br>
+                                <div>
+                                    <select class="form-control" id="select-pagar-editar">
+                                        <option value="0" selected>No se paga al recibir</option>
+                                        <option value="1">Se paga al recibir</option>
+                                    </select>
+                                </div>
+                            </div> 
+
+                            
+                            <div class="form-group">
+                                <label style="color:#191818">Pagar Encargos a Servicio?</label>
+                                <br>
+                                <div>
+                                    <select class="form-control" id="select-encargos-editar">
+                                        <option value="0" selected>No se paga al recibir</option>
+                                        <option value="1">Se paga al recibir</option>
+                                    </select>
+                                </div>
+                            </div> 
+
+                            <div class="form-group">
                                 <label style="color:#191818">Tipo Servicio</label>
                                 <br>
                                 <div>
@@ -802,6 +848,9 @@
         var direccion = document.getElementById('direccion-nuevo').value;
         var tipovista = document.getElementById('select-vista').value;
 
+        var pagar = document.getElementById('select-pagar').value;
+        var pagarencargos = document.getElementById('select-pagar-encargo').value;
+ 
         var compra = document.getElementById('compra-nuevo').value;
         
         var cbprivado = document.getElementById('cbprivado').checked;
@@ -993,6 +1042,9 @@
             formData.append('minimocompra', minimocompra);
             formData.append('cbproducto', cbproducto_1);
             formData.append('cbprivado', cbprivado_1);
+
+            formData.append('pagar', pagar);
+            formData.append('pagarencargos', pagarencargos)
 
             formData.append('compra', compra);
             
@@ -1407,8 +1459,7 @@
                     $('#descripcion-editar').val(response.data.servicio.descripcion);
                     $('#descripcioncorta-editar').val(response.data.servicio.descripcion_corta);
 
-                    $('#compra-editar').val(response.data.servicio.compra_limite);
-                      
+                    $('#compra-editar').val(response.data.servicio.compra_limite);                      
                   
                     if(response.data.servicio.utiliza_minimo == 1){
                         $('#cbminimo-editar').prop('checked', true);
@@ -1438,6 +1489,14 @@
 
                     if(response.data.servicio.tipo_vista == 1){
                         $('#select-vista-editar option')[1].selected = true;
+                    }
+
+                    if(response.data.servicio.pago_a_ordenes == 1){
+                        $('#select-pagar-editar option')[1].selected = true;
+                    }
+
+                    if(response.data.servicio.pago_a_encargos == 1){
+                        $('#select-encargos-editar option')[1].selected = true;
                     }
 
                     if(response.data.servicio.cerrado_emergencia == 1){
@@ -1482,6 +1541,9 @@
         var longitud = document.getElementById('longitud-editar').value;
         var direccion = document.getElementById('direccion-editar').value;
         var tipovista = document.getElementById('select-vista-editar').value;
+
+        var pagar = document.getElementById('select-pagar-editar').value;
+        var pagarencargos = document.getElementById('select-encargos-editar').value;
 
         var compra = document.getElementById('compra-editar').value;
         
@@ -1551,6 +1613,9 @@
         formData.append('longitud', longitud);
         formData.append('direccion', direccion);
         formData.append('tipovista', tipovista);
+
+        formData.append('pagar', pagar);
+        formData.append('pagarencargos', pagarencargos);
 
         formData.append('compra', compra);
         

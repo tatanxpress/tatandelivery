@@ -71,12 +71,7 @@
 
 </style>
     <!-- cabecera -->
-    <div class="row"> 
-            <center><p class="titulo">
-            REPORTE DE COBRO (CUPÓN DONACIÓN)<br>          
-            </p>
-            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>           
-    </div>  
+   
 
         <table id="customers">
           <tr>
@@ -110,11 +105,6 @@
 
         </table>
 
-
-        <p class="oficina">
-        ___________________________   &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;  &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;   _________________________ <br>
-        &nbsp; &nbsp;  Administrador de Cobro  &nbsp; &nbsp; &nbsp; &nbsp;   &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;          Responsable del Servicio         
-        </p>
 
 
 </body>

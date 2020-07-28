@@ -91,6 +91,7 @@
             <th style="width: 10%"># Orden</th>
             <th style="width: 15%">Fecha Completo</th>
             <th style="width: 15%">Total orden</th>
+            <th style="width: 15%">Pagado a Propi.</th>
           </tr>
         
           @foreach($orden as $dato)
@@ -98,6 +99,7 @@
               <td>{{$dato->id }}</td>             
               <td>{{$dato->fecha_1}}</td>
               <td>${{$dato->precio_subtotal}}</td>
+              <td>{{$dato->pagado}}</td>
             </tr> 
           @endforeach  
          
@@ -106,19 +108,21 @@
             <td>Total:</td>
             <td></td>
             <td>${{ $totalDinero }}</td>
+            <td></td>
           </tr>
 
           <tr>
             <td>Comisión: {{ $comision }}%</td>
             <td></td>
             <td>${{ $suma }}</td>
+            <td></td>
           </tr>
 
           <tr>
             <td>Pagar:</td>
             <td></td>
             <td>${{ $pagar }}</td>
-            
+            <td></td>
             
           </tr>
 

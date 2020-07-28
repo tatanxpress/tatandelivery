@@ -32,6 +32,9 @@ use App\MotoristaEncargoAsignado;
 use App\Motoristas;
 use App\EncargoAsignadoServicio; 
 use App\Servicios;
+use OneSignal;
+
+
 
 class EncargosWebController extends Controller
 {
@@ -154,10 +157,13 @@ class EncargosWebController extends Controller
                 foreach($encargo as $e){
                     $e->fecha_entrega = date("Y-m-d\TH:i", strtotime($e->fecha_entrega));
                     $e->fecha_finaliza = date("Y-m-d\TH:i", strtotime($e->fecha_finaliza));
+
+                    $e->idservicio = EncargoAsignadoServicio::where('encargos_id', $e->id)->pluck('servicios_id')->first();
                 }
+               
+                $servicios = Servicios::all();
 
-
-                return ['success' => 1, 'encargo' => $encargo];
+                return ['success' => 1, 'encargo' => $encargo, 'servicios' => $servicios];
             }else{
                 return ['success' => 2];
             }
@@ -213,26 +219,49 @@ class EncargosWebController extends Controller
             $fecha = Carbon::now('America/El_Salvador');
 
             if($upload){ 
+
+                DB::beginTransaction();
+           
+                try {
  
-                $e = new Encargos();
-                $e->identificador = $request->identificador;
-                $e->nombre = $request->nombre;
-                $e->descripcion = $request->descripcion;
-                $e->ingreso = $fecha;
-                $e->fecha_inicia = $request->fechainicio;
-                $e->fecha_finaliza = $request->fechafin;
-                $e->fecha_entrega = $request->fechaentrega;
-                $e->activo = 1;
-                $e->imagen = $nombreFoto;
-                $e->tipo_vista = $request->tipovista;
-                $e->permiso_motorista = 0; // aun el moto asignado no puede ver el encargo
-                $e->vista_cliente = 0; // encargo activo pero no visible al cliente aun
-                $e->visible_propietario = 1; // visible al propietario la tarjeta si esta asignado. 
-                                            // una vez complete las ordenes_encargo podra ocultar la tarjeta
-                if($e->save()){
-                    return ['success' => 2];
-                }{
-                    return ['success' => 3];
+                    $e = new Encargos();
+                    $e->identificador = $request->identificador;
+                    $e->nombre = $request->nombre;
+                    $e->descripcion = $request->descripcion;
+                    $e->ingreso = $fecha;
+                    $e->fecha_inicia = $request->fechainicio;
+                    $e->fecha_finaliza = $request->fechafin;
+                    $e->fecha_entrega = $request->fechaentrega;
+                    $e->activo = 1;
+                    $e->imagen = $nombreFoto;
+                    $e->tipo_vista = $request->tipovista;
+                    $e->permiso_motorista = 0; // aun el moto asignado no puede ver el encargo
+                    $e->vista_cliente = 0; // encargo activo pero no visible al cliente aun
+                    $e->visible_propietario = 1; // visible al propietario la tarjeta si esta asignado. 
+                                                // una vez complete las ordenes_encargo podra ocultar la tarjeta
+                    if($e->save()){
+ 
+                        $n = new EncargoAsignadoServicio();
+                        $n->encargos_id = $e->id;
+                        $n->servicios_id = $request->servicio;
+
+                        if($n->save()){
+
+                            DB::commit();
+
+                            return ['success' => 2];
+                        }else{
+                            return ['success' => 3];
+                        }                        
+                    }else{
+                        return ['success' => 3];
+                    }
+
+                } catch(\Throwable $e){
+                    DB::rollback();
+                    return [
+                        'success' => 3
+                    ];
                 }
             }
         }
@@ -308,6 +337,17 @@ class EncargosWebController extends Controller
                             'permiso_motorista' => $request->permisomotorista,
                             'visible_propietario' => $request->visiblepropietario
                             ]);
+
+                            // editar servicio, vendra null en encargos finalizados
+                            if($request->servicio != null){
+                                if(EncargoAsignadoServicio::where('encargos_id', $request->id)->first()){
+                                  
+                                    EncargoAsignadoServicio::where('encargos_id', $request->id)->update([
+                                    'servicios_id' => $request->servicio
+                                    ]);
+                                } 
+                            }
+                            
                             
                         if(Storage::disk('listaservicios')->exists($imagenOld)){
                             Storage::disk('listaservicios')->delete($imagenOld);                                
@@ -335,6 +375,17 @@ class EncargosWebController extends Controller
                         'permiso_motorista' => $request->permisomotorista,
                         'visible_propietario' => $request->visiblepropietario    
                         ]);
+
+                        // editar servicio, vendra null en encargos finalizados
+                        if($request->servicio != null){
+                            if(EncargoAsignadoServicio::where('encargos_id', $request->id)->first()){
+                            
+                                EncargoAsignadoServicio::where('encargos_id', $request->id)->update([
+                                'servicios_id' => $request->servicio
+                                ]);
+                            } 
+                        }                        
+                        
 
                     return ['success' => 2];
                 } 
@@ -380,7 +431,7 @@ class EncargosWebController extends Controller
 
                         return ['success' => 2]; // editado
                 
-            }else{
+            }else{ 
                
                 // verificar que no haya ninguno igual
                 if(EncargoAsignadoServicio::where('encargos_id', $request->idencargo)->first()){
@@ -1589,18 +1640,33 @@ class EncargosWebController extends Controller
                 ];
             }
 
-            if(OrdenesEncargo::where('id', $request->id)->first()){
+            if($od = OrdenesEncargo::where('id', $request->id)->first()){
                 
                 OrdenesEncargo::where('id', $request->id)->update([
                     'revisado' => 2 // en proceso
                     ]);
 
-                
-                
-                return ['success' => 1];
+                // notificacion al cliente de esta orden
+                $dd = User::where('id', $od->users_id)->first();
+
+                if($dd->device_id != "0000"){ // evitar id malos
+
+                    $titulo = "Encargo #".$od->id;
+                    $mensaje = "Muchas Gracias por confirmar su Encargo.";
+
+                    try {
+                        $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id); 
+                    } catch (Exception $e) {
+                        
+                    }
+
+                     return ['success' => 1];
+                }else{
+                    return ['success' => 2];
+                }               
 
             }else{
-                return ['success' => 2]; 
+                return ['success' => 3]; 
             }
         }
     }
@@ -1857,6 +1923,12 @@ class EncargosWebController extends Controller
             }
         }
     } 
+
+
+
+    public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
+    }
 
 
 }
