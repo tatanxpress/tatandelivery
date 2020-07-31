@@ -80,7 +80,7 @@ Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@p
     
 Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
  
-  
+   
   
 // seccion encargos
 Route::post('usuario/encargos/por-zona', 'Api\EncargosController@encargosPorZona'); // lista de encargos
@@ -88,7 +88,7 @@ Route::post('usuario/encargos/categorias-vertical', 'Api\EncargosController@list
 Route::post('usuario/encargos/categorias-horizontal', 'Api\EncargosController@listaDeCategoriasHorizontal'); // lista de categorias con productos horizontales
 Route::post('usuario/encargos/categorias-horizontal-seccion', 'Api\EncargosController@listaDeCategoriasHorizontalSeccion'); // lista de categorias con productos horizontales
 
-  
+   
 Route::post('usuario/encargos/producto-individual', 'Api\EncargosController@productoIndividual'); // producto individual del encargo
 Route::post('usuario/encargos/agregar-producto', 'Api\EncargosController@agregarProductoEncargo'); // agregar producto de encargo
 Route::post('usuario/encargos/ver-carrito', 'Api\EncargosController@verCarritoDeCompras'); // ver carrito de compras
@@ -169,7 +169,7 @@ Route::post('propietarios/zonas/mapa', 'Api\PropietarioController@verMapaZona');
 Route::post('propietario/productos', 'Api\PropietarioController@verProductos'); // listado de productos vertical
 Route::post('propietario/productos-h', 'Api\PropietarioController@verProductosHorizontal'); // listado de productos horizontal
 Route::post('propietario/productos-h-seccion', 'Api\PropietarioController@buscarProductoSeccion'); // lista de productos "ver todos"
-  
+   
 Route::post('propietario/producto/individual', 'Api\PropietarioController@verProductosIndividual'); // ver producto individual
 Route::post('propietario/actualizar/producto', 'Api\PropietarioController@actualizarProducto'); // actualizar producto
 Route::post('propietarios/buscar/producto', 'Api\PropietarioController@buscarProducto'); // locales tipo tienda

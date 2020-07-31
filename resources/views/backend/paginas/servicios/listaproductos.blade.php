@@ -77,7 +77,8 @@
 
                                 <div class="form-group">
                                     <label>Descripcion</label>
-                                    <input type="text" maxlength="500" class="form-control" id="descripcion-nuevo" placeholder="Descripcion producto">
+                                    <textarea maxlength="500" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
+
                                 </div>
 
                                 <div class="form-group">
@@ -177,9 +178,10 @@
                                     <label>Nombre</label>
                                     <input type="text" maxlength="50" class="form-control" id="nombre-editar" placeholder="Nombre producto">
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group"> 
                                     <label>Descripcion</label>
-                                    <input type="text" maxlength="500" class="form-control" id="descripcion-editar" placeholder="Descripcion producto">
+                                    <textarea maxlength="500" rows="2" class="form-control" id="descripcion-editar" placeholder="Descripción producto"></textarea>
+
                                 </div>
                                 <div class="form-group">
                                     <label id="txtImagen">Imagen producto</label>

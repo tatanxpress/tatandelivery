@@ -24,6 +24,7 @@ use App\EncargoAsignarMoto;
 use App\ListaEncargo;
 use App\ListaProductoEncargo;
 use App\OrdenesEncargoDireccion;
+use App\CategoriasNegocio;
 
 class EncargosController extends Controller
 {
@@ -111,6 +112,21 @@ class EncargosController extends Controller
 
                 $fechaNombre = $dianumero . " de " . $mes . " a las " . $hora;
                 $e->fecha_entrega = $fechaNombre;
+
+                // fecha estatica para iphone
+
+                setlocale(LC_ALL, 'es_ES');
+                $mesfechaf = date("d-m-Y", strtotime($e->fecha_finaliza));
+                $fechaf = Carbon::parse($mesfechaf);
+                $fechaf->format("F"); 
+                $mesf = $fechaf->formatLocalized('%B');
+                
+                $dianumerof = date("d", strtotime($e->fecha_finaliza));
+                $horaf = date("h:i A", strtotime($e->fecha_finaliza));               
+
+                $fechaiphone = $dianumerof . " de " . $mesf . " a las " . $horaf;
+                $e->fechaiphone = $fechaiphone;
+
 
                 $e->estado = $estado; // si es 1, esto ha finalizado
                 $e->packTiempo = $packTiempo;
@@ -269,7 +285,7 @@ class EncargosController extends Controller
                 ];
             }  
         
-            if(ListaEncargo::where('id', $request->seccionid)->first()){
+            if($ll = ListaEncargo::where('id', $request->seccionid)->first()){
 
                 // si pudo ver esta pantalla, porque categoria estaba activa
                 $productos = DB::table('lista_producto_encargo AS l')
@@ -278,13 +294,13 @@ class EncargosController extends Controller
                 ->where('l.activo', 1) // producto unicamente activo
                 ->where('l.lista_encargo_id', $request->seccionid)            
                 ->get();
-                
-                return ['success' => 1, 'productos' => $productos];
+
+                $categoria = CategoriasNegocio::where('id', $ll->categorias_negocios_id)->pluck('nombre')->first();
+
+                return ['success' => 1, 'productos' => $productos, 'categoria' => $categoria];
             }else{
                 return ['success' => 2];
-            }
-
-                                 
+            }                                 
         }
     }
 
@@ -311,7 +327,6 @@ class EncargosController extends Controller
                 ];
             }
  
-
             if(ListaProductoEncargo::where('id', $request->productoid)->first()){
 
                 $producto = DB::table('lista_producto_encargo AS l')
@@ -339,7 +354,7 @@ class EncargosController extends Controller
                 'mismoservicio' => 'required' // para preguntar si borra contenido anterior y crear nuevo carrito
             );    
                     
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(  
                 'userid.required' => 'El id del usuario es requerido.',
                 'productoid.required' => 'El id del producto es requerido.',
                 'mismoservicio.required' => 'El ID del mismo servicio requerido.', 
@@ -810,7 +825,7 @@ class EncargosController extends Controller
                 $orden = DB::table('ordenes_encargo AS o')
                     ->join('encargos AS e', 'e.id', '=', 'o.encargos_id')
                     ->select('o.id', 'e.nombre',
-                    'e.fecha_finaliza', 'o.mensaje_cancelado', 'o.precio_envio', 
+                    'e.fecha_finaliza', 'o.precio_envio', 
                     'o.revisado', 'o.precio_subtotal', 'o.fecha_orden', 'e.fecha_entrega') 
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible_cliente', 1)
@@ -1160,7 +1175,7 @@ class EncargosController extends Controller
 
            
             // buscar si tiene carrito
-            if(CarritoEncargoProducto::where('id', $request->id)->first()){
+            if($data = CarritoEncargoProducto::where('id', $request->id)->first()){
 
                 // informacion del producto + cantidad elegida
                 $producto = DB::table('carrito_encargo_pro AS o')
@@ -1169,10 +1184,14 @@ class EncargosController extends Controller
                 ->where('o.id', $request->id)
                 ->get();
                
+                // obtener nombre de la categoria
+                $dd = ProductoCategoriaNegocio::where('id', $data->producto_cate_nego_id)->first();
+                $categoria = CategoriasNegocio::where('id', $dd->categorias_negocio_id)->pluck('nombre')->first();
 
                 return [
                     'success' => 1,
                     'producto' => $producto,
+                    'categoria' => $categoria
                 ];
 
                 

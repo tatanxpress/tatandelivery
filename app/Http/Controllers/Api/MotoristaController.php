@@ -1512,7 +1512,7 @@ class MotoristaController extends Controller
 
                 $orden;
 
-                if($request->filtro == "1"){ // solo ordenes donde se le pago a propietario
+                if($request->filtro == 1){ // solo ordenes donde se le pago a propietario
                     $orden = DB::table('motorista_ordenes AS m')
                     ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
                     ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
@@ -1534,8 +1534,6 @@ class MotoristaController extends Controller
                     ->orderBy('o.id', 'DESC')
                     ->get();
                 }
-                 
-                
 
                 foreach($orden as $o){
                    
