@@ -77,7 +77,7 @@
 
                                 <div class="form-group">
                                     <label>Descripcion</label>
-                                    <textarea maxlength="500" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
+                                    <textarea maxlength="2000" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
 
                                 </div>
 
@@ -180,7 +180,7 @@
                                 </div>
                                 <div class="form-group"> 
                                     <label>Descripcion</label>
-                                    <textarea maxlength="500" rows="2" class="form-control" id="descripcion-editar" placeholder="Descripción producto"></textarea>
+                                    <textarea maxlength="2000" rows="2" class="form-control" id="descripcion-editar" placeholder="Descripción producto"></textarea>
 
                                 </div>
                                 <div class="form-group">
@@ -409,8 +409,8 @@
             return;
         }
         
-        if(descripcion.length > 500){
-            toastr.error("500 caracter máximo descripcion");
+        if(descripcion.length > 2000){
+            toastr.error("2000 caracter máximo descripcion");
             return false;
         }
 
@@ -669,8 +669,8 @@
             return false;
         }
 
-        if(descripcion.length > 500){
-            toastr.error("500 caracter máximo descripcion");
+        if(descripcion.length > 2000){
+            toastr.error("2000 caracter máximo descripcion");
             return false;
         }
 

@@ -18,7 +18,7 @@ class CreateProductoTable extends Migration
             $table->bigInteger('servicios_tipo_id')->unsigned();
             $table->string('nombre', 50);
             $table->string('imagen', 100);
-            $table->string('descripcion', 500)->default("");
+            $table->string('descripcion', 2000)->default("");
             $table->decimal('precio', 10,2);
             $table->integer('unidades');
             $table->boolean('disponibilidad');
