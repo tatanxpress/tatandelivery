@@ -25,6 +25,8 @@ use App\ListaEncargo;
 use App\ListaProductoEncargo;
 use App\OrdenesEncargoDireccion;
 use App\CategoriasNegocio;
+use App\EncargoAsignadoServicio;
+use App\Servicios;
 
 class EncargosController extends Controller
 {
@@ -331,10 +333,17 @@ class EncargosController extends Controller
 
                 $producto = DB::table('lista_producto_encargo AS l')
                 ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'l.producto_cate_nego_id')
-                ->select('l.id', 'pc.nombre', 'pc.imagen', 'pc.descripcion', 'pc.precio', 'pc.utiliza_nota', 'pc.nota')
+                ->select('l.id', 'pc.nombre', 'pc.imagen', 'pc.descripcion',
+                 'pc.precio', 'pc.utiliza_nota', 'pc.nota', 'l.producto_cate_nego_id')
                 ->where('l.id', $request->productoid)
                 ->get();
-              
+
+                foreach($producto as $p){
+                    $data = ProductoCategoriaNegocio::where('id', $p->producto_cate_nego_id)->first();
+                    $datacate = CategoriasNegocio::where('id', $data->categorias_negocio_id)->first();
+                    $p->categoria = $datacate->nombre;
+                }
+                              
                 return ['success' => 1, 'producto' => $producto];
 
             }else{
@@ -370,8 +379,6 @@ class EncargosController extends Controller
             } 
  
             // verificar primero si el encargo finalizo
-
-          
 
             $tiempoHoy = Carbon::now('America/El_Salvador');
             $tiempoReal = new DateTime($tiempoHoy);
@@ -504,11 +511,10 @@ class EncargosController extends Controller
 
                 DB::beginTransaction();
                 try {
-
+ 
                     // preguntar si usuario ya tiene un carrito de compras
                     if($cart = CarritoEncargo::where('users_id', $request->userid)->first()){
 
-                        $titulo = Encargos::where('id', $cart->encargos_id)->pluck('nombre')->first();
                         
                         $producto = DB::table('producto_categoria_negocio AS p')
                         ->join('carrito_encargo_pro AS c', 'c.producto_cate_nego_id', '=', 'p.id')          
@@ -518,22 +524,24 @@ class EncargosController extends Controller
   
                     // sub total de la orden
  
-                    foreach($producto as $p){
-                        $cantidad = $p->cantidad;
-                        $precio = $p->precio;
-                        $multi = $cantidad * $precio;
-                        $p->multiplicado = number_format((float)$multi, 2, '.', '');
-                    }
+                        foreach($producto as $p){
+                            $cantidad = $p->cantidad;
+                            $precio = $p->precio;
+                            $multi = $cantidad * $precio;
+                            $p->multiplicado = number_format((float)$multi, 2, '.', '');
+                        }
 
-                    // verificar unidades de cada producto
-                    foreach ($producto as $pro) {                            
-                        $pro->precio = number_format((float)$pro->precio, 2, '.', '');
-                    } 
-            
+                        // verificar unidades de cada producto
+                        foreach ($producto as $pro) {                            
+                            $pro->precio = number_format((float)$pro->precio, 2, '.', '');
+                        } 
+
+                        $subTotal = collect($producto)->sum('multiplicado'); 
+                        $subTotal = number_format((float)$subTotal, 2, '.', '');
                         return [
                             'success' => 1,
                             'producto' => $producto,
-                            'servicio' => $titulo                                  
+                            'subtotal' => $subTotal                        
                         ];
 
                     }else{
@@ -716,6 +724,10 @@ class EncargosController extends Controller
                     $datosZona = EncargosZona::where('encargos_id', $cart->encargos_id)->first();
 
                     $fecha = Carbon::now('America/El_Salvador');
+
+                    $idservicio = EncargoAsignadoServicio::where('encargos_id', $cart->encargos_id)->pluck('servicios_id')->first();
+
+                    $pagopropi = Servicios::where('id', $idservicio)->first();
                     
                     $orden = new OrdenesEncargo();
                     $orden->encargos_id = $cart->encargos_id;
@@ -734,7 +746,8 @@ class EncargosController extends Controller
                     $orden->estado_1 = 0;
                     $orden->estado_2 = 0;
                     $orden->estado_3 = 0;
- 
+                    $orden->pago_a_propi = $pagopropi->pago_a_encargos;
+
                     $orden->save();
 
                     // obtener direccion
@@ -856,8 +869,22 @@ class EncargosController extends Controller
                         $o->tipoestado = "Cancelado";
                     }else{
                         $o->tipoestado = "Pendiente";
-                    }     
+                    }   
                     
+                    // cambiar formato a fecha de entrega
+
+                    
+                    setlocale(LC_ALL, 'es_ES');
+                    $mesfechaf = date("d-m-Y", strtotime($o->fecha_entrega));
+                    $fechaf = Carbon::parse($mesfechaf);
+                    $fechaf->format("F"); 
+                    $mesf = $fechaf->formatLocalized('%B');
+                    
+                    $dianumerof = date("d", strtotime($o->fecha_entrega));
+                    $horaf = date("h:i A", strtotime($o->fecha_entrega));               
+
+                    $o->fecha_entrega = $dianumerof . " de " . $mesf . " a las " . $horaf;                
+                     
                     $o->direccion = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->pluck('direccion')->first();
                 }
 

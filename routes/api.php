@@ -60,6 +60,10 @@ Route::post('usuario/servicios/buscar/global', 'Api\BuscadorController@buscarPro
 
 // proceso    
 Route::post('usuario/proceso/ver/ordenes', 'Api\ProcesadorOrdenesController@verOrdenes'); // ver orden hecha por mismo usuario
+
+// mejorado para version 1.18 android, para ver que tipo de cupon se ha aplicado 05/08/2020
+Route::post('usuario/proceso/ver/ordenes-mejorado', 'Api\ProcesadorOrdenesController@verOrdenesMejorado');
+
 Route::post('usuario/proceso/ver/orden/id', 'Api\ProcesadorOrdenesController@verOrdenPorID'); // ver orden por id
 
 // version mejorada para android, pero ya no utilizada en nueva actualizacion
@@ -111,7 +115,7 @@ Route::post('usuario/encargos/completar-encargo', 'Api\EncargosController@comple
 
 
 
-
+ 
    
 // PROPIETARIOS   
   
@@ -143,7 +147,7 @@ Route::post('propietario/borrar/orden', 'Api\PropietarioController@borrarOrden')
 // cancelar orden extraordinariamente
 Route::post('propietario/cancelar/extraordinario', 'Api\PropietarioController@cancelarOrdenExtraordinariamente'); // cancelar orden extraordinariamente
   
- 
+  
 Route::post('propietario/ver/pago', 'Api\PropietarioController@verPagosCompletos'); // ver ordenes completadas
 Route::post('propietario/ver/pago/canceladas', 'Api\PropietarioController@verPagosCancelados'); // ver ordenes completadas
 Route::post('propietario/completadas/hoy', 'Api\PropietarioController@verCompletadasHoy'); // ver ordenes completadas hoy
@@ -200,10 +204,10 @@ Route::post('afiliado/encargos/orden/ver-productos-individual', 'Api\Afiliados\A
 
 Route::post('afiliado/encargos/ver/finalizados-hoy', 'Api\Afiliados\AfiliadosVersion2Controller@verEncargosFinalizadosHoy');
 
-Route::post('afiliado/encargos/ver/historia-encargos', 'Api\Afiliados\AfiliadosVersion2Controller@verHistorialDeEncargosFinalizados');
+Route::post('afiliado/encargos/ver/historial-encargos', 'Api\Afiliados\AfiliadosVersion2Controller@verHistorialDeEncargosFinalizados');
 
 
-
+  
 
     //** Fin Version 2 para Afiliados */
 

@@ -38,6 +38,9 @@ use App\OrdenesEncargo;
 use App\EncargoAsignadoServicio;
 use App\Encargos;
 use OneSignal;
+use App\ProductoCategoriaNegocio;
+use App\CategoriasNegocio;
+
 
 class AfiliadosVersion2Controller extends Controller
 {
@@ -771,6 +774,7 @@ class AfiliadosVersion2Controller extends Controller
             $lista = DB::table('ordenes_encargo')
             ->select('id', 'precio_subtotal', 'fecha_orden', 'estado_0', 'revisado')
             ->where('visible_propietario', 1) // cuando finaliza orden se setea a 0, para no volver a verlo y solo orden no cancelada
+            ->whereIn('revisado', [1, 2]) // los pendientes de confirmacion y en proceso
             ->where('encargos_id', $request->encargoid) 
             ->get();
 
@@ -1023,16 +1027,23 @@ class AfiliadosVersion2Controller extends Controller
 
             $producto = DB::table('ordenes_encargo_producto AS op')
             ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'op.producto_cate_nego_id')
-            ->select('pc.id', 'pc.nombre', 'pc.imagen', 'pc.precio', 'pc.descripcion', 'pc.utiliza_nota', 'op.cantidad', 'op.nota')
+            ->select('pc.id', 'pc.nombre', 'pc.imagen', 'pc.precio', 
+            'pc.descripcion', 'pc.utiliza_nota', 'op.cantidad', 'op.nota', 'op.producto_cate_nego_id')
             ->where('op.id', $request->productoid)
             ->orderBy('op.id', 'ASC')
             ->get();
+
+            $categoria = "";
 
             foreach($producto as $p){
                 $cantidad = $p->cantidad;
                 $precio = $p->precio;
                 $multi = $cantidad * $precio;
                 $p->multiplicado = number_format((float)$multi, 2, '.', '');
+
+                $data = ProductoCategoriaNegocio::where('id', $p->producto_cate_nego_id)->first();
+                $datacate = CategoriasNegocio::where('id', $data->categorias_negocio_id)->first();
+                $p->categoria = $datacate->nombre;
             }
 
             return ['success' => 1, 'productos' => $producto];

@@ -1443,6 +1443,13 @@ class PropietarioController extends Controller
                         $precio = $p->precio;
                         $multi = $cantidad * $precio;
                         $p->multiplicado = number_format((float)$multi, 2, '.', '');
+
+                        $desc = $p->descripcion;
+                        if($p->descripcion == "."){
+                            $desc = "";
+                        }
+
+                        $p->descripcion = $desc;                        
                     }
             
                 return ['success' => 1, 'producto' => $producto];

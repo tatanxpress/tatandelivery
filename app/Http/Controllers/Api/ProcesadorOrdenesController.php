@@ -42,7 +42,6 @@ use App\CuponDonacion;
 use App\Instituciones;
 use Exception;
 
-
 class ProcesadorOrdenesController extends Controller
 {
     // enviar la primer orden
@@ -1677,6 +1676,12 @@ class ProcesadorOrdenesController extends Controller
                 foreach($orden as $o){                    
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
+
+                    // direccion de envio
+                    $direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
+
+                    $o->direccion = $direccion;
+
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
                         $o->aplicacupon = 1;
@@ -1698,10 +1703,10 @@ class ProcesadorOrdenesController extends Controller
                                 $total = 0;
                             }
 
-                            // no es necesario verificar si aplico el envio gratis, ya que este setea el envio a 0.00
+                            $t = $total + $o->precio_envio;
 
                             // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$total, 2, '.', '');
+                            $o->precio_total = number_format((float)$t, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 3){
                             $o->tipocupon = 3;
@@ -1714,7 +1719,9 @@ class ProcesadorOrdenesController extends Controller
                                 $total = 0;
                             }
 
-                            $o->precio_total = number_format((float)$total, 2, '.', '');
+                            $t = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$t, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
                             $o->tipocupon = 4;
@@ -1740,9 +1747,8 @@ class ProcesadorOrdenesController extends Controller
                             // dado error, extrano
                             $o->tipocupon = 0;
                             
-                            $total = $o->precio_total;
-                            $envio = $o->precio_envio;
-                            $total = $total + $envio;
+                          
+                            $total = $o->precio_total + $o->precio_envio;
                             $total = number_format((float)$total, 2, '.', '');
         
                             $o->precio_total = $total;
@@ -1750,17 +1756,162 @@ class ProcesadorOrdenesController extends Controller
 
                     }else{
                         $o->aplicacupon = 0;
-
-                        $total = $o->precio_total;
-                        $envio = $o->precio_envio;
-                        $total = $total + $envio;
+                      
+                        $total = $o->precio_total + $o->precio_envio;
                         $total = number_format((float)$total, 2, '.', '');
     
                         $o->precio_total = $total;
-                    }                    
+                    }
                 }
 
                 // mensaje para que el usuario vea como tocar la tarjeta
+                // /** En nueva actualizacion ya no se vera este mensaje */
+                $mensaje = "Tocar la NOTA para ver estado de orden";
+
+                return ['success' => 1, 'ordenes' => $orden, 'mensaje' => $mensaje];
+            }else{
+                return ['success' => 2];
+            }            
+        }
+    }
+
+     // ver ordenes por usuario, version mejorada para ver que tipo de cupon se ha aplicado
+     // version 1.18 android
+     public function verOrdenesMejorado(Request $request){
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'userid' => 'required'               
+            );
+        
+            $mensajeDatos = array(                                      
+                'userid.required' => 'El id del usuario es requerido.'            
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }  
+            
+            if(User::where('id', $request->userid)->first()){
+                $orden = DB::table('ordenes AS o')
+                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')              
+                    ->select('o.id', 's.nombre', 'o.precio_total',
+                    'o.nota_orden', 'o.fecha_orden', 'o.precio_envio')
+                    ->where('o.users_id', $request->userid)
+                    ->where('o.visible', 1)
+                    ->get();
+                 
+                foreach($orden as $o){                    
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+
+
+                    // direccion de envio
+                    $direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
+
+                    $o->direccion = $direccion;
+
+                    $cupon = "";
+
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                       
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                           
+                            $cupon = "Envío Gratis";
+
+                        }else if($tipo->tipo_cupon_id == 2){
+                           
+                            // modificar precio
+                            $data = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+
+                            $total = $o->precio_total - $data->dinero;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            if($data->aplico_envio_gratis == 1){
+                                $cupon = "Descuento de: $" . $data->dinero . " Con Envío Gratis";
+                            }else{
+                                $cupon = "Descuento de: $" . $data->dinero;
+                            }
+
+                            $t = $total + $o->precio_envio; // si aplico envio gratis, este sera $0.00
+                            $o->precio_total = number_format((float)$t, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 3){
+                          
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            $cupon = "Rebaja de: " . $porcentaje . "%";
+
+                            $t = $total + $o->precio_envio;
+
+                            $o->precio_total = number_format((float)$t, 2, '.', '');
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                            
+                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                            $o->producto = $producto;
+
+                            $cupon = "Producto Gratis: " . $producto;
+
+                            // solo sumara sub total + envio
+                            $total = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+                           
+                            // sumar sub total + envio + donacion
+                            $data = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
+                            $ins = Instituciones::where('id', $data->instituciones_id)->pluck('nombre')->first();
+ 
+                            $cupon = "Donación de: $" . $data->dinero . " A: " . $ins; 
+
+                            $total = $o->precio_total + $o->precio_envio;
+                            $total = $total + $data->dinero;
+                            $o->precio_total = number_format((float)$total, 2, '.', '');
+                        }
+                        else{
+                            // dado error, extrano
+                                 
+                            $total = $o->precio_total + $o->precio_envio;
+                            $total = number_format((float)$total, 2, '.', '');
+        
+                            $o->precio_total = $total;
+                        }
+
+                    }else{
+                        
+                        $total = $o->precio_total + $o->precio_envio;
+                        $total = number_format((float)$total, 2, '.', '');
+    
+                        $o->precio_total = $total;
+                    }  
+                    
+                    $o->cupon = $cupon;
+                }
+
+                // mensaje para que el usuario vea como tocar la tarjeta
+                // /** En nueva actualizacion ya no se vera este mensaje */
                 $mensaje = "Tocar la NOTA para ver estado de orden";
 
                 return ['success' => 1, 'ordenes' => $orden, 'mensaje' => $mensaje];

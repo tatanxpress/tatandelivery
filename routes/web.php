@@ -495,7 +495,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // control de ordenes
   Route::get('/control/lista/ordeneshoy', 'ControlOrdenesController@indexHoy'); 
   Route::get('/control/tabla/ordeneshoy', 'ControlOrdenesController@tablaHoy');
-   
+    
   // notificaciones 
   Route::get('/control/lista/notificacion', 'ControlOrdenesController@indexNotificacion'); 
 

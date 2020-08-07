@@ -54,7 +54,7 @@
                               
                               <div class="form-group">
                                   <label>Nombre</label>
-                                  <input type="text" maxlength="50" class="form-control" id="nombre-nuevo" placeholder="Nombre producto">
+                                  <input type="text" maxlength="75" class="form-control" id="nombre-nuevo" placeholder="Nombre producto">
                               </div>
 
                                 <div class="form-group">
@@ -78,7 +78,6 @@
                                 <div class="form-group">
                                     <label>Descripcion</label>
                                     <textarea maxlength="2000" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
-
                                 </div>
 
                                 <div class="form-group">
@@ -128,7 +127,7 @@
  
                                 <div class="form-group">
                                     <label>Nota (ejemp: si un producto necesita opciones a elegir)</label>
-                                    <input type="text" maxlength="50" value="" class="form-control" id="nota-nuevo">
+                                    <input type="text" maxlength="75" value="" class="form-control" id="nota-nuevo">
                                 </div>
 
                             </div>
@@ -176,7 +175,7 @@
                                 </div> 
                                 <div class="form-group">
                                     <label>Nombre</label>
-                                    <input type="text" maxlength="50" class="form-control" id="nombre-editar" placeholder="Nombre producto">
+                                    <input type="text" maxlength="75" class="form-control" id="nombre-editar" placeholder="Nombre producto">
                                 </div>
                                 <div class="form-group"> 
                                     <label>Descripcion</label>
@@ -236,7 +235,7 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Nota</label>
-                                    <input type="text" maxlength="50" class="form-control" id="nota-editar">
+                                    <input type="text" maxlength="75" class="form-control" id="nota-editar">
                                 </div>
                                 <div class="form-group">
                                     <div>
@@ -328,9 +327,7 @@
             var cblimite_1 = 0;
             var cbnota_1 = 0;
             var cbimagen_1 = 0;
-         
-
-          
+                   
             if(cbdisponibilidad){
                 cbdisponibilidad_1 = 1;
             }
@@ -389,8 +386,8 @@
             return;
         }
         
-        if(nombre.length > 50){
-            toastr.error("50 caracter máximo nombre");
+        if(nombre.length > 75){
+            toastr.error("75 caracter máximo nombre");
             return false;
         }
 
@@ -405,8 +402,7 @@
         }
 
         if(descripcion === ''){
-            toastr.error("descripcion es requerido");
-            return;
+            descripcion = ".";
         }
         
         if(descripcion.length > 2000){
@@ -659,14 +655,13 @@
             return false;
         }
 
-        if(nombre.length > 50){
-            toastr.error("50 caracter máximo nombre");
+        if(nombre.length > 75){
+            toastr.error("75 caracter máximo nombre");
             return false;
         }
 
-        if (descripcion === '') {
-            toastr.error("descripcion es requerido");
-            return false;
+        if(descripcion === ''){
+            descripcion = ".";
         }
 
         if(descripcion.length > 2000){

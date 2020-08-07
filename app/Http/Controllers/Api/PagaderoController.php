@@ -843,6 +843,7 @@ class PagaderoController extends Controller
                     
                 $start = Carbon::parse($request->fecha1)->startOfDay(); 
                 $end = Carbon::parse($request->fecha2)->endOfDay();
+
             
                 $orden = DB::table('ordenes_encargo_revisadas AS r')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'r.ordenes_encargo_id')
@@ -872,7 +873,8 @@ class PagaderoController extends Controller
                         // se pagara a propietario
 
                         $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
-                        $totalcobro = $o->precio_envio;
+                       
+                        $totalcobro = $totalcobro + $o->precio_envio;
                     }else{
                         // no se pagara a propietario
                         $total = $o->precio_subtotal + $o->precio_envio;
@@ -884,7 +886,7 @@ class PagaderoController extends Controller
                 }
 
                 // sumar ganancia de esta fecha
-                
+                 
                 $totalcobro = number_format((float)$totalcobro, 2, '.', '');
                 return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
             }else{

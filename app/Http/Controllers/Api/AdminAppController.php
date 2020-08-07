@@ -387,7 +387,8 @@ class AdminAppController extends Controller
                             'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
                             'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
                             'o.precio_envio')
-                ->where('o.revisado', '!=', 5) // no ver cancelados
+              
+                ->whereNotIn('o.revisado', [5]) // no ver cancelados
                 ->whereDate('e.fecha_entrega', $fecha)                
                 ->orderBy('o.id', 'DESC')
                 ->get();

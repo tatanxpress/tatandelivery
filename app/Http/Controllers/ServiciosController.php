@@ -624,7 +624,7 @@ class ServiciosController extends Controller
 
                 } catch(\Throwable $e){
                     DB::rollback();
-                    return ['success' => 4];
+                    return ['success' => 4, 'error' => $e];
                 }
 
             }else{

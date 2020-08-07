@@ -10,8 +10,8 @@
                 <thead>             
                 <tr>
                     <th style="width: 10%">ID orden</th> 
-                    <th style="width: 20%">ID Servicio</th> 
-                    <th style="width: 15%">Nombre</th>
+                    <th style="width: 15%">Cliente</th> 
+                    <th style="width: 15%">Servicio</th>
                     <th style="width: 15%">Hora</th>                     
                     <th style="width: 15%">Sub Total</th>
                     <th style="width: 15%">Zona</th>
@@ -25,7 +25,7 @@
                 @foreach($orden as $dato)
                 <tr>
                     <td>{{ $dato->id }}</td>
-                    <td>{{ $dato->identificador }}</td>
+                    <td>{{ $dato->cliente }}</td>
                     <td>{{ $dato->nombre }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->precio_total }}</td>                   

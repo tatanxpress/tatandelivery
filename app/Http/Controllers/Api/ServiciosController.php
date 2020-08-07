@@ -46,7 +46,6 @@ class ServiciosController extends Controller
             // obtener zona segun id del usuario
             $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
             
-            $mensaje = "Agregar una dirección para ver los Servicios. Presionando el botón en la parte superior derecha. Gracias.";
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
@@ -65,13 +64,16 @@ class ServiciosController extends Controller
             $iphoneApp = $datos->iphone;
 
           
-            // para agregar una nueva direccion
-            $mensaje = "Agregar una nueva Dirección, en el botón superior derecho.";
+            // para agregar una nueva direccion para android
+            $mensaje = "Agregar una nueva Dirección.";
+            // para iphone
+            $mensaje2 = "Agregar una nueva Dirección, presionando en el botón +";
 
             return [
                 'success' => 1,                     
                 'servicios' => $servicios, 
-                'mensaje' => $mensaje, // una nueva direccion
+                'mensaje' => $mensaje, // una nueva direccion para android
+                'mensaje2' => $mensaje2, // una nueva direccion para iphone
                 'zona' => $idzona, 
                 'activo' => $activoAndroid, // activo android
                 'activo_iphone' => $activoIphoneApp, // activo iphone
@@ -508,6 +510,10 @@ class ServiciosController extends Controller
                 $index = 0;
 
                 foreach($zonaPublicidad as $secciones){
+
+                    if($secciones->descripcion == "."){
+                        $secciones->descripcion = "";
+                    }
 
                     array_push($resultsBloque,$secciones); 
                 

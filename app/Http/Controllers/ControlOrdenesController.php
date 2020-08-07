@@ -61,7 +61,7 @@ class ControlOrdenesController extends Controller
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')       
         ->select('o.id', 's.identificador', 'o.fecha_orden', 's.nombre', 'o.precio_total',
             'o.estado_2', 'o.estado_3', 'o.estado_4', 'o.estado_5', 'o.estado_6',
-            'o.estado_7', 'o.estado_8')
+            'o.estado_7', 'o.estado_8', 'o.users_id')
         ->whereDate('o.fecha_orden', $fecha)
         ->get();
  
@@ -76,6 +76,8 @@ class ControlOrdenesController extends Controller
             if($od->revisado == 1){
                 $verificado = "Si";
             }
+
+            $o->cliente = $od->nombre;
 
             $motorista = "";
             if($mo = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){

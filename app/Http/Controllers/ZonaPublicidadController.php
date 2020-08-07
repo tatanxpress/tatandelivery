@@ -138,6 +138,7 @@ class ZonaPublicidadController extends Controller
         ->join('publicidad AS p', 'p.id', '=', 'z.publicidad_id') 
         ->select('z.id', 'p.nombre', 'p.identificador', 'z.fecha', 'z.posicion')
         ->where('z.zonas_id', $idzona)
+        ->where('p.activo', 1) // solo activo para mover posiciones
         ->orderBy('z.posicion', 'ASC')
         ->get();
 

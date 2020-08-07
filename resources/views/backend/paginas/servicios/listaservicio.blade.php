@@ -1653,6 +1653,7 @@
             $('#tablaDatatable').load(ruta);
             $('#modalServicio').modal('hide');
         } else if(response.data.success == 4){
+            console.log(response);
             toastr.error('Error trycatch');
         }else if(response.data.success == 5){
             toastr.error('identificador no disponible');
