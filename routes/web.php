@@ -528,3 +528,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   
 });         
    
+Route::get('metodos/pagar', 'MetodosDePago@metododepago');
+
+
+
