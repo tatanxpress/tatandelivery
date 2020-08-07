@@ -67,7 +67,7 @@ class ServiciosController extends Controller
             // para agregar una nueva direccion para android
             $mensaje = "Agregar una nueva Dirección, presionando el boton AZUL +.";
             // para iphone
-            $mensaje2 = "Agregar una nueva Dirección, presionando en el botón superior Derecho (+)";
+            $mensaje2 = "Agregar una nueva Dirección, presionando en el ultimo icono Superior Derecho";
 
             return [
                 'success' => 1,                     
