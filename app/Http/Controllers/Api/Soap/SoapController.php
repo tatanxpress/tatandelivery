@@ -33,7 +33,14 @@ class SoapController extends BaseSoapController
             $infov = "2012";
             $infos = "123";
 
-            $response = $this->service->CreateCliente($rtl, $info, $infov, $infos);
+            $params = [
+                'Rtl' => $rtl, 
+                'Info' => $info,
+                'Infov' => $infov,
+                'InfoS' => $infos
+            ];
+
+            $response = $this->service->CreateCliente($params);
             //return view ('bienes-servicios-soap', compact('response'));
             return [$response];
         }
