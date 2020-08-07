@@ -810,12 +810,15 @@
                         $('#numerocasa').val(datos[index].numero_casa);
                         $('#puntoreferencia').val(datos[index].punto_referencia);
 
-                        if(datos[index].movil_ordeno == 1){ 
+                        if(datos[index].movil_ordeno == 0){
+                            $('#versionapp').val("No ha actualizado");
+                        }
+                        else if(datos[index].movil_ordeno == 1){ 
                             $('#versionapp').val("Iphone");
                         }else if(datos[index].movil_ordeno == 2){
                             $('#versionapp').val("Android");
                         }else{
-                            $('#versionapp').val("No ha actualizado");
+                            $('#versionapp').val(datos[index].movil_ordeno);
                         }
                       
                         $('#latitud').val(datos[index].latitud);
