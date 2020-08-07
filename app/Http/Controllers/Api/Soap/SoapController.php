@@ -11,6 +11,9 @@ class SoapController extends BaseSoapController
 
     public function BienesServicios(){
         try {
+
+            ini_set('default_socket_timeout', 600);
+
             // web service a conectar
             self::setWsdl('https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL');
            
