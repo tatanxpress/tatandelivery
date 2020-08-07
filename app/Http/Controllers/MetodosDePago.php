@@ -9,8 +9,8 @@ class MetodosDePago extends Controller
     //
     public function metododepago(){
 
-        phpinfo();
-       /*try {
+        //phpinfo();
+       try {
         $opts = array(
             'http' => array(
                 'user_agent' => 'PHPSoapClient'
@@ -41,7 +41,7 @@ class MetodosDePago extends Controller
     catch(\Exception $e) {
         echo $e->getMessage();
     }
-*/
+
     }
 
 
