@@ -363,3 +363,8 @@ Route::post('adminapp/ver/notificacion/propietario', 'Api\AdminAppController@env
 Route::post('adminapp/ver/lista-motoristas', 'Api\AdminAppController@verListaMotoristas');
 Route::post('adminapp/ver/notificacion/motorista', 'Api\AdminAppController@enviarNotificacionMotorista');
 
+
+
+
+
+Route::get('bienes-servicios', 'Api\Soap\SoapController@BienesServicios');

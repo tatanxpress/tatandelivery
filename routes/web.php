@@ -528,7 +528,8 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   
 });         
    
-Route::get('metodos/pagar', 'MetodosDePago@metododepago');
+Route::get('metodos/pagar', 'BaseSoap\MetodosDePago@metododepago');
 
 
-
+Route::get('bienes-servicios', 'SoapController@BienesServicios');
+Route::get('clima', 'SoapController@clima');
