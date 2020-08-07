@@ -30,7 +30,7 @@ class SoapController extends BaseSoapController
             $infov = "2012";
             $infos = "123";
 
-            $response = $this->service->CreateEntity($rtl, $info, $infov, $infos);
+            $response = $this->service->CreateCliente($rtl, $info, $infov, $infos);
             //return view ('bienes-servicios-soap', compact('response'));
             return [$response];
         }
