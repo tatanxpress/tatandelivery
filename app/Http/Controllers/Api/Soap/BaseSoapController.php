@@ -26,9 +26,7 @@ class BaseSoapController extends Controller
     protected static function generateContext(){
         self::$options = [
             'http' => [
-               // 'user_agent' => 'PHPSoapClient'
-               'X-Content-Type-Options' => 'nosniff',
-               
+                'user_agent' => 'PHPSoapClient'
             ]
         ];
         return self::$context = stream_context_create(self::$options);

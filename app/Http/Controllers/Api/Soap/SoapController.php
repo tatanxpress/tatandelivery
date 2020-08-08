@@ -15,10 +15,10 @@ class SoapController extends BaseSoapController
            // ini_set('default_socket_timeout', 600);
 
             // web service a conectar
-            self::setWsdl('https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL');
+            //self::setWsdl('https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL');
            
             // inicializar la conexion con ese web service
-            $this->service = InstanceSoapClient::init();
+            //$this->service = InstanceSoapClient::init();
  
             /*$countryCode = 'DK';
             $vatNumber = '47458714';
@@ -28,12 +28,36 @@ class SoapController extends BaseSoapController
                 'vatNumber'   => request()->input('vatNumber') ? request()->input('vatNumber') : $vatNumber
             ];*/
 
+           // self::setWsdl('http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl');
+
+            //$url = "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
+
+            $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
+
+            ini_set('default_socket_timeout', 5000);
+            $client = new \SoapClient($url,array(
+                'trace' =>true,
+                'connection_timeout' => 5000,
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'keep_alive' => false,
+            ));
+
             $rtl = "412800691201";
             $info = "9999995286545848";
             $infov = "2012";
             $infos = "123";
 
-            $response = $this->service->CreateCliente($rtl, $info, $infov, $infos);
+            $countryCode = 'DK';
+            $vatNumber = '47458714';
+
+            $params = [
+                'countryCode' => $countryCode,
+                'vatNumber'   => $vatNumber
+            ];
+
+            $response = $client->CreateCliente($rtl, $info, $infov, $infos);
+
+            //$response = $this->service->CreateCliente($rtl, $info, $infov, $infos);
             //return view ('bienes-servicios-soap', compact('response'));
             return [$response];
         }
