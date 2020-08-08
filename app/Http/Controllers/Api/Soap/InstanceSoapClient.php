@@ -14,8 +14,11 @@ class InstanceSoapClient extends BaseSoapController implements InterfaceInstance
     public static function init(){
         $wsdlUrl = self::getWsdl();
         $soapClientOptions = [
-            'stream_context' => self::generateContext(),
-            'cache_wsdl'     => WSDL_CACHE_NONE
+            'trace' => true, 
+            'keep_alive' => true,
+            'connection_timeout' => 5000,
+            'cache_wsdl'     => WSDL_CACHE_NONE,
+            'compression'   => SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP | SOAP_COMPRESSION_DEFLATE
         ];
         return new SoapClient($wsdlUrl, $soapClientOptions);
     }

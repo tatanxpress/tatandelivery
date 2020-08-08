@@ -12,14 +12,14 @@ class SoapController extends BaseSoapController
     public function BienesServicios(){
         try {
 
-            ini_set('default_socket_timeout', 600);
+           // ini_set('default_socket_timeout', 600);
 
             // web service a conectar
             self::setWsdl('https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL');
            
             // inicializar la conexion con ese web service
             $this->service = InstanceSoapClient::init();
-
+ 
             /*$countryCode = 'DK';
             $vatNumber = '47458714';
 
@@ -33,14 +33,7 @@ class SoapController extends BaseSoapController
             $infov = "2012";
             $infos = "123";
 
-            $params = [
-                'Rtl' => $rtl, 
-                'Info' => $info,
-                'Infov' => $infov,
-                'InfoS' => $infos
-            ];
-
-            $response = $this->service->CreateCliente($params);
+            $response = $this->service->CreateCliente($rtl, $info, $infov, $infos);
             //return view ('bienes-servicios-soap', compact('response'));
             return [$response];
         }
