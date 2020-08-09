@@ -50,6 +50,16 @@
                   <p>Tipo servicios por Zona</p>
                 </a>
               </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/tiposerviciozona/posiciones-globales') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Posición Global</p>
+                </a>
+              </li>
+
+      
+
             </ul>
           </li>
         @endcan 
@@ -119,6 +129,14 @@
                   <p>Zona Servicios</p>
                 </a>
               </li>
+              
+              <li class="nav-item">
+                <a href="{{ url('/admin/zonaservicio/posiciones-globales') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Posición Global</p>
+                </a>
+              </li>
+
               @endcan 
               <li class="nav-item">
                 <a href="{{ url('/admin/propietarios/lista') }}" target="frameprincipal" class="nav-link">
@@ -155,7 +173,7 @@
                   <p>Publicidad Activa</p>
                 </a>
               </li>
-
+         
               <li class="nav-item">
                 <a href="{{ url('/admin/publicidad/lista-inactivo') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -167,6 +185,13 @@
                 <a href="{{ url('/admin/zonapublicidad/lista') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Zona publicidad</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/publicidad/pos') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Posición Publi. Global</p>
                 </a>
               </li>
        

@@ -53,6 +53,19 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // tipo servicio zonas 
   Route::get('/tiposerviciozona/lista-tipo-servicio-zona', 'TipoServicioZonaController@index');
   Route::get('/tiposerviciozona/tablas/lista-tipo-servicio-zona', 'TipoServicioZonaController@serviciotabla');
+
+  // posiciones globales para tipo de servicios
+  Route::get('/tiposerviciozona/posiciones-globales', 'TipoServicioZonaController@indexGlobal');
+  Route::get('/tiposerviciozona/tablas/tablatiposervicioglobal', 'TipoServicioZonaController@tablaGlobalTipos');
+  Route::post('/tiposerviciozona/ordenar-globalmente', 'TipoServicioZonaController@orderTipoServicioGlobalmente');
+
+  // posiciones globales para servicios por zona
+  Route::get('/zonaservicio/posiciones-globales', 'ZonaServiciosController@indexGlobal');
+  Route::get('/zonaservicio/tablas/tablatiposervicioglobal', 'ZonaServiciosController@tablaGlobalTipos');
+  Route::post('/zonaservicio/ordenar-globalmente', 'ZonaServiciosController@orderTipoServicioGlobalmente');
+
+
+
   Route::post('/tiposerviciozona/buscar/servicio', 'TipoServicioZonaController@buscarServicio');
   Route::post('/tiposerviciozona/nuevo', 'TipoServicioZonaController@nuevoTipoServicioZona');
   Route::post('/tiposerviciozona/informacion','TipoServicioZonaController@informacionTipoZona');
@@ -147,6 +160,13 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/zonapublicidad/{id}', 'ZonaPublicidadController@filtrado'); 
   Route::get('/zonapublicidad/tabla/{id}', 'ZonaPublicidadController@tablaFiltrado');
   Route::post('/zonapublicidad/ordenar', 'ZonaPublicidadController@ordenar'); 
+
+  // posiciones globales para zona de publicidad
+  Route::get('/publicidad/pos', 'ZonaPublicidadController@indexGlobalPublicidad');
+  Route::get('/publicidad/tablas/tablasgloblal', 'ZonaPublicidadController@tablaGlobalPubli');
+  Route::post('/publicidad/ordenar-globalmente', 'ZonaPublicidadController@ordenarPubliGlobal');
+
+  
   // producto a promocion 
   Route::get('/productopromocion/{id}/{id1}', 'ProductoPublicidadController@index');
   Route::get('/promo/tablas/{id}', 'ProductoPublicidadController@productoPromocion');

@@ -183,7 +183,6 @@ class ZonaPublicidadController extends Controller
         return view('backend.paginas.publicidad.tablas.tablaregistropromo', compact('registro'));
     }
 
-
      // nuevo registro de pago
      public function nuevoregistro(Request $request){       
         if($request->isMethod('post')){
@@ -384,6 +383,45 @@ class ZonaPublicidadController extends Controller
             }
         }         
     }
-  
+
+    // posiciones globales
+    public function indexGlobalPublicidad(){ 
+        return view('backend.paginas.zonaspublicidad.listaglobal');          
+    }
+
+    public function tablaGlobalPubli(){
+           
+        $tipos = Publicidad::all();  
+
+        foreach($tipos as $t){
+            
+            $tipo = "";
+            if($t->tipo_publicidad == 1){
+                $tipo = "Promocion";
+            }else{
+                $tipo = "Publicidad";
+            }
+
+            $t->tipo = $tipo;
+        }
+ 
+        return view('backend.paginas.zonaspublicidad.tablas.tablaposglobalpublicidad', compact('tipos'));
+    }
+
+    // ordenar publicidad o promocion globalmente
+    public function ordenarPubliGlobal(Request $request){
+       
+        // recorrer cada tipo de servicio
+        foreach ($request->order as $order) {
+
+            $tipoid = $order['id'];
+
+            DB::table('zonas_publicidad')
+            ->where('publicidad_id', $tipoid) 
+            ->update(['posicion' => $order['posicion']]); // actualizar posicion
+        }           
+
+        return ['success' => 1];
+    }
      
 }

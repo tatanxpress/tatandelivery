@@ -8,6 +8,7 @@ use App\Zonas;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use App\ZonasServicios;
+use App\TipoServicios;
 
 class TipoServicioZonaController extends Controller
 {
@@ -36,6 +37,30 @@ class TipoServicioZonaController extends Controller
 
         return view('backend.paginas.tiposervicioszona.tablas.tablatiposerviciozona', compact('tipo'));
     } 
+
+
+    // posiciones globales
+    public function indexGlobal(){ 
+        
+        return view('backend.paginas.tiposervicioszona.listaglobal');
+    }
+ 
+    public function tablaGlobalTipos(){
+           
+       $tipos = TipoServicios::all();  
+
+       foreach($tipos as $t){
+
+        $contador = DB::table('tipo_servicios_zonas')
+        ->where('tipo_servicios_id', $t->id)
+        ->whereNotIn('zonas_id', [1,2]) // no quiero la zona de prueba, y la zona cero registro
+        ->count();
+
+        $t->cuantas = $contador;
+       }
+
+       return view('backend.paginas.tiposervicioszona.tablas.tablatiposervicioglobal', compact('tipos'));
+    }
 
     // buscar servicio segun select
     public function buscarServicio(Request $request){
@@ -195,7 +220,7 @@ class TipoServicioZonaController extends Controller
 
     // filtro de posiciones
       // filtrado
-      public function filtrado($idzona){
+    public function filtrado($idzona){
 
         return view('backend.paginas.tiposervicioszona.listafiltrado', compact('idzona'));  
     }  
@@ -245,6 +270,23 @@ class TipoServicioZonaController extends Controller
             }
         }
 
+        return ['success' => 1];
+    }
+
+
+    // ordenar tipos de servicios para todas las zonas
+    public function orderTipoServicioGlobalmente(Request $request){
+
+        // recorrer cada tipo de servicio
+        foreach ($request->order as $order) {
+
+            $tipoid = $order['id'];
+
+            DB::table('tipo_servicios_zonas')
+            ->where('tipo_servicios_id', $tipoid) // restaurante por ejemplo
+            ->update(['posicion' => $order['posicion']]); // actualizar posicion
+        }           
+        
         return ['success' => 1];
     }
 

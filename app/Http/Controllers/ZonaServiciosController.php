@@ -18,6 +18,45 @@ class ZonaServiciosController extends Controller
         $this->middleware('auth:admin');
     }
 
+    // posiciones globales
+    public function indexGlobal(){ 
+        
+        return view('backend.paginas.zonaservicios.listaglobal');
+    }
+
+    public function tablaGlobalTipos(){
+        
+        $servicios = Servicios::all();
+
+        foreach($servicios as $t){
+
+            $contador = DB::table('zonas_servicios')
+            ->where('servicios_id', $t->id)
+            ->whereNotIn('zonas_id', [1,2]) // no quiero la zona de prueba, y la zona cero registro
+            ->count();
+    
+            $t->cuantas = $contador;
+        }
+ 
+        return view('backend.paginas.zonaservicios.tablas.tablazonaservicioglobal', compact('servicios'));
+    }
+
+    // ordenar tipos de servicios para todas las zonas
+    public function orderTipoServicioGlobalmente(Request $request){
+
+        // recorrer cada tipo de servicio
+        foreach ($request->order as $order) {
+
+            $tipoid = $order['id'];
+
+            DB::table('zonas_servicios')
+            ->where('servicios_id', $tipoid) // restaurante por ejemplo
+            ->update(['posicion' => $order['posicion']]); // actualizar posicion
+        }
+        
+        return ['success' => 1];
+    }
+
     // lista de zonas servicios
     public function index(){ 
 
