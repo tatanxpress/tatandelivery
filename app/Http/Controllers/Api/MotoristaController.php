@@ -310,7 +310,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4', 
                 'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 
-                'o.hora_2', 'o.estado_6', 'o.pago_a_propi')
+                'o.hora_2', 'o.estado_6', 'o.pago_a_propi', 'o.nota_orden')
                 ->where('o.estado_6', 0) // nadie a seteado este
                 ->where('o.estado_4', 1) // inicia la orden
                 ->where('o.estado_8', 0) // orden no cancelada
@@ -430,7 +430,7 @@ class MotoristaController extends Controller
                 } //end foreach
 
 
-                 // actualizar id, cada vez
+                
              
                 return ['success' => 2, 'ordenes' => $orden]; 
             }else{
@@ -803,7 +803,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
                 'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi')
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 0) // aun no han salido a entregarse
@@ -955,7 +955,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
                 'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi')
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 1) // van a entregarse
