@@ -7,22 +7,18 @@
                 <thead>
                     <tr> 
                         <th style="width: 30%">Nombre</th>
-                        <th style="width: 40%">En cuantas zonas esta</th>
-                        <th style="width: 30%">Total zonas esta activo</th>
                     </tr>
                     </thead>
                     <tbody id="tablecontents">
-                        @foreach($tipos as $dato)
+                        @foreach($lista as $dato)
                         <tr class="row1" data-id="{{ $dato->id }}">
                         
-                        <td>{{ $dato->nombre }}</td> 
-                        <td>{{ $dato->cuantas }}</td>
-                        <td>{{ $dato->activos }}</td> 
+                        <td>{{ $dato->nombre }}</td>
                         </tr>
                         @endforeach
                     </tbody>                  
                 </table>
-            </div>           
+            </div> 
           </div>
         </div>
       </div>

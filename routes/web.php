@@ -62,10 +62,13 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // posiciones globales para servicios por zona
   Route::get('/zonaservicio/posiciones-globales', 'ZonaServiciosController@indexGlobal');
   Route::get('/zonaservicio/tablas/tablatiposervicioglobal', 'ZonaServiciosController@tablaGlobalTipos');
+  Route::get('/zonaservicio/tablas/tablatiposervicioglobal2/{id}', 'ZonaServiciosController@tablaGlobalTipos2');
+
+
   Route::post('/zonaservicio/ordenar-globalmente', 'ZonaServiciosController@orderTipoServicioGlobalmente');
 
 
-
+ 
   Route::post('/tiposerviciozona/buscar/servicio', 'TipoServicioZonaController@buscarServicio');
   Route::post('/tiposerviciozona/nuevo', 'TipoServicioZonaController@nuevoTipoServicioZona');
   Route::post('/tiposerviciozona/informacion','TipoServicioZonaController@informacionTipoZona');

@@ -20,11 +20,13 @@ class ZonaServiciosController extends Controller
 
     // posiciones globales
     public function indexGlobal(){ 
+
+        $tipos = TipoServicios::all();
         
-        return view('backend.paginas.zonaservicios.listaglobal');
+        return view('backend.paginas.zonaservicios.listaglobal', compact('tipos'));
     }
 
-    public function tablaGlobalTipos(){
+    public function tablaGlobalTipos(){ // viene el id del tipo
         
         $servicios = Servicios::all();
 
@@ -36,9 +38,28 @@ class ZonaServiciosController extends Controller
             ->count();
     
             $t->cuantas = $contador;
-        }
+
+            $activos = DB::table('zonas_servicios')
+            ->where('servicios_id', $t->id)
+            ->where('activo', 1)
+            ->whereNotIn('zonas_id', [1,2]) // no quiero la zona de prueba, y la zona cero registro
+            ->count();
+
+            $t->activos = $activos;
+        } 
  
         return view('backend.paginas.zonaservicios.tablas.tablazonaservicioglobal', compact('servicios'));
+    }
+
+    
+    public function tablaGlobalTipos2($id){ // viene el id del tipo
+       
+        $lista = DB::table('servicios')
+        ->select('id', 'nombre')
+        ->where('tipo_servicios_id', $id)
+        ->get();  
+ 
+        return view('backend.paginas.zonaservicios.tablas.tablazonaservicioglobal2', compact('lista'));
     }
 
     // ordenar tipos de servicios para todas las zonas

@@ -47,7 +47,7 @@ class TipoServicioZonaController extends Controller
  
     public function tablaGlobalTipos(){
            
-       $tipos = TipoServicios::all();  
+       $tipos = TipoServicios::orderBy('nombre')->get();  
 
        foreach($tipos as $t){
 
@@ -57,6 +57,14 @@ class TipoServicioZonaController extends Controller
         ->count();
 
         $t->cuantas = $contador;
+
+        $activos = DB::table('tipo_servicios_zonas')
+        ->where('tipo_servicios_id', $t->id)
+        ->where('activo', 1)
+        ->whereNotIn('zonas_id', [1,2]) // no quiero la zona de prueba, y la zona cero registro
+        ->count();
+
+        $t->activos = $activos;
        }
 
        return view('backend.paginas.tiposervicioszona.tablas.tablatiposervicioglobal', compact('tipos'));
