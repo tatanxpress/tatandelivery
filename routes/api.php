@@ -307,10 +307,12 @@ Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas');
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorialNuevo'); // ver historial de ordenes
 Route::post('revisador/ver/historial-encargos', 'Api\PagaderoController@verHistorialEncargos'); // ver historial de encargos
 
-
-
+// No utilizado 08/08/2020
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
  
+// revisar todas las ordenes pendientes de un motorista 
+Route::post('revisador/confirmar/todos/pago', 'Api\BitacoraRevisadorController@revisarTodos');
+
 
 // APP ADMINISTRADORES
 
