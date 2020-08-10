@@ -16,6 +16,7 @@ use App\MotoristaOrdenes;
 use App\OrdenesUrgentesDos;
 use App\OrdenesUrgentesTres;
 use App\OrdenesUrgentesCuatro;
+use App\ClienteNoContesta;
 
 class VerificarOrdenes extends Command
 {
@@ -209,7 +210,7 @@ class VerificarOrdenes extends Command
 
 
         //*********************************** */
-        // pasaron 5+ de hora entrega al cliente (hora_2 + zona + 5+) y no se ha entregado su orden
+        // pasaron 5+ de hora entrega al cliente (hora_2 + zona) y no se ha entregado su orden
         // tabla ordenes_urgentes_tres
         
         $orden3 = DB::table('ordenes')
@@ -387,7 +388,7 @@ class VerificarOrdenes extends Command
         //*********************************** */
 
         // se activa cuando hay ordenes sin contestar y no han sido canceladas
-        // se le agrega 2 minutos extra, sino se activara el registro y notificacion
+        // se le agrega 1 minutos extra, sino se activara el registro y notificacion
 
         $ordenhoy = DB::table('ordenes')
         ->where('estado_2', 0) // aun no han contestado
@@ -496,11 +497,97 @@ class VerificarOrdenes extends Command
                     } catch (Exception $e) {
                         
                     }                                               
-                }
-
-                
+                }                
             }            
-        }       
+        }    
+
+
+            //*********************************** */
+
+        // se activa cuando hay ordenes que el cliente no contesta
+        // se le agrega 2 minutos extra, sino se activara el registro y notificacion
+
+        $ordenhoy = DB::table('ordenes')
+        ->where('estado_2', 1) // ya respondio cliente con el tiempo
+        ->where('estado_3', 0) // aun no contesta cliente que espera la orden
+        ->where('estado_8', 0) // no ha sido cancelada
+        ->whereDate('fecha_orden', '=', Carbon::today('America/El_Salvador')->toDateString())
+        ->orderBy('id', 'ASC')
+        ->get();
+
+        $pilaCliente = array();
+
+        if(count($ordenhoy) > 0){
+
+            $seguroC = false;
+         
+            foreach($ordenhoy as $o){
+
+                // PARA TODOS LOS SERVICIOS
+                if(ClienteNoContesta::where('ordenes_id', $o->id)->first()){
+                    // no guardar registro, no obtener id propietarios. 
+                }
+                else{
+                    // preguntar si supera hora estimada, con la hora actual
+                    $time1 = Carbon::parse($o->fecha_orden);
+                    // 2 minutos mas despues de recibir la orden                   
+                    $horaAlerta = $time1->addMinute(2)->format('Y-m-d H:i:s'); // 2 min de advertencia
+                    
+                    $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
+                                    
+                    $d1 = new DateTime($horaAlerta);
+                    $d2 = new DateTime($today);
+
+                    if ($d1 > $d2){
+                    // tiempo aun no superado
+                            
+                    }else{
+                        // tiempo superado. MANDAR ADVERTENCIA
+
+                        // guardar registro
+
+                        $seguroC = true;
+
+                        $fecha = Carbon::now('America/El_Salvador');
+
+                        $osp = new ClienteNoContesta;
+                        $osp->ordenes_id = $o->id;
+                        $osp->save();
+                        
+                    }
+                }
+            }
+
+            if($seguroC){
+
+                $administradores2 = DB::table('administradores')
+                ->where('activo', 1)
+                ->where('disponible', 1)
+                ->get();
+
+                $pilaAdministradores2 = array();
+                foreach($administradores2 as $p){
+                    if(!empty($p->device_id)){
+                        
+                        if($p->device_id != "0000"){
+                            array_push($pilaAdministradores2, $p->device_id);
+                        }
+                    }
+                } 
+
+                //si no esta vacio
+                if(!empty($pilaAdministradores2)){
+                    $titulo = "Cliente No Contesta";
+                    $mensaje = "Hay Ordenes Sin Contestacion de Cliente";
+                    try {
+                        $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores2);   
+                    } catch (Exception $e) {
+                        
+                    }                                               
+                }                
+            }            
+        }  
+
     }
 
     public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){

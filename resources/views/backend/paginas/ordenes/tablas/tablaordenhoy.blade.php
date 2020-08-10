@@ -11,7 +11,7 @@
                 <tr>
                     <th style="width: 10%">ID orden</th> 
                     <th style="width: 15%">Cliente</th> 
-                    <th style="width: 15%">Servicio</th>
+                    <th style="width: 15%">Identi</th>
                     <th style="width: 15%">Hora</th>                     
                     <th style="width: 15%">Sub Total</th>
                     <th style="width: 15%">Zona</th>
@@ -26,7 +26,7 @@
                 <tr>
                     <td>{{ $dato->id }}</td>
                     <td>{{ $dato->cliente }}</td>
-                    <td>{{ $dato->nombre }}</td>
+                    <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->precio_total }}</td>                   
                     <td>{{ $dato->zonaidenti }}</td>     

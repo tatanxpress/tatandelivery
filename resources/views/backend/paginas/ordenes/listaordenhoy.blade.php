@@ -11,6 +11,7 @@
       <div class="container-fluid">
           <div class="col-sm-12">
             <h1>Ordenes Hoy {{ $fecha }}</h1>
+            <label id="total-hoy">Total Hoy $</label>
           </div>  
 
           <button type="button" onclick="recargar()" class="btn btn-success btn-sm">
@@ -60,6 +61,10 @@
         var ruta = "{{ URL::to('admin/control/tabla/ordeneshoy') }}";
         $('#tablaDatatable').load(ruta);
 
+        var total = {{$total}};
+      
+        document.getElementById('total-hoy').innerHTML = 'Total Hoy $'+total;
+
       countdown();
     });  
     
@@ -70,6 +75,23 @@
   function recargar(){
     var ruta = "{{ url('/admin/control/tabla/ordeneshoy') }}";
     $('#tablaDatatable').load(ruta);  
+
+    // traer total de dinero de ordenes completadas
+    axios.post('/admin/control/total/de/ventas-hoy', {
+      'id':0
+      })
+      .then((response) => {
+          if(response.data.success == 1){
+
+            document.getElementById('total-hoy').innerHTML = 'Total Hoy $'+response.data.total;
+          }
+          else{
+              toastr.error('Error al obtener Total $');
+          }
+      })
+      .catch((error) => {
+          toastr.error('Error');
+      });
   }
 
   function countdown() {

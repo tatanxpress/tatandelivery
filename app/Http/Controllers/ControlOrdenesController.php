@@ -41,8 +41,16 @@ class ControlOrdenesController extends Controller
      public function indexHoy(){
 
         $fecha = Carbon::now('America/El_Salvador');
-        $fecha = date("d-m-Y h:i A", strtotime($fecha));        
-        return view('backend.paginas.ordenes.listaordenhoy', compact('fecha'));
+        $orden = DB::table('ordenes')      
+        ->where('estado_7', 1) // unicamente completadas  
+        ->whereDate('fecha_orden', $fecha)
+        ->get(); 
+
+        $total = 0.00;
+        $total = collect($orden)->sum('precio_total');
+        $total = number_format((float)$total, 2, '.', '');
+
+        return view('backend.paginas.ordenes.listaordenhoy', compact('fecha', 'total'));
     }
 
     public function indexNotiCliente(){
@@ -54,7 +62,7 @@ class ControlOrdenesController extends Controller
  
     // tabla de lista de ordenes, ultimas 100
     public function tablaHoy(){ 
-
+ 
         $fecha = Carbon::now('America/El_Salvador');
 
         $orden = DB::table('ordenes AS o')
@@ -77,7 +85,12 @@ class ControlOrdenesController extends Controller
                 $verificado = "Si";
             }
 
-            $o->cliente = $od->nombre;
+            $cliente = $od->nombre; // sino tiene calificacion, solo mostrar nombre
+            if($mm = MotoristaExperiencia::where('ordenes_id', $o->id)->first()){
+                $cliente = $od->nombre . " | Califico: " . $mm->experiencia . " | " . $mm->mensaje; 
+            }
+
+            $o->cliente = $cliente;
 
             $motorista = "";
             if($mo = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
@@ -121,9 +134,25 @@ class ControlOrdenesController extends Controller
 
             $o->estado = $estado;
         }
- 
+        
         return view('backend.paginas.ordenes.tablas.tablaordenhoy', compact('orden'));
     } 
+
+    public function totalVentasHoy(Request $request){
+
+        $fecha = Carbon::now('America/El_Salvador');
+
+        $orden = DB::table('ordenes')      
+        ->where('estado_7', 1) // unicamente completadas  
+        ->whereDate('fecha_orden', $fecha)
+        ->get(); 
+
+        $total = 0.00;
+        $total = collect($orden)->sum('precio_total');
+        $total = number_format((float)$total, 2, '.', '');
+ 
+        return ['success' => 1, 'total' => $total];
+    }
 
     // index notificaciones
     public function indexNotificacion(){
