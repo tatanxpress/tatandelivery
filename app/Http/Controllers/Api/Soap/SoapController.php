@@ -34,18 +34,19 @@ class SoapController extends BaseSoapController
 
             $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
 
-            ini_set('default_socket_timeout', 5000);
-            $client = new \SoapClient($url,array(
-                'trace' =>true,
-                'connection_timeout' => 5000,
-                'cache_wsdl' => WSDL_CACHE_NONE,
-                'keep_alive' => false,
-            ));
-
             $rtl = "999999999999";
             $info = "9999995286545848";
             $infov = "2012";
             $infos = "123";
+
+            $headerbody = array('Info'=> $info, 'InfoS' => $infos, 'Infov' => $infov, 'Rtl' => $rtl); 
+
+            $header = new SoapHeader($url, 'CreateCliente', $headerbody);       
+
+            //set the Headers of Soap Client.
+            $soap_client->__CreateCliente($header);
+
+            return $soap_client;
 
             $countryCode = 'DK';
             $vatNumber = '47458714';
