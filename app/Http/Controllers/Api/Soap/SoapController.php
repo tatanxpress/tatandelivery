@@ -23,11 +23,23 @@ class SoapController extends BaseSoapController
 
             $headerbody = array('Info'=> $info, 'InfoS' => $infos, 'Infov' => $infov, 'Rtl' => $rtl); 
 
+            $client = new \SoapClient(null, $headerbody);
+
             $header = new \SoapHeader($url, 'CreateCliente', $headerbody);       
             
-            $soap_client->__CreateCliente($header); 
+            $client->__CreateCliente($header); 
             
-            return $soap_client;
+            return $client;
+
+
+            
+$header = new SoapHeader('http://soapinterop.org/echoheader/', 
+                            'echoMeStringRequest',
+                            'hello world');
+
+$client->__setSoapHeaders($header);
+
+$client->__soapCall("echoVoid", null);
 
         }
         catch(\Exception $e) {
