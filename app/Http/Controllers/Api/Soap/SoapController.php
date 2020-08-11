@@ -27,7 +27,7 @@ class SoapController extends BaseSoapController
 
             //$header = new \SoapHeader($url, 'CreateCliente', $headerbody);       
             
-            $client->__CreateCliente($header); 
+            $client->__CreateCliente($headerbody); 
             
             return $client;
 
