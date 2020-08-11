@@ -31,7 +31,7 @@ class SoapController extends BaseSoapController
             //set the Headers of Soap Client.
             $soap_client->__setSoapHeaders($header);
             
-            return $client;
+            return $soap_client;
 
 
             
