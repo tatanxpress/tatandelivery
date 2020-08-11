@@ -18,6 +18,7 @@ use App\User;
 use Carbon\Carbon;
 use DateTime;
 use App\VersionesApp;
+use App\MultiplesImagenes;
 
 class ServiciosController extends Controller
 {
@@ -449,7 +450,8 @@ class ServiciosController extends Controller
             ->join('servicios_tipo AS st', 'st.servicios_1_id', '=', 's.id')
             ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
             ->select('p.id', 'p.nombre', 'p.descripcion', 'p.precio', 
-            'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 'p.utiliza_imagen', 'p.utiliza_cantidad', 'p.utiliza_nota', 'p.nota')
+            'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 'p.utiliza_imagen',
+             'p.utiliza_cantidad', 'p.utiliza_nota', 'p.nota', 'p.utiliza_video', 'p.utiliza_imagen_extra')
             ->where('p.id', $request->productoid)
             ->get();
 
@@ -458,7 +460,7 @@ class ServiciosController extends Controller
                     $s->descripcion = "";
                 }
             }
-             
+              
                 return ['success' => 1, 'producto' => $producto];
 
             }else{
@@ -537,9 +539,45 @@ class ServiciosController extends Controller
             }
         }
     }
+    
 
+    // obtener lista de imagenes
+    public function obtenerListaDeImagenes(Request $request){
 
+        if($request->isMethod('post')){ 
 
+            // validaciones para los datos
+            $reglaDatos = array(                
+                'id' => 'required',
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del producto es requerido.',
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($p = Producto::where('id', $request->id)->first()){
+
+                $multiple = MultiplesImagenes::where('producto_id', $request->id)
+                ->orderBy('posicion', 'ASC')
+                ->get();
+
+                return ['success' => 1, 'producto' => $multiple];
+
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
 
 
 

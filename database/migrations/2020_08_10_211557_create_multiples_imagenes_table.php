@@ -19,7 +19,7 @@ class CreateMultiplesImagenesTable extends Migration
             $table->string('imagen_extra', 100);
             $table->integer('posicion');
  
-            $table->foreign('producto_id')->references('id')->on('ordenes');
+            $table->foreign('producto_id')->references('id')->on('producto');
         });
     }
 
