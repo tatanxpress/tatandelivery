@@ -67,8 +67,7 @@
                                         <input type="file" style="color:#191818" id="imagen-nuevo" accept="image/jpeg, image/jpg, image/png"/>
                                     </div>
                                 </div>
-
-                                
+ 
                                 <div class="form-group">
                                     <label>Utiliza imagen</label>
                                     <br>
@@ -253,7 +252,6 @@
                                     <input type="checkbox" id="cbimagen-editar">
                                 </div>
 
-
                             </div>
                         </div>
                     </div>
@@ -266,6 +264,7 @@
         </div>        
     </div>      
 </div>
+
 
 @extends('backend.menus.inferior')
 
@@ -692,6 +691,16 @@
         }
 
         return true;
+    }
+
+    // agregar mas foto del producto
+    function modalFoto(id){
+        window.location.href="{{ url('/admin/productos/mas/fotografias') }}/"+id;
+    }
+
+    // agregar un video al producto
+    function modalVideo(id){
+        window.location.href="{{ url('/admin/productos/mas/video') }}/"+id;
     }
 
   </script>

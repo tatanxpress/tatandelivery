@@ -61,7 +61,16 @@
                       <button type="button" class="btn btn-primary btn-xs" onclick="informacion({{ $dato->id }})">
                       <i class="fas fa-eye" title="Editar"></i>&nbsp; Editar
                       </button> 
-                    
+                      </br>
+                      </br>
+                      <button type="button" class="btn btn-warning btn-xs" onclick="modalVideo({{ $dato->id }})">
+                      <i class="fas fa-eye" title="Video"></i>&nbsp; Video
+                      </button> 
+                      </br>
+                      </br>
+                      <button type="button" class="btn btn-success btn-xs" onclick="modalFoto({{ $dato->id }})">
+                      <i class="fas fa-eye" title="Fotos Extras"></i>&nbsp; Fotos Extras
+                      </button> 
                     </td> 
 
                     </tr>
@@ -104,7 +113,7 @@
           })
           .then((response) => {
             loadingOverlay().cancel(spinHandle);
-            console.log(response);
+           
             toastr.success('Actualizado');
           })
           .catch((error) => {           

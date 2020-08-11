@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\MultiplesImagenes;
 
 class ProductoController extends Controller
 {
@@ -125,6 +126,11 @@ class ProductoController extends Controller
                 $avatar = $request->file('imagen'); 
                 $upload = Storage::disk('productos')->put($nombreFoto, \File::get($avatar));
 
+                if(Producto::where('imagen', $nombreFoto)->first()){
+                    // este nombre de imagen ya existe, reintentar subir
+                    return ['success' => 3];
+                }
+
                 $conteo = Producto::where('servicios_tipo_id', $request->idcategoria)->count();
                 $posicion = 1;
     
@@ -161,6 +167,7 @@ class ProductoController extends Controller
                     $ca->utiliza_nota = $request->cbnota;
                     $ca->nota = $nota;
                     $ca->utiliza_imagen = $request->cbimagen;
+                    $ca->utiliza_video = 0;
         
                     if($ca->save()){
                         return ['success' => 2]; // guardado
@@ -392,5 +399,356 @@ class ProductoController extends Controller
         }
         return ['success' => 1];
     }
+
+
+    public function indexMasFotos($id){
+       
+        $nombre = Producto::where('id', $id)->pluck('nombre')->first();
+        
+        return view('backend.paginas.servicios.listamultiplesfotos', compact('nombre', 'id'));
+    }
+
+
+    public function indexMasFotosTabla($id){
+        $foto = MultiplesImagenes::where('producto_id', $id)->get();
+        
+        return view('backend.paginas.servicios.tablas.tablaproductoimagenes', compact('foto'));
+    }
+
+     public function indexMasVideo($id){
+       
+        $data = Producto::where('id', $id)->first();
+
+        $nombre = $data->nombre;
+        $video = $data->video_url;
+        
+        return view('backend.paginas.servicios.listaproductovideo', compact('nombre', 'video', 'id'));
+    }
+
+
+    // nueva foto extra de producto
+    public function nuevaFotoExtra(Request $request){        
+        if($request->isMethod('post')){  
+ 
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(   
+                'id.required' => 'id producto es requerido'       
+                
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            } 
+            
+            // validar imagen
+            if($request->hasFile('imagen')){                
+
+                // validaciones para los datos
+                $regla2 = array( 
+                    'imagen' => 'required|image', 
+                );    
+         
+                $mensaje2 = array(
+                    'imagen.required' => 'La imagen es requerida',
+                    'imagen.image' => 'El archivo debe ser una imagen',
+                    );
+    
+                $validar2 = Validator::make($request->all(), $regla2, $mensaje2 );
+    
+                if ( $validar2->fails()) 
+                {
+                    return ['success' => 1]; // imagen no valida
+                }
+            }
+
+                $cadena = Str::random(15);
+                $tiempo = microtime(); 
+                $union = $cadena.$tiempo;
+                $nombre = str_replace(' ', '_', $union);
+                            
+                $extension = '.'.$request->imagen->getClientOriginalExtension();
+                $nombreFoto = $nombre.strtolower($extension);
+                $avatar = $request->file('imagen'); 
+
+                if(MultiplesImagenes::where('imagen_extra', $nombreFoto)->first()){
+                    // este nombre de imagen ya existe, reintentar subir
+                    return ['success' => 3];
+                }
+
+                $upload = Storage::disk('productos')->put($nombreFoto, \File::get($avatar));
+
+              
+
+                if($upload){
+                  
+                    $ca = new MultiplesImagenes();
+                    $ca->producto_id = $request->id;
+                    $ca->imagen_extra = $nombreFoto;
+                    $ca->posicion = 1;
+
+                    if($ca->save()){
+                        return ['success' => 2]; // guardado
+                    }else{
+                        return ['success' => 3]; // error la guardar
+                    }
+                }else{
+                    return ['success' => 4]; // error al guardar imagen
+                }     
+        }
+    } 
+
+
+    // borrar imagen de producto extra
+    public function borrarImagenExtra(Request $request){
+
+        if($request->isMethod('post')){  
+ 
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(   
+                'id.required' => 'id producto es requerido'       
+                
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            } 
+            
+            if($mi = MultiplesImagenes::where('id', $request->id)->first()){
+
+                if(Storage::disk('productos')->exists($mi->imagen_extra)){
+                    Storage::disk('productos')->delete($mi->imagen_extra);                                
+                }
+
+                $idpro = $mi->producto_id;
+
+                MultiplesImagenes::where('id', $request->id)->delete();
+
+                // buscar si hay imagenes extra, sino desactivar
+                if(MultiplesImagenes::where('producto_id', $request->id)->first()){
+                    // si hay aun
+                }else{
+                    Producto::where('id', $idpro)->update([
+                        'utiliza_imagen_extra' => 0 
+                        ]);
+                }
+
+                return ['success' => 1];
+            }
+        }
+    }
+
+    public function editarProductoImagenExtra(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'id' => 'required'                
+            );
+
+            $messages = array(   
+                'id.required' => 'El id es requerido' 
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            // por lo menos hay 1 foto extra
+            if(MultiplesImagenes::where('producto_id', $request->id)->first()){
+                Producto::where('id', $request->id)->update([
+                    'utiliza_imagen_extra' => $request->check              
+                    ]);
+
+                    return ['success' => 1];
+    
+            }else{
+                return ['success' => 2];
+            }           
+        } 
+    }
+
+
+    public function ordenarImagenesExtra(Request $request){
+
+        foreach ($request->order as $order) {
+
+            $tipoid = $order['id'];
+
+            DB::table('zonas_publicidad')
+            ->where('publicidad_id', $tipoid) 
+            ->update(['posicion' => $order['posicion']]); // actualizar posicion
+        }           
+
+        return ['success' => 1];
+    }
+    
+
+    public function agregarVideoProducto(Request $request){
+
+        if($request->isMethod('post')){  
+ 
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(   
+                'id.required' => 'id producto es requerido'       
+                
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            } 
+
+            $cadena = Str::random(15);
+            $tiempo = microtime(); 
+            $union = $cadena.$tiempo;
+            $nombre = str_replace(' ', '_', $union);
+                        
+            $extension = '.'.$request->video->getClientOriginalExtension();
+            $nombreVideo = $nombre.strtolower($extension);
+            $avatar = $request->file('video'); 
+
+            if(Producto::where('video_url', $nombreVideo)->first()){
+                // este nombre de video ya existe, reintentar subir
+                return ['success' => 1];
+            }
+
+            $upload = Storage::disk('productos')->put($nombreVideo, \File::get($avatar));
+
+            if($upload){
+
+                // obtener url anterior, sino habia nada, pues no eliminara nada
+                $dd = Producto::where('id', $request->id)->pluck('video_url')->first();
+
+                if(Storage::disk('productos')->exists($dd)){
+                    Storage::disk('productos')->delete($dd);                                
+                }
+
+                // agregar nueva url
+                 Producto::where('id', $request->id)->update([                   
+                  'video_url' => $nombreVideo,
+                ]);
+                
+                return ['success' => 2]; 
+                
+            }else{
+                return ['success' => 3]; // error al guardar
+            }     
+        }
+    }
+
+
+    public function borrarVideoProducto(Request $request){
+
+        if($request->isMethod('post')){  
+ 
+            $regla = array( 
+                'id' => 'required'
+            );
+ 
+            $mensaje = array(   
+                'id.required' => 'id producto es requerido'       
+                
+            );
+
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            } 
+            
+            if($p = Producto::where('id', $request->id)->first()){
+
+                if(Storage::disk('productos')->exists($p->video_url)){
+                    Storage::disk('productos')->delete($p->video_url);                                
+                }
+                
+                Producto::where('id', $p->id)->update([
+                    'utiliza_video' => 0,
+                    'video_url' => ""
+                    ]);
+
+                return ['success' => 1];
+            }
+        }
+    }
+
+
+    public function editarProductoVideo(Request $request){
+
+        if($request->isMethod('post')){   
+            $rules = array( 
+                'id' => 'required'                
+            );
+
+            $messages = array(   
+                'id.required' => 'El id es requerido' 
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            // por lo menos hay 1 foto extra
+            if($p = Producto::where('id', $request->id)->first()){
+
+                if($p->video_url == null || $p->video_url == ""){
+                    return ['success' => 1];
+                }
+
+                Producto::where('id', $request->id)->update([
+                    'utiliza_video' => $request->check              
+                    ]);
+
+                    return ['success' => 2];
+    
+            }else{
+                return ['success' => 3];
+            }           
+        } 
+
+    }
+
+
 }
   

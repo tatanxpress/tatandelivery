@@ -139,7 +139,7 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   // productos 
   Route::get('/productos/{id}', 'ProductoController@index');  
   Route::get('/productos/tablas/{id}', 'ProductoController@tablaProductos');
-  Route::post('/productos/nuevo', 'ProductoController@nuevo');
+  Route::post('/productos/nuevo', 'ProductoController@nuevo'); 
   Route::post('/productos/informacion', 'ProductoController@informacion');
   Route::post('/productos/editar', 'ProductoController@editar');
   Route::post('/productos/ordenar', 'ProductoController@ordenar'); 
@@ -226,7 +226,23 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::post('/ordenes/buscar-su-motorista', 'OrdenesController@buscarSuMotorista'); 
   Route::post('/ordenes/cambiar-su-motorista', 'OrdenesController@editarMotoristaASuOrden'); 
 
+ 
 
+  // agregar mas fotos a un producto
+  Route::get('/productos/mas/fotografias/{id}', 'ProductoController@indexMasFotos'); 
+  Route::get('/productos/tabla/mas/fotografias/{id}', 'ProductoController@indexMasFotosTabla'); 
+  Route::post('/productos/agregar/imagen-extra', 'ProductoController@nuevaFotoExtra'); 
+  Route::post('/productos/imagenes/extra-borrar', 'ProductoController@borrarImagenExtra'); 
+  Route::post('/productos/editar/imagen-entra', 'ProductoController@editarProductoImagenExtra'); 
+  Route::post('/productos/imagenes-extra/ordenar', 'ProductoController@ordenarImagenesExtra'); 
+
+  
+
+  // agregar un video al producto
+  Route::get('/productos/mas/video/{id}', 'ProductoController@indexMasVideo'); 
+  Route::post('/productos/agregar/video', 'ProductoController@agregarVideoProducto'); 
+  Route::post('/productos/video/borrar', 'ProductoController@borrarVideoProducto'); 
+  Route::post('/productos/editar/video', 'ProductoController@editarProductoVideo'); 
 
 
   // motorista ordenes   
@@ -369,6 +385,8 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
 
   Route::get('/encargos/zonas-lista/{id}', 'EncargosWebController@verListaZonasEncargo'); 
   Route::get('/encargos/tabla/zonas-lista/{id}', 'EncargosWebController@verListaZonasEncargoTabla'); 
+
+  
   
   Route::post('/encargos/zonas/zona-borrar', 'EncargosWebController@borrarZonaEncargo');
   Route::post('/encargos/zonas/zona-nuevo', 'EncargosWebController@nuevoEncargoZona');
@@ -555,6 +573,6 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
    
 Route::get('metodos/pagar', 'BaseSoap\MetodosDePago@metododepago');
 
-
+ 
 Route::get('bienes-servicios', 'SoapController@BienesServicios');
 Route::get('clima', 'SoapController@clima');
