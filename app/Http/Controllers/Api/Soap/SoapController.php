@@ -32,7 +32,7 @@ class SoapController extends BaseSoapController
             ini_set('default_socket_timeout', 5000);
             $client = new \SoapClient($url, array(
                 
-                'keep_alive' => false,
+                'keep_alive' => true,
             ));
 
             // Create Contact obj
