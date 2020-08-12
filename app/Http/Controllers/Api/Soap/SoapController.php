@@ -5,30 +5,40 @@ namespace App\Http\Controllers\Api\Soap;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
+class CreateCliente 
+  {
+    public $Rtl;
+    public $Info;
+    public $InfoV;
+    public $InfoS;
+  }
+
 class SoapController extends BaseSoapController
 {
-    private $service;
+   
 
     public function BienesServicios(){
+
+        $rtl = "999999999999";
+        $info = "9999995286545848";
+        $infov = "2012";
+        $infos = "123";
+
         try {
 
+            $charge = new CreateCliente();
+            $charge->Rtl = $rtl;
+            $charge->Info = $info;
+            $charge->InfoV = $infov;
+            $charge->InfoS = $infos;
+
             $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
+           
+            //$res = $client->__call('charge',array('parametrs'=>$params)); 
+           
+            $client = new \SoapClient($url);
 
-            $rtl = "999999999999";
-            $info = "9999995286545848";
-            $infov = "2012";
-            $infos = "123";
-
-            $params = array (
-                'Rtl' => $rtl,
-                'Info' => $info,
-                'Infov' => $infov,
-                'InfoS' => $infos 
-            );
-
-            $client = new \SoapClient($url, $params);
-
-            return $client->__getFunctions();
+            return $client->CreateCliente($charge);
             
         } catch(SoapFault $fault){
 
