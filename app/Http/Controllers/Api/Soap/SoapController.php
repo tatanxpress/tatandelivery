@@ -25,10 +25,10 @@ class SoapController extends BaseSoapController
                 'Infov' => $infov,
                 'InfoS' => $infos 
             );
-            
-            $client = new \SoapClient($url);
 
-            return $client->CreateCliente($rtl, $info, $infov, $infos);
+            $client = new \SoapClient($url, $params);
+
+            return $client->__getFunctions();
             
         } catch(SoapFault $fault){
 
