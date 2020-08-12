@@ -26,6 +26,8 @@ class SoapController extends BaseSoapController
         $infov = "2012";
         $infos = "123";
 
+        phpinfo();
+
         try {
             ini_set('default_socket_timeout', 600);
             $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL");
