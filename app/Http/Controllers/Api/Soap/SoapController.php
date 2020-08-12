@@ -18,7 +18,6 @@ class CreateCliente {
 
 class SoapController extends BaseSoapController
 {
-   
 
     public function BienesServicios(){
 
@@ -29,8 +28,8 @@ class SoapController extends BaseSoapController
 
         try {
 
-            $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL");
-
+            $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL", array('keep_alive' => false));
+           
             // Create Contact obj
             $contact = new CreateCliente($rtl, $info, $infov, $infos);
 
