@@ -31,9 +31,7 @@ class SoapController extends BaseSoapController
         try {
             ini_set('default_socket_timeout', 5000);
             $client = new \SoapClient($url, array(
-                'trace' =>true,
-                'connection_timeout' => 5000,
-                'cache_wsdl' => WSDL_CACHE_NONE,
+                
                 'keep_alive' => false,
             ));
 
