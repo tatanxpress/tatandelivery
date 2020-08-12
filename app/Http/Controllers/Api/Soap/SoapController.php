@@ -28,7 +28,7 @@ class SoapController extends BaseSoapController
             
             $client = new \SoapClient($url);
 
-            return $client->CreateCliente($params);
+            return $client->CreateCliente($rtl, $info, $infov, $infos);
             
         } catch(SoapFault $fault){
 
