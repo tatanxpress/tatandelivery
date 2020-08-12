@@ -29,6 +29,8 @@ class SoapController extends BaseSoapController
         $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
         try {
 
+            ini_set('default_socket_timeout', 6000000);
+
             $options = Array(
                 "uri" => $url,
                 "style" => SOAP_RPC,
