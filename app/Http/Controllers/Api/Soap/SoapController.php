@@ -13,6 +13,16 @@ class CreateCliente
     public $InfoS;
   }
 
+  class CreateCliente {
+    public function __construct($rtl, $info, $infov, $infos) 
+    {
+        $this->Rtl = $rtl;
+        $this->Info = $info;
+        $this->Infov = $infov;
+        $this->InfoS = $infos;
+    }
+}
+
 class SoapController extends BaseSoapController
 {
    
@@ -26,19 +36,20 @@ class SoapController extends BaseSoapController
 
         try {
 
-            $charge = new CreateCliente();
-            $charge->Rtl = $rtl;
-            $charge->Info = $info;
-            $charge->InfoV = $infov;
-            $charge->InfoS = $infos;
+            $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL");
 
-            $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
-           
-            //$res = $client->__call('charge',array('parametrs'=>$params)); 
-           
-            $client = new \SoapClient($url);
+            // Create Contact obj
+            $contact = new CreateCliente($rtl, $info, $infov, $infos);
 
-            return $client->CreateCliente($charge);
+            // Set request params
+            $params = array(
+                "CreateCliente" => $contact               
+            );
+
+            $response = $client->__soapCall("CreateCliente", array($params));
+
+            return $response;
+           
             
         } catch(SoapFault $fault){
 
