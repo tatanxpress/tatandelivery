@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 
-class CreateCliente {
+  class CreateCliente {
     public function __construct($rtl, $info, $infov, $infos) 
     {
         $this->Rtl = $rtl;
@@ -18,6 +18,7 @@ class CreateCliente {
 
 class SoapController extends BaseSoapController
 {
+   
 
     public function BienesServicios(){
 
@@ -25,25 +26,33 @@ class SoapController extends BaseSoapController
         $info = "9999995286545848";
         $infov = "2012";
         $infos = "123";
-
-        phpinfo();
-
+        $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
         try {
-            ini_set('default_socket_timeout', 600);
-            $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL");
 
-            // Create Contact obj
-            $contact = new CreateCliente($rtl, $info, $infov, $infos);
-
-            // Set request params
-            $params = array(
-                "CreateCliente" => $contact               
+            $options = Array(
+                "uri" => $url,
+                "style" => SOAP_RPC,
+                "use"=> SOAP_ENCODED,
+                "soap_version"=> SOAP_1_1,
+                "cache_wsdl"=> WSDL_CACHE_BOTH,
+                "connection_timeout" => 15,
+                "trace" => false,
+                "encoding" => "UTF-8",
+                "exceptions" => false,
             );
 
-            $response = $client->__soapCall("CreateCliente", array($params));
+            $client = new \SoapClient($url, $options);
 
-            return $response;
-           
+            // Create Contact obj
+
+            $charge = new CreateCliente();
+            $charge->Rtl = $rtl;
+            $charge->Info = $info;
+            $charge->InfoV = $infov;
+            $charge->InfoS = $infos;
+
+        
+            return $client->CreateCliente($charge);
             
         } catch(SoapFault $fault){
 
