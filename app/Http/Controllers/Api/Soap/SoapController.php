@@ -5,15 +5,8 @@ namespace App\Http\Controllers\Api\Soap;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class CreateCliente 
-  {
-    public $Rtl;
-    public $Info;
-    public $InfoV;
-    public $InfoS;
-  }
 
-  class CreateCliente {
+class CreateCliente {
     public function __construct($rtl, $info, $infov, $infos) 
     {
         $this->Rtl = $rtl;
