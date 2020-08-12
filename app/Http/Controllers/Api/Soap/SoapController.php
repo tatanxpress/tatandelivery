@@ -45,14 +45,13 @@ class SoapController extends BaseSoapController
 
             // Create Contact obj
 
-            $charge = new CreateCliente();
-            $charge->Rtl = $rtl;
-            $charge->Info = $info;
-            $charge->InfoV = $infov;
-            $charge->InfoS = $infos;
-
+            $contact = new CreateCliente($rtl, $info, $infov, $infos);
+         
+            $params = array(
+                "CreateCliente" => $contact
+            );
         
-            return $client->CreateCliente($charge);
+            return $client->__soapCall("CreateCliente", array($params));
             
         } catch(SoapFault $fault){
 
