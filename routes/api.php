@@ -368,7 +368,7 @@ Route::post('adminapp/ver/notificacion/motorista', 'Api\AdminAppController@envia
 
 // obtener lista de imagenes de un producto
 Route::post('usuario/producto/lista-de-imagenes', 'Api\ServiciosController@obtenerListaDeImagenes');
-
+Route::post('usuario/producto/video-url', 'Api\ServiciosController@obtenerVideoProducto');
 
 
 

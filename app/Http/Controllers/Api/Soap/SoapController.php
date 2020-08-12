@@ -22,6 +22,23 @@ class SoapController extends BaseSoapController
             
 
             $headerbody = array('Info'=> $info, 'InfoS' => $infos, 'Infov' => $infov, 'Rtl' => $rtl); 
+
+            $options = array(
+                'location' => 'http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente',
+            );
+            
+            $client = new SoapClient("http://www.quickregistration.ae/temp/PassedVehicleTestService.xml", $options);
+            
+            $username = new SoapHeader("http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente", 'username', 'myUser');
+            $password = new SoapHeader("http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente", 'password', 'yetAnotherPassword');
+            
+            $client->__setSoapHeaders(array($username, $password));
+            
+            $result = $client->vehiclePassedTest('chassisNo');
+            
+            var_dump($result);
+
+
             
             $soap_client = new \SoapClient($url, $headerbody);
             

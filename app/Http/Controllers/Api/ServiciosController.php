@@ -580,7 +580,38 @@ class ServiciosController extends Controller
     }
 
 
+    public function obtenerVideoProducto(Request $request){
 
+        if($request->isMethod('post')){ 
+
+            // validaciones para los datos
+            $reglaDatos = array(                
+                'id' => 'required',
+            );
+        
+            $mensajeDatos = array(                                      
+                'id.required' => 'El id del producto es requerido.',
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($p = Producto::where('id', $request->id)->first()){
+                
+                return ['success' => 1, 'video' => $p->video_url];
+
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
 
 
 }
