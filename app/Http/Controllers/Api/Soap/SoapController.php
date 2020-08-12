@@ -12,59 +12,30 @@ class SoapController extends BaseSoapController
     public function BienesServicios(){
         try {
 
-
             $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
 
             $rtl = "999999999999";
             $info = "9999995286545848";
             $infov = "2012";
             $infos = "123";
-            
 
-            $headerbody = array('Info'=> $info, 'InfoS' => $infos, 'Infov' => $infov, 'Rtl' => $rtl); 
-
-            $options = array(
-                'location' => 'http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente',
+            $params = array (
+                'Rtl' => $rtl,
+                'Info' => $info,
+                'Infov' => $infov,
+                'InfoS' => $infos 
             );
-            
-            $client = new SoapClient("http://www.quickregistration.ae/temp/PassedVehicleTestService.xml", $options);
-            
-            $username = new SoapHeader("http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente", 'username', 'myUser');
-            $password = new SoapHeader("http://redserfinsa.com/services/buypass/IBuyPassService/CreateCliente", 'password', 'yetAnotherPassword');
-            
-            $client->__setSoapHeaders(array($username, $password));
-            
-            $result = $client->vehiclePassedTest('chassisNo');
-            
-            var_dump($result);
 
+            $client = new \SoapClient($url, $params);
 
+            return $client->__getTypes();
             
-            $soap_client = new \SoapClient($url, $headerbody);
-            
-           //Create Soap Header.       
-            $header = new \SOAPHeader('CreateCliente', $headerbody);       
-       
-            //set the Headers of Soap Client.
-            $soap_client->__CreateCliente($header);
-            
-            return $soap_client;
+        } catch(SoapFault $fault){
 
-
-            
-$header = new SoapHeader('http://soapinterop.org/echoheader/', 
-                            'echoMeStringRequest',
-                            'hello world');
-
-$client->__setSoapHeaders($header);
-
-$client->__soapCall("echoVoid", null);
-
-        }
-        catch(\Exception $e) {
-            return $e->getMessage();
         }
     }
+           
+
 
     /*public function BienesServicios(){
         try {
