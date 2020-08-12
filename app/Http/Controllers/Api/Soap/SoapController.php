@@ -27,7 +27,28 @@ class SoapController extends BaseSoapController
         $infov = "2012";
         $infos = "123";
         $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
+
         try {
+            self::setWsdl($url);
+            $this->service = InstanceSoapClient::init();
+
+            $contact = new CreateCliente($rtl, $info, $infov, $infos);
+         
+            $params = array(
+                "CreateCliente" => $contact
+            );
+
+            $cities = $this->service->CreateCliente($params);
+            $ciudades = $this->loadXmlStringAsArray($cities->CreateClienteResponse);
+            //dd($ciudades['Table'][1]);
+            return [$ciudades];
+        }
+        catch(\Exception $e) {
+            return $e->getMessage();
+        }
+
+
+       /* try {
 
             ini_set('default_socket_timeout', 6000000);
 
@@ -57,7 +78,7 @@ class SoapController extends BaseSoapController
             
         } catch(SoapFault $fault){
 
-        }
+        }*/
     }
            
 
