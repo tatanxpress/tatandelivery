@@ -26,11 +26,16 @@ class SoapController extends BaseSoapController
         $infov = "2012";
         $infos = "123";
 
-        phpinfo();
+        $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
 
         try {
-            ini_set('default_socket_timeout', 600);
-            $client = new \SoapClient("https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL");
+            ini_set('default_socket_timeout', 5000);
+            $client = new \SoapClient($url, array(
+                'trace' =>true,
+                'connection_timeout' => 5000,
+                'cache_wsdl' => WSDL_CACHE_NONE,
+                'keep_alive' => false,
+            ));
 
             // Create Contact obj
             $contact = new CreateCliente($rtl, $info, $infov, $infos);
