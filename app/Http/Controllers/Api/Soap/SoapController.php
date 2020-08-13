@@ -28,6 +28,32 @@ class SoapController extends BaseSoapController
         $infos = "123";
         $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
 
+
+        $client = new \SoapClient($url);
+        
+        $xmlr = new \SimpleXMLElement("<CreateCliente></CreateCliente>");
+        $xmlr->addChild('Info', $info);
+        $xmlr->addChild('InfoS', $infos);
+        $xmlr->addChild('InfoV', $infov);
+        $xmlr->addChild('Rtl', $rtl);
+        
+        $params = new \stdClass();
+        $params->xml = $xmlr->asXML();
+        
+        $result = $client->CreateCliente($params);
+        
+        return $result;
+
+
+
+
+
+
+
+
+
+
+
         try {
             self::setWsdl($url);
             $this->service = InstanceSoapClient::init();
