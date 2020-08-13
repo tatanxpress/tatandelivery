@@ -41,7 +41,7 @@ Route::post('usuario/servicios/ver/publicidad', 'Api\ServiciosController@verPubl
         
   
 
-// vista tipo tienda   
+// vista tipo tienda
 Route::post('usuario/servicios/tienda/producto', 'Api\VistaTipoTiendaController@getTodoProductoTienda'); // productos de tienda
       
 // carrito 

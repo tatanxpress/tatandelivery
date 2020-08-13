@@ -451,7 +451,8 @@ class ServiciosController extends Controller
             ->join('producto AS p', 'p.servicios_tipo_id', '=', 'st.id')
             ->select('p.id', 'p.nombre', 'p.descripcion', 'p.precio', 
             'p.unidades', 'p.imagen', 'p.activo', 'p.disponibilidad', 'p.utiliza_imagen',
-             'p.utiliza_cantidad', 'p.utiliza_nota', 'p.nota', 'p.utiliza_video', 'p.utiliza_imagen_extra')
+             'p.utiliza_cantidad', 'p.utiliza_nota', 'p.nota', 'p.utiliza_video', 
+             'p.utiliza_imagen_extra', 'p.video_url')
             ->where('p.id', $request->productoid)
             ->get();
 
