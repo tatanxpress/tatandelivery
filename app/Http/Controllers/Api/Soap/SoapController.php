@@ -23,42 +23,7 @@ class SoapController extends BaseSoapController
     public function BienesServicios(){
 
 
-        $wsdl = 'https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL';
-
-        $params = array(
-            'CreateCliente' => [
-                "Info"    => "9999995286545848",
-                "InfoS"   => "123",
-                "InfoV"   => "2012",
-                "Rtl"     => "999999999999",
-            ]
-        );
-        $parameters2 = array(
-            'trace' => true,
-            'exceptions' => true,  
-            "location" => $wsdl,
-            'cache_wsdl' => WSDL_CACHE_NONE,        
-            'connection_timeout' => 50
-        );
-
-       
-
-        $client = new \SoapClient($wsdl, array(
-            "trace" => true,
-            'cache_wsdl' => WSDL_CACHE_NONE));
-        #$client->__setSoapHeaders(self::soapClientWSSecurityHeader());
-
-        $response = $client->__soapCall("CreateCliente", array($params));
-
-
-        echo "====== REQUEST HEADERS =====" . PHP_EOL;
-        var_dump($client->__getLastRequestHeaders());
-        echo "========= REQUEST ==========" . PHP_EOL;
-        var_dump($client->__getLastRequest());
-        echo "========= RESPONSE =========" . PHP_EOL;
-        var_dump($response);
-
-
+        var_dump(openssl_get_cert_locations());
     }
            
 
