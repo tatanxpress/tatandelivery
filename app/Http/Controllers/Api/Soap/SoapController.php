@@ -35,19 +35,13 @@ class SoapController extends BaseSoapController
         );
         $parameters2 = array(
             'trace' => true,
-            'exceptions' => true,
+            'exceptions' => true,  
             "location" => $wsdl,
-            'cache_wsdl' => WSDL_CACHE_NONE,
-            'stream_context' => stream_context_create(array(
-                'ssl' => array(
-                    'ciphers' => 'DEFAULT:!TLSv1.0:!SSLv3',
-                    'verify_peer' => false,
-                    'verify_peer_name' => true,
-                    'allow_self_signed' => true
-                ),
-            )),
+            'cache_wsdl' => WSDL_CACHE_NONE,        
             'connection_timeout' => 50
         );
+
+        
 
         $client = new \SoapClient($wsdl, $parameters2);
         #$client->__setSoapHeaders(self::soapClientWSSecurityHeader());
