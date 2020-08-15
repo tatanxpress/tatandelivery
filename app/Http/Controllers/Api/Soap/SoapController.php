@@ -23,7 +23,8 @@ class SoapController extends BaseSoapController
     public function BienesServicios(){
 
 
-        var_dump(openssl_get_cert_locations());
+        phpinfo();
+
     }
            
 
