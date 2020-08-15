@@ -630,8 +630,7 @@
         if(fechaentrega === ''){
             toastr.error("fecha entrega fin es requerido");
             return;
-        }
-        
+        }        
 
         return true;
     }

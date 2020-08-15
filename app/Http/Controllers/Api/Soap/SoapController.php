@@ -22,89 +22,47 @@ class SoapController extends BaseSoapController
 
     public function BienesServicios(){
 
-        $rtl = "999999999999";
-        $info = "9999995286545848";
-        $infov = "2012";
-        $infos = "123";
-        $url = "https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL";
+
+        $wsdl = 'https://buypasstest.redserfinsa.com:8080/BuyPass/BuyPassService.asmx?WSDL';
+
+        $params = array(
+            'CreateCliente' => [
+                "Info"    => "9999995286545848",
+                "InfoS"   => "123",
+                "InfoV"   => "2012",
+                "Rtl"     => "999999999999",
+            ]
+        );
+        $parameters2 = array(
+            'trace' => true,
+            'exceptions' => true,
+            "location" => $wsdl,
+            'cache_wsdl' => WSDL_CACHE_NONE,
+            'stream_context' => stream_context_create(array(
+                'ssl' => array(
+                    'ciphers' => 'DEFAULT:!TLSv1.0:!SSLv3',
+                    'verify_peer' => false,
+                    'verify_peer_name' => true,
+                    'allow_self_signed' => true
+                ),
+            )),
+            'connection_timeout' => 50
+        );
+
+        $client = new \SoapClient($wsdl, $parameters2);
+        #$client->__setSoapHeaders(self::soapClientWSSecurityHeader());
+
+        $response = $client->__soapCall("CreateCliente", array($params));
 
 
-        $client = new \SoapClient($url);
-        
-        $xmlr = new \SimpleXMLElement("<CreateCliente></CreateCliente>");
-        $xmlr->addChild('Info', $info);
-        $xmlr->addChild('InfoS', $infos);
-        $xmlr->addChild('InfoV', $infov);
-        $xmlr->addChild('Rtl', $rtl);
-        
-        $params = new \stdClass();
-        $params->xml = $xmlr->asXML();
-        
-        $result = $client->CreateCliente($params);
-        
-        return $result;
+        echo "====== REQUEST HEADERS =====" . PHP_EOL;
+        var_dump($client->__getLastRequestHeaders());
+        echo "========= REQUEST ==========" . PHP_EOL;
+        var_dump($client->__getLastRequest());
+        echo "========= RESPONSE =========" . PHP_EOL;
+        var_dump($response);
 
 
-
-
-
-
-
-
-
-
-
-        try {
-            self::setWsdl($url);
-            $this->service = InstanceSoapClient::init();
-
-            $contact = new CreateCliente($rtl, $info, $infov, $infos);
-         
-            $params = array(
-                "CreateCliente" => $contact
-            );
-
-            $cities = $this->service->CreateCliente($params);
-            $ciudades = $this->loadXmlStringAsArray($cities->CreateClienteResponse);
-            //dd($ciudades['Table'][1]);
-            return [$ciudades];
-        }
-        catch(\Exception $e) {
-            return $e->getMessage();
-        }
-
-
-       /* try {
-
-            ini_set('default_socket_timeout', 6000000);
-
-            $options = Array(
-                "uri" => $url,
-                "style" => SOAP_RPC,
-                "use"=> SOAP_ENCODED,
-                "soap_version"=> SOAP_1_1,
-                "cache_wsdl"=> WSDL_CACHE_BOTH,
-                "connection_timeout" => 15,
-                "trace" => false,
-                "encoding" => "UTF-8",
-                "exceptions" => false,
-            );
-
-            $client = new \SoapClient($url, $options);
-
-            // Create Contact obj
-
-            $contact = new CreateCliente($rtl, $info, $infov, $infos);
-         
-            $params = array(
-                "CreateCliente" => $contact
-            );
-        
-            return $client->__soapCall("CreateCliente", array($params));
-            
-        } catch(SoapFault $fault){
-
-        }*/
     }
            
 

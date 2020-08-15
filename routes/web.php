@@ -17,7 +17,7 @@ Route::get('/preguntas-frecuentes', 'FrontendController@verFAQ'); // pagina de p
 Route::get('/terminos-condiciones', 'FrontendController@verTerminos'); // pagina de preguntas
 
 // Rutas administrador
- 
+  
 Route::get('admin/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');  // pagina inicio de sesion admin
 Route::post('admin/logout', 'Auth\AdminLoginController@logout')->name('admin.logout'); // cerrado de sesion
 Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.submit'); // inicio de sesion
