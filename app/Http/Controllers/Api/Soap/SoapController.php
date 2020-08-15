@@ -41,9 +41,11 @@ class SoapController extends BaseSoapController
             'connection_timeout' => 50
         );
 
-        
+       
 
-        $client = new \SoapClient($wsdl, $parameters2);
+        $client = new \SoapClient($wsdl, array(
+            "trace" => true,
+            'cache_wsdl' => WSDL_CACHE_NONE));
         #$client->__setSoapHeaders(self::soapClientWSSecurityHeader());
 
         $response = $client->__soapCall("CreateCliente", array($params));
