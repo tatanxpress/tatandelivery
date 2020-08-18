@@ -42,7 +42,7 @@ class SoapController extends BaseSoapController
         );
 
         $client = new \SoapClient($wsdl, $parameters2);
-        $client->__setSoapHeaders(self::soapClientWSSecurityHeader());
+        $//client->__setSoapHeaders(self::soapClientWSSecurityHeader());
 
         $response = $client->__soapCall("CreateCliente", array($params));
 
