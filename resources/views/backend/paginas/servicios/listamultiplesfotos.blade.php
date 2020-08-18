@@ -117,7 +117,6 @@
     </div>      
 </div>
 
-
 <!-- modal editar -->
 <div class="modal fade" id="modalEditar">
     <div class="modal-dialog">

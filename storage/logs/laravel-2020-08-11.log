@@ -1,4 +1,0 @@
-[2020-08-11 22:03:18] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
- (SQL: select * from `producto` where `id` = 1436 limit 1) null 
-[2020-08-11 22:03:22] local.ERROR: SQLSTATE[HY000] [2002] No se puede establecer una conexión ya que el equipo de destino denegó expresamente dicha conexión.
- (SQL: select * from `producto` where `id` = 1436 limit 1) null 

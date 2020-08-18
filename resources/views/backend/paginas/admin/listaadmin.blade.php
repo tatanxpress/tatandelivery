@@ -32,7 +32,7 @@
              <h3 class="card-title">Formulario</h3>
            </div>
            <div class="card-body">
-             <div class="row">           
+             <div class="row">            
                <div class="col-md-6">
                     <div class="form-group">
                          <label>Nombre:</label>

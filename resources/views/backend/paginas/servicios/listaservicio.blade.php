@@ -1446,9 +1446,6 @@
             }) 
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
-
-               
-
                 if(response.data.success == 1){
                      
                     $('#modalServicio').modal('show');
