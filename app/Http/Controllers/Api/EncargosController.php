@@ -109,7 +109,7 @@ class EncargosController extends Controller
                 $fecha->format("F"); 
                 $mes = $fecha->formatLocalized('%B');*/
 
-
+                // FECHA ENTREGA
                 $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
                 $fecha = Carbon::parse($e->fecha_finaliza);
                 $mes = $meses[($fecha->format('n')) - 1];
@@ -131,12 +131,12 @@ class EncargosController extends Controller
                 //$fechar = Carbon::parse($e->fecha_finaliza);
                 //$mesf = $meses[($fechar->format('n')) - 1];
                 
+                // FECHA IPHONE
                 $dianumerof = date("d", strtotime($e->fecha_finaliza));
                 $horaf = date("h:i A", strtotime($e->fecha_finaliza));               
 
                 $fechaiphone = $dianumerof . " de " . $mes . " a las " . $horaf;
                 $e->fechaiphone = $fechaiphone;
-
 
                 $e->estado = $estado; // si es 1, esto ha finalizado
                 $e->packTiempo = $packTiempo;
@@ -530,7 +530,7 @@ class EncargosController extends Controller
                         ->where('c.carrito_encargo_id', $cart->id)
                         ->get();
   
-                    // sub total de la orden
+                        // sub total de la orden
  
                         foreach($producto as $p){
                             $cantidad = $p->cantidad;
@@ -546,10 +546,14 @@ class EncargosController extends Controller
 
                         $subTotal = collect($producto)->sum('multiplicado'); 
                         $subTotal = number_format((float)$subTotal, 2, '.', '');
+
+                        $botonTexto = Encargos::where('id', $cart->encargos_id)->pluck('texto_boton')->first();
+
                         return [
                             'success' => 1,
                             'producto' => $producto,
-                            'subtotal' => $subTotal                        
+                            'subtotal' => $subTotal,
+                            'boton' => $botonTexto                 
                         ];
 
                     }else{
@@ -776,7 +780,7 @@ class EncargosController extends Controller
                     $dir->revisado = $d->revisado;
 
                     $dir->save();
-
+ 
                      // guardar todos los productos de esa orden
                      foreach($producto as $p){
  

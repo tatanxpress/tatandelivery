@@ -239,6 +239,9 @@ class EncargosWebController extends Controller
                     $e->vista_cliente = 0; // encargo activo pero no visible al cliente aun
                     $e->visible_propietario = 1; // visible al propietario la tarjeta si esta asignado. 
                                                 // una vez complete las ordenes_encargo podra ocultar la tarjeta
+                    
+                    $e->texto_boton = $request->boton;
+                    
                     if($e->save()){
  
                         $n = new EncargoAsignadoServicio();
@@ -335,7 +338,8 @@ class EncargosWebController extends Controller
                             'tipo_vista' => $request->tipovista,
                             'vista_cliente' => $request->vistacliente,
                             'permiso_motorista' => $request->permisomotorista,
-                            'visible_propietario' => $request->visiblepropietario
+                            'visible_propietario' => $request->visiblepropietario,
+                            'texto_boton' => $request->boton
                             ]);
 
                             // editar servicio, vendra null en encargos finalizados
@@ -373,7 +377,8 @@ class EncargosWebController extends Controller
                         'tipo_vista' => $request->tipovista,
                         'vista_cliente' => $request->vistacliente,
                         'permiso_motorista' => $request->permisomotorista,
-                        'visible_propietario' => $request->visiblepropietario    
+                        'visible_propietario' => $request->visiblepropietario,
+                        'texto_boton' => $request->boton
                         ]);
 
                         // editar servicio, vendra null en encargos finalizados

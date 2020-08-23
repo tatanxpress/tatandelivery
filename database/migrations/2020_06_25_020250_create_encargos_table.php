@@ -32,7 +32,7 @@ class CreateEncargosTable extends Migration
                                                     // encargos asi al meterse vera las ordenes_encargo, al terminar las ordenes_encargo
                                                     // podra ocultar la tarjeta encargo.
 
- 
+            $table->string('texto_boton', 90)->default('Guardar'); // texto para el boton del encargo
 
         });
     }

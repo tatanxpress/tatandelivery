@@ -71,6 +71,11 @@
                                     <textarea maxlength="500" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción"></textarea>
                                 </div>
 
+                                <div class="form-group">
+                                    <label>Texto para boton guardar</label>
+                                    <input type="text" maxlength="90" class="form-control" id="boton-nuevo" placeholder="Texto">
+                                </div>
+
 
                                 <div class="form-group">
                                     <div>
@@ -169,6 +174,11 @@
                                 <div class="form-group">
                                     <label>Descripción</label>
                                     <textarea maxlength="500" rows="2" class="form-control" id="descripcion-editar" placeholder="Descripción"></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Texto para boton guardar</label>
+                                    <input type="text" maxlength="90" class="form-control" id="boton-editar" placeholder="Texto">
                                 </div>
  
                                 <div class="form-group">
@@ -312,7 +322,8 @@
                         
                         $('#nombre-editar').val(val.nombre);
                         $('#descripcion-editar').val(val.descripcion);
-                                          
+                        $('#boton-editar').val(val.texto_boton);
+
                         $('#fechainicio-editar').val(val.fecha_inicia); 
                         $('#fechafin-editar').val(val.fecha_finaliza);
                         $('#fechaentrega-editar').val(val.fecha_entrega); 
@@ -382,7 +393,7 @@
         var checkmoto = document.getElementById('checkmotorista').checked;
         var checkpropi = document.getElementById('checkpropietario').checked;
         var servicio = document.getElementById('select-servicio-editar').value;
-        
+        var boton = document.getElementById('boton-editar').value;
 
         var activo_1 = 0;
         var vistacliente_1 = 0;
@@ -407,7 +418,8 @@
         }
 
 
-        var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega, servicio);
+        var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio,
+         fechafin, imagen, fechaentrega, servicio, boton);
 
         if(retorno){
  
@@ -427,6 +439,7 @@
             formData.append('permisomotorista', checkmoto_1);
             formData.append('visiblepropietario', checkpropi_1);
             formData.append('servicio', servicio);
+            formData.append('boton', boton);
                                     
             axios.post('/admin/encargos/editar-encargos', formData, {
             })
@@ -454,7 +467,8 @@
         }       
     }
 
-    function validarEncargo(identificador, nombre, descripcion, fechainicio, fechafin, imagen, fechaentrega, servicio){
+    function validarEncargo(identificador, nombre, descripcion, fechainicio, 
+    fechafin, imagen, fechaentrega, servicio, boton){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -473,6 +487,16 @@
         
         if(nombre.length > 200){
             toastr.error("200 caracter máximo nombre");
+            return false;
+        }
+
+        if(boton === ''){
+            toastr.error("Texto boton es requerido");
+            return;
+        }
+        
+        if(boton.length > 90){
+            toastr.error("90 caracter máximo texto boton");
             return false;
         }
 
@@ -526,8 +550,10 @@
         var fechaentrega = document.getElementById('fechaentrega-nuevo').value;
         var tipovista = document.getElementById('tipovista-nuevo').value;
         var servicio = document.getElementById('select-servicio').value;
+        var boton = document.getElementById('boton-nuevo').value;
 
-        var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega, servicio);
+        var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, 
+        fechafin, fechaentrega, servicio, boton);
         
         if(retorno){
             var spinHandle = loadingOverlay().activate();
@@ -542,6 +568,7 @@
             formData.append('fechaentrega', fechaentrega);
             formData.append('tipovista', tipovista);
             formData.append('servicio', servicio);
+            formData.append('boton', boton);
 
             axios.post('/admin/encargos/nuevo', formData, { 
                     })
@@ -570,7 +597,8 @@
 
     }
 
-    function validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, fechafin, fechaentrega, servicio){
+    function validarNuevo(identificador, nombre, descripcion, imagen, 
+    fechainicio, fechafin, fechaentrega, servicio, boton){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -594,6 +622,16 @@
         
         if(nombre.length > 200){
             toastr.error("200 caracter máximo nombre");
+            return false;
+        }
+
+        if(boton === ''){
+            toastr.error("boton texto es requerido");
+            return;
+        }
+        
+        if(boton.length > 90){
+            toastr.error("90 caracter máximo boton texto");
             return false;
         }
         
