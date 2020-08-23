@@ -111,7 +111,7 @@ class EncargosController extends Controller
 
 
                 $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-                $fecha = Carbon::parse('03-04-2018');
+                $fecha = Carbon::parse($e->fecha_finaliza);
                 $mes = $meses[($fecha->format('n')) - 1];
                 
                 $dianumero = date("d", strtotime($e->fecha_entrega));
@@ -122,16 +122,19 @@ class EncargosController extends Controller
 
                 // fecha estatica para iphone
 
-                setlocale(LC_ALL, 'es_ES');
+               /* setlocale(LC_ALL, 'es_ES');
                 $mesfechaf = date("d-m-Y", strtotime($e->fecha_finaliza));
                 $fechaf = Carbon::parse($mesfechaf);
                 $fechaf->format("F"); 
-                $mesf = $fechaf->formatLocalized('%B');
+                $mesf = $fechaf->formatLocalized('%B');*/
+
+                //$fechar = Carbon::parse($e->fecha_finaliza);
+                //$mesf = $meses[($fechar->format('n')) - 1];
                 
                 $dianumerof = date("d", strtotime($e->fecha_finaliza));
                 $horaf = date("h:i A", strtotime($e->fecha_finaliza));               
 
-                $fechaiphone = $dianumerof . " de " . $mesf . " a las " . $horaf;
+                $fechaiphone = $dianumerof . " de " . $mes . " a las " . $horaf;
                 $e->fechaiphone = $fechaiphone;
 
 
