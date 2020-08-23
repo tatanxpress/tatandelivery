@@ -691,9 +691,6 @@ class EncargosController extends Controller
             $tiempoHoy = Carbon::now('America/El_Salvador');
             $tiempoReal = new DateTime($tiempoHoy);
             DB::beginTransaction();
-
-            
-            return ['success' => 1];
            
             try { 
 
@@ -765,7 +762,7 @@ class EncargosController extends Controller
 
                     $orden->save();
 
-
+                    return ['success' => 1];
                     // obtener direccion
                     $d = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
 
