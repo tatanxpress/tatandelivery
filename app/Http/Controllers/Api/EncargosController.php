@@ -110,11 +110,10 @@ class EncargosController extends Controller
                 $mes = $fecha->formatLocalized('%B');*/
 
 
-                setlocale(LC_ALL, 'es_ES');
-                $mesfecha = Carbon::parse('03-04-2018');
-                $mesfecha->format("F"); // Inglés.
-                $mes = $mesfecha->formatLocalized('%B');
-
+                $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+                $fecha = Carbon::parse('03-04-2018');
+                $mes = $meses[($fecha->format('n')) - 1];
+                
                 $dianumero = date("d", strtotime($e->fecha_entrega));
                 $hora = date("h:i A", strtotime($e->fecha_entrega));               
 
