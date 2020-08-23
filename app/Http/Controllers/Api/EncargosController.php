@@ -103,10 +103,16 @@ class EncargosController extends Controller
                 }
 
                 // obtener el mes
-                setlocale(LC_ALL, 'es_ES');
+                /*setlocale(LC_ALL, 'es_ES');
                 $mesfecha = date("d-m-Y", strtotime($e->fecha_entrega));
                 $fecha = Carbon::parse('03-04-2018');
                 $fecha->format("F"); 
+                $mes = $fecha->formatLocalized('%B');*/
+
+
+                setlocale(LC_ALL, 'es_ES');
+                $mesfecha = Carbon::parse('03-04-2018');
+                $fecha->format("F"); // Inglés.
                 $mes = $fecha->formatLocalized('%B');
 
                 $dianumero = date("d", strtotime($e->fecha_entrega));
