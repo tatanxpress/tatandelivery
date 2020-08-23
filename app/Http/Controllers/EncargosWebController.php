@@ -169,7 +169,7 @@ class EncargosWebController extends Controller
             }
         }
     }
-
+ 
     // crear nuevo encargo
     public function nuevoEncargo(Request $request){
        

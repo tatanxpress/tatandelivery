@@ -28,7 +28,7 @@ class CreateOrdenesEncargoTable extends Migration
             $table->string('mensaje_cancelado', 200)->nullable();
 
             $table->boolean('cancelado_por')->default(0);
-            $table->dateTime('fecha_cancelado');
+            $table->dateTime('fecha_cancelado')->nullable();
 
             $table->integer('calificacion')->default(0);
             $table->string('mensaje', 400)->nullable();
@@ -36,20 +36,20 @@ class CreateOrdenesEncargoTable extends Migration
             // debe ser seteado por propietario, indicando que inicio la preparacion
             // del encargo
             $table->boolean('estado_0')->default(0);
-            $table->dateTime('fecha_0');
+            $table->dateTime('fecha_0')->nullable();
 
             // debe ser seteado para darle permiso al motorista de iniciar la entrega
             // osea aqui ya se termino la orden
             $table->boolean('estado_1')->default(0);
-            $table->dateTime('fecha_1');
+            $table->dateTime('fecha_1')->nullable();
  
             // cuando motorista va en camino
             $table->boolean('estado_2')->default(0);
-            $table->dateTime('fecha_2');
+            $table->dateTime('fecha_2')->nullable();
 
             // motorista completo la orden
             $table->boolean('estado_3')->default(0);
-            $table->dateTime('fecha_3');
+            $table->dateTime('fecha_3')->nullable();
 
             $table->foreign('users_id')->references('id')->on('users');
             $table->foreign('encargos_id')->references('id')->on('encargos');

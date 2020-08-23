@@ -469,7 +469,7 @@ class EncargosController extends Controller
 
                     // guardar producto
                     $idcarrito = $carrito->id;
-
+ 
                     $extra = new CarritoEncargoProducto();
                     $extra->carrito_encargo_id = $idcarrito;
                     $extra->producto_cate_nego_id = $idproducto;
@@ -891,11 +891,15 @@ class EncargosController extends Controller
                     // cambiar formato a fecha de entrega
 
                     
-                    setlocale(LC_ALL, 'es_ES');
+                    /*setlocale(LC_ALL, 'es_ES');
                     $mesfechaf = date("d-m-Y", strtotime($o->fecha_entrega));
                     $fechaf = Carbon::parse($mesfechaf);
                     $fechaf->format("F"); 
-                    $mesf = $fechaf->formatLocalized('%B');
+                    $mesf = $fechaf->formatLocalized('%B');*/
+
+                    $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+                    $fechaf = Carbon::parse($e->fecha_entrega);
+                    $mesf = $meses[($fechaf->format('n')) - 1];
                     
                     $dianumerof = date("d", strtotime($o->fecha_entrega));
                     $horaf = date("h:i A", strtotime($o->fecha_entrega));               
