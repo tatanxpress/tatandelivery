@@ -898,7 +898,7 @@ class EncargosController extends Controller
                     $mesf = $fechaf->formatLocalized('%B');*/
 
                     $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-                    $fechaf = Carbon::parse($e->fecha_entrega);
+                    $fechaf = Carbon::parse($o->fecha_entrega);
                     $mesf = $meses[($fechaf->format('n')) - 1];
                     
                     $dianumerof = date("d", strtotime($o->fecha_entrega));
