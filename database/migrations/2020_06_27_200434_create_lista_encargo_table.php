@@ -17,8 +17,8 @@ class CreateListaEncargoTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('categorias_negocios_id')->unsigned(); // id de categoria
             $table->bigInteger('encargos_id')->unsigned(); // id de categoria
-            $table->integer('posicion');
-            $table->boolean('activo');
+            $table->integer('posicion')->default(1);
+            $table->boolean('activo')->default(1);
 
             $table->foreign('categorias_negocios_id')->references('id')->on('categorias_negocios');
             $table->foreign('encargos_id')->references('id')->on('encargos');

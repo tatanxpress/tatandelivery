@@ -17,8 +17,8 @@ class CreateListaProductoEncargoTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('lista_encargo_id')->unsigned(); // id de la lista
             $table->bigInteger('producto_cate_nego_id')->unsigned(); // id del producto de cualquier negocio
-            $table->integer('posicion');
-            $table->boolean('activo');
+            $table->integer('posicion')->default(1);
+            $table->boolean('activo')->default(1);
             
             $table->foreign('lista_encargo_id')->references('id')->on('lista_encargo');
             $table->foreign('producto_cate_nego_id')->references('id')->on('producto_categoria_negocio');
