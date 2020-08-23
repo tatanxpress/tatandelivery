@@ -754,15 +754,19 @@ class EncargosController extends Controller
                     $orden->visible_propietario = 1;
                     $orden->cancelado_por = 0;
                     $orden->calificacion = 0;
+                    $orden->fecha_cancelado = null;
                     $orden->estado_0 = 0; 
+                    $orden->fecha_0 = null;
                     $orden->estado_1 = 0;
+                    $orden->fecha_1 = null;
                     $orden->estado_2 = 0;
+                    $orden->fecha_2 = null;
                     $orden->estado_3 = 0;
+                    $orden->fecha_3 = null;
                     $orden->pago_a_propi = $pagopropi->pago_a_encargos;
 
                     $orden->save();
 
-                    return ['success' => 1];
                     // obtener direccion
                     $d = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
 
@@ -804,7 +808,7 @@ class EncargosController extends Controller
                         CarritoEncargo::where('users_id', $request->userid)->delete();
                     }
 
-                    //DB::commit();
+                    DB::commit();
                     
                     return ['success' => 1];
 
