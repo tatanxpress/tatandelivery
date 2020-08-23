@@ -547,13 +547,19 @@ class EncargosController extends Controller
                         $subTotal = collect($producto)->sum('multiplicado'); 
                         $subTotal = number_format((float)$subTotal, 2, '.', '');
 
-                        $botonTexto = Encargos::where('id', $cart->encargos_id)->pluck('texto_boton')->first();
+                        $data = Encargos::where('id', $cart->encargos_id)->first();
+
+                        $botonTexto = $data->texto_boton;
+                        $requiereNota = $data->requiere_nota;
+                        $notaEncargo = $data->nota_encargo;
 
                         return [
                             'success' => 1,
                             'producto' => $producto,
                             'subtotal' => $subTotal,
-                            'boton' => $botonTexto                 
+                            'boton' => $botonTexto,
+                            'requiere_nota' => $requiereNota,
+                            'nota_encargo' => $notaEncargo               
                         ];
 
                     }else{
@@ -915,7 +921,7 @@ class EncargosController extends Controller
             }
         }
     }
-
+  
     public function buscadorProductoPorEncargo(Request $request){
 
         if($request->isMethod('post')){ 

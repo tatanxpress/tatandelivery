@@ -14,6 +14,8 @@ use App\Direccion;
 use App\Zonas;
 use App\CarritoTemporalModelo;
 use App\CarritoExtraModelo;
+use App\CarritoEncargo;
+use App\CarritoEncargoProducto;
 
 class PerfilController extends Controller
 {
@@ -449,12 +451,18 @@ class PerfilController extends Controller
                         // actualizar zona donde esta el usuario
                         User::where('id', $request->userid)->update(['zonas_id' => $id]);
 
-                        // BORRAR CARRITO DE COMPRAS, YA QUE CAMBIO DE ZONA O DIRECCION
+                        // BORRAR CARRITO DE COMPRAS, SI CAMBIO DE DIRECCION
 
                         if($tabla1 = CarritoTemporalModelo::where('users_id', $request->userid)->first()){
                             CarritoExtraModelo::where('carrito_temporal_id', $tabla1->id)->delete();
                             CarritoTemporalModelo::where('users_id', $request->userid)->delete();
-                        }                       
+                        }
+                        
+                        // BORRAR CARRITO DE ENCARGOS, SI CAMBIO CAMBIO DIRECCION
+                        if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
+                            CarritoEncargoProducto::where('carrito_encargo_id', $carrito->id)->delete();
+                            CarritoEncargo::where('users_id', $request->userid)->delete();
+                        }
 
                         DB::commit();
 

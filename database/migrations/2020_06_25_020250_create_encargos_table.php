@@ -33,6 +33,9 @@ class CreateEncargosTable extends Migration
                                                     // podra ocultar la tarjeta encargo.
 
             $table->string('texto_boton', 90)->default('Guardar'); // texto para el boton del encargo
+            $table->boolean('requiere_nota')->default(0);
+            $table->string('nota_encargo', 75)->nullable(); // mensaje para cuadro de dialogo
+
 
         });
     }

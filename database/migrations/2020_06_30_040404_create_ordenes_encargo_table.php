@@ -53,6 +53,8 @@ class CreateOrdenesEncargoTable extends Migration
 
             $table->foreign('users_id')->references('id')->on('users');
             $table->foreign('encargos_id')->references('id')->on('encargos');
+
+            $table->string('nota_encargo', 200)->nullable();
         });
     }
 
