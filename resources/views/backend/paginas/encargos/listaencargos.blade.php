@@ -115,6 +115,17 @@
                                 </div> 
 
                                 <div class="form-group">
+                                    <label>Requiere nota para el Encargo</label>
+                                    <br>
+                                    <input type="checkbox" id="checknota-nuevo">
+                                </div>  
+
+                                <div class="form-group">
+                                    <label>Nota para Encargo</label>
+                                    <input type="text" maxlength="75" class="form-control" id="nota-nuevo" placeholder="Nota">
+                                </div>
+
+                                <div class="form-group">
                                     <label style="color:#191818">Servicio</label>
                                     <br>
                                     <div>
@@ -248,6 +259,17 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <label>Requiere nota para el Encargo</label>
+                                    <br>
+                                    <input type="checkbox" id="checknota-editar">
+                                </div>  
+
+                                <div class="form-group">
+                                    <label>Nota para Encargo</label>
+                                    <input type="text" maxlength="75" class="form-control" id="nota-editar" placeholder="Nota">
+                                </div>
+
+                                <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
                                         <p>Tamaño recomendado de: 600x300 pixeles</p>
@@ -359,12 +381,18 @@
                             $('#checkpropietario').prop('checked', true);
                         }
 
+                        if(val.requiere_nota == 1){
+                            $('#checknota-editar').prop('checked', true);
+                        }else{
+                            $('#checknota-editar').prop('checked', false);
+                        }
+
+                        $('#nota-editar').val(val.nota_encargo);
+
                         $('#activo').prop('checked', true);
 
                         $('#img-producto').prop("src","{{ url('storage/listaservicios') }}"+'/'+ val.imagen);
                     });  
-
-                  
 
                 }
                 else{
@@ -395,11 +423,19 @@
         var servicio = document.getElementById('select-servicio-editar').value;
         var boton = document.getElementById('boton-editar').value;
 
+        var checknota = document.getElementById('checknota-editar').checked;
+        var nota = document.getElementById('nota-editar').value;
+
         var activo_1 = 0;
         var vistacliente_1 = 0;
         var checkmoto_1 = 0;
         var checkpropi_1 = 0;
 
+        var checknota_1 = 0;
+        
+        if(checknota){
+            checknota_1 = 1;
+        }
 
         if(activo){
             activo_1 = 1;
@@ -419,7 +455,7 @@
 
 
         var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio,
-         fechafin, imagen, fechaentrega, servicio, boton);
+         fechafin, imagen, fechaentrega, servicio, boton, nota, checknota);
 
         if(retorno){
  
@@ -440,7 +476,10 @@
             formData.append('visiblepropietario', checkpropi_1);
             formData.append('servicio', servicio);
             formData.append('boton', boton);
-                                    
+            formData.append('nota', nota);
+            formData.append('checknota', checknota_1);
+
+
             axios.post('/admin/encargos/editar-encargos', formData, {
             })
             .then((response) => {
@@ -468,7 +507,7 @@
     }
 
     function validarEncargo(identificador, nombre, descripcion, fechainicio, 
-    fechafin, imagen, fechaentrega, servicio, boton){
+    fechafin, imagen, fechaentrega, servicio, boton, nota, checknota){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -537,6 +576,20 @@
             return;
         }
 
+        if(checknota){
+
+            if(nota === ''){
+                toastr.error("Nota es requerida");
+                return false;
+            }            
+        }   
+
+        if(nota.length > 75){
+            toastr.error("75 caracter máximo Nota");
+            return false;
+        }
+        
+
         return true;
     }
     
@@ -552,10 +605,19 @@
         var servicio = document.getElementById('select-servicio').value;
         var boton = document.getElementById('boton-nuevo').value;
 
+        var checknota = document.getElementById('checknota-nuevo').checked;
+        var nota = document.getElementById('nota-nuevo').value;
+
         var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, 
-        fechafin, fechaentrega, servicio, boton);
+        fechafin, fechaentrega, servicio, boton, nota);
         
         if(retorno){
+
+            var checknota_1 = 0;
+            if(checknota){
+                checknota_1 = 1;
+            }
+
             var spinHandle = loadingOverlay().activate();
             var formData = new FormData();
 
@@ -569,6 +631,8 @@
             formData.append('tipovista', tipovista);
             formData.append('servicio', servicio);
             formData.append('boton', boton);
+            formData.append('nota', nota);
+            formData.append('checknota', checknota_1);
 
             axios.post('/admin/encargos/nuevo', formData, { 
                     })
@@ -598,7 +662,7 @@
     }
 
     function validarNuevo(identificador, nombre, descripcion, imagen, 
-    fechainicio, fechafin, fechaentrega, servicio, boton){
+    fechainicio, fechafin, fechaentrega, servicio, boton, nota){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -668,7 +732,12 @@
         if(fechaentrega === ''){
             toastr.error("fecha entrega fin es requerido");
             return;
-        }        
+        }    
+
+        if(nota.length > 75){
+            toastr.error("75 caracter máximo Nota");
+            return false;
+        }    
 
         return true;
     }

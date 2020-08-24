@@ -241,9 +241,11 @@ class EncargosWebController extends Controller
                                                 // una vez complete las ordenes_encargo podra ocultar la tarjeta
                     
                     $e->texto_boton = $request->boton;
+                    $e->requiere_nota = $request->checknota;
+                    $e->nota_encargo = $request->nota;
                     
                     if($e->save()){
- 
+  
                         $n = new EncargoAsignadoServicio();
                         $n->encargos_id = $e->id;
                         $n->servicios_id = $request->servicio;
@@ -339,7 +341,9 @@ class EncargosWebController extends Controller
                             'vista_cliente' => $request->vistacliente,
                             'permiso_motorista' => $request->permisomotorista,
                             'visible_propietario' => $request->visiblepropietario,
-                            'texto_boton' => $request->boton
+                            'texto_boton' => $request->boton,
+                            'requiere_nota' => $request->checknota,
+                            'nota_encargo' => $request->nota
                             ]);
 
                             // editar servicio, vendra null en encargos finalizados
@@ -378,7 +382,9 @@ class EncargosWebController extends Controller
                         'vista_cliente' => $request->vistacliente,
                         'permiso_motorista' => $request->permisomotorista,
                         'visible_propietario' => $request->visiblepropietario,
-                        'texto_boton' => $request->boton
+                        'texto_boton' => $request->boton,
+                        'requiere_nota' => $request->checknota,
+                        'nota_encargo' => $request->nota
                         ]);
 
                         // editar servicio, vendra null en encargos finalizados
@@ -388,8 +394,8 @@ class EncargosWebController extends Controller
                                 EncargoAsignadoServicio::where('encargos_id', $request->id)->update([
                                 'servicios_id' => $request->servicio
                                 ]);
-                            } 
-                        }                        
+                            }
+                        }
                         
 
                     return ['success' => 2];

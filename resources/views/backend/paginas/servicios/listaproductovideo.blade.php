@@ -253,7 +253,6 @@
                 loadingOverlay().cancel(spinHandle);
                 toastr.error('Error');
             });
-
    }
 
    function respuestaBorrar(response){
