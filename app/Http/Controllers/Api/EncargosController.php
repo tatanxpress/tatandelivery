@@ -60,7 +60,7 @@ class EncargosController extends Controller
             $encargos = DB::table('encargos AS e')
             ->join('encargos_zona AS ez', 'ez.encargos_id', '=', 'e.id')
             ->select('e.id', 'e.nombre', 'e.descripcion', 'e.tipo_vista', 
-            'e.imagen', 'e.fecha_finaliza', 'e.fecha_entrega'. 'e.fecha_estimada')
+            'e.imagen', 'e.fecha_finaliza', 'e.fecha_entrega', 'e.fecha_estimada')
             ->where('ez.zonas_id', $idzona)
             ->where('e.activo', '1') // encargo activo en general
             ->where('e.vista_cliente', '1')  // cuando encargo termina, se oculta al cliente, porque tenemos todas las opciones
