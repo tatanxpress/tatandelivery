@@ -914,7 +914,8 @@ class EncargosController extends Controller
                     //$horaf = date("h:i A", strtotime($o->fecha_entrega));               
 
                     //$o->fecha_entrega = $dianumerof . " de " . $mesf . " a las " . $horaf;
-                      $o->fecha_entrega = $o->fecha_estimada; // un texto para poner la fecha
+                      $asi = $o->fecha_estimada;
+                      $o->fecha_entrega = $asi; // un texto para poner la fecha
                                          
                     $o->direccion = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->pluck('direccion')->first();
                 }
