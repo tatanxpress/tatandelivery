@@ -863,7 +863,7 @@ class EncargosController extends Controller
                     ->join('encargos AS e', 'e.id', '=', 'o.encargos_id')
                     ->select('o.id', 'e.nombre',
                     'e.fecha_finaliza', 'o.precio_envio', 
-                    'o.revisado', 'o.precio_subtotal', 'o.fecha_orden', 'e.fecha_entrega', 'e.nota_encargo') 
+                    'o.revisado', 'o.precio_subtotal', 'o.fecha_orden', 'e.fecha_entrega', 'o.nota_encargo') 
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible_cliente', 1)
                     ->get();
