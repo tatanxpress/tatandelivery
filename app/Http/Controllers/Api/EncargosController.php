@@ -770,6 +770,7 @@ class EncargosController extends Controller
                     $orden->estado_3 = 0;
                     $orden->fecha_3 = null;
                     $orden->pago_a_propi = $pagopropi->pago_a_encargos;
+                    $orden->nota_encargo = $request->nota;
 
                     $orden->save();
 

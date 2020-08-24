@@ -14,7 +14,7 @@
           <div class="col-sm-12">
             <h1>Ordenes Encargo para: {{ $nombre }}</h1>
           </div> 
-      </div>
+      </div> 
     </section>
      
   <!-- seccion frame -->

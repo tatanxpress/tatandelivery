@@ -13,6 +13,7 @@
                 <th style="width: 15%">Cliente</th>
                 <th style="width: 15%">Fecha Orden</th>              
                 <th style="width: 15%">Precio SubTotal</th>
+                <th style="width: 15%">Nota Encargo</th>
                 <th style="width: 15%">Estado</th>
                 <th style="width: 15%">Opciones</th>
                 </tr>
@@ -25,6 +26,7 @@
                 <td>{{ $dato->nombre }}</td>
                 <td>{{ $dato->fecha_orden }}</td>
                 <td>{{ $dato->precio_subtotal }}</td>
+                <td>{{ $dato->nota_encargo }}</td>
 
                 @if($dato->revisado == 1)
                     <td><span class="badge bg-warning">Pendiente</span></td>

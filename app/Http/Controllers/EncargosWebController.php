@@ -1424,7 +1424,8 @@ class EncargosWebController extends Controller
 
         $ordenes = DB::table('ordenes_encargo AS o')
         ->join('ordenes_encargo_direccion AS oe', 'oe.ordenes_encargo_id', '=', 'o.id')
-        ->select('o.id', 'oe.nombre', 'o.precio_subtotal', 'o.revisado', 'o.fecha_orden', 'o.mensaje_cancelado')
+        ->select('o.id', 'oe.nombre', 'o.precio_subtotal', 'o.revisado', 
+        'o.fecha_orden', 'o.mensaje_cancelado', 'o.nota_encargo')
         ->where('o.encargos_id', $id)
         ->get(); 
  
