@@ -255,11 +255,11 @@ Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago')
 // notificar al cliente que su orden esta cerca o afuera
 Route::post('motorista/notificar/cliente/orden', 'Api\MotoristaController@notificarClienteOrden');
 
-
+ 
 // Seccion encargos motoristas  
 Route::post('motorista/encargo/nuevos', 'Api\MotoristaController@verNuevosOrdenesEncargos'); // ver nuevos encargos
 Route::post('motorista/encargo/aceptar-entrega', 'Api\MotoristaController@aceptarOrdenEncargo'); // seleccionar el encargo
-
+ 
 Route::post('motorista/encargo/en-proceso', 'Api\MotoristaController@verNuevosOrdenesEncargosProceso'); // ver encargos en proceso   
 Route::post('motorista/encargo/en-proceso-estados', 'Api\MotoristaController@verNuevosOrdenesEncargosProcesoEstado'); // ver encargos en proceso   
 Route::post('motorista/encargo/iniciar-entrega', 'Api\MotoristaController@iniciarEntregaEncargo');   

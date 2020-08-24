@@ -1873,7 +1873,7 @@ class MotoristaController extends Controller
                 ->join('encargos AS e', 'e.id', '=', 'oe.encargos_id')
                 ->join('motorista_encargo_asignado AS m', 'm.encargos_id', '=', 'e.id')
                 ->select('oe.id', 'e.nombre', 'e.fecha_entrega', 'oe.encargos_id',
-                 'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi')
+                 'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi', 'oe.nota_encargo')
                 ->where('e.permiso_motorista', 1) // ya tiene permiso de ver todas las ordenes de ese encargo
                 ->where('oe.visible_motorista', 1) // visible a motorista
                 ->where('m.motoristas_id', $request->id) 
@@ -2091,7 +2091,7 @@ class MotoristaController extends Controller
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
                 ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 
-                'o.estado_1', 'o.encargos_id', 'o.revisado', 'o.pago_a_propi')
+                'o.estado_1', 'o.encargos_id', 'o.revisado', 'o.pago_a_propi', 'o.nota_encargo')
                 ->where('o.visible_motorista', 1)
                 ->where('o.estado_2', 0) // aun no han salido a entregarse 
                 ->where('mo.motoristas_id', $request->id)
@@ -2347,7 +2347,7 @@ class MotoristaController extends Controller
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
                 ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1',
-                 'o.encargos_id', 'o.revisado', 'o.pago_a_propi')
+                 'o.encargos_id', 'o.revisado', 'o.pago_a_propi', 'o.nota_encargo')
                 ->where('o.estado_3', 0) // aun sin entregar al cliente
                 ->where('o.visible_motorista', 1) // aun visible al motorista
                 ->where('o.estado_2', 1) // ya salio a entregarse
@@ -2612,7 +2612,7 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
                     ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 'o.nota_encargo')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->where('o.pago_a_propi', 1)
@@ -2625,7 +2625,7 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
                     ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 'o.nota_encargo')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->whereBetween('o.fecha_3', [$start, $end]) 
