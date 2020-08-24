@@ -363,8 +363,6 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/encargos/tabla/lista-finalizo', 'EncargosWebController@verListaFinalizadoTabla');
   Route::post('/encargos/asignar-servicio', 'EncargosWebController@asignarServicioAlEncargo');
 
-  
-  
 
   Route::post('/encargos/activarlo', 'EncargosWebController@activarEncargo');
   Route::get('/encargos/lista-negocios', 'EncargosWebController@verListaNegocios'); 

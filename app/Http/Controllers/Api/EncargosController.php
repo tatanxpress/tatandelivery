@@ -114,12 +114,13 @@ class EncargosController extends Controller
                 $fecha = Carbon::parse($e->fecha_finaliza);
                 $mes = $meses[($fecha->format('n')) - 1];
                 
-                $dianumero = date("d", strtotime($e->fecha_entrega));
-                $hora = date("h:i A", strtotime($e->fecha_entrega));               
+                //$dianumero = date("d", strtotime($e->fecha_entrega));
+                //$hora = date("h:i A", strtotime($e->fecha_entrega));               
 
-                $fechaNombre = $dianumero . " de " . $mes . " a las " . $hora;
-                $e->fecha_entrega = $fechaNombre;
-
+                // MENSAJE PERSONALIZADO PARA FECHA ESTIMADA 
+                //$fechaNombre = $dianumero . " de " . $mes . " a las " . $hora;
+                $e->fecha_entrega = $e->fecha_estimada; // mejor un texto para decirle fecha de entrega 
+  
                 // fecha estatica para iphone
 
                /* setlocale(LC_ALL, 'es_ES');
@@ -904,15 +905,16 @@ class EncargosController extends Controller
                     $fechaf->format("F"); 
                     $mesf = $fechaf->formatLocalized('%B');*/
 
-                    $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-                    $fechaf = Carbon::parse($o->fecha_entrega);
-                    $mesf = $meses[($fechaf->format('n')) - 1];
+                    //$meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+                    //$fechaf = Carbon::parse($o->fecha_entrega);
+                    //$mesf = $meses[($fechaf->format('n')) - 1];
                     
-                    $dianumerof = date("d", strtotime($o->fecha_entrega));
-                    $horaf = date("h:i A", strtotime($o->fecha_entrega));               
+                   // $dianumerof = date("d", strtotime($o->fecha_entrega));
+                    //$horaf = date("h:i A", strtotime($o->fecha_entrega));               
 
-                    $o->fecha_entrega = $dianumerof . " de " . $mesf . " a las " . $horaf;                
-                     
+                    //$o->fecha_entrega = $dianumerof . " de " . $mesf . " a las " . $horaf;
+                      $o->fecha_entrega = $o->fecha_estimada; // un texto para poner la fecha
+                                         
                     $o->direccion = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->pluck('direccion')->first();
                 }
 

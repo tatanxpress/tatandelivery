@@ -102,6 +102,11 @@
                                     <label>Fecha entrega</label>
                                     <input type="datetime-local" class="form-control" id="fechaentrega-nuevo">
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Fecha estimada de entrega</label>
+                                    <input type="text" maxlength="200" class="form-control" id="estimada-nuevo" placeholder="Fecha Estimada" required>
+                                </div>
  
                                 <div class="form-group">
                                     <label style="color:#191818">Tipo de Vista</label>
@@ -205,6 +210,11 @@
                                 <div class="form-group">
                                     <label>Fecha entrega</label>
                                     <input type="datetime-local" class="form-control" id="fechaentrega-editar">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Fecha estimada de entrega</label>
+                                    <input type="text" maxlength="200" class="form-control" id="estimada-editar" placeholder="Fecha Estimada" required>
                                 </div>
 
                                 <div class="form-group">
@@ -349,6 +359,8 @@
                         $('#fechainicio-editar').val(val.fecha_inicia); 
                         $('#fechafin-editar').val(val.fecha_finaliza);
                         $('#fechaentrega-editar').val(val.fecha_entrega); 
+
+                        $('#estimada-editar').val(val.fecha_estimada); 
                         
 
                         var tipo = document.getElementById("select-servicio-editar");
@@ -426,6 +438,8 @@
         var checknota = document.getElementById('checknota-editar').checked;
         var nota = document.getElementById('nota-editar').value;
 
+        var estimada = document.getElementById('estimada-editar').value;
+
         var activo_1 = 0;
         var vistacliente_1 = 0;
         var checkmoto_1 = 0;
@@ -455,7 +469,7 @@
 
 
         var retorno = validarEncargo(identificador, nombre, descripcion, fechainicio,
-         fechafin, imagen, fechaentrega, servicio, boton, nota, checknota);
+         fechafin, imagen, fechaentrega, servicio, boton, nota, checknota, estimada);
 
         if(retorno){
  
@@ -478,7 +492,7 @@
             formData.append('boton', boton);
             formData.append('nota', nota);
             formData.append('checknota', checknota_1);
-
+            formData.append('estimada', estimada);
 
             axios.post('/admin/encargos/editar-encargos', formData, {
             })
@@ -494,7 +508,7 @@
                     $('#tablaDatatable').load(ruta);
                     $('#modalEditar').modal('hide'); 
                 }
-                else{
+                else{ 
                     toastr.error('Error desconocido');
                 }
             })
@@ -507,7 +521,7 @@
     }
 
     function validarEncargo(identificador, nombre, descripcion, fechainicio, 
-    fechafin, imagen, fechaentrega, servicio, boton, nota, checknota){
+    fechafin, imagen, fechaentrega, servicio, boton, nota, checknota, estimada){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -528,6 +542,18 @@
             toastr.error("200 caracter máximo nombre");
             return false;
         }
+
+        
+        if(estimada === ''){
+            toastr.error("estimada es requerido");
+            return;
+        }
+        
+        if(estimada.length > 200){
+            toastr.error("200 caracter máximo estimada");
+            return false;
+        }
+
 
         if(boton === ''){
             toastr.error("Texto boton es requerido");
@@ -607,9 +633,10 @@
 
         var checknota = document.getElementById('checknota-nuevo').checked;
         var nota = document.getElementById('nota-nuevo').value;
+        var estimada = document.getElementById('estimada-nuevo').value;
 
         var retorno = validarNuevo(identificador, nombre, descripcion, imagen, fechainicio, 
-        fechafin, fechaentrega, servicio, boton, nota);
+        fechafin, fechaentrega, servicio, boton, nota, estimada);
         
         if(retorno){
 
@@ -633,6 +660,7 @@
             formData.append('boton', boton);
             formData.append('nota', nota);
             formData.append('checknota', checknota_1);
+            formData.append('estimada', estimada);
 
             axios.post('/admin/encargos/nuevo', formData, { 
                     })
@@ -662,7 +690,7 @@
     }
 
     function validarNuevo(identificador, nombre, descripcion, imagen, 
-    fechainicio, fechafin, fechaentrega, servicio, boton, nota){
+    fechainicio, fechafin, fechaentrega, servicio, boton, nota, estimada){
 
         if(identificador === ''){
             toastr.error("identificador es requerido");
@@ -686,6 +714,16 @@
         
         if(nombre.length > 200){
             toastr.error("200 caracter máximo nombre");
+            return false;
+        }
+
+        if(estimada === ''){
+            toastr.error("estimada es requerido");
+            return;
+        }
+        
+        if(estimada.length > 200){
+            toastr.error("200 caracter máximo estimada");
             return false;
         }
 

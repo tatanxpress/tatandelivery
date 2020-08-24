@@ -243,6 +243,7 @@ class EncargosWebController extends Controller
                     $e->texto_boton = $request->boton;
                     $e->requiere_nota = $request->checknota;
                     $e->nota_encargo = $request->nota;
+                    $e->fecha_estimada = $request->estimada;
                     
                     if($e->save()){
   
@@ -343,7 +344,8 @@ class EncargosWebController extends Controller
                             'visible_propietario' => $request->visiblepropietario,
                             'texto_boton' => $request->boton,
                             'requiere_nota' => $request->checknota,
-                            'nota_encargo' => $request->nota
+                            'nota_encargo' => $request->nota,
+                            'fecha_estimada' => $request->estimada
                             ]);
 
                             // editar servicio, vendra null en encargos finalizados
@@ -384,7 +386,8 @@ class EncargosWebController extends Controller
                         'visible_propietario' => $request->visiblepropietario,
                         'texto_boton' => $request->boton,
                         'requiere_nota' => $request->checknota,
-                        'nota_encargo' => $request->nota
+                        'nota_encargo' => $request->nota,
+                        'fecha_estimada' => $request->estimada
                         ]);
 
                         // editar servicio, vendra null en encargos finalizados
@@ -1427,7 +1430,7 @@ class EncargosWebController extends Controller
         ->select('o.id', 'oe.nombre', 'o.precio_subtotal', 'o.revisado', 
         'o.fecha_orden', 'o.mensaje_cancelado', 'o.nota_encargo')
         ->where('o.encargos_id', $id)
-        ->get(); 
+        ->get();
  
         foreach($ordenes as $i){
             $i->fecha_orden = date("d-m-Y h:i A", strtotime($i->fecha_orden));

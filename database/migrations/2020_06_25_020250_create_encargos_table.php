@@ -35,7 +35,7 @@ class CreateEncargosTable extends Migration
             $table->string('texto_boton', 90)->default('Guardar'); // texto para el boton del encargo
             $table->boolean('requiere_nota')->default(0);
             $table->string('nota_encargo', 75)->nullable(); // mensaje para cuadro de dialogo
-
+            $table->string('fecha_estimada', 200)(); // escribir fecha estimada de entrega
 
         });
     }
