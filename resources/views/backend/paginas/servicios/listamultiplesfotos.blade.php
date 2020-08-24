@@ -61,7 +61,6 @@
                                 <div class="form-group">
                                     <div>
                                         <label>Imagen</label>
-                                        <p>Tamaño recomendado de: 400 x 300</p>
                                     </div> 
                                     <br>
                                     <div class="col-md-10">

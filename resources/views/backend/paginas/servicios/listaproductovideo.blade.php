@@ -38,10 +38,9 @@
                     <h3 class="card-title">Tabla de Video Unico</h3>
                 </div>
                 
-                <video autoplay="true" loop="true" controls>
+                <video autoplay="true" controls>
                     <source src="{{ url('storage/productos/'.$video) }}">
                 </video>
-
 
             </div>
         </div>
