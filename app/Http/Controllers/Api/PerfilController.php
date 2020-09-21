@@ -46,9 +46,10 @@ class PerfilController extends Controller
                     ];
                 }
 
+                $unido = "+503" . $request->telefono;
             
-            if(User::where('phone', $request->telefono)->first()){
-                User::where('phone', $request->telefono)->update(['password' => Hash::make($request->password)]);
+            if(User::where('phone', $unido)->first()){
+                User::where('phone', $unido)->update(['password' => Hash::make($request->password)]);
                 return ['success' => 1]; 
             }
             return ['success' => 2];            
