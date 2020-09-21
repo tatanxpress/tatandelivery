@@ -246,7 +246,9 @@ class LoginController extends Controller
                 ];
             }
 
-            $unido = $request->telefono;
+            // ES EL POR DEFECTO QUE TIENEN VERSIONES VIEJAS
+
+            $unido = "+503" . $request->telefono;
 
             // verificar si correo esta registrado
             if($datos = User::where('phone', $unido)->first()){
