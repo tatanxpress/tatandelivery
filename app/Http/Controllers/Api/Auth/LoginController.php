@@ -103,8 +103,7 @@ class LoginController extends Controller
                     $n->save();                   
                 }
                 DB::commit(); 
-                // DESACTIVADO SMS
-                return ['success' => 3];
+              
             
                 // envio del mensaje
                 $sid = "ACc68bf246c0d9be071f2367e81b686201";
@@ -378,7 +377,7 @@ class LoginController extends Controller
             if($ns = NumeroSMS::where('numero', $request->telefono)->first()){
 
                 // verificar contador si permite mas intentos
-                $limitecontador = 20; // intentos
+                $limitecontador = 7; // intentos
                 $contador = $ns->contador;
 
                 if($contador >= $limitecontador){
@@ -404,8 +403,6 @@ class LoginController extends Controller
                 $n->fecha = $fecha;
                 $n->save();   
             }
-
-            return ['success' => 3];
             
             // envio del mensaje
             $sid = "ACc68bf246c0d9be071f2367e81b686201";

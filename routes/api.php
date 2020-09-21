@@ -27,7 +27,7 @@ Route::post('usuario/telefono/area', 'Api\Auth\LoginController@verificarNumeroAr
 Route::post('usuario/codigo/temporal-area', 'Api\Auth\LoginController@verificarCodigoTemporalArea');
 Route::post('usuario/login/area', 'Api\Auth\LoginController@loginUsuarioArea');
 Route::post('usuario/codigo-correo-area', 'Api\Auth\LoginController@codigoCorreoArea');
-Route::post('usuario/revisar-codigo-area', 'Api\Auth\LoginController@revisarCodigoCorreoArea');
+Route::post('usuario/revisar-codigo-area', 'Api\Auth\LoginController@revisarCodigoCorreoArea'); 
 Route::post('usuario/cambio/password-area', 'Api\Auth\LoginController@nuevaPasswordArea'); // cambia contraseña con correo
 
 
