@@ -139,13 +139,11 @@ Route::post('usuario/comprar/credipuntos', 'Api\TarjetaController@ingresarCrediP
 
  
 
-Route::post('usuario/ss', 'Api\TarjetaController@ss');
 
 
+   
 
-  
-
-
+ 
 
  
    

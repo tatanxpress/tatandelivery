@@ -1844,23 +1844,7 @@ class TarjetaController extends Controller
         }
     }
 
-    public function ss(){
-
-       
-
-        $data = User::all();
-
-        foreach($data as $d){
-            $p = User::where('id', $d->id)->pluck('phone')->first();
-
-            $unir = "+503" . $p;
-            
-            User::where('id', $d->id)->update(['phone' => $unir]);
-        }
- 
-        
-
-    }
+   
 
 
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
