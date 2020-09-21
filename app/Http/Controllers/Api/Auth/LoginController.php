@@ -477,7 +477,7 @@ class LoginController extends Controller
                 return ['success' => 3];
             }
         }
-    }
+    } 
 
     // login usuario por usuario y contraseña
     public function loginUsuarioArea(Request $request){

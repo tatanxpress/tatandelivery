@@ -228,7 +228,7 @@
         var mensaje = document.getElementById('mensaje-rechazo').value;
         var estado = document.getElementById('select-estado').value;
 
-        if(estado == 1){
+        if(estado == 2){
             if(mensaje === ''){
                 toastr.error("Mensaje es requerido");
                 return;
