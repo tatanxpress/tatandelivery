@@ -76,12 +76,12 @@
 
                                 <div class="form-group">
                                     <label>Descripcion</label>
-                                    <textarea maxlength="2000" rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
+                                    <textarea maxlength="2000" value="." rows="2" class="form-control" id="descripcion-nuevo" placeholder="Descripción producto"></textarea>
                                 </div>
 
                                 <div class="form-group">
                                     <label>Precio producto</label>
-                                    <input type="number" step="any" class="form-control" id="precio-nuevo">
+                                    <input type="number" step="any" value="1" class="form-control" id="precio-nuevo">
                                 </div>
 
                                 <div class="form-group">
@@ -97,7 +97,7 @@
                                 <div class="form-group">
                                     <label>Activo</label>
                                     <br>
-                                    <input type="checkbox" id="cbactivo-nuevo">
+                                    <input type="checkbox" checked id="cbactivo-nuevo">
                                 </div>
 
                                 <div class="form-group">
