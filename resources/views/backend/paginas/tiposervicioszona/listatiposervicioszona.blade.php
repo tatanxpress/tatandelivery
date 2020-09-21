@@ -302,7 +302,7 @@
                 
         var estado_1 = 0;
         if(estado){
-            estado_1 = 1;
+            estado_1 = 1; 
         }
 
         let me = this;
@@ -312,7 +312,7 @@
 
         var spinHandle = loadingOverlay().activate();
 
-        axios.post('/admin/tiposerviciozona/tablas/lista-tipo-servicio-zona', formData, {
+        axios.post('/admin/activar/desactivar/tiposervicio', formData, {
         })
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);     

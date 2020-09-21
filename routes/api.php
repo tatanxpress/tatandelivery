@@ -30,7 +30,7 @@ Route::post('usuario/codigo-correo-area', 'Api\Auth\LoginController@codigoCorreo
 Route::post('usuario/revisar-codigo-area', 'Api\Auth\LoginController@revisarCodigoCorreoArea'); 
 Route::post('usuario/cambio/password-area', 'Api\Auth\LoginController@nuevaPasswordArea'); // cambia contraseña con correo
 
-
+ 
      
 // perfil  
 Route::post('usuario/informacion', 'Api\PerfilController@infoPerfil'); // cambia contraseña en perfil
