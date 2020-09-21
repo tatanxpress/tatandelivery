@@ -127,11 +127,11 @@ class AdminAppController extends Controller
     }
 
     
-    //*** ver solo ordenes de HOY */
+    //*** VERSION 1 */
 
     public function ordenesHoy(Request $request){
 
-        if($request->isMethod('post')){   
+        if($request->isMethod('post')){
             $rules = array(                
                 'id' => 'required' 
             );
@@ -164,7 +164,7 @@ class AdminAppController extends Controller
                     'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4', 
                     'o.estado_5', 'o.estado_6', 'o.estado_7', 'o.estado_8', 'o.users_id',
                     'o.mensaje_8', 'o.cancelado_cliente', 'o.cancelado_propietario',
-                    'o.fecha_8', 'o.pago_a_propi', 'o.precio_envio', 'o.precio_total')
+                    'o.fecha_8', 'o.pago_a_propi', 'o.precio_envio', 'o.precio_total', 'o.tipo_pago')
                 ->whereDate('o.fecha_orden', $fecha)
                 ->orderBy('o.id', 'DESC')
                 ->get();
@@ -195,8 +195,16 @@ class AdminAppController extends Controller
 
                     $o->pagaapropi = $pagaapropi;
 
-                    $envio = $o->precio_envio;
-                    $o->subtotal = number_format((float)$o->precio_total, 2, '.', '');
+                    $envio = $o->precio_envio; 
+
+                    $metodo = "";
+                    if($o->tipo_pago == 0){
+                        $metodo = " | Efectivo";
+                    }else{
+                        $metodo = " | Credi Puntos";
+                    }
+
+                    $o->subtotal = number_format((float)$o->precio_total, 2, '.', '') . $metodo;
                     
                     // verificar si utilizo algun cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
@@ -340,7 +348,7 @@ class AdminAppController extends Controller
 
                         if($o->cancelado_propietario == 1){
                             $mensajeCancelado = "Cancelo Propietario a: " . $hora . " - Mensaje: " . $o->mensaje_8; 
-                        }                        
+                        } 
                     }
 
                     $o->mensajeCancelado = $mensajeCancelado;
@@ -380,17 +388,17 @@ class AdminAppController extends Controller
             if($aa = Administradores::where('id', $request->id)->first()){
 
                 $fecha = Carbon::now('America/El_Salvador');
-
+ 
                 $orden = DB::table('encargos AS e')
                 ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
                 ->select('e.id AS idencargo', 'o.id', 'e.fecha_entrega', 'o.revisado', 'o.estado_0', 'o.fecha_0',
                             'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
                             'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
-                            'o.precio_envio')
+                            'o.precio_envio', 'o.tipo_pago')
               
                 ->whereNotIn('o.revisado', [5]) // no ver cancelados
-                ->whereDate('e.fecha_entrega', $fecha)                
-                ->orderBy('o.id', 'DESC')
+                ->whereDate('e.fecha_entrega', $fecha)                 
+                ->orderBy('o.id', 'DESC') 
                 ->get();
       
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
@@ -406,7 +414,7 @@ class AdminAppController extends Controller
                         $pagar = "Pagar a Propietario: $" . $p1 . " Y cobrar al cliente (con envio) $" . $suma;
                     }else{
                         $pagar = "Cobrar al cliente: (Sub total + envio) $" . $suma;
-                    }
+                    } 
 
                     $o->pagar = $pagar;
 

@@ -310,7 +310,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4', 
                 'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 
-                'o.hora_2', 'o.estado_6', 'o.pago_a_propi', 'o.nota_orden')
+                'o.hora_2', 'o.estado_6', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
                 ->where('o.estado_6', 0) // nadie a seteado este
                 ->where('o.estado_4', 1) // inicia la orden
                 ->where('o.estado_8', 0) // orden no cancelada
@@ -320,8 +320,8 @@ class MotoristaController extends Controller
 
                 foreach($orden as $o){
                     
-                    $o->direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
-
+                    $datadir = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+                    $o->direccion = $datadir->direccion;
                     $pagarPropi = "";  // para decile si paga a propietario o no                 
                     $cupon = ""; // texto para decir que tipo de cupon aplico
                     
@@ -336,8 +336,8 @@ class MotoristaController extends Controller
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEntrega = $horaEstimada;
 
-                     // buscar si aplico cupon
-                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
                        
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
@@ -419,13 +419,12 @@ class MotoristaController extends Controller
                             $o->precio_total = number_format((float)$total, 2, '.', '');     
                         }
 
-                    }else{                                            
+                    }else{
                         $total = $o->precio_total + $o->precio_envio;
                         $o->precio_total = number_format((float)$total, 2, '.', '');                        
                     }
 
                     $o->cupon = $cupon;
-
 
                 } //end foreach
 
@@ -803,7 +802,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
                 'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden')
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 0) // aun no han salido a entregarse
@@ -955,7 +954,7 @@ class MotoristaController extends Controller
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
                 'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden')
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 1) // van a entregarse
@@ -1516,7 +1515,8 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes AS m')
                     ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
                     ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.pago_a_propi')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 
+                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
                     ->where('o.estado_7', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->where('o.pago_a_propi', 1)
@@ -1527,7 +1527,8 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes AS m')
                     ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
                     ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 'o.pago_a_propi')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 
+                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
                     ->where('o.estado_7', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->whereBetween('o.fecha_orden', [$start, $end]) 
@@ -1543,7 +1544,9 @@ class MotoristaController extends Controller
                     $o->servicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
 
                     // sacar direccion guardada de la orden
-                    $o->direccion = OrdenesDirecciones::where('ordenes_id', $o->id)->pluck('direccion')->first();
+                    $datadir = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+
+                    $o->direccion = $datadir->direccion;
                     
                     $cupon = "";
                     $tipo = "";
@@ -1641,9 +1644,13 @@ class MotoristaController extends Controller
                         $o->precio_total = number_format((float)$total, 2, '.', '');
                     }
 
+                    // ** LA APP SOLO VERIFICA SI PAGO CON CREDI PUNTOS Y SETEA A $0.00
+                    
+
                     $o->cupon = $cupon;
                 }
 
+                //** LA GANANCIA MOTORISTA PARA EXTRANJEROS YA FUE AGREGADA AL ORDENAR */
                 // sumar ganancia de motorista de esta fecha
                 $suma = collect($orden)->sum('ganancia_motorista');
                 $ganado = number_format((float)$suma, 2, '.', '');
@@ -1873,7 +1880,7 @@ class MotoristaController extends Controller
                 ->join('encargos AS e', 'e.id', '=', 'oe.encargos_id')
                 ->join('motorista_encargo_asignado AS m', 'm.encargos_id', '=', 'e.id')
                 ->select('oe.id', 'e.nombre', 'e.fecha_entrega', 'oe.encargos_id',
-                 'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi', 'oe.nota_encargo')
+                 'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi', 'oe.nota_encargo', 'oe.tipo_pago')
                 ->where('e.permiso_motorista', 1) // ya tiene permiso de ver todas las ordenes de ese encargo
                 ->where('oe.visible_motorista', 1) // visible a motorista
                 ->where('m.motoristas_id', $request->id) 
@@ -2091,7 +2098,8 @@ class MotoristaController extends Controller
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
                 ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 
-                'o.estado_1', 'o.encargos_id', 'o.revisado', 'o.pago_a_propi', 'o.nota_encargo')
+                'o.estado_1', 'o.encargos_id', 'o.revisado',
+                 'o.pago_a_propi', 'o.nota_encargo', 'o.tipo_pago')
                 ->where('o.visible_motorista', 1)
                 ->where('o.estado_2', 0) // aun no han salido a entregarse 
                 ->where('mo.motoristas_id', $request->id)
@@ -2347,7 +2355,7 @@ class MotoristaController extends Controller
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
                 ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1',
-                 'o.encargos_id', 'o.revisado', 'o.pago_a_propi', 'o.nota_encargo')
+                 'o.encargos_id', 'o.revisado', 'o.pago_a_propi', 'o.nota_encargo', 'o.tipo_pago')
                 ->where('o.estado_3', 0) // aun sin entregar al cliente
                 ->where('o.visible_motorista', 1) // aun visible al motorista
                 ->where('o.estado_2', 1) // ya salio a entregarse
@@ -2612,7 +2620,8 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
                     ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 'o.nota_encargo')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi',
+                     'o.nota_encargo', 'o.tipo_pago')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->where('o.pago_a_propi', 1)
@@ -2625,7 +2634,8 @@ class MotoristaController extends Controller
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
                     ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 'o.nota_encargo')
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 
+                    'o.nota_encargo', 'o.tipo_pago')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->whereBetween('o.fecha_3', [$start, $end]) 
@@ -2647,10 +2657,15 @@ class MotoristaController extends Controller
                     }                    
                     $o->tipo = $tipo;
                     
-                    // se cobro a cliente
+                    if($o->tipo_pago == 1){ // credi puntos
+                        $o->total = number_format((float)0, 2, '.', '');
+                    }else{
+                        // se cobro a cliente
                     $suma = $o->precio_subtotal + $o->precio_envio;
                     $o->total = number_format((float)$suma, 2, '.', '');
+                    }
 
+                    // el precio envio del extranjero ya va agregado cuando se hace la orden
                     $o->precio_envio = number_format((float)$o->precio_envio, 2, '.', '');
                 }
 
@@ -2664,6 +2679,312 @@ class MotoristaController extends Controller
         }
     }
 
+
+    public function verMotoristaEnCaja(Request $request){
+
+        if($request->isMethod('post')){ 
+            $reglaDatos = array(
+                'motoristaid' => 'required'
+            );
+
+            $mensajeDatos = array(                                      
+                'motoristaid.required' => 'El motorista id es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validarDatos->errors()->all()
+                ];
+            } 
+            
+            if(Motoristas::where('id', $request->motoristaid)->first()){
+
+                // estas ordenes ya fueron revisadas
+                $noquiero = DB::table('ordenes_revisadas')->get();
+
+                $pilaOrden = array();
+                foreach($noquiero as $p){
+                    array_push($pilaOrden, $p->ordenes_id);
+                }
+
+                $orden = DB::table('motorista_ordenes AS mo')
+                ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
+                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
+                'o.servicios_id', 'o.estado_8', 'o.fecha_7', 'o.pago_a_propi', 'o.tipo_pago')
+                ->where('mo.motoristas_id', $request->motoristaid)               
+                ->where('o.estado_6', 1) // ordenes que motorista inicio la entrega 
+                ->where('o.estado_8', 0) // no canceladas
+                ->whereNotIn('o.id', $pilaOrden) // filtro para no ver ordenes revisadas
+                ->get();
+
+                $totalcobro = 0;
+
+                foreach($orden as $o){
+
+
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+
+                        // buscar tipo de cupon
+                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                        // ver que tipo se aplico
+                        // el precio envio ya esta modificado
+                        if($tipo->tipo_cupon_id == 1){
+                           
+
+                            if($o->pago_a_propi == 1){
+                                // se paga a propietario
+                               
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                   // $totalcobro = $totalcobro + $o->precio_total; 
+                                   // MENOS LO QUE SE PAGARA A PROPIETARIO
+                                   // MAS LO QUE CANCELARA CLIENTE
+                                   // envio es siempre 0
+                                   $info = -$o->precio_total + $o->precio_total;
+                                   $totalcobro = $totalcobro + $info;
+                                }else{
+                                    // credi puntos
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+                               // $o->precio_total = number_format((float), 2, '.', '');  
+                             
+                            }else{
+                                // no se paga a propietario
+                                // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $o->precio_total;   
+                                }
+                                
+                             
+                            }
+                            //
+                         
+                           
+                        }else if($tipo->tipo_cupon_id == 2){
+                            
+                            // modificar precio
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                            $descuento = $dd->dinero;
+
+                            $total = $o->precio_total - $descuento;
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+
+                            if($o->pago_a_propi == 1){
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
+                                
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+
+                                $afectado = $o->precio_envio + $total;
+                              
+
+                            }else{ 
+                                // no se le paga a propietario
+
+                                // sumar el precio de envio
+                                $suma = $total + $o->precio_envio;
+
+                              
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
+                            }
+
+                        }else if($tipo->tipo_cupon_id == 3){
+
+                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+                            $resta = $o->precio_total * ($porcentaje / 100);
+                            $total = $o->precio_total - $resta;
+
+
+                            if($total <= 0){
+                                $total = 0;
+                            }
+
+                            if($o->pago_a_propi == 1){
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
+                                
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+
+                                $afectado = $o->precio_envio + $total;
+                              
+
+                            }else{ 
+                                // no se le paga a propietario
+
+                                // sumar el precio de envio
+                                $suma = $total + $o->precio_envio;
+
+                              
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
+                            }
+
+                        }else if($tipo->tipo_cupon_id == 4){
+                           
+                            if($o->pago_a_propi == 1){
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;
+    
+                                }
+                               
+                            }else{
+                                // no se le paga a servicio 
+    
+                                $cobro = $o->precio_total + $o->precio_envio;
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
+                            }
+
+
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                            
+                            $total = $donacion + $o->precio_total;
+                            
+                            if($o->pago_a_propi == 1){
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;    
+                                }
+                               
+                            }else{
+                                // no se le paga a servicio 
+    
+                                $cobro = $total + $o->precio_envio;
+                                
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
+                            }
+                          
+                        }
+                        
+                    }else{              
+
+                        if($o->pago_a_propi == 1){
+                           
+                            if($o->tipo_pago == 0){
+                                $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                $totalcobro = $totalcobro + $info;                                
+                                $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
+                            }else{
+                                // CREDI PUNTOS
+                                $totalcobro = $totalcobro - $o->precio_total;
+
+                                $o->precio_total = number_format((float)0, 2, '.', '');
+                            }
+                           
+                        }else{
+                            // no se le paga a servicio 
+
+                            $cobro = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                            // NO SUMAR SI PAGO CON CREDI PUNTOS
+                            if($o->tipo_pago == 0){
+                                $totalcobro = $totalcobro + $cobro; 
+                            }
+                        }
+
+                        
+                    }                  
+                }
+
+                // Encargos
+
+                 // estas ordenes ya fueron revisadas
+                 $noquiero2 = DB::table('ordenes_encargo_revisadas')->get();
+
+                 $pilaOrden2 = array();
+                 foreach($noquiero2 as $p){
+                     array_push($pilaOrden2, $p->ordenes_encargo_id);
+                 }
+ 
+                 $orden2 = DB::table('motorista_ordenes_encargo AS mo')
+                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
+                 ->select('o.id', 'o.fecha_3', 'mo.motoristas_id', 'o.precio_subtotal', 
+                 'o.precio_envio', 'o.pago_a_propi', 'o.estado_3', 'o.tipo_pago')
+                 ->where('mo.motoristas_id', $request->motoristaid)               
+                 ->where('o.estado_2', 1) // ordenes que motorista inicio la entrega
+                 ->whereNotIn('o.id', $pilaOrden2) // filtro para no ver ordenes encargo revisadas
+                 ->get(); 
+ 
+                 $totalcobro2 = 0;
+ 
+                 foreach($orden2 as $o){   
+                     if($o->pago_a_propi == 1){
+                            
+                         if($o->tipo_pago == 0){
+
+                            $info = -$o->precio_subtotal + ($o->precio_subtotal + $o->precio_envio);
+                            $totalcobro2 = $totalcobro2 + $info;  
+                         }else{
+                             // CREDI PUNTOS
+                             $totalcobro2 = $totalcobro2 - $o->precio_subtotal; 
+                         }
+                        
+                     }else{
+                         // no se le paga a servicio 
+ 
+                         $cobro2 = $o->precio_subtotal + $o->precio_envio;
+                        
+                         if($o->tipo_pago == 0){
+                             $totalcobro2 = $totalcobro2 + $cobro2; 
+                         } else{
+                             $totalcobro2 = $totalcobro2 + 0; 
+                         }
+                     } 
+                 }
+
+                // Ordenes
+                $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+                // Encargos
+                $totalcobro2 = number_format((float)$totalcobro2, 2, '.', '');
+
+                
+                return ['success' => 1, 'caja1' => $totalcobro, 'caja2' => $totalcobro2];
+            }
+        }
+
+    }
 
 
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){

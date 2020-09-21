@@ -11,7 +11,6 @@
                   <th style="width: 10%">Teléfono</th>
                   <th style="width: 20%">Correo</th>
                   <th style="width: 10%">Zona actual</th>
-                  <th style="width: 10%">Activo</th>
                   <th style="width: 15%">Fecha Registro</th>
                      
                 </tr>
@@ -23,13 +22,7 @@
                   <td>{{ $dato->telefono }}</td> 
                   <td>{{ $dato->correo }}</td>
                   <td>{{ $dato->identificador }}</td>
-                  <td> 
-                    @if($dato->activo == 0)
-                    <span class="badge bg-danger">Inactivo</span>
-                    @else
-                    <span class="badge bg-success">Activo</span>
-                    @endif                  
-                  </td> 
+                 
                   <td>{{ $dato->fecha }}</td>
                 
                                 

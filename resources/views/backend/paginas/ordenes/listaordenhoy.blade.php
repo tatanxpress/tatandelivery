@@ -45,6 +45,38 @@
 	  </div>
 	</section>
 
+
+  <!-- modal iniciar orden del cliente -->
+<div class="modal fade" id="modalIniciar">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Contestar orden</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-iniciar">
+                    <div class="card-body">
+                        <div class="row">  
+                          
+                            <div class="form-group">
+                                <input type="hidden" id="id-editar">
+                            </div>
+                         
+                        </div>
+                    </div>  
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-success" id="btnGuardar" onclick="iniciar()">Iniciar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
 @extends('backend.menus.inferior')
  
 @section('content-admin-js') 
@@ -61,7 +93,7 @@
         var ruta = "{{ URL::to('admin/control/tabla/ordeneshoy') }}";
         $('#tablaDatatable').load(ruta);
 
-        var total = {{$total}};
+        var total = {{$total}}; 
       
         document.getElementById('total-hoy').innerHTML = 'Total Hoy $'+total;
 
@@ -111,6 +143,42 @@
   }
 
 
+  // iniciar una orden que el cliente no contesta
+  function modalIniciar(id){
+        $('#modalIniciar').modal('show');
+        $('#id-editar').val(id);
+  }
+
+  function iniciar(){
+    var id = document.getElementById('id-editar').value; // id de orden
+    
+    spinHandle = loadingOverlay().activate();
+
+    var formData = new FormData();
+    formData.append('ordenid', id);
+                        
+    axios.post('/api/usuario/proceso/orden/estado-3',formData,{
+        })
+        .then((response) => {
+            loadingOverlay().cancel(spinHandle);
+            toastr.success('Realizado'); 
+            $('#modalIniciar').modal('hide');
+           
+            recargar();
+    })
+    .catch((error) => {
+        loadingOverlay().cancel(spinHandle); 
+        toastr.error('Error del servidor');    
+    });  
+
+  }
+
+  // vista de productos
+  function verProductos(id){
+
+    window.open("{{ URL::to('admin/productos/orden/nueva') }}/" + id);
+
+  }
 
  </script>
 

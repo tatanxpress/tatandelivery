@@ -15,6 +15,11 @@
                 <i class="fas fa-pencil-alt"></i>
                     Nueva categoria
           </button>    
+
+          <button type="button" onclick="verTodoProducto()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Ver Todos los Productos
+          </button>   
       </div>
     </section>
     
@@ -308,14 +313,21 @@
       }
     }
 
+    // mandamos id de categoria
     function producto(id){
         window.location.href="{{ url('/admin/productos/') }}/"+id;
     }
 
     function recargarVista(){
         id = {{ $id }};
-          var ruta = "{{ url('/admin/categorias/tablas') }}/"+id;
-          $('#tablaDatatable').load(ruta);
+         var ruta = "{{ url('/admin/categorias/tablas') }}/"+id;
+        $('#tablaDatatable').load(ruta);
+    }
+
+    function verTodoProducto(){ 
+        // id del servicio
+        var id = {{ $id }};
+        window.location.href="{{ url('/admin/ver/todos/productos/') }}/"+id;
     }
 
   </script>

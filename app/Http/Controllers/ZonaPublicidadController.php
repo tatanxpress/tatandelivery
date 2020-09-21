@@ -391,7 +391,7 @@ class ZonaPublicidadController extends Controller
 
     public function tablaGlobalPubli(){
            
-        $tipos = Publicidad::all();  
+        $tipos = Publicidad::where('activo', 1)->get();  
 
         foreach($tipos as $t){
             
@@ -401,7 +401,7 @@ class ZonaPublicidadController extends Controller
             }else{
                 $tipo = "Publicidad";
             }
-
+ 
             $t->tipo = $tipo;
         }
  

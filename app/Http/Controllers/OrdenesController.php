@@ -1002,7 +1002,7 @@ class OrdenesController extends Controller
 
         $ordenFiltro = DB::table('ordenes AS o')
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-        ->select('o.id', 's.identificador', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden')
+        ->select('o.id', 's.identificador', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 'o.tipo_pago')
         ->where('o.estado_7', 1) // solo ordenes completadas por motorista
         ->where('o.users_id', $id)            
         ->get();
@@ -1016,8 +1016,10 @@ class OrdenesController extends Controller
 
         foreach($ordenFiltro as $o){
 
-            $o->conteo = $conteo + 1;
+            $conteo = $conteo + 1;
 
+            $o->conteo = $conteo;
+ 
             $subtotal = $subtotal + $o->precio_total;
             $envio = $envio + $o->precio_envio;    
             $o->fecha_orden = date("d-m-Y", strtotime($o->fecha_orden));

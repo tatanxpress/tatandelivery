@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use Carbon\Carbon;
 use App\DineroOrden;
+use App\AreasPermitidas;
+
 
 class CarritoTemporalController extends Controller
 {
@@ -218,14 +220,11 @@ class CarritoTemporalController extends Controller
                 ];
             }  
 
-            if(User::where('id', $request->userid)->first()){
+            if($uu = User::where('id', $request->userid)->first()){
 
                 // preguntar si NO tiene direccion el usuario           
-                if(!Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first())
-                {
-                    return [
-                        'success' => 1 // usuario sin direccion
-                    ];
+                if(!Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first()){
+                    return ['success' => 1];
                 }
             
                 try {
@@ -234,6 +233,8 @@ class CarritoTemporalController extends Controller
                     $excedido = 0; // saver si ha excedido las unidades
                     $limitePromocion = 0; // saver si producto es promocion, y limite por orden
                     $limiteorden = 0; // verificar si tiene limite de ordenar un producto por pedido
+                 
+
 
                     // preguntar si usuario ya tiene un carrito de compras
                     if($cart = CarritoTemporalModelo::where('users_id', $request->userid)->first()){
@@ -472,6 +473,20 @@ class CarritoTemporalController extends Controller
 
                         $horainicio = date("h:i A", strtotime($horainicio));
                         $horafinal = date("h:i A", strtotime($horafinal));
+
+                        //SAVER SI ES UNA CUENTA FUERA DE EL SALVADOR
+                        $tipo = 0; // cuenta fuera del pais
+                        $estado = 0; // si es fuera del pais, saver su estado
+
+                        if(AreasPermitidas::where('areas', $uu->area)->first()){
+                            $tipo = 1; // cuenta dentro del pais permitidos                    
+                        }
+ 
+                        if($tipo == 0){
+                            $dd = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
+                            $estado = $dd->estado;
+                        }
+                        // hoy verificar estado
             
                         return [
                             'success' => 2,
@@ -494,7 +509,9 @@ class CarritoTemporalController extends Controller
                             'horainicio' => $horainicio, // horario zona servicio negocio privado
                             'horafinal' => $horafinal,      
                             'producto' => $producto, //todos los productos  
-                            'activoservicio' => $activoservicio                                               
+                            'activoservicio' => $activoservicio,
+                            'tipo' => $tipo, // saver si es area del pais o no  
+                            'estado' => $estado                                 
                         ];
 
                     }else{
@@ -822,6 +839,7 @@ class CarritoTemporalController extends Controller
                     ->where('zonas_id', $zonaiduser)
                     ->where('servicios_id', $servicioidC)
                     ->first();
+                    
 
                     // PRIORIDAD 4
                     // esta zona tiene un minimo de $$ para aplicar nuevo tipo de cargo

@@ -83,13 +83,13 @@ class ZonaServiciosController extends Controller
 
         $zonas = Zonas::whereNotIn('id', [1,2])->get();
 
-        $servicios = Servicios::all();
+        $servicios = Servicios::orderBy('nombre', 'ASC')->get();
 
-        $serviciostipo = TipoServicios::all();
+        $serviciostipo = TipoServicios::orderBy('nombre', 'ASC')->get();
 
         return view('backend.paginas.zonaservicios.listazonaservicios', compact('zonas', 'servicios', 'serviciostipo'));
-    }
-
+    } 
+ 
     // tabla
     public function serviciotabla(){
         

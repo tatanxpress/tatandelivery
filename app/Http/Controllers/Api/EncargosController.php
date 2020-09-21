@@ -27,6 +27,7 @@ use App\OrdenesEncargoDireccion;
 use App\CategoriasNegocio;
 use App\EncargoAsignadoServicio;
 use App\Servicios;
+use App\AreasPermitidas;
 
 class EncargosController extends Controller
 {
@@ -516,7 +517,7 @@ class EncargosController extends Controller
                 ];
             }
 
-            if(User::where('id', $request->userid)->first()){
+            if($uu = User::where('id', $request->userid)->first()){
 
                 DB::beginTransaction();
                 try {
@@ -554,13 +555,29 @@ class EncargosController extends Controller
                         $requiereNota = $data->requiere_nota;
                         $notaEncargo = $data->nota_encargo;
 
+                        $verificado = 0;
+
+                        if(!AreasPermitidas::where('areas', $uu->area)->first()){
+                            // area no permitida, verificar si ya revisaron su direccion
+
+                            if($dd = Direccion::where('user_id', $uu->id)->where('seleccionado', 1)->first()){
+                                if($dd->estado == 0){
+                                    $verificado = 1; // no revisada
+                                }
+                                else if($dd->estado == 2){
+                                    $verificado = 2; // direccion rechazada
+                                }
+                            }
+                        }
+
                         return [
                             'success' => 1,
                             'producto' => $producto,
                             'subtotal' => $subTotal,
                             'boton' => $botonTexto,
                             'requiere_nota' => $requiereNota,
-                            'nota_encargo' => $notaEncargo               
+                            'nota_encargo' => $notaEncargo,
+                            'verificado' => $verificado           
                         ];
 
                     }else{
@@ -711,9 +728,8 @@ class EncargosController extends Controller
                     $finaliza = new DateTime($fecha_finaliza);
 
                     if($tiempoReal >= $finaliza){
-                        return [ // este encargo a finalizado
-                            'success' => 3
-                        ]; 
+                         // este encargo a finalizado
+                        return ['success' => 3]; 
                     }
 
                     $producto = DB::table('carrito_encargo_pro AS cp')
@@ -731,11 +747,11 @@ class EncargosController extends Controller
                         array_push($pila, $multi); // unir para subtotal $                        
                     } 
 
-                    $resultado=0;
+                    $resultado = 0;
                     foreach ($pila as $valor){
-                        $resultado=$resultado+$valor;
+                        $resultado = $resultado+$valor;
                     }
-
+                 
                     $convertir = number_format((float)$resultado, 2, '.', '');
                     $precioTotal = (string) $convertir;
 
@@ -747,15 +763,41 @@ class EncargosController extends Controller
                     $idservicio = EncargoAsignadoServicio::where('encargos_id', $cart->encargos_id)->pluck('servicios_id')->first();
 
                     $pagopropi = Servicios::where('id', $idservicio)->first();
+
+                    $cargoEnvio = 0;
+                    $gananciaMoto = 0;
+
+                    $uu = User::where('id', $request->userid)->first();
+                    if(AreasPermitidas::where('areas', $uu->area)->first()){
+                        $cargoEnvio = $datosZona->precio_envio;
+                        $gananciaMoto = $datosZona->ganancia_motorista;
+                    }else{
+                        $dd = Direccion::where('user_id', $uu->id)->where('seleccionado', 1)->first();
+                        $cargoEnvio = $dd->precio_envio;
+                        $gananciaMoto = $dd->ganancia_motorista;
+                    }
+
+                    if($request->tipopago != null){
+                        if($request->tipopago == 1){ // pagara con credi puntos
+                            $monedero = User::where('id', $request->userid)->pluck('monedero')->first();
+                            if($resultado > $monedero){ // solo si es mayor, return
+                                return ['success' => 4];
+                            }
+
+                            $descontado = $monedero - ($resultado + $cargoEnvio);
+                            // puedo comprar, descontar credito
+                            User::where('id', $request->userid)->update(['monedero' => $descontado]);
+                        }
+                    }
                     
                     $orden = new OrdenesEncargo();
                     $orden->encargos_id = $cart->encargos_id;
                     $orden->users_id = $request->userid;
                     $orden->precio_subtotal = $precioTotal;
                     $orden->revisado = 1; // pendiente
-                    $orden->precio_envio = $datosZona->precio_envio;
+                    $orden->precio_envio = $cargoEnvio;
                     $orden->fecha_orden = $fecha;
-                    $orden->ganancia_motorista = $datosZona->ganancia_motorista;
+                    $orden->ganancia_motorista = $gananciaMoto;
                     $orden->visible_cliente = 1;
                     $orden->visible_motorista = 1; // es visible, pero hasta que admin coloque permiso podra ver en tabla encargos
                     $orden->visible_propietario = 1;
@@ -772,6 +814,18 @@ class EncargosController extends Controller
                     $orden->fecha_3 = null;
                     $orden->pago_a_propi = $pagopropi->pago_a_encargos;
                     $orden->nota_encargo = $request->nota;
+
+                    if($request->tipopago == null){
+                        $orden->tipo_pago = 0; // por defecto pago como efectivo
+                    }else{
+                        if($request->tipopago == 0){
+                            $orden->tipo_pago = 0; // efectivo
+                        }else if($request->tipopago == 1){
+                            $orden->tipo_pago = 1; // credi puntos
+                        }else{
+                            $orden->tipo_pago = 0; // por defecto pago como efectivo
+                        }
+                    }
 
                     $orden->save();
 
@@ -811,10 +865,10 @@ class EncargosController extends Controller
                     }  
 
                     // hoy borrar el carrito de encargos
-                    if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
+                    /*if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
                         CarritoEncargoProducto::where('carrito_encargo_id', $carrito->id)->delete();
                         CarritoEncargo::where('users_id', $request->userid)->delete();
-                    }
+                    }*/
 
                     DB::commit();
                     
@@ -826,10 +880,7 @@ class EncargosController extends Controller
             
             }catch(\Error $e){
                 DB::rollback();
-
-                return [
-                    'success' => 4
-                ];
+                return ['success' => 5];
             }
         }
     }
@@ -865,9 +916,10 @@ class EncargosController extends Controller
                     ->select('o.id', 'e.nombre',
                     'e.fecha_finaliza', 'o.precio_envio', 
                     'o.revisado', 'o.precio_subtotal', 'o.fecha_orden', 
-                    'e.fecha_entrega', 'o.nota_encargo', 'e.fecha_estimada') 
+                    'e.fecha_entrega', 'o.nota_encargo', 'e.fecha_estimada', 'o.tipo_pago') 
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible_cliente', 1)
+                    ->orderBy('o.id', 'DESC')
                     ->get();
                   
                 foreach($orden as $o){                    
@@ -1230,7 +1282,6 @@ class EncargosController extends Controller
                     'message' => $validarDatos->errors()->all()
                 ];
             }
-
            
             // buscar si tiene carrito
             if($data = CarritoEncargoProducto::where('id', $request->id)->first()){

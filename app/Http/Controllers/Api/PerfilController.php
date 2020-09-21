@@ -16,11 +16,13 @@ use App\CarritoTemporalModelo;
 use App\CarritoExtraModelo;
 use App\CarritoEncargo;
 use App\CarritoEncargoProducto;
+use App\AreasPermitidas;
+use Log; 
 
 class PerfilController extends Controller
 {
-     // cambiar contraseña con correo
-     public function nuevaPassword(Request $request){
+    // cambiar contraseña con correo
+    public function nuevaPassword(Request $request){
         if($request->isMethod('post')){   
             $rules = array(                
                 'telefono' => 'required',
@@ -149,29 +151,6 @@ class PerfilController extends Controller
                 ];
             }
 
-            // entrara si enviamos imagen y la validara          
-            if($request->hasFile('imagen')){                
-
-                // validaciones para los datos
-                $regla = array( 
-                    'imagen' => 'required',
-                );    
-         
-                $mensaje = array(
-                    'imagen.required' => 'La imagen es requerida'                    
-                    );
-    
-                $validar = Validator::make($request->all(), $regla, $mensaje );
-    
-                if ( $validar->fails()) 
-                {
-                    return [
-                        'success' => 0, 
-                        'message' => $validar->errors()->all()
-                    ];
-                }            
-            }
-
             // validar correo si es unico
             if(User::where('email', $request->correo)->where('id', '!=', $request->userid)->first()){
                 return [
@@ -180,67 +159,18 @@ class PerfilController extends Controller
             }
 
             // buscar usuario quien editara perfil
-            if($usuario = User::where('id', $request->userid)->first()){                        
-
-                if($request->hasFile('imagen')){    
-                    // generar nombre para la imagen
-                    $cadena = Str::random(20);
-                    $tiempo = microtime(); 
-                    $union = $usuario->id.$cadena.$tiempo;
-                    // quitar espacios vacios
-                    $nombreImagen = str_replace(' ', '_', $union);
-                    
-                    // guardar imagen en disco, solo podra ser accedida por aplicacion, no por navegador
-                    $extension = '.'.$request->imagen->getClientOriginalExtension();
-                    $avatar = $request->file('imagen'); 
-                    $nombreFinal = $nombreImagen.$extension;
-                    $upload = Storage::disk('usuario')->put($nombreFinal, \File::get($avatar));
+            if($usuario = User::where('id', $request->userid)->first()){   
                 
-                    if($upload){
-                        // obtnener nombre foto anterior
-                        $imagenOld = $usuario->imagen;       
-                     
-                        // guardar datos del perfil
-                        $usuario->name = $request->nombre;
-                        $usuario->email = $request->correo;
-                        $usuario->imagen = $nombreFinal;
+                $usuario->name = $request->nombre;
+                $usuario->email = $request->correo;
 
-                        // comprobar si cambio el correo
+                if($usuario->save()){
 
-                        if($usuario->save()){
-                            
-                            // si se guardo todo, borrar foto anterior
-                            if(Storage::disk('usuario')->exists($imagenOld)){
-                                Storage::disk('usuario')->delete($imagenOld);       
-                            }
-
-                            return [
-                                'success' => 2 //datos guardados
-                            ];
-                        }else{
-                            return [
-                                'success' => 0 // error al guardar los datos                                
-                            ];
-                        }   
-                    }else{
-                        return [
-                            'success' => 0 //error al subir la imagen
-                        ];
-                    }
-                }// /if imagen
-                else{
-
-                    // no viene imagen asi que solo gurdar datos
-                    $usuario->name = $request->nombre;
-                    $usuario->email = $request->correo;
-
-                    if($usuario->save()){
-
-                        return [
-                            'success' => 2 //datos guardados correctamente
-                        ];
-                    }
+                    return [
+                        'success' => 2 //datos guardados correctamente
+                    ];
                 }
+               
             }else{
                 return [
                     'success' => 0 //usuario no encontrado                    
@@ -291,8 +221,6 @@ class PerfilController extends Controller
 
     // guardara las direcciones de los usuarios 
     public function guardarDireccion(Request $request){
-
-      
         if($request->isMethod('post')){ 
             
             $reglaDatos = array(
@@ -362,12 +290,28 @@ class PerfilController extends Controller
 
                     if($request->latitudreal != null){
                         $direccion->latitud_real = $request->latitudreal;
+                    }else{
+                        $direccion->latitud_real = "";
                     }
 
                     if($request->longitudreal != null){
                         $direccion->longitud_real = $request->longitudreal;
+                    }else{
+                        $direccion->longitud_real = "";
                     }
+
+
                     $direccion->revisado = 0;
+
+                    // campos para credi-puntos
+
+                    // 0: esperando confirmacion del administrador
+                    // 1: verificada, direccion hermano lejano, y setea su precio
+                    // 2: rechazada y colocar mensaje porque fue rechazada
+                    $direccion->estado = 0;
+                    $direccion->precio_envio = 0;
+
+                    // precio_envio   y  mensaje_rechazo  son  null
                     
                     if($direccion->save()){
 
@@ -377,6 +321,20 @@ class PerfilController extends Controller
                         try {
                             Direccion::where('user_id', $request->userid)->where('id', '!=', $id)->update(['seleccionado' => 0]);
                             User::where('id',$request->userid)->update(['zonas_id'=> $request->zona_id]);
+
+                            // BORRAR CARRITO DE COMPRAS, SI CAMBIO DE DIRECCION
+
+                            if($tabla1 = CarritoTemporalModelo::where('users_id', $request->userid)->first()){
+                                CarritoExtraModelo::where('carrito_temporal_id', $tabla1->id)->delete();
+                                CarritoTemporalModelo::where('users_id', $request->userid)->delete();
+                            }
+
+                            // BORRAR CARRITO DE ENCARGOS, SI CAMBIO CAMBIO DIRECCION
+                            if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
+                                CarritoEncargoProducto::where('carrito_encargo_id', $carrito->id)->delete();
+                                CarritoEncargo::where('users_id', $request->userid)->delete();
+                            }
+
                             DB::commit();
 
                             return [
@@ -557,6 +515,62 @@ class PerfilController extends Controller
             }            
         }
     }
+
+
+    // SECCION PARA DIRECCIONES DE VARIAS AREAS
+    public function verDireccionesAreas(Request $request){
+        if($request->isMethod('post')){  
+
+            $rules = array(                
+                'userid' => 'required'                
+            );    
+     
+            $messages = array(                                      
+                'userid.required' => 'El id del usuario es requerido.',               
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            if($u = User::where('id', $request->userid)->first()){
+                
+                $direccion = DB::table('direccion_usuario AS d')            
+                ->join('zonas AS z', 'z.id', '=', 'd.zonas_id')
+                ->select('d.id', 'd.nombre', 'd.direccion', 'd.numero_casa', 
+                'd.punto_referencia', 'd.seleccionado', 'z.nombre AS nombreZona',
+                'd.estado', 'd.precio_envio', 'd.mensaje_rechazo')
+                ->where('d.user_id', $request->userid)
+                ->get();
+ 
+                // verificar que area es para poder mostrar pantalla
+                // * punto gps
+                // * solo direccion
+                $tipo = 0; // pantalla solo ingresar nueva info, pero sin cambiar gps
+                if(AreasPermitidas::where('areas', $u->area)->first()){
+                    $tipo = 1; // pantalla GPS
+                }
+
+                foreach($direccion as $d){
+                     $d->precio_envio = number_format((float)$d->precio_envio, 2, '.', '');
+                }
+ 
+                return ['success' => 1, 'direcciones' => $direccion, 'tipo' => $tipo];
+            }else{
+                return ['succcess'=> 2];
+            }
+        }
+    }
+
+
+   
+
 
 
 

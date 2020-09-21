@@ -25,6 +25,8 @@ class CreateUsersTable extends Migration
             $table->dateTime('fecha');
             $table->boolean('activo')->default(1);
 
+            // credi-puntos
+
             $table->foreign('zonas_id')->references('id')->on('zonas');
         });
     }

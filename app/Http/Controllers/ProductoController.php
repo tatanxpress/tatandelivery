@@ -47,6 +47,33 @@ class ProductoController extends Controller
         return view('backend.paginas.servicios.tablas.tablaproductos', compact('producto'));
     }
 
+    // ver todos los productos
+    public function indexTodos($id){
+        // recivimos el id del servicio
+        $dato = DB::table('servicios_tipo AS st')
+        ->join('servicios AS s', 's.id', '=', 'st.servicios_1_id')
+        ->select('s.nombre')
+        ->where('st.servicios_1_id', $id) 
+        ->first();   
+
+        $nombre = $dato->nombre;
+
+        return view('backend.paginas.servicios.listaproductostodos', compact('id', 'nombre'));    
+    }
+
+    public function tablaTodosLosProductos($id){
+        $producto = DB::table('producto AS p')
+        ->join('servicios_tipo AS s', 's.id', '=', 'p.servicios_tipo_id')
+        ->select('p.id', 'p.nombre', 'p.descripcion', 'p.posicion', 'p.precio',
+         'p.es_promocion', 'p.disponibilidad', 'p.activo', 'p.utiliza_cantidad', 'p.imagen',
+         's.nombre AS categoria')
+        ->where('s.servicios_1_id', $id)
+        ->orderBy('p.nombre', 'ASC')
+        ->get(); 
+ 
+        return view('backend.paginas.servicios.tablas.tablaproductostodos', compact('producto'));
+    } 
+ 
     // nuevo producto
     public function nuevo(Request $request){        
         if($request->isMethod('post')){  

@@ -87,6 +87,8 @@
             <th>Fecha</th>
             <th>Cupón</th>
             <th>Paga a P.</th>
+            <th>Método</th>
+            <th>Área</th>
           </tr>
 
           @foreach($orden as $dato)
@@ -95,12 +97,20 @@
               <td>${{$dato->precio_total}}</td>
               <td>{{$dato->fecha_orden}}</td>
               <td>{{$dato->cupon}}</td>
-              @if($dato->pago_a_propi == 1)
-              <td>Si</td>
-              @else
-              <td>No</td>
-              @endif
+                @if($dato->pago_a_propi == 1)
+                <td>Si</td>
+                @else
+                <td>No</td>
+                @endif
 
+                @if($dato->tipo_pago == 0)
+                <td>Efectivo</td>
+                @else
+                <td>Credito</td>
+                @endif
+
+                <td>{{ $dato->area }}</td>
+           
             </tr> 
           @endforeach  
  
@@ -110,7 +120,8 @@
             <td></td>
             <td></td>
             <td></td>
-           
+            <td></td>
+            <td></td>
           </tr>
           
           <tr>
@@ -119,7 +130,8 @@
             <td></td>
             <td></td>
             <td></td>
-           
+            <td></td>
+            <td></td>
           </tr>
 
           <tr>
@@ -128,7 +140,8 @@
             <td></td>
             <td></td>
             <td></td>
-            
+            <td></td>
+            <td></td>
           </tr>
         
         </table>

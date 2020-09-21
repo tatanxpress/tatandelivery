@@ -20,7 +20,7 @@
           </button>
 
         <br>
-        <br>
+        <br> 
 
           <div class="form-group" style="width: 25%">
               <label>Descuento de $$ para este cupon</label>

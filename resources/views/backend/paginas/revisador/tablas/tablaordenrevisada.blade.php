@@ -4,7 +4,7 @@
         <div class="col-12">
           <div class="card">         
             <div class="card-body">
-             <p>Dinero en caja: <strong>${{ $suma }} </strong></p>
+             <p>Dinero en caja: <strong>${{ $totalcobro }} </strong></p>
           </div>
         </div>
       </div>
@@ -22,24 +22,30 @@
                     <th style="width: 20%">Nombre</th> 
                     <th style="width: 15%">Fecha orden</th> 
                     <th style="width: 15%">Fecha revisada</th>
-                    <th style="width: 15%">Precio (Sub Total + Envio)</th>
-                    <th style="width: 10%">Cupon</th>
-                </tr>
+                  
+                    <th style="width: 10%">Método</th>
+                </tr> 
                 </thead>
-                <tbody> 
+                <tbody>  
                 @foreach($orden as $dato)
       
                 <tr>
                     <td>{{ $dato->ordenes_id }}</td>
                     <td>{{ $dato->identificador }}</td>
                     <td>{{ $dato->nombre }}</td>
-                    <td>{{ $dato->fecha_orden }}</td>
+                    <td>{{ $dato->fecha_orden }}</td> 
                     <td>{{ $dato->fecha }}</td>
-                    <td>{{ $dato->precio }}</td>
-                    <td>{{ $dato->usacupon }}</td>
+                    <td>
+                      @if($dato->tipo_pago == 0)
+                        Efectivo
+                        @else
+                        Credi Puntos
+                        @endif
+                    </td>
                 </tr>
      
-                @endforeach            
+                @endforeach    
+                       
                 </tbody>            
               </table>
             </div>          

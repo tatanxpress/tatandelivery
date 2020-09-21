@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+ 
 // USUARIOS  
 Route::post('verificar/telefono', 'Api\Auth\LoginController@verificarNumero'); // verificar si el telefono esta registrado
 Route::post('verificar-codigo-temporal', 'Api\Auth\LoginController@verificarCodigoTemporal'); // verificar telefono + codigo temporal.
@@ -21,7 +21,17 @@ Route::post('usuario/codigo-correo', 'Api\Auth\LoginController@codigoCorreo'); /
 Route::post('usuario/revisar-codigo', 'Api\Auth\LoginController@revisarCodigoCorreo'); // revisar codigo del correo
 Route::post('usuario/registro', 'Api\Auth\RegisterController@registroUsuario'); // registro usuario
 Route::post('usuario/nueva-password', 'Api\PerfilController@nuevaPassword'); // cambia contraseña con correo
-    
+
+// Verificaciones con areas
+Route::post('usuario/telefono/area', 'Api\Auth\LoginController@verificarNumeroArea');
+Route::post('usuario/codigo/temporal-area', 'Api\Auth\LoginController@verificarCodigoTemporalArea');
+Route::post('usuario/login/area', 'Api\Auth\LoginController@loginUsuarioArea');
+Route::post('usuario/codigo-correo-area', 'Api\Auth\LoginController@codigoCorreoArea');
+Route::post('usuario/revisar-codigo-area', 'Api\Auth\LoginController@revisarCodigoCorreoArea');
+Route::post('usuario/cambio/password-area', 'Api\Auth\LoginController@nuevaPasswordArea'); // cambia contraseña con correo
+
+
+     
 // perfil  
 Route::post('usuario/informacion', 'Api\PerfilController@infoPerfil'); // cambia contraseña en perfil
 Route::post('usuario/editar-perfil', 'Api\PerfilController@editarPerfil'); // cambiar datos del perfil
@@ -31,7 +41,7 @@ Route::post('usuario/zonas/lista', 'Api\PoligonoController@getListaZonas'); // l
 Route::post('usuario/nueva/direccion', 'Api\PerfilController@guardarDireccion'); // nueva direccion
 Route::post('usuario/seleccionar/direccion', 'Api\PerfilController@seleccionarDireccion'); // seleccionar direccion
 Route::post('usuario/eliminar/direccion', 'Api\PerfilController@eliminarDireccion'); // eliminar una direccion
-         
+          
 // servicios   
 Route::post('usuario/servicios/lista', 'Api\ServiciosController@getServiciosZona'); // lista de tipo servicio por zona
 Route::post('usuario/servicios/tipo/servicio', 'Api\ServiciosController@getTipoServicios'); // locales tipo cualquiera
@@ -83,8 +93,8 @@ Route::post('usuario/proceso/orden/estado-1', 'Api\ProcesadorOrdenesController@p
 Route::post('usuario/proceso/orden/estado-3', 'Api\ProcesadorOrdenesController@procesarOrdenEstado3'); // procesar orden tercer paso *
     
 Route::post('usuario/verificar/cupon', 'Api\ProcesadorOrdenesController@verificarCupon'); // procesar orden primer paso *
- 
-   
+  
+      
   
 // seccion encargos
 Route::post('usuario/encargos/por-zona', 'Api\EncargosController@encargosPorZona'); // lista de encargos
@@ -114,6 +124,28 @@ Route::post('usuario/encargos/cancelar-encargo', 'Api\EncargosController@cancela
 Route::post('usuario/encargos/completar-encargo', 'Api\EncargosController@completarEncargo'); // completar encargo
 
 
+// AGREGACION PARA TARJETA
+Route::post('usuario/mostrar/todas/ciudades', 'Api\TarjetaController@obtenerCiudades');
+Route::post('usuario/registro/lejano', 'Api\Auth\RegisterController@registroUsuarioLejano');
+Route::post('usuario/direcciones/areas', 'Api\PerfilController@verDireccionesAreas'); 
+Route::post('usuario/metodos/de/pago', 'Api\TarjetaController@verMetodosDePago');
+Route::post('usuario/carrito/ver/proceso/credi-puntos', 'Api\TarjetaController@verProcesarOrdenPuntos');
+Route::post('usuario/proceso/orden/estado-1-v2', 'Api\TarjetaController@procesarOrdenEstado1V2'); 
+Route::post('usuario/metodos/de/pago/encargo', 'Api\TarjetaController@verInformacionDelEncargo');
+
+// INGRESO DE CREDI PUNTOS
+Route::post('usuario/ver/info/credipuntos', 'Api\TarjetaController@verInfoCrediPuntos');
+Route::post('usuario/comprar/credipuntos', 'Api\TarjetaController@ingresarCrediPuntosCliente');
+
+ 
+
+Route::post('usuario/ss', 'Api\TarjetaController@ss');
+
+
+
+  
+
+
 
  
    
@@ -131,7 +163,7 @@ Route::post('propietario/ver/productos', 'Api\PropietarioController@verProductos
 Route::post('propietario/ver/producto/individual', 'Api\PropietarioController@ordenProductosIndividual'); // ver producto individual de la orden
 Route::post('propietario/ver/orden/id', 'Api\PropietarioController@verOrdenPorID'); // ver estados orden por id
    
-// procesar ordenes 
+// procesar ordenes  
 Route::post('propietario/proceso/orden/estado-2', 'Api\PropietarioController@procesarOrdenEstado2'); // dar tiempo de espera *
 Route::post('propietario/proceso/orden/estado-4', 'Api\PropietarioController@procesarOrdenEstado4'); // iniciar preparacion, avisa a motoristas
   
@@ -256,7 +288,7 @@ Route::post('motorista/pendiente/pago', 'Api\MotoristaController@pendientePago')
 Route::post('motorista/notificar/cliente/orden', 'Api\MotoristaController@notificarClienteOrden');
 
  
-// Seccion encargos motoristas  
+// Seccion encargos motoristas   
 Route::post('motorista/encargo/nuevos', 'Api\MotoristaController@verNuevosOrdenesEncargos'); // ver nuevos encargos
 Route::post('motorista/encargo/aceptar-entrega', 'Api\MotoristaController@aceptarOrdenEncargo'); // seleccionar el encargo
  
@@ -275,6 +307,8 @@ Route::post('motorista/encargos/ver/historial-encargos', 'Api\MotoristaControlle
 Route::post('motorista/encargo/lista-productos', 'Api\MotoristaController@verListaDeProductosDeEncargo'); // ver lista de producto del encargo   
 Route::post('motorista/encargo/lista-productos-individual', 'Api\MotoristaController@verListaDeProductosDeEncargoIndividual'); // ver producto del encargo individual 
 
+// motorista en caja
+Route::post('motorista/tengo/encaja', 'Api\MotoristaController@verMotoristaEnCaja');
 
 
 
@@ -286,8 +320,8 @@ Route::post('motorista/encargo/lista-productos-individual', 'Api\MotoristaContro
 
 
   
- 
-   
+  
+    
 // REVISADOR DE PAGOS 
 
 Route::post('revisador/login', 'Api\PagaderoController@loginRevisador'); // login revisador
@@ -303,10 +337,10 @@ Route::post('revisador/ver/motoristas', 'Api\PagaderoController@verMotoristas');
   
 // DESACTUALIZADA 22/07/2020
 //Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorial'); // ver historial de ordenes
- 
+  
 Route::post('revisador/ver/historial', 'Api\PagaderoController@verHistorialNuevo'); // ver historial de ordenes
 Route::post('revisador/ver/historial-encargos', 'Api\PagaderoController@verHistorialEncargos'); // ver historial de encargos
-
+ 
 // No utilizado 08/08/2020
 Route::post('revisador/ver/fecharecorte', 'Api\BitacoraRevisadorController@verFechaRecorte'); // ver fecha de recorte de caja
  
@@ -315,11 +349,15 @@ Route::post('revisador/confirmar/todos/pago', 'Api\BitacoraRevisadorController@r
 
 
 // APP ADMINISTRADORES
-
+ 
 Route::post('adminapp/login', 'Api\AdminAppController@loginRevisador'); // login administrador
 Route::post('adminapp/actualizar/password', 'Api\AdminAppController@reseteo'); // cambio de contrasena
 
 Route::post('adminapp/ordenes/hoy', 'Api\AdminAppController@ordenesHoy'); // solo ordenes de hoy
+Route::post('adminapp/ordenes/hoyv2', 'Api\AdminAppController@ordenesHoyV2');
+
+
+
 Route::post('adminapp/encargos/ordenes/hoy', 'Api\AdminAppController@ordenesEncargoHoy'); // solo ordenes de hoy
   
 // ordenes sin contestar con 1 minutos extra
@@ -371,8 +409,3 @@ Route::post('usuario/producto/lista-de-imagenes', 'Api\ServiciosController@obten
 Route::post('usuario/producto/video-url', 'Api\ServiciosController@obtenerVideoProducto');
 
 
-
-
-
-
-Route::get('bienes-servicios', 'Api\Soap\SoapController@BienesServicios');

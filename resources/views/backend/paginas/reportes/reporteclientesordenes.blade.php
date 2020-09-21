@@ -87,17 +87,25 @@
             <th>Fecha</th>
             <th>Sub Total</th>
             <th>Envío</th>
+            <th>Método</th>
             <th>Cupón</th>
           </tr>
   
           @foreach($ordenFiltro as $dato)
             <tr>
-              <td>{{ $dato->conteo }}</td>             
+              <td>{{ $dato->conteo }}</td>              
               <td>{{ $dato->id }}</td>
               <td>{{ $dato->identificador }}</td>
               <td>{{ $dato->fecha_orden }}</td>
               <td>${{ $dato->precio_total }}</td>
               <td>${{ $dato->precio_envio }}</td>
+              <td>
+                @if($dato->tipo_pago == 1)
+                  Credito
+                @else
+                  Efectivo
+                @endif
+              </td>
               <td>{{ $dato->cupon }}</td>                          
               
             </tr> 
@@ -110,6 +118,7 @@
             <td></td>
             <td>${{ $subtotal }}</td>
             <td>${{ $envio }}</td>
+            <td></td>
             <td>{{ $conteocupon }}</td>
           </tr>
           

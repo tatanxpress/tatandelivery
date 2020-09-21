@@ -4,8 +4,8 @@
         <div class="col-12">
           <div class="card">         
             <div class="card-body">
-             <p>Total ordenes sin completar: <strong>{{ $sincompletar }} </strong></p>
-             <p>Total dinero sin entregar: <strong> ${{ $suma }} </p>
+             <p>Total ordenes sin completar: <strong>{{ $conteo }} </strong></p>
+             <p>Total dinero sin entregar: <strong> ${{ $totalcobro }} </p>
           </div>
         </div>
       </div>
@@ -17,11 +17,11 @@
             <div class="card-body">
               <table id="example2" class="table table-bordered table-hover">
                 <thead>             
-                <tr>
+                <tr> 
                     <th style="width: 10%"># orden</th>
                     <th style="width: 15%">Identificador Motorista</th>
-                    <th style="width: 15%">Fecha Selecciono</th>                    
-                    <th style="width: 15%">Total $</th> 
+                    <th style="width: 15%">Fecha Agarro</th> 
+                    <th style="width: 15%">Método</th> 
                 </tr>
                 </thead>
                 <tbody> 
@@ -30,8 +30,14 @@
                 <tr>
                     <td>{{ $dato->ordenes_encargo_id }}</td>
                     <td>{{ $dato->identificador }}</td>
-                    <td>{{ $dato->fecha_agarrada }}</td>                   
-                    <td>${{ $dato->total }}</td>
+                    <td>{{ $dato->fecha_agarrada }}</td>     
+                    <td>
+                    @if($dato->tipo_pago == 0)
+                        Efectivo
+                        @else
+                        Credi Puntos
+                        @endif
+                    </td>               
                    
                 </tr>
      

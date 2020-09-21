@@ -24,46 +24,28 @@ class ConfiguracionesController extends Controller
     } 
 
     public function informacion(Request $request){
-        $limite = DB::table('dinero_orden')->where('id', 1)->first();
+        //$limite = DB::table('dinero_orden')->where('id', 1)->first();
+        $app = VersionesApp::where('id', 1)->first();
+        $fecha = "Sin fecha aun";
+        if($app->fecha_token != null){
+            $fecha = date("h:i A d-m-Y", strtotime($app->fecha_token));
+        } 
 
-        return ['success' => 1, 'info' => $limite];
+        return ['success' => 1, 'info' => $app, 'fecha' => $fecha];
     }
 
     public function informacionApp(Request $request){
         $app = DB::table('versiones_app')->where('id', 1)->first();
-
+        
         return ['success' => 1, 'info' => $app];
     }
 
     public function actualizar(Request $request){
         if($request->isMethod('post')){   
             
-            $regla = array(                 
-                'cupones' => 'required',
-                'sms' => 'required',
-                'correo' => 'required'
-            );
-
-            $mensaje = array(
-                'cupones.required' => 'Cupones es requerido',
-                'sms.required' => 'SMS es requerido',
-                'correo.required' => 'Correo es requerido'
-                );
-
-            $validar = Validator::make($request->all(), $regla, $mensaje );
-
-            if ($validar->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validar->errors()->all()
-                ];
-            } 
-
-            DineroOrden::where('id', 1)->update([             
-                'ver_cupones' => $request->cupones,
-                'correo' => $request->correo,
-                'activo_sms' => $request->sms
+            VersionesApp::where('id', 1)->update([             
+                'comision' => $request->comision,
+                'activo_tarjeta' => $request->cbcredito
                 ]);
 
             return ['success' => 1];

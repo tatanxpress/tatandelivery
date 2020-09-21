@@ -5,7 +5,6 @@
     <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
     <link href="{{ asset('css/backend/estiloToggle.css') }}" type="text/css" rel="stylesheet" /> 
     <link href="{{ asset('css/backend/bootstrap-select.min.css') }}" type="text/css" rel="stylesheet" />
-
 @stop
 
 <section class="content-header">
@@ -53,6 +52,11 @@
                     Filtro minimo para envio gratis
             </button>
 
+            <button type="button" style="margin-left" onclick="modal()" class="btn btn-info btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Activar/Desactivar Servicio
+            </button> 
+ 
           </div>
         </div>
       </div>
@@ -557,6 +561,63 @@
         </div>        
     </div>      
 </div>
+
+
+
+<!-- activar o desactivar servicios -->
+<div class="modal fade" id="modalVista">
+    <div class="modal-dialog"> 
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Activar o Desactivar Servicio</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-vista">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12"> 
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Servicios</label>
+                                    <br>
+                                    <div>
+                                        <select class="form-control" id="select-tiposervicio">   
+                                            @foreach($servicios as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->nombre}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+
+                                <div class="form-group"> 
+                                    <label>Disponibilidad</label><br>
+                                    <input type="hidden" id="id-editar">
+                                    <label class="switch" style="margin-top:10px">
+                                        <input type="checkbox" id="cbvista">
+                                        <div class="slider round">
+                                            <span class="on">Activar</span> 
+                                            <span class="off">Desactivar</span>
+                                        </div>
+                                    </label>
+                                </div> 
+
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="modificarServicio()">Actualizar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
  
 @extends('backend.menus.inferior')
 @section('content-admin-js')	 
@@ -1109,6 +1170,49 @@
             toastr.error('Error');
         });
     }
+
+
+
+    function modal(){
+        $('#modalVista').modal('show');
+    }
+
+    function modificarServicio(){
+        var id = document.getElementById("select-tiposervicio").value; 
+        var estado = document.getElementById("cbvista").checked;
+                
+        var estado_1 = 0;
+        if(estado){
+            estado_1 = 1;
+        }
+
+        let me = this;
+        let formData = new FormData();
+        formData.append('id', id);
+        formData.append('estado', estado_1);
+
+        var spinHandle = loadingOverlay().activate();
+
+        axios.post('/admin/activar/desactivar/zonaservicio', formData, {
+        })
+            .then((response) => {
+                loadingOverlay().cancel(spinHandle);     
+                revision(response);
+            })
+            .catch((error) => {
+                toastr.error('Error del servidor');
+                loadingOverlay().cancel(spinHandle);
+        });      
+    }
+
+    function revision(){
+        toastr.success('Actualizado');
+        var ruta = "{{ URL::to('admin/zonaservicios/tabla/lista') }}";
+        $('#tablaDatatable').load(ruta);
+        $('#modalVista').modal('hide');      
+    }
+
+
 
 </script>
  

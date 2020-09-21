@@ -37,6 +37,7 @@ use App\AplicaCuponCinco;
 use App\OrdenesEncargoRevisadas;
 use App\MotoristaOrdenEncargo;
 use App\OrdenesEncargo;
+use Log;
 
 class PagaderoController extends Controller
 {
@@ -138,7 +139,7 @@ class PagaderoController extends Controller
                     'success' => 0, 
                     'message' => $validarDatos->errors()->all()
                 ];
-            }
+            } 
             
             if(Revisador::where('id', $request->id)->first()){
 
@@ -153,7 +154,7 @@ class PagaderoController extends Controller
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
-                'o.servicios_id', 'o.estado_8', 'o.fecha_7', 'o.pago_a_propi')
+                'o.servicios_id', 'o.estado_8', 'o.fecha_7', 'o.pago_a_propi', 'o.tipo_pago')
                 ->where('mo.motoristas_id', $request->motoristaid)               
                 ->where('o.estado_6', 1) // ordenes que motorista inicio la entrega 
                 ->where('o.estado_8', 0) // no canceladas
@@ -164,14 +165,17 @@ class PagaderoController extends Controller
 
                 foreach($orden as $o){
 
+
                     if($o->fecha_7 == null){
                         $o->fecha_orden = "Sin completar aun";
                     }else{
                         $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_7));
                     }
-                    
+                     
                     $aplicacupon = 0;
-                    
+                    $textocupon = "";
+                    $mensaje = "Pago realizado a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
+
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
                      
@@ -188,17 +192,32 @@ class PagaderoController extends Controller
                             if($o->pago_a_propi == 1){
                                 // se paga a propietario
                                
-                                // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
-                                $o->precio_total = number_format((float)0 , 2, '.', ''); 
-
-                                $totalcobro = $totalcobro + 0; 
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                   // $totalcobro = $totalcobro + $o->precio_total; 
+                                   // MENOS LO QUE SE PAGARA A PROPIETARIO
+                                   // MAS LO QUE CANCELARA CLIENTE
+                                   // envio es siempre 0
+                                   $info = -$o->precio_total + $o->precio_total;
+                                   $totalcobro = $totalcobro + $info;
+                                }else{
+                                    // credi puntos
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+                               // $o->precio_total = number_format((float), 2, '.', '');  
+                               $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
                             }else{
                                 // no se paga a propietario
                                 // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
-                                $totalcobro = $totalcobro + $o->precio_total;   
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $o->precio_total;   
+                                }
+                                
                                 $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
                             }
-
+                            //
+                            $textocupon = "Envío Gratis";
                            
                         }else if($tipo->tipo_cupon_id == 2){
                             $o->tipocupon = 2;
@@ -211,35 +230,45 @@ class PagaderoController extends Controller
                                 $total = 0;
                             }
 
-                            $precioenvio = 0;
                             $aplicoenvio = 0; // para saver en la app si aplico tambien envio gratis
 
-                            if($dd->aplico_envio_gratis == 0){
-                                $precioenvio = $o->precio_envio;
-                                
+                            if($dd->aplico_envio_gratis == 0){                              
+                                $textocupon = "Descuento de $ " . $descuento;
                             }else{
                                 // si aplico el envio gratis este cupon
                                 $aplicoenvio = 1;
+                                $textocupon = "Descuento de $" . $descuento . " + Envío Gratis";
                             }
 
                             $o->aplicoenvio = $aplicoenvio;
 
                             if($o->pago_a_propi == 1){
-                                // se paga a propietario
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
+                                
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
 
-                                $o->precio_total = number_format((float)$precioenvio, 2, '.', '');
-                                $totalcobro = $totalcobro + $precioenvio; 
+                                $afectado = $o->precio_envio + $total;
+                                $o->precio_total = number_format((float)$afectado, 2, '.', '');
 
-                            }else{
+                            }else{ 
                                 // no se le paga a propietario
 
                                 // sumar el precio de envio
-                                $suma = $total + $precioenvio;
+                                $suma = $total + $o->precio_envio;
 
                                 // precio modificado con el descuento dinero
                                 $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                                $totalcobro = $totalcobro + $suma; 
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
                             }
 
                         }else if($tipo->tipo_cupon_id == 3){
@@ -249,104 +278,150 @@ class PagaderoController extends Controller
                             $resta = $o->precio_total * ($porcentaje / 100);
                             $total = $o->precio_total - $resta;
 
+                            $textocupon = "Descuento del " . $porcentaje . "%";
+
                             if($total <= 0){
                                 $total = 0;
                             }
 
                             if($o->pago_a_propi == 1){
-                                // se paga a propietario
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
                                 
-                                $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
 
-                                $totalcobro = $totalcobro + $o->precio_envio;
-                            }
-                            else{
+                                $afectado = $o->precio_envio + $total;
+                                $o->precio_total = number_format((float)$afectado, 2, '.', '');
+
+                            }else{ 
                                 // no se le paga a propietario
 
                                 // sumar el precio de envio
                                 $suma = $total + $o->precio_envio;
 
+                                // precio modificado con el descuento dinero
                                 $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                                $totalcobro = $totalcobro + $suma;  
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
                             }
-
-                            
 
                         }else if($tipo->tipo_cupon_id == 4){
                             $o->tipocupon = 4;
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
                             $o->producto = $producto;
-
+                            $textocupon = "Producto Gratis: " . $producto;
+                           
+                           
                             if($o->pago_a_propi == 1){
-                                // se paga a propietario
-                                
-                                $o->precio_total = number_format((float) $o->precio_envio, 2, '.', '');
-                                $totalcobro = $totalcobro + $o->precio_envio;
-
-                            }else{
-                                // no se paga a propietario
-
-                                $sumado = $o->precio_total + $o->precio_envio;
-                                $sumado = number_format((float)$sumado, 2, '.', '');
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                    $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;
     
-                                $o->precio_total = $sumado;    
-                                $totalcobro = $totalcobro + $sumado; 
+                                    $o->precio_total = number_format((float)0, 2, '.', '');
+                                }
+                               
+                            }else{
+                                // no se le paga a servicio 
+    
+                                $cobro = $o->precio_total + $o->precio_envio;
+                                $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
                             }
+
+
                         }
                         else if($tipo->tipo_cupon_id == 5){
                             $o->tipocupon = 5;
                             $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
+                            $textocupon = "Donación de: " . $donacion;
+                            
+                            $total = $donacion + $o->precio_total;
                             
                             if($o->pago_a_propi == 1){
-                                // se paga a propietario, aunque cupon donacion es dinero aparte
-
-                                $suma = $o->precio_envio + $donacion;
-
-                                $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                                $totalcobro = $totalcobro + $suma;
-
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                    $o->precio_total = number_format((float)$total + $o->precio_envio, 2, '.', '');
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;
+    
+                                    $o->precio_total = number_format((float)0, 2, '.', '');
+                                }
+                               
                             }else{
-                                // no se le paga a propietario
-
-                                // sumar
-                                $suma = $o->precio_total + $o->precio_envio + $donacion;
-
-                                $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                                $totalcobro = $totalcobro + $suma;
-                            }                            
+                                // no se le paga a servicio 
+    
+                                $cobro = $total + $o->precio_envio;
+                                $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                                
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
+                            }
+                          
                         }
                         else{
                             $o->tipocupon = 0;
                         }
 
-                    }else{
-                       
+                    }else{              
 
                         if($o->pago_a_propi == 1){
-                            // se paga a propietario, aunque cupon donacion es dinero aparte
-                                                      
-                            $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
-    
-                            $totalcobro = $totalcobro + $o->precio_envio;
+                           
+                            if($o->tipo_pago == 0){
+                                $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                $totalcobro = $totalcobro + $info;                                
+                                $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
+                            }else{
+                                // CREDI PUNTOS
+                                $totalcobro = $totalcobro - $o->precio_total;
+
+                                $o->precio_total = number_format((float)0, 2, '.', '');
+                            }
+                           
                         }else{
                             // no se le paga a servicio 
+
                             $cobro = $o->precio_total + $o->precio_envio;
                             $o->precio_total = number_format((float)$cobro, 2, '.', '');
-    
-                            $totalcobro = $totalcobro + $cobro; 
+                            // NO SUMAR SI PAGO CON CREDI PUNTOS
+                            if($o->tipo_pago == 0){
+                                $totalcobro = $totalcobro + $cobro; 
+                            }
                         }
-                         
+
+                        
                     }
 
+                  
+                    $o->mensaje = $mensaje; // lo que se pago a propietario
                     $o->aplicacupon = $aplicacupon;
+                    $o->textocupon = $textocupon;
+                  
                 }
                 
                 // sumar ganancia de esta fecha
                 $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+
+              
                 
                 return ['success' => 1, 'orden' => $orden, 'debe' => $totalcobro];
             }
@@ -452,156 +527,7 @@ class PagaderoController extends Controller
         }
     }
 
-    // ver historial, DESACTUALIZADA 22/07/2020
-    /*public function verHistorial(Request $request){
-        if($request->isMethod('post')){
-            $reglaDatos = array(
-                'id' => 'required', 
-                'fecha1' => 'required',
-                'fecha2' => 'required'
-            );
-
-            $mensajeDatos = array(                                      
-                'id.required' => 'El id motorista es requerido.',
-                'fecha1.required' => 'La fecha1 es requerido.',
-                'fecha2.required' => 'La fecha2 es requerido.'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
  
-            if(Revisador::where('id', $request->id)->first()){
-                    
-                $start = Carbon::parse($request->fecha1)->startOfDay(); 
-                $end = Carbon::parse($request->fecha2)->endOfDay();
-            
-                $orden = DB::table('ordenes_revisadas AS r')
-                ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
-                ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio', 'o.pago_a_propi')
-                ->where('r.revisador_id', $request->id)
-                ->whereBetween('r.fecha', [$start, $end]) 
-                ->orderBy('o.id', 'ASC')
-                ->get();
-
-                $totalcobro = 0;        
-               
-                foreach($orden as $o){
-                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
-                    
-                    // nombre motorista
-                    $idm = DB::table('motorista_ordenes AS m')                        
-                    ->where('m.ordenes_id', $o->id)
-                    ->pluck('motoristas_id')                 
-                    ->first();
-
-                    $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
-                    $o->motorista = $nombre;
-                
-
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
-
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-                           
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
-                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
-                          
-                            $totalcobro = $totalcobro + $o->precio_total;                           
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                            // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
-                           
-                            $total = $o->precio_total - $descuento;
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-                            
-                            $totalcobro = $totalcobro + $suma;
-
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                           
-                            $totalcobro = $totalcobro + $suma;
-
-                        }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $o->precio_total = $sumado;
-                            $o->producto = $producto;                           
-
-                            $totalcobro = $totalcobro + $sumado;
-                        }else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
-                            $info = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio + $info->dinero;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $o->precio_total = $sumado;                                           
-
-                            $totalcobro = $totalcobro + $sumado;
-                        }
-                        else{
-
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;    
-                        
-                        $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
-
-                        $totalcobro = $totalcobro + $total;
-                    }                   
-                }
-
-                // sumar ganancia de esta fecha
-                
-                $totalcobro = number_format((float)$totalcobro, 2, '.', '');
-                return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }*/
   
     // ver historial - version cuando motorista paga a propietario o no
     public function verHistorialNuevo(Request $request){
@@ -636,177 +562,243 @@ class PagaderoController extends Controller
             
                 $orden = DB::table('ordenes_revisadas AS r')
                 ->join('ordenes AS o', 'o.id', '=', 'r.ordenes_id')
-                ->select('o.id', 'o.precio_total', 'r.fecha', 'o.precio_envio', 'o.pago_a_propi')
+                ->select('o.id', 'o.precio_total', 'r.fecha', 
+                'o.precio_envio', 'o.pago_a_propi', 'o.tipo_pago')
                 ->where('r.revisador_id', $request->id)
                 ->whereBetween('r.fecha', [$start, $end]) 
                 ->orderBy('o.id', 'ASC')
                 ->get();
 
                 $totalcobro = 0;
-           
-                foreach($orden as $o){
-                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
-                    
-                    // nombre motorista
-                    $idm = DB::table('motorista_ordenes AS m')                        
-                    ->where('m.ordenes_id', $o->id)
-                    ->pluck('motoristas_id')                 
-                    ->first();
 
-                    $nombre = Motoristas::where('id', $idm)->pluck('nombre')->first();
-                    $o->motorista = $nombre;
-                 
+                foreach($orden as $o){
+
+                    $motorista = "";
+
+                    if($mm = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
+                        $motorista = Motoristas::where('id', $mm->motoristas_id)->pluck('nombre')->first();
+                    }
+
+                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
+
+                    $o->motorista = $motorista;
+                     
 
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
+                     
+
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-                           
-                            if($o->pago_a_propi == 1){ // pagarle al propietario                         
 
-                                // cobro a motorista $0.00 ya que se paga a servicio y envio es gratis
-                                $totalcobro = 0; 
-                                // esta orden sera de $0.00 ya que se pago a servicio, envio es $0.00
-                                $o->precio_total = number_format((float)0, 2, '.', '');
+                            if($o->pago_a_propi == 1){
+                                // se paga a propietario
+                               
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                   // $totalcobro = $totalcobro + $o->precio_total; 
+                                   // MENOS LO QUE SE PAGARA A PROPIETARIO
+                                   // MAS LO QUE CANCELARA CLIENTE
+                                   // envio es siempre 0
+                                   $info = -$o->precio_total + $o->precio_total;
+                                   $totalcobro = $totalcobro + $info;
+                                }else{
+                                    // credi puntos
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+                               // $o->precio_total = number_format((float), 2, '.', '');  
+                               $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
                             }else{
-                                // aqui no se le paga a propietario
-                                $totalcobro = $totalcobro + $o->precio_total; // no ta sumando envio, ya que es cupon envio gratis                                                       
-                                $o->precio_total = number_format((float)$o->precio_envio, 2, '.', ''); // marcara siempre 0.0
-                            }                           
-                              
+                                // no se paga a propietario
+                                // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $o->precio_total;   
+                                }
+                                
+                                $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+                            }
+                            //
+                           
                         }else if($tipo->tipo_cupon_id == 2){
                             $o->tipocupon = 2;
                             // modificar precio
-                            $descuento = AplicaCuponDos::where('ordenes_id', $o->id)->pluck('dinero')->first();
-                           
+                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                            $descuento = $dd->dinero;
+
                             $total = $o->precio_total - $descuento;
                             if($total <= 0){
                                 $total = 0;
                             }
 
-                            if($o->pago_a_propi == 1){ // pagado a propietario
+                            if($o->pago_a_propi == 1){
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
                                 
-                                $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');                            
-                                $totalcobro = $totalcobro + $o->precio_envio;
-                            }else{
-                                // aqui no se le paga al propietario
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
+
+                                $afectado = $o->precio_envio + $total;
+                                $o->precio_total = number_format((float)$afectado, 2, '.', '');
+
+                            }else{ 
+                                // no se le paga a propietario
 
                                 // sumar el precio de envio
-                                 $suma = $total + $o->precio_envio;
-                                
+                                $suma = $total + $o->precio_envio;
+
                                 // precio modificado con el descuento dinero
-                                $o->precio_total = number_format((float)$suma, 2, '.', '');                            
-                                $totalcobro = $totalcobro + $suma;
+                                $o->precio_total = number_format((float)$suma, 2, '.', '');
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
                             }
 
-
                         }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
 
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
                             $total = $o->precio_total - $resta;
 
+
                             if($total <= 0){
                                 $total = 0;
                             }
 
-                            if($o->pago_a_propi == 1){ // pagado a propietario
+                            if($o->pago_a_propi == 1){
+                               
+                                if($o->tipo_pago == 0){ // efectivo
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;
+                                                               
+                                }else{
+                                    // credi puntos
+                                
+                                    $totalcobro = $totalcobro - $o->precio_total;
+                                }
 
-                                // solo se cobra el envio a motorista
-                                $totalcobro = $totalcobro + $o->precio_envio;
-                                $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
-                              
-                            }else{
+                                $afectado = $o->precio_envio + $total;
+                                $o->precio_total = number_format((float)$afectado, 2, '.', '');
 
-                                // aqui no se paga a propietario
+                            }else{ 
+                                // no se le paga a propietario
 
                                 // sumar el precio de envio
                                 $suma = $total + $o->precio_envio;
-                                $o->precio_total = number_format((float)$suma, 2, '.', '');
 
-                                $totalcobro = $totalcobro + $suma;
+                                // precio modificado con el descuento dinero
+                                $o->precio_total = number_format((float)$suma, 2, '.', '');
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $suma; 
+                                }
                             }
 
                         }else if($tipo->tipo_cupon_id == 4){
                             $o->tipocupon = 4;
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-                            $o->producto = $producto;
-
+                           
+                           
                             if($o->pago_a_propi == 1){
-
-                               // se paga a propietario
-
-                               $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
-                               $totalcobro = $totalcobro + $o->precio_envio;
-
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                    $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;
+    
+                                    $o->precio_total = number_format((float)0, 2, '.', '');
+                                }
+                               
                             }else{
-                              // no se paga a propietario
-
-                              $sumado = $o->precio_total + $o->precio_envio;
-                              $sumado = number_format((float)$sumado, 2, '.', '');
-  
-                              $o->precio_total = $sumado;
-  
-                              $totalcobro = $totalcobro + $sumado;
+                                // no se le paga a servicio 
+    
+                                $cobro = $o->precio_total + $o->precio_envio;
+                                $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                                // NO SUMAR SI PAGO CON CREDI PUNTOS
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
                             }
 
-                            
-                        }else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
-                            $info = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
 
+                        }
+                        else if($tipo->tipo_cupon_id == 5){
+                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
+                            
+                            $total = $donacion + $o->precio_total;
+                            
                             if($o->pago_a_propi == 1){
-                                // se paga a propietario, aqui veremos el envio y el dinero extra de cupon donacion
-                                $sumado = $o->precio_envio + $info->dinero;
-                                $o->precio_total = number_format((float)$sumado, 2, '.', '');
-
-                                $totalcobro = $totalcobro + $sumado;
+                           
+                                if($o->tipo_pago == 0){
+                                    $info = -$o->precio_total + ($total + $o->precio_envio);
+                                    $totalcobro = $totalcobro + $info;                                
+                                    $o->precio_total = number_format((float)$total + $o->precio_envio, 2, '.', '');
+                                }else{
+                                    // CREDI PUNTOS
+                                    $totalcobro = $totalcobro - $o->precio_total;
+    
+                                    $o->precio_total = number_format((float)0, 2, '.', '');
+                                }
+                               
                             }else{
-                                // no se paga a propietario
-
-                                $sumado = $o->precio_total + $o->precio_envio + $info->dinero;
-                                $sumado = number_format((float)$sumado, 2, '.', '');
+                                // no se le paga a servicio 
     
-                                $o->precio_total = $sumado;                                           
-    
-                                $totalcobro = $totalcobro + $sumado;
+                                $cobro = $total + $o->precio_envio;
+                                $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                                
+                                if($o->tipo_pago == 0){
+                                    $totalcobro = $totalcobro + $cobro; 
+                                }
                             }
-                            
+                          
                         }
-                        else{
+                       
 
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;    
+                    }else{              
 
                         if($o->pago_a_propi == 1){
-                            // se paga a propietario
-                            $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
-                            $totalcobro = $totalcobro + $o->precio_envio;
+                           
+                            if($o->tipo_pago == 0){
+                                $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
+                                $totalcobro = $totalcobro + $info;                                
+                                $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
+                            }else{
+                                // CREDI PUNTOS
+                                $totalcobro = $totalcobro - $o->precio_total;
 
+                                $o->precio_total = number_format((float)0, 2, '.', '');
+                            }
+                           
                         }else{
-                            // no se paga a propietario
+                            // no se le paga a servicio 
 
-                            $total = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$total, 2, '.', '');
-    
-                            $totalcobro = $totalcobro + $total;
-                        }    
-                    }                   
+                            $cobro = $o->precio_total + $o->precio_envio;
+                            $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                            // NO SUMAR SI PAGO CON CREDI PUNTOS
+                            if($o->tipo_pago == 0){
+                                $totalcobro = $totalcobro + $cobro; 
+                            }
+                        }
+                    }
                 }
-
-                // sumar ganancia de esta fecha
                 
+                // sumar ganancia de esta fecha
                 $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+
+                
                 return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
             }else{
                 return ['success' => 2];
@@ -847,47 +839,57 @@ class PagaderoController extends Controller
             
                 $orden = DB::table('ordenes_encargo_revisadas AS r')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'r.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.estado_1', 'o.fecha_1', 
-                'o.precio_envio', 'o.pago_a_propi')
+                ->select('o.id', 'o.precio_subtotal', 'o.estado_1', 'o.fecha_1',  
+                'o.precio_envio', 'o.pago_a_propi', 'o.tipo_pago')
                 ->where('r.revisador_id', $request->id)
                 ->where('o.estado_1', 1) // propietario finalizo la preparacion
-                ->whereBetween('o.fecha_1', [$start, $end]) // fecha finalizo preparacion 
+                ->whereBetween('r.fecha', [$start, $end]) // fecha cuando reviso
                 ->orderBy('o.id', 'ASC')
                 ->get();
+ 
+                $totalcobro = 0;
 
-                $totalcobro = 0;   
-           
-                foreach($orden as $o){
-                    $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha_1));
-                    
+                foreach($orden as $o){   
+
                     $motorista = "";
 
-                    // buscar motorista de este encargo
-                    if($mo = MotoristaOrdenEncargo::where('ordenes_encargo_id', $o->id)->first()){
-                        $motorista = Motoristas::where('id', $mo->motoristas_id)->pluck('nombre')->first();                        
+                    if($mm = MotoristaOrdenEncargo::where('ordenes_encargo_id', $o->id)->first()){
+                        $motorista = Motoristas::where('id', $mm->motoristas_id)->pluck('nombre')->first();
                     }
-                    
+
                     $o->motorista = $motorista;
 
                     if($o->pago_a_propi == 1){
-                        // se pagara a propietario
 
-                        $o->precio_total = number_format((float)$o->precio_envio, 2, '.', '');
+                           
+                        if($o->tipo_pago == 0){
+                            $info = -$o->precio_subtotal + ($o->precio_subtotal + $o->precio_envio);
+                            $totalcobro = $totalcobro + $info;                                
+                            $o->precio_total = number_format((float)$info, 2, '.', '');
+                        }else{
+                            // CREDI PUNTOS
+                            $totalcobro = $totalcobro - $o->precio_subtotal;
+
+                            $o->precio_total = number_format((float)0, 2, '.', '');
+                        }
                        
-                        $totalcobro = $totalcobro + $o->precio_envio;
                     }else{
-                        // no se pagara a propietario
-                        $total = $o->precio_subtotal + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
-    
-                        $totalcobro = $totalcobro + $total;
-                    }
-                                    
-                }
+                        // no se le paga a servicio 
 
-                // sumar ganancia de esta fecha
+                        $cobro = $o->precio_subtotal + $o->precio_envio;
+                        $o->precio_total = number_format((float)$cobro, 2, '.', '');
+                       
+                        if($o->tipo_pago == 0){
+                            $totalcobro = $totalcobro + $cobro; 
+                        } else{
+                            $totalcobro = $totalcobro + 0; 
+                        }
+                    }
+                }
                  
+                // sumar ganancia de esta fecha
                 $totalcobro = number_format((float)$totalcobro, 2, '.', '');
+               
                 return ['success' => 1, 'histoorden' => $orden, 'ganado' => $totalcobro];                             
             }else{
                 return ['success' => 2];
@@ -971,7 +973,7 @@ class PagaderoController extends Controller
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
                 ->select('o.id', 'o.fecha_3', 'mo.motoristas_id', 'o.precio_subtotal', 
-                'o.precio_envio', 'o.pago_a_propi', 'o.estado_3')
+                'o.precio_envio', 'o.pago_a_propi', 'o.estado_3', 'o.tipo_pago')
                 ->where('mo.motoristas_id', $request->motoristaid)               
                 ->where('o.estado_2', 1) // ordenes que motorista inicio la entrega
                 ->whereNotIn('o.id', $pilaOrden) // filtro para no ver ordenes encargo revisadas
@@ -979,7 +981,7 @@ class PagaderoController extends Controller
 
                 $totalcobro = 0;
 
-                foreach($orden as $o){   
+                foreach($orden as $o){    
                     
                     $fecha3 = "";
                     if($o->estado_3 == 0){
@@ -987,24 +989,40 @@ class PagaderoController extends Controller
                     }else{
                        $fecha3 = date("h:i A d-m-Y", strtotime($o->fecha_3)); // fecha completo la orden 
                     }
-                    
                     $o->fecha_3 = $fecha3;
                         
-                    $cobro = 0;
+                    $pagoa = "";
+
                     if($o->pago_a_propi == 1){
-                        // se paga a propietario
 
-                        $cobro = $o->precio_envio; // solo envio
+                        $pagoa = "Pago a propietario: $" . $o->precio_subtotal;
+                           
+                        if($o->tipo_pago == 0){
+                            $info = -$o->precio_subtotal + ($o->precio_subtotal + $o->precio_envio);
+                            $totalcobro = $totalcobro + $info;                                
+                            $o->precio_total = number_format((float)$info, 2, '.', '');
+                        }else{
+                            // CREDI PUNTOS
+                            $totalcobro = $totalcobro - $o->precio_subtotal;
 
-                        $o->precio_total = number_format((float)$o->precio_envio, 2, '.', ''); // solo envio
+                            $o->precio_total = number_format((float)0, 2, '.', '');
+                        }
+                       
                     }else{
-                        // no se paga a propietario 
+                        // no se le paga a servicio 
 
                         $cobro = $o->precio_subtotal + $o->precio_envio;
                         $o->precio_total = number_format((float)$cobro, 2, '.', '');
-                    } 
+                       
+                        if($o->tipo_pago == 0){
+                            $totalcobro = $totalcobro + $cobro; 
+                        } else{
+                            $totalcobro = $totalcobro + 0; 
+                        }
+                    }
 
-                    $totalcobro = $totalcobro + $cobro;    
+                    $o->pagoa = $pagoa;
+
                 }
                 
                 // sumar ganancia de esta fecha

@@ -15,7 +15,7 @@
           <button type="button" onclick="modalBuscar()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Buscar ordenes revisadas
-          </button>    
+          </button>     
 
           <button type="button" onclick="modalBuscar4()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
@@ -281,7 +281,7 @@
 
             var ruta = "{{ url('/admin/ordenrevisada') }}/"+revisador+"/"+fechadesde+"/"+fechahasta;
             $('#tablaDatatable').load(ruta);       
-                 
+                  
         } 
     }  
 
@@ -319,7 +319,7 @@
         var moto = document.getElementById('moto-buscar2').value;
         $('#modalBuscar2').modal('hide');
         var ruta = "{{ url('/admin/ordenrevisada2') }}/"+moto
-        $('#tablaDatatable').load(ruta);
+        $('#tablaDatatable').load(ruta); 
     }
 
     function buscar3(){

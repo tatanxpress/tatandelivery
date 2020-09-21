@@ -32,6 +32,13 @@
                   <p>Zona</p>
                 </a>
               </li>
+              <li class="nav-item">
+                <a href="{{ url('/admin/usuario/ciudades') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Ciudades</p>
+                </a>
+              </li>
+              
               <li class="nav-item"> 
                 <a href="{{ url('/admin/tipos/lista-tipos') }}" target="frameprincipal" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
@@ -101,6 +108,35 @@
                   <p>Numero Registro</p>
                 </a>
               </li> 
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/extranjeros/extranjeros') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Extranjeros No Verificado</p>
+                </a>
+              </li> 
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/usuario/credipuntos') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Credi Puntos No Verificados</p>
+                </a>
+              </li> 
+
+              <li class="nav-item">
+                <a href="{{ url('/admin/lista/credito/para/quitar') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Quitar Credito</p>
+                </a>
+              </li>
+
+              
+              <li class="nav-item">
+                <a href="{{ url('/admin/registro/credipuntos') }}" target="frameprincipal" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Credi Puntos Todos</p>
+                </a>
+              </li>
                    
             </ul>
           </li>

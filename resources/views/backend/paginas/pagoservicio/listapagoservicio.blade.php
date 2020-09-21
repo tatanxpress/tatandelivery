@@ -11,18 +11,14 @@
  <section class="content-header">
        <div class="container-fluid"> 
            <div class="col-sm-12">
-             <h1>Generar pagos a servicios</h1>
+             <h1>Generar pagos a servicios</h1> 
            </div>  
-           <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Buscar Ordenes Completadas de servicio
-          </button>  
-
+         
           <button type="button" onclick="modalReporte()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Generar reporte de ordenes Completadas
           </button>  
-
+ 
           <button type="button" onclick="modalReporte3()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Reporte orden cancelada
@@ -67,7 +63,7 @@
        </div>
      </section>
 
-<!-- modal buscar -->
+<!-- modal buscar NO USO 20/09/2020 -->
 <div class="modal fade" id="modalBuscar">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -313,7 +309,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Reporte Servicio uso min de compra para envio gratis</h4>
+                <h4 class="modal-title">Reporte Tipo de cargo aplicado</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -346,7 +342,7 @@
                                     <input type="date" class="form-control" id="fechahasta-reporte6">
                                 </div>
 
-                                
+                                 
                                 <div class="form-group">
                                     <label style="color:#191818">Tipo cargo de envio</label>
                                     <br>
@@ -355,9 +351,9 @@
                                             <option value="1">Cargo de envio de zona servicio</option>
                                             <option value="2">Cargo de envio a mitad de precio</option>
                                             <option value="3">Cargo de envio gratis de zona servicio</option>
-                                            <option value="4">Cargo de envio supero minimo de compra</option>                                  
+                                            <option value="4">Cargo de envio supero minimo de compra</option>                                
                                         </select>
-                                    </div> 
+                                    </div>  
                                 </div>
 
                                 <div class="form-group">
@@ -481,7 +477,7 @@
         $('#modalReporte7').modal('show');
     }
 
-    // lista de ordenes completadas
+    // lista de ordenes completadas NO USADO 20/09/2020
     function buscar(){
         var servicioid = document.getElementById('servicioid').value;
         var fechadesde = document.getElementById('fechadesde').value;

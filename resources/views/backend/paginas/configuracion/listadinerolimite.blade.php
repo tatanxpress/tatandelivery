@@ -12,13 +12,9 @@
            <div class="col-sm-12">
              <h1>Configuraciones</h1>
            </div>  
-           <button type="button" onclick="modalCambiar()" class="btn btn-success btn-sm">
+           <button type="button" onclick="modalCambiar()" class="btn btn-success btn-sm" style="margin-top:15px">
                 <i class="fas fa-pencil-alt"></i>
                     Cambiar configuracion
-          </button>  
-          <button type="button" onclick="modalVersion()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Versiones App
           </button>  
          
        </div>
@@ -41,11 +37,11 @@
      </section>
 
 <!-- modal actualizar -->
-<div class="modal fade" id="modalCambiar">
+<div class="modal fade" id="modalCambiar" style="margin-top:15px;">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Estado de cupones</h4>
+                <h4 class="modal-title">Estados</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -56,33 +52,26 @@
                         <div class="row">  
                             <div class="col-md-12">
 
-                                <div class="form-group" style="margin-left:20px">
-                                    <label>Mostrar Cupones en aplicacion</label><br>
-                                    <label class="switch" style="margin-top:10px">
-                                        <input type="checkbox" id="cupones">
-                                        <div class="slider round">
-                                            <span class="on">Activar</span>
-                                            <span class="off">Desactivar</span>
-                                        </div>
-                                    </label>
-                                </div>  
-
-                                
-                                <div class="form-group" style="margin-left:20px">
-                                    <label>Estado Envio SMS</label><br>
-                                    <label class="switch" style="margin-top:10px">
-                                        <input type="checkbox" id="sms">
-                                        <div class="slider round">
-                                            <span class="on">Activar</span>
-                                            <span class="off">Desactivar</span>
-                                        </div>
-                                    </label>
-                                </div>  
+                                <div class="form-group">
+                                    <label>Fecha del Token de Wompi</label>
+                                    <input type="text" disabled class="form-control" id="fecha-token">
+                                </div>
 
                                 <div class="form-group">
-                                    <label>Correo de informacion para Envio SMS</label>
-                                    <input type="text" maxlength="100" class="form-control" id="correo" placeholder="Correo">
+                                    <label>Comisión</label>
+                                    <input type="number" step="0.01" class="form-control" id="comision">
                                 </div>
+
+                                <div class="form-group" style="margin-left:20px">
+                                    <label>Estado de ingresar Credi Puntos</label><br>
+                                    <label class="switch" style="margin-top:10px">
+                                        <input type="checkbox" id="cbcredito">
+                                        <div class="slider round">
+                                        <span class="on">Activado</span>
+                                         <span class="off">Desactivado</span>
+                                        </div>
+                                    </label>
+                                </div>  
                               
                             </div>
                         </div>
@@ -184,19 +173,15 @@
 
                     $('#modalCambiar').modal('show');
 
-                    if(response.data.info.ver_cupones == 0){
-                        $("#cupones").prop("checked", false);
-                    }else{
-                        $("#cupones").prop("checked", true);
-                    }
+                    $('#comision').val(response.data.info.comision);
 
-                    if(response.data.info.activo_sms == 0){
-                        $("#sms").prop("checked", false);
+                    if(response.data.info.activo_tarjeta == 0){
+                        $("#cbcredito").prop("checked", true);
                     }else{
-                        $("#sms").prop("checked", true);
+                        $("#cbcredito").prop("checked", false);
                     }
-
-                    $('#correo').val(response.data.info.correo);
+                  
+                    $('#fecha-token').val(response.data.fecha);
 
                 }else{
                     toastr.error('No encontrado'); 
@@ -208,69 +193,22 @@
         });
     }
 
-    function modalVersion(){
-        document.getElementById("formulario-version").reset();
-        spinHandle = loadingOverlay().activate();
-       
-        axios.post('/admin/informacion/de/aplicacion',{        
-            })
-            .then((response) => {
-                loadingOverlay().cancel(spinHandle);
-             
-                if(response.data.success == 1){
-
-                    $('#modalVersion').modal('show');
-
-                    if(response.data.info.activo == 0){
-                        $("#boolVersiones").prop("checked", false);
-                    }else{
-                        $("#boolVersiones").prop("checked", true);
-                    }
-
-                    if(response.data.info.activo_iphone == 0){
-                        $("#boolVersionesIphone").prop("checked", false);
-                    }else{
-                        $("#boolVersionesIphone").prop("checked", true);
-                    }
-
-                    $('#iphone').val(response.data.info.iphone);
-                    $('#android').val(response.data.info.android);
-
-                }else{
-                    toastr.error('No encontrado'); 
-                }
-            })
-            .catch((error) => {
-                loadingOverlay().cancel(spinHandle); 
-                toastr.error('Error del servidor');    
-        });
-    }
+  
  
-    function cambiar(){      
-        var cupones = document.getElementById('cupones').checked;
-        var sms = document.getElementById('sms').checked;
-        var correo = document.getElementById('correo').value;
+    function cambiar(){  
+        var comision = document.getElementById('comision').value;
+        var cbcredito = document.getElementById('cbcredito').checked;
 
-        var cupones_1 = 0;
-        var sms_1 = 0;
+        var cbcredito_1 = 1;
 
-        if(cupones){
-            cupones_1 = 1;
+        if(cbcredito){
+            cbcredito_1 = 0;
         }
-        if(sms){
-            sms_1 = 1;
-        }
-
-        if(correo === ''){
-            toastr.error('Correo es requerido');
-            return;
-        }
-
         var spinHandle = loadingOverlay().activate();             
         var formData = new FormData();
-        formData.append('cupones', cupones_1);
-        formData.append('sms', sms_1);
-        formData.append('correo', correo);
+      
+        formData.append('cbcredito', cbcredito_1);
+        formData.append('comision', comision);
 
         axios.post('/admin/dinero/limite/actualizar', formData, {
         }) 
@@ -278,7 +216,6 @@
             loadingOverlay().cancel(spinHandle);
 
             if(response.data.success == 1){
-
                 $('#modalCambiar').modal('hide');
                 toastr.success('Actualizado'); 
 
@@ -292,61 +229,7 @@
         });       
     }
 
-    function cambiarVersion(){
-        var boolVersion = document.getElementById('boolVersiones').checked;
-        var boolVersionIphone = document.getElementById('boolVersionesIphone').checked;
-        var android = document.getElementById('android').value;
-        var iphone = document.getElementById('iphone').value;
-
-        var versiones_1 = 0;
-        var versiones_iphone = 0;
-
-        if(boolVersion){
-            versiones_1 = 1;
-        }
-
-        if(boolVersionIphone){
-            versiones_iphone = 1;
-        }
-        
-        if(android === ''){
-            toastr.error('Android version es requerido');
-            return;
-        }
-
-        if(iphone === ''){
-            toastr.error('Iphone version es requerido');
-            return;
-        }
-
-        var spinHandle = loadingOverlay().activate();             
-        var formData = new FormData();
-        formData.append('version', versiones_1);
-        formData.append('versioniphone', versiones_iphone);
-        
-        formData.append('android', android);
-        formData.append('iphone', iphone);
-
-        axios.post('/admin/actualizar/versiones/app', formData, {
-        }) 
-        .then((response) => {
-            loadingOverlay().cancel(spinHandle);
-
-            if(response.data.success == 1){
-
-                $('#modalVersion').modal('hide');
-                toastr.success('Actualizado'); 
-
-            }else{
-                toastr.error('No encontrado'); 
-            }
-        })
-        .catch((error) => {
-            loadingOverlay().cancel(spinHandle); 
-            toastr.error('Error');             
-        }); 
-    }
-
+  
    
 
  

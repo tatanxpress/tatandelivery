@@ -15,6 +15,7 @@ class AddPagoPropiOrdenesToOrdenesTable extends Migration
     {
         Schema::table('ordenes', function (Blueprint $table) {
             $table->boolean("pago_a_propi")->default(0);
+            $table->boolean("tipo_pago")->default(0);
         });
     }
 

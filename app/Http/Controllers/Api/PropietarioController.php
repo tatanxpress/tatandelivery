@@ -236,7 +236,7 @@ class PropietarioController extends Controller
                 'telefono' => 'required',
                 'password' => 'required|min:8|max:16',
             );
-
+ 
             $messages = array(                                      
                 'telefono.required' => 'El telefono es requerido',  
                 'password.required' => 'La contraseña es requerida',

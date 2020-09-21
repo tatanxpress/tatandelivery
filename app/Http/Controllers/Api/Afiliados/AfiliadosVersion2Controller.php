@@ -468,8 +468,6 @@ class AfiliadosVersion2Controller extends Controller
             }
             
             if($p = Propietarios::where('id', $request->id)->first()){
-
-               // Log::info($request->all());
                
                 foreach($request->categoria as $key => $value){
 

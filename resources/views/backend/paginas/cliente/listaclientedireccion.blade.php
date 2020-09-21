@@ -7,7 +7,7 @@
 @stop
 
 <section class="content-header">
-      <div class="container-fluid">
+      <div class="container-fluid"> 
           <div class="col-sm-12">
             <h1>Direcciones de: {{ $nombre }}</h1>
           </div>        
@@ -101,7 +101,38 @@
                               <br>
                               <input type="checkbox" id="verificado">
                           </div>   
-                     
+
+                          <div class="form-group">
+                                <label style="color:#191818">Estado (Direccion extranjero)</label>
+                                <br>
+                                <div>
+                                    <select class="form-control" id="select-estado">
+                                        <option value="0" selected>No Verificado</option>
+                                        <option value="1">Verificado</option>
+                                        <option value="2">Rechazada</option>
+                                    </select>
+                                </div>
+                          </div> 
+
+                          
+                          <div class="form-group">
+                              <label style="color:#191818">Mensaje rechazo de direccion</label>
+                              <br>
+                              <input type="text" maxlength="200" id="mensaje-rechazo" class="form-control"></label>
+                          </div> 
+
+                          <div class="form-group">
+                              <label style="color:#191818">Cargo Envio</label>
+                              <br>
+                              <input type="number" step="0.01" id="cargo-envio" class="form-control"></label>
+                          </div>  
+ 
+                          <div class="form-group">
+                              <label style="color:#191818">Ganancia Motorista</label>
+                              <br>
+                              <input type="number" step="0.01" id="ganancia-motorista" class="form-control"></label>
+                          </div> 
+
                         </div> 
                     </div>
                 </form>
@@ -165,7 +196,21 @@
                 if(response.data.direccion.revisado == 1){
                     $('#verificado').prop('checked', true);
                 }  
+
+                if(response.data.direccion.estado == 0){
+                    $('#select-estado option')[0].selected = true;
+                }else  if(response.data.direccion.estado == 1){
+                    $('#select-estado option')[1].selected = true;
+                }else  if(response.data.direccion.estado == 2){
+                    $('#select-estado option')[2].selected = true;
+                }
  
+                $('#cargo-envio').val(response.data.direccion.precio_envio);
+                $('#ganancia-motorista').val(response.data.direccion.ganancia_motorista);
+
+                $('#mensaje-rechazo').val(response.data.direccion.mensaje_rechazo);
+
+
             }else{
                 toastr.error('Direccion no encontrada'); 
             } 
@@ -191,11 +236,34 @@
       var longitudreal = document.getElementById('longitud-real').value;
 
       var verificado = document.getElementById('verificado').checked;
- 
-      if(nombre === ''){
-            toastr.error("nombre es requerido");
-            return;
+
+      // verificando la direccion del extranjero
+      var cargo = document.getElementById('cargo-envio').value;
+      var ganamotorista = document.getElementById('ganancia-motorista').value;
+      var mensaje = document.getElementById('mensaje-rechazo').value;
+      var estado = document.getElementById('select-estado').value;
+
+      if(estado == '2'){
+        if(mensaje === ''){
+          toastr.error("Mensaje rechazo es requerido");
+          return;
         }
+      }
+
+      if(cargo === ''){
+          toastr.error("cargo envio es requerido");
+          return;
+      }
+
+      if(ganamotorista === ''){
+          toastr.error("ganancia motorista es requerido");
+          return;
+      }
+
+      if(nombre === ''){
+          toastr.error("nombre es requerido");
+          return;
+      }
 
       if(nombre.length > 100){
           toastr.error("100 caracter máximo nombre");
@@ -230,6 +298,12 @@
       formData.append('latitudreal', latitudreal);
       formData.append('longitudreal', longitudreal);
       formData.append('verificado', veri_1);
+
+      formData.append('estado', estado);
+      formData.append('ganmotorista', ganamotorista);
+      formData.append('cargoenvio', cargo);
+      formData.append('mensaje', mensaje);
+
        
       axios.post('/admin/cliente/actualizar-info-direccion', formData, { 
               })
@@ -237,6 +311,7 @@
                   loadingOverlay().cancel(spinHandle);
                   
                   if(response.data.success == 1){
+                    toastr.success('Actualizado'); 
                         recargar();
                   }
                   else{

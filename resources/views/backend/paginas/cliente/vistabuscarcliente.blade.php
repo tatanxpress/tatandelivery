@@ -61,7 +61,7 @@
                             <div class="col-md-12">
 
                                 <div class="form-group">
-                                    <label>Teléfono cliente</label>
+                                    <label>Área + Teléfono</label>
                                     <input type="text" maxlength="20" class="form-control" id="tel-cliente">
                                 </div>
 
@@ -91,43 +91,73 @@
             </button>
         </div>
 
-        <div class="modal-body">        
-            <div class="form-group">
-                <label style="color:#191818">Código dispositivo</label>
-                <br>
-                <input id="id-editar" type="hidden">
-                <input id="codigo" disabled class="form-control">
+        <form id="formulario-info">
+
+            <div class="modal-body">        
+                <div class="form-group">
+                    <label style="color:#191818">Código dispositivo</label>
+                    <br>
+                    <input id="id-editar" type="hidden">
+                    <input id="codigo" disabled class="form-control">
+                </div>
+                
+                <div class="form-group" style="margin-left:20px">
+                    <label>Disponibilidad</label><br>
+                    <label class="switch" style="margin-top:10px">
+                        <input type="checkbox" id="toggle-activo">
+                        <div class="slider round">
+                            <span class="on">Activar</span>
+                            <span class="off">Desactivar</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="form-group" style="margin-left:20px">
+                    <label>Activo agregar credito (en rojo, usuario si puede agregar credito)</label><br>
+                    <label class="switch" style="margin-top:10px">
+                        <input type="checkbox" id="cbcredito">
+                        <div class="slider round">
+                        <span class="on">Activado</span>
+                        <span class="off">Desactivado</span>
+                        </div>
+                    </label>
+                </div>
+    
+                <div class="form-group">
+                    <label>Nombre</label>
+                    <input type="text" maxlength="100" class="form-control" id="nombre-editar">
+                </div>   
+
+                <div class="form-group">
+                    <label>Correo</label>
+                    <input type="text" maxlength="100" class="form-control" id="correo-editar">
+                </div>   
+
+                <div class="form-group">
+                    <label>Código recuperación (correo)</label>
+                    <input type="text" maxlength="6" class="form-control" id="codigo-editar">
+                </div> 
+
+                <div class="form-group">
+                    <label>Area</label>
+                    <input type="text" disabled maxlength="100" class="form-control" id="area-editar">
+                </div>  
+
+
+                <div class="form-group" style="margin-left:20px">
+                    <label>Reset Password (12345678)</label><br>
+                    <label class="switch" style="margin-top:10px">
+                        <input type="checkbox" id="cbpass">
+                        <div class="slider round">
+                            <span class="on">Activar</span>
+                            <span class="off">Desactivar</span>
+                        </div>
+                    </label>
+                </div>
+                
+
             </div>
-            
-            <div class="form-group" style="margin-left:20px">
-                <label>Disponibilidad</label><br>
-                <label class="switch" style="margin-top:10px">
-                    <input type="checkbox" id="toggle-activo">
-                    <div class="slider round">
-                        <span class="on">Activar</span>
-                        <span class="off">Desactivar</span>
-                    </div>
-                </label>
-            </div>
- 
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" maxlength="100" class="form-control" id="nombre-editar">
-            </div>   
-
-            <div class="form-group">
-                <label>Correo</label>
-                <input type="text" maxlength="100" class="form-control" id="correo-editar">
-            </div>   
-
-            <div class="form-group">
-                <label>Código recuperación</label>
-                <input type="text" maxlength="10" class="form-control" id="codigo-editar">
-            </div>  
-            
-
-        </div>
-          
+        </form>
         <div class="modal-footer float-right">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
             <button type="button" class="btn btn-primary" onclick="editar()">Actualizar</button>
@@ -204,10 +234,12 @@
 
     function modalBuscar(){
         document.getElementById("formulario-buscar").reset();
+        document.getElementById("formulario-info").reset();
         $('#modalBuscar').modal('show');
     }
   
     function buscarCliente(){
+
         var tel = document.getElementById('tel-cliente').value;
 
         if(tel === ''){
@@ -240,12 +272,20 @@
                     $('#nombre-editar').val(response.data.cliente.name);
                     $('#correo-editar').val(response.data.cliente.email);
                     $('#codigo-editar').val(response.data.cliente.codigo_correo);
+                    $('#area-editar').val(response.data.cliente.area);
 
                     if(response.data.cliente.activo == 0){
                         $("#toggle-activo").prop("checked", false);
                     }else{
                         $("#toggle-activo").prop("checked", true);
-                    }                   
+                    }    
+
+                    if(response.data.cliente.activo_tarjeta == 0){
+                        $("#cbcredito").prop("checked", true);
+                    }else{
+                        $("#cbcredito").prop("checked", false);
+                    }  
+
                 }else{ 
                     toastr.error('Usuario no encontrado'); 
                 }         
@@ -263,6 +303,18 @@
         var nombre = document.getElementById('nombre-editar').value;
         var correo = document.getElementById('correo-editar').value;
         var codigo = document.getElementById('codigo-editar').value;
+        var cbpass = document.getElementById('cbpass').checked;
+        var cbcredito = document.getElementById('cbcredito').checked;
+        
+        var cbpass_1 = 0;
+        var cbcredito_1 = 1;
+
+        if(cbpass){
+            cbpass_1 = 1;
+        }
+        if(cbcredito){
+            cbcredito_1 = 0;
+        }
 
         if(nombre === ''){
             toastr.error("nombre es requerido");
@@ -289,8 +341,8 @@
             return;
         }
 
-        if(codigo.length > 10){
-            toastr.error("10 caracter máximo codigo");
+        if(codigo.length > 6){
+            toastr.error("6 caracter máximo codigo");
             return false;
         }
 
@@ -309,6 +361,8 @@
         formData.append('nombre', nombre); 
         formData.append('correo', correo);
         formData.append('codigo', codigo);
+        formData.append('cbpass', cbpass_1);
+        formData.append('cbcredito', cbcredito_1);
        
         var spinHandle = loadingOverlay().activate();
  

@@ -23,8 +23,10 @@ class CreateOrdenesDireccionesTable extends Migration
             $table->string('numero_casa', 30)->default('');
             $table->string('punto_referencia', 400)->default('');
             $table->string('latitud', 50)->default('');
-            $table->string('longitud', 50)->default('');                       
+            $table->string('longitud', 50)->default('');  
             
+            $table->boolean('tipo_pago'); //0 :efectivo, 1: credi puntos
+                        
             $table->decimal('copia_envio', 7,2); // una copia del precio de zona que habia
             $table->decimal('copia_min_gratis', 7,2);// guardar una copia del minimo a comprar para envio gratis
             // sabremos que fue, si el tipo_cargo en ordenes esta en nivel 4

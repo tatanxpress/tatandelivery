@@ -17,8 +17,18 @@
           <button type="button" onclick="modalAgregar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Nuevo Asignación
+          </button>   
+
+           <button type="button" onclick="vistaBorrar()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Borrar Todo
+          </button>  
+
+           <button type="button" onclick="vistaGlobal()" class="btn btn-success btn-sm">
+                <i class="fas fa-pencil-alt"></i>
+                    Asignación Global
           </button>    
-      </div>
+      </div> 
     </section>
     
   <!-- seccion frame -->
@@ -128,6 +138,77 @@
     </div>      
 </div>
  
+<!-- borrar todo los registros -->
+<div class="modal fade" id="modalVista">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Borrar todas las asignaciones</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-vista">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-danger" onclick="borrarTodo()">Borrar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+
+<div class="modal fade" id="modalGlobal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Nueva Asignación Global</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formulario-nuevo">
+                    <div class="card-body">
+                        <div class="row">  
+                            <div class="col-md-12">
+
+                                <div class="form-group">
+                                    <label style="color:#191818">Motoristas identificador</label>
+                                    <br>
+                                    <div>
+                                    <select class="form-control" id="moto" required>   
+                                            @foreach($motoristas as $item)                                                
+                                                <option value="{{$item->id}}">{{$item->identificador}}</option>
+                                            @endforeach                                         
+                                        </select>
+                                    </div> 
+                                </div> 
+                              
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-between">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" onclick="nuevoGlobal()">Guardar</button>
+            </div>          
+        </div>        
+    </div>      
+</div>
+
+
 @extends('backend.menus.inferior')
 
 @section('content-admin-js')
@@ -158,6 +239,14 @@
 
     function modalAgregar(){
         $('#modalAgregar').modal('show');
+    }
+
+    function vistaBorrar(){
+        $('#modalVista').modal('show');
+    }
+
+    function vistaGlobal(){
+        $('#modalGlobal').modal('show');
     }
   
     function nuevo(){
@@ -201,6 +290,43 @@
             toastr.error('Error desconocido');
         }
     } 
+
+
+    function nuevoGlobal(){
+        var motorista = document.getElementById('moto').value;
+
+        var spinHandle = loadingOverlay().activate();
+        var formData = new FormData();
+        
+        formData.append('motorista', motorista);
+       
+        axios.post('/admin/motoristasservicio/nuevo-global', formData, { 
+                })
+                .then((response) => {
+                    loadingOverlay().cancel(spinHandle);
+                    respuestaGlobal(response);
+                })
+                .catch((error) => {
+                    loadingOverlay().cancel(spinHandle);
+                    toastr.error('Error');
+                });
+    }
+
+ 
+    function respuestaGlobal(response){
+
+        if (response.data.success == 0) {
+            toastr.error('Validacion incorrecta');
+        } else if (response.data.success == 1) {
+            toastr.success('Completado');
+            var ruta = "{{ url('/admin/motoristasservicio/tabla/lista') }}";
+            $('#tablaDatatable').load(ruta);
+            $('#modalGlobal').modal('hide');  
+        } 
+        else {
+            toastr.error('Error desconocido');
+        }
+    }
   
     function borrar(){
         var id = document.getElementById('id-editar').value;
@@ -227,6 +353,31 @@
         });
     }
   
+   // function borrar todo
+   function borrarTodo(){
+
+    var spinHandle = loadingOverlay().activate();
+    axios.post('/admin/motoristasservicio/borrartodo',{
+        'id': 0 
+            })
+            .then((response) => {
+                loadingOverlay().cancel(spinHandle);
+                if(response.data.success == 1){
+                    toastr.success('Borrado Todo');
+           
+                    var ruta = "{{ url('/admin/motoristasservicio/tabla/lista') }}";
+                    $('#tablaDatatable').load(ruta);
+                    $('#modalVista').modal('hide');
+ 
+                }else{
+                    toastr.error("ID no encontrado");
+                }
+            })
+            .catch((error) => {
+                loadingOverlay().cancel(spinHandle); 
+                toastr.error('Error del servidor');    
+        });
+   }
   
 
   </script>

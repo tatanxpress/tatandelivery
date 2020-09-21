@@ -15,6 +15,7 @@ class AddPagoPropiOrdenesToOrdenesEncargoTable extends Migration
     {
         Schema::table('ordenes_encargo', function (Blueprint $table) {
             $table->boolean("pago_a_propi")->default(0);
+            $table->boolean("tipo_pago")->default(0);
         });
     }
 

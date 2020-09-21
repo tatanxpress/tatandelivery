@@ -27,7 +27,7 @@
       <div class="card card-primary">  
           <div class="card-header">
             <h3 class="card-title">Tabla de Productos</h3>
-          </div>
+          </div> 
           <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
@@ -40,37 +40,7 @@
 	</section>
 
 
-<!-- modal borrar -->
-<div class="modal fade" id="modalBorrar">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Borrar Registro</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-borrar">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12"> 
 
-                                <div class="form-group">
-                                    <input type="hidden" id="idborrar">
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-danger" onclick="borrar()">Borrar</button>
-            </div>          
-        </div>        
-    </div>      
-</div>
 
 <!-- modal nuevo -->
 <div class="modal fade" id="modalNuevo">
@@ -181,58 +151,6 @@
 
 
 
-<!-- modal editar encargo -->
-<div class="modal fade" id="modalEditar">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Editar Encargo</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="formulario-editar">
-                    <div class="card-body">
-                        <div class="row">  
-                            <div class="col-md-12"> 
-                                
-                                <div class="form-group">
-                                    <input type="hidden" id="id-editar">
-                                </div>
-
-                                <div class="form-group">
-                                <label style="color:#191818">Tipo Servicio</label>
-                                <br>
-                                <div>
-                                    <select class="form-control" id="select-zonaeditar">                                     
-                                    </select>
-                                </div> 
-                            </div>
-                             
-                                <div class="form-group">
-                                    <label>Precio Envio</label>
-                                    <input type="number" step="any" class="form-control" id="precio-editar">
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Ganancia Motorista</label>
-                                    <input type="number" step="any" class="form-control" id="ganancia-editar">
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer justify-content-between">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" onclick="editarNegocio()">Guardar</button>
-            </div>          
-        </div>        
-    </div>      
-</div> 
-
 @extends('backend.menus.inferior')
 
 @section('content-admin-js')
@@ -261,21 +179,6 @@
         $('#modalNuevo').modal('show');
     }
     
-     
-    function respuestaBorrar(response){
-        if(response.data.success == 1){
-            toastr.success('Borrado'); 
-            id = {{ $id }}; // id del encargo
-            
-            var ruta = "{{ url('/admin/encargos/lista/ver-productos-tabla') }}/"+id;
-            $('#tablaDatatable').load(ruta);
-            $('#modalBorrar').modal('hide');     
-        }
-        else{
-            toastr.error('Error al guardar'); 
-        }
-    }
-
     function guardar(){
        
         var id = {{ $id }}; // lista_encargo_id

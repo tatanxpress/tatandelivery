@@ -292,7 +292,7 @@
                                         </select>
                                     </div> 
                                 </div> 
-
+ 
                                 <div class="form-group">
                                     <label>Fecha desde</label>
                                     <input type="date" class="form-control" id="fechadesde-reportepago">

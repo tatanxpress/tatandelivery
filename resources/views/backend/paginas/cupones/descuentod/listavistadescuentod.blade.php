@@ -22,15 +22,6 @@
         <br>
         <br>
 
-          <div class="form-group" style="width: 25%">
-              <label>Descuento de $$ para este cupon</label>
-              <input type="number" step="0.01" class="form-control" id="dinero" placeholder="Descuento">
-          </div> 
-
-          <button type="button" onclick="actualizarDinero()" class="btn btn-success btn-sm">
-                <i class="fas fa-pencil-alt"></i>
-                    Actualizar Mínimo
-          </button>
 
       </div>
     </section>
@@ -144,8 +135,6 @@
     <script type="text/javascript">	 
     $(document).ready(function(){
 
-      var dinero = {{ $dinero }};
-      $('#dinero').val(dinero);
 
       var id = {{ $id }};
       var ruta = "{{ URL::to('admin/cupones/tabla/serviciodescuentod') }}/"+id;

@@ -29,6 +29,7 @@ use Exception;
 use App\Admin;
 use Auth; 
 use App\Administradores;
+use App\Producto;
  
 class ControlOrdenesController extends Controller
 {
@@ -53,6 +54,29 @@ class ControlOrdenesController extends Controller
         return view('backend.paginas.ordenes.listaordenhoy', compact('fecha', 'total'));
     }
 
+    public function indexProductosHoy($id){ // id de orden
+        return view('backend.paginas.ordenes.listaordenhoyproductos', compact('id'));
+    }
+
+    public function tablaProductosHoy($id){
+        
+        // obtener todos los productos
+        $lista = OrdenesDescripcion::where('ordenes_id', $id)->orderBy('id', 'ASC')->get();
+
+        foreach($lista as $l){
+
+            $dato = Producto::where('id', $l->producto_id)->first();
+            $nombre = $dato->nombre;
+            $imagen = $dato->imagen;
+            $l->nombre = $nombre;
+            $l->imagen = $dato->imagen;
+
+            $l->total = $l->cantidad * $l->precio;
+        }
+
+        return view('backend.paginas.ordenes.tablas.tablaordenhoyproducto', compact('lista'));
+    }
+
     public function indexNotiCliente(){
 
         $zonas = Zonas::all();
@@ -69,26 +93,36 @@ class ControlOrdenesController extends Controller
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')       
         ->select('o.id', 's.identificador', 'o.fecha_orden', 's.nombre', 'o.precio_total',
             'o.estado_2', 'o.estado_3', 'o.estado_4', 'o.estado_5', 'o.estado_6',
-            'o.estado_7', 'o.estado_8', 'o.users_id')
+            'o.estado_7', 'o.estado_8', 'o.users_id', 'o.tipo_pago', 'o.nota_orden')
         ->whereDate('o.fecha_orden', $fecha)
         ->get();
- 
+  
         $estado = "";
         foreach($orden as $o){        
             $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
 
             $od = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
             $o->zonaidenti = Zonas::where('id', $od->zonas_id)->pluck('identificador')->first();
+            
+            $verificado = "No. ";
+            $metodopago = "";
 
-            $verificado = "No";
+            if($o->tipo_pago == 1){ // credi puntos
+                $metodopago = " | Pagar con Credi Puntos";
+            }else{
+                $metodopago = " | Pagar con Efectivo";
+            }
+           
             if($od->revisado == 1){
-                $verificado = "Si";
+                $verificado = "Si. ";
             }
 
-            $cliente = $od->nombre; // sino tiene calificacion, solo mostrar nombre
+            $area = User::where('id', $od->users_id)->pluck('area')->first();
+
+            $cliente = $od->nombre . " | Area: " . $area; // sino tiene calificacion, solo mostrar nombre
             if($mm = MotoristaExperiencia::where('ordenes_id', $o->id)->first()){
                 $cliente = $od->nombre . " | Califico: " . $mm->experiencia . " | " . $mm->mensaje; 
-            }
+            } 
 
             $o->cliente = $cliente;
 
@@ -98,7 +132,7 @@ class ControlOrdenesController extends Controller
             }
             $o->motorista = $motorista;
 
-            $o->verificado = $verificado;
+            $o->verificado = $verificado . $metodopago;
             
             if($o->estado_2 == 0){
                 $estado = "Orden sin contestacion del propietario";
@@ -137,7 +171,8 @@ class ControlOrdenesController extends Controller
         
         return view('backend.paginas.ordenes.tablas.tablaordenhoy', compact('orden'));
     } 
-
+ 
+    // ver las ventas de hoy fecha
     public function totalVentasHoy(Request $request){
 
         $fecha = Carbon::now('America/El_Salvador');

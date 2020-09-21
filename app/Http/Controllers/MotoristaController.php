@@ -23,7 +23,7 @@ class MotoristaController extends Controller
     // lista de motoristas
     public function index(){
         return view('backend.paginas.motoristas.listamotorista');
-    } 
+    }  
  
     // tabla 
     public function mototabla(){
@@ -333,6 +333,14 @@ class MotoristaController extends Controller
         }
     }
 
+    // borrar TODAS LAS ASIGNACIONES
+    public function borrarTodo(Request $request){
+        if($request->isMethod('post')){           
+            MotoristasAsignados::truncate();
+            return ['success' => 1];
+        }
+    }
+
     // agregar motorista a servicio
     public function nuevomotoservicio(Request $request){
         if($request->isMethod('post')){
@@ -370,6 +378,50 @@ class MotoristaController extends Controller
             }else{
                 return ['success' => 3];
             }
+        }
+    }
+
+     // agregar motorista global
+     public function nuevoGlobal(Request $request){
+        if($request->isMethod('post')){
+
+            $regla = array(
+                'motorista' => 'required'
+            );
+
+            $mensaje = array(
+                'motorista.required' => 'identificador es requerido'
+                );
+
+                
+            $validar = Validator::make($request->all(), $regla, $mensaje );
+
+            if ($validar->fails()) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validar->errors()->all()
+                ];
+            }  
+           
+            // obener todos los servicios
+            $servicios = Servicios::all();
+            foreach($servicios as $s){
+
+                if(MotoristasAsignados::where('motoristas_id', $request->motorista)
+                ->where('servicios_id', $s->id)->first()){
+                    // ya existe el registro
+                }else{
+                    // guardar registro
+                    $m = new MotoristasAsignados();
+                    $m->servicios_id = $s->id;
+                    $m->motoristas_id = $request->motorista;
+                    $m->save();
+                }
+            }
+            
+            // Completado
+            return ['success' => 1];           
         }
     }
     

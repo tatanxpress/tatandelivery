@@ -23,7 +23,10 @@ class TipoServicioZonaController extends Controller
         $identificador = DB::table('zonas')
         ->select('id', 'identificador')
         ->get();
-        return view('backend.paginas.tiposervicioszona.listatiposervicioszona', compact('identificador'));
+
+        $tiposervicio = TipoServicios::all();
+
+        return view('backend.paginas.tiposervicioszona.listatiposervicioszona', compact('identificador', 'tiposervicio'));
     }
 
     // tabla para ver servicios por zonas
@@ -297,5 +300,64 @@ class TipoServicioZonaController extends Controller
         
         return ['success' => 1];
     }
+
+
+
+    public function activarDesactivarTipoServicio(Request $request){
+        
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'
+            );    
+
+            $messages = array(                                      
+                'id.required' => 'El ID tipo servicio es requerido.'                        
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+ 
+            TipoServiciosZona::where('tipo_servicios_id', $request->id)->update(['activo' => $request->estado]);
+
+            return['success' => 1];
+        }
+    }
+
+
+    // por zona servicio
+    public function activarDesactivarZonaServicio(Request $request){
+        
+        if($request->isMethod('post')){   
+            $rules = array(                
+                'id' => 'required'
+            );    
+
+            $messages = array(                                      
+                'id.required' => 'El ID tipo servicio es requerido.'                        
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if ( $validator->fails() ) 
+            {
+                return [
+                    'success' => 0, 
+                    'message' => $validator->errors()->all()
+                ];
+            } 
+  
+            ZonasServicios::where('servicios_id', $request->id)->update(['activo' => $request->estado]);
+
+            return['success' => 1];
+        }
+    }
+
 
 }

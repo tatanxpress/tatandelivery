@@ -45,8 +45,7 @@ class ServiciosController extends Controller
                 ];
             }    
             // obtener zona segun id del usuario
-            $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
-            
+            $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();            
                 
             $servicios = DB::table('tipo_servicios_zonas AS tz')
             ->join('tipo_servicios AS t', 't.id', '=', 'tz.tipo_servicios_id')
@@ -68,7 +67,7 @@ class ServiciosController extends Controller
             // para agregar una nueva direccion para android
             $mensaje = "Agregar una nueva Dirección, presionando el boton AZUL +.";
             // para iphone
-            $mensaje2 = "Agregar una nueva Dirección, presionando en el ultimo icono Superior Derecho";
+            $mensaje2 = "Agregar una nueva Dirección";
 
             return [
                 'success' => 1,                     

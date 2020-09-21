@@ -75,7 +75,9 @@
             REPORTE DE COBRO<br>
             COBRADOR: {{ $nombre }} 
             </p> 
-            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p></center>  
+            <p><font size="3">De: {{ $f1 }}  Hasta: {{ $f2 }}</font></p>
+            
+            <p><font size="3">En caja ${{ $totalcobro }}</font></p></center>  
          
     </div>  
 
@@ -83,30 +85,23 @@
           <tr>
             <th style="width:6px;"># Orden</th>           
             <th style="width:6px;">Fecha Recivido</th>
-            <th style="width:5px;">Total $</th>
+            <th style="width:6px;">Método</th>
           </tr>
- 
+  
           @foreach($orden as $dato)
             <tr>
               <td>{{ $dato->ordenes_id }}</td>             
               <td>{{ $dato->fecha }}</td>
-              <td>${{ $dato->precio }}</td>
+              <td>
+                  @if($dato->tipo_pago == 0)
+                        Efectivo
+                        @else
+                        Credi Puntos
+                        @endif
+              </td>
             </tr> 
           @endforeach  
 
-          
-         
-          <tr>           
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-
-          <tr>
-            <td>Total:</td>           
-            <td></td>
-            <td>${{ $suma }}</td>
-          </tr>
         
         </table>
 

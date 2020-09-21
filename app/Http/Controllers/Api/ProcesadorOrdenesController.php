@@ -1155,14 +1155,16 @@ class ProcesadorOrdenesController extends Controller
                     $activo = $cupon->activo;
                     $zonacarrito = $cart->zonas_id;
                     $serviciocarrito = $cart->servicios_id;
-                    
+                    $faltacredito = 0; // si es 1; falta credito para pagar
+                    $micredito = User::where('id', $request->userid)->pluck('monedero')->first();
+
                     if($cupon->ilimitado == 0){
                         // verificar si aun es valido este cupon
                         if($contador >= $usolimite || $activo == 0){
                             return ['success' => 2]; // cupon ya no es valido
                         }
                     }  
-
+ 
                     if($tipocupon == 1){// tipo: envio gratis
 
                         // buscar si este cupon aplica a esta zona
@@ -1200,10 +1202,14 @@ class ProcesadorOrdenesController extends Controller
                                         $consumido=$consumido+$valor;
                                     }
 
+                                    // falta credito o no para pagar, el envio no se verifica
+                                    if($micredito >= $consumido){
+                                        $faltacredito = 0;
+                                    }
+
                                     // comprobar que supera el minimo o igual para aplicar cargo de envio $0.00
                                     if($consumido >= $dinerominimo){
-
-                                        return ['success' => 3]; // correcto
+                                        return ['success' => 3, 'faltacredito' => $faltacredito]; // correcto
                                     }else{
 
                                         $dinerominimo = number_format((float)$dinerominimo, 2, '.', '');
@@ -1264,16 +1270,13 @@ class ProcesadorOrdenesController extends Controller
                                 $subtotal = $consumido - $dinerodescuento;
                                 if($subtotal <= 0){
                                     $subtotal = 0;
-                                }
-
-                                $subtotal = number_format((float)$subtotal, 2, '.', '');
+                                } 
 
                                 //** conocer el envio, tipo de cargo */
                                 $zonaiduser = 0;
                                 // sacar id zona del usuario
                                 if($user = Direccion::where('user_id', $request->userid)
-                                ->where('seleccionado', 1)->first())
-                                {
+                                ->where('seleccionado', 1)->first()){
                                     $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
                                 } 
                                 $envioPrecio = 0;                                            
@@ -1314,14 +1317,23 @@ class ProcesadorOrdenesController extends Controller
                                 // esta zona tiene un minimo de $$ para envio gratis
                                 if($datosInfo->min_envio_gratis == 1){
                                     // precio envio sera 0, si supera $$ en carrito de compras
-                                    if($consumido > $datosInfo->costo_envio_gratis){
+                                    // VERIFICAR EL SUB TOTAL YA CON CUPON APLICADO SI SUPERA
+                                    if($subtotal >= $datosInfo->costo_envio_gratis){
                                         $envioPrecio = 0;
                                     }
                                 }       
 
+                              
+
                                 // ver si este cupon aplica envio gratis
                                 if($aplicaenviogratis == 1){
                                     $envioPrecio = 0;
+                                }
+
+                                $sumadog = $consumido + $envioPrecio;
+                                // verificar si falta credito
+                                if($micredito >= $sumadog){
+                                    $faltacredito = 0;
                                 }
 
                                 // sumar sub total + cargo de envio
@@ -1338,7 +1350,8 @@ class ProcesadorOrdenesController extends Controller
                                 'cargo' => $envioPrecio, 
                                 'aplica' => $aplicaenviogratis, 
                                 'total' => $totalsumado,
-                                'descuento' => $cdd->dinero];
+                                'descuento' => $cdd->dinero,
+                                'faltacredito' => $faltacredito];
 
                             }else{
                                 return ['success' => 9];
@@ -1399,8 +1412,6 @@ class ProcesadorOrdenesController extends Controller
                                         $total = 0;
                                     }
 
-                                    $total = number_format((float)$total, 2, '.', '');
-
                                     //** conocer el envio, tipo de cargo */
                                     $zonaiduser = 0;
                                     // sacar id zona del usuario
@@ -1446,8 +1457,9 @@ class ProcesadorOrdenesController extends Controller
                                     // PRIORIDAD 4
                                     // esta zona tiene un minimo de $$ para envio gratis
                                     if($datosInfo->min_envio_gratis == 1){
+                                        // VERIFICAR EL SUB TOTAL YA CON CUPON APLICADO SI SUPERA
                                         // precio envio sera 0, si supera $$ en carrito de compras
-                                        if($consumido > $datosInfo->costo_envio_gratis){
+                                        if($total > $datosInfo->costo_envio_gratis){
                                             $envioPrecio = 0;
                                         }
                                     }       
@@ -1455,8 +1467,16 @@ class ProcesadorOrdenesController extends Controller
                                     // sumar sub total + cargo de envio
                                     $totalsumado = $total + $envioPrecio;
                                     
+                                    if($micredito >= $totalsumado){
+                                        $faltacredito = 0;
+                                    }
+                                    $total = number_format((float)$total, 2, '.', '');
+                                    $totalsumado = number_format((float)$totalsumado, 2, '.', '');
+                                    $envioPrecio = number_format((float)$envioPrecio, 2, '.', '');
                                     // sub total, cargo envio, total, porcentaje
-                                    return ['success' => 11, 'dinero' => $total, 'cargo' => $envioPrecio, 'total' => $totalsumado, 'aplica' => $porcentaje];
+                                    return ['success' => 11, 'dinero' => $total,
+                                     'cargo' => $envioPrecio, 'total' => $totalsumado, 
+                                     'aplica' => $porcentaje, 'faltacredito' => $faltacredito];
                                 }else{
                                     // consumible no alcanza el minimo para aplicar este cupon de 
                                     // descuento
@@ -1509,17 +1529,17 @@ class ProcesadorOrdenesController extends Controller
                                 $consumido=$consumido+$valor;
                             }  
 
-                                // comprobar que supera el minimo o igual para producto gratis
-                                if($consumido >= $dinerominimo){
-                                    // producto gratis
-                                    return ['success' => 15, 'cargo' => $cdg->nombre];
-                                }else{
+                            // comprobar que supera el minimo o igual para producto gratis
+                            if($consumido >= $dinerominimo){
+                                // producto gratis
+                                return ['success' => 15, 'cargo' => $cdg->nombre];
+                            }else{
 
-                                    $t = number_format((float)$dinerominimo, 2, '.', '');
-                                    return ['success' => 16, 'dinero' => $t];
-                                    // el sub total en carrito de compra no supera el minimo a comprar
-                                    // para dar producto gratis
-                                }
+                                $t = number_format((float)$dinerominimo, 2, '.', '');
+                                return ['success' => 16, 'dinero' => $t];
+                                // el sub total en carrito de compra no supera el minimo a comprar
+                                // para dar producto gratis
+                            }
 
                         }else{
                             // no aplica para este servicio el producto gratis
@@ -1561,7 +1581,7 @@ class ProcesadorOrdenesController extends Controller
                             
                             // DONACION                              
                             $total = $consumido + $donacion;
-                            $total = number_format((float)$total, 2, '.', '');
+                           
 
                             //** conocer el envio, tipo de cargo */
                             $zonaiduser = 0;
@@ -1608,8 +1628,9 @@ class ProcesadorOrdenesController extends Controller
                             // PRIORIDAD 4
                             // esta zona tiene un minimo de $$ para envio gratis
                             if($datosInfo->min_envio_gratis == 1){
+                                // VERIFICAR EL SUB TOTAL YA CON CUPON APLICADO SI SUPERA
                                 // precio envio sera 0, si supera $$ en carrito de compras
-                                if($consumido > $datosInfo->costo_envio_gratis){
+                                if($total > $datosInfo->costo_envio_gratis){
                                     $envioPrecio = 0;
                                 }
                             }       
@@ -1617,14 +1638,19 @@ class ProcesadorOrdenesController extends Controller
                             // sumar sub total + cargo de envio
                             $totalsumado = $total + $envioPrecio;
 
+                            if($micredito >= $totalsumado){
+                                $faltacredito = 0;
+                            }
+                            $total = number_format((float)$total, 2, '.', '');
                             $totalsumado = number_format((float)$totalsumado, 2, '.', '');
-                            
+                            $envioPrecio = number_format((float)$envioPrecio, 2, '.', '');
                             // sub total, cargo envio, total, donacion, descripcion
                             return ['success' => 22, 
                             'dinero' => $total, 
                             'cargo' => $envioPrecio, 
                             'total' => $totalsumado,                            
-                            'descripcion' => $cd->descripcion];   
+                            'descripcion' => $cd->descripcion,
+                            'faltacredito' => $faltacredito];   
 
                         }else{
                             return ['success' => 21]; // cupon no encontrado
@@ -1803,9 +1829,10 @@ class ProcesadorOrdenesController extends Controller
                 $orden = DB::table('ordenes AS o')
                     ->join('servicios AS s', 's.id', '=', 'o.servicios_id')              
                     ->select('o.id', 's.nombre', 'o.precio_total',
-                    'o.nota_orden', 'o.fecha_orden', 'o.precio_envio')
+                    'o.nota_orden', 'o.fecha_orden', 'o.precio_envio', 'o.tipo_pago')
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible', 1)
+                    ->orderBy('o.id', 'DESC')
                     ->get();
                  
                 foreach($orden as $o){                    

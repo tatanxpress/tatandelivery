@@ -16,7 +16,8 @@ class CategoriasController extends Controller
     } 
 
     // lista de servicios tipo, que son categorias de cada servicio
-    public function index($id){        
+    public function index($id){      
+        // mandamos el id del servicio  
         return view('backend.paginas.servicios.listacategorias', compact('id'));
     } 
 

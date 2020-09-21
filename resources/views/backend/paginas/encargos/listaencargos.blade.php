@@ -72,7 +72,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Texto para boton guardar</label>
+                                    <label>Nota de dialogo cuando Nota encargo no es requerido</label>
                                     <input type="text" maxlength="90" class="form-control" id="boton-nuevo" placeholder="Texto">
                                 </div>
 
@@ -193,7 +193,7 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Texto para boton guardar</label>
+                                    <label>Nota de dialogo cuando Nota encargo no es requerido</label>
                                     <input type="text" maxlength="90" class="form-control" id="boton-editar" placeholder="Texto">
                                 </div>
  
