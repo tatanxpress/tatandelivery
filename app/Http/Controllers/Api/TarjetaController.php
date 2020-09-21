@@ -1846,7 +1846,7 @@ class TarjetaController extends Controller
 
     public function ss(){
 
-        return "estas listo :)";
+       
 
         $data = User::all();
 
@@ -1857,7 +1857,7 @@ class TarjetaController extends Controller
             
             User::where('id', $d->id)->update(['phone' => $unir]);
         }
-
+ 
         
 
     }
