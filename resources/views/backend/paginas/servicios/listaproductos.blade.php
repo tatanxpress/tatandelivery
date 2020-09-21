@@ -71,7 +71,7 @@
                                 <div class="form-group">
                                     <label>Utiliza imagen</label>
                                     <br>
-                                    <input type="checkbox" id="cbimagen-nuevo">
+                                    <input type="checkbox" checked id="cbimagen-nuevo">
                                 </div>
 
                                 <div class="form-group">
