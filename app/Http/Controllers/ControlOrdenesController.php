@@ -119,9 +119,10 @@ class ControlOrdenesController extends Controller
 
             $area = User::where('id', $od->users_id)->pluck('area')->first();
 
-            $cliente = $od->nombre . " | Area: " . $area; // sino tiene calificacion, solo mostrar nombre
+            $cliente = $od->nombre . " | Área: " . $area; 
+            $nombre = $od->nombre . " | Área: " . $area; 
             if($mm = MotoristaExperiencia::where('ordenes_id', $o->id)->first()){
-                $cliente = $od->nombre . " | Califico: " . $mm->experiencia . " | " . $mm->mensaje; 
+                $cliente = $nombre . " | Califico: " . $mm->experiencia . " | " . $mm->mensaje; 
             } 
 
             $o->cliente = $cliente;
