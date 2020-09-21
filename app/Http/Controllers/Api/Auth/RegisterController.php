@@ -97,7 +97,7 @@ class RegisterController extends Controller
             }else{
                 $usuario->area = $request->area; // nuevas actualizacion
             }
-            
+            $usuario->activo_tarjeta = 0; // bien
            
             if($usuario->save()){
                 return ['success'=>3, 'usuario_id'=> $usuario->id];
@@ -184,7 +184,8 @@ class RegisterController extends Controller
                 // campos para credi-puntos
                 $usuario->monedero = 0;  // credi puntos
                 $usuario->area = $request->area; // area de esta persona lejana
-
+                $usuario->activo_tarjeta = 0; // bien
+                
                 if($usuario->save()){
 
                     $data = Zonas::where('id', $request->idzona)->first();

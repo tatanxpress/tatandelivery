@@ -102,7 +102,7 @@ class LoginController extends Controller
                     $n->fecha = $fecha;
                     $n->save();                   
                 }
-                DB::commit();
+                DB::commit(); 
                 // DESACTIVADO SMS
                 return ['success' => 3];
             
