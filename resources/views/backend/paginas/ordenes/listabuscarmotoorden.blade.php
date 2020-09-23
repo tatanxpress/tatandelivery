@@ -1,26 +1,26 @@
 @extends('backend.menus.superior')
- 
+
  @section('content-admin-css')
-     <link href="{{ asset('css/backend/adminlte.min.css') }}" type="text/css" rel="stylesheet" /> 
-     <link href="{{ asset('css/backend/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" /> 
+     <link href="{{ asset('css/backend/adminlte.min.css') }}" type="text/css" rel="stylesheet" />
+     <link href="{{ asset('css/backend/dataTables.bootstrap4.css') }}" type="text/css" rel="stylesheet" />
      <link href="{{ asset('css/frontend/toastr.min.css') }}" type="text/css" rel="stylesheet" />
- 
- @stop  
- 
+
+ @stop
+
  <section class="content-header">
        <div class="container-fluid">
            <div class="col-sm-12">
              <h1>Buscador de ordenes de motorista</h1>
-           </div>  
+           </div>
            <button type="button" onclick="modalBuscar()" class="btn btn-success btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para ordenes del Motorista
-          </button>   
+          </button>
 
           <button type="button" style="margin-left:15px" onclick="modalFiltro()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
                     Filtro para datos basicos
-          </button>  
+          </button>
 
           <button type="button" style="margin-left:15px" onclick="reportePago()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
@@ -30,12 +30,12 @@
 
           <button type="button" style="margin-left:15px" onclick="reportePagoEncargos()" class="btn btn-primary btn-sm">
                 <i class="fas fa-pencil-alt"></i>
-                    Reporte pago de encargos 
+                    Reporte pago de encargos
           </button>
 
        </div>
      </section>
-     
+
    <!-- seccion frame -->
    <section class="content">
      <div class="container-fluid">
@@ -53,7 +53,7 @@
            </div>
        </div>
      </section>
- 
+
 <!-- modal buscar -->
 <div class="modal fade" id="modalBuscar">
     <div class="modal-dialog">
@@ -67,21 +67,21 @@
             <div class="modal-body">
                 <form id="formulario-buscar">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                             <div class="form-group">
                                     <label style="color:#191818">Motorista identificador</label>
                                     <br>
-                                    <div>  
+                                    <div>
 
-                                        <select class="form-control selectpicker" id="motoid" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
+                                        <select class="form-control selectpicker" id="motoid" data-live-search="true" required>
+                                            @foreach($moto as $item)
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
+                                            @endforeach
                                         </select>
-                                    </div> 
-                                </div> 
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label>Fecha desde</label>
@@ -92,7 +92,7 @@
                                     <label>Fecha hasta</label>
                                     <input type="date" class="form-control" id="fechahasta">
                                 </div>
-                              
+
                             </div>
                         </div>
                     </div>
@@ -101,9 +101,9 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="buscar()">Buscar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- modal filtro -->
@@ -119,21 +119,21 @@
             <div class="modal-body">
                 <form id="formulario-filtro">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                             <div class="form-group">
                                     <label style="color:#191818">Motorista identificador</label>
                                     <br>
-                                    <div>  
+                                    <div>
 
-                                        <select class="form-control selectpicker" id="motoid-filtro" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
+                                        <select class="form-control selectpicker" id="motoid-filtro" data-live-search="true" required>
+                                            @foreach($moto as $item)
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
+                                            @endforeach
                                         </select>
-                                    </div> 
-                                </div> 
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label>Fecha desde</label>
@@ -145,7 +145,7 @@
                                     <input type="date" class="form-control" id="fechahasta-filtro">
                                 </div>
 
-                              
+
                             </div>
                         </div>
                     </div>
@@ -154,9 +154,9 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtro()">Filtrar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -173,7 +173,7 @@
             <div class="modal-body">
                 <form id="formulario-dato">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                                 <div class="form-group">
@@ -189,13 +189,13 @@
                                 <div class="form-group">
                                     <label>Ordenes canceladas</label>
                                     <input type="text" disabled class="form-control" id="totalcanceladas">
-                                </div>                           
-                                
+                                </div>
+
                                 <div class="form-group">
                                     <label>Total ganacia</label>
                                     <input type="text" disabled class="form-control" id="totalganancia">
                                 </div>
-                              
+
                             </div>
                         </div>
                     </div>
@@ -203,9 +203,9 @@
             </div>
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 
@@ -224,21 +224,21 @@
             <div class="modal-body">
                 <form id="formulario-registro">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                             <div class="form-group">
                                     <label style="color:#191818">Motorista identificador</label>
                                     <br>
-                                    <div>  
+                                    <div>
 
-                                        <select class="form-control selectpicker" id="motoid-registro" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
+                                        <select class="form-control selectpicker" id="motoid-registro" data-live-search="true" required>
+                                            @foreach($moto as $item)
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
+                                            @endforeach
                                         </select>
-                                    </div> 
-                                </div> 
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label>Fecha desde</label>
@@ -250,7 +250,7 @@
                                     <input type="date" class="form-control" id="fechahasta-registro">
                                 </div>
 
-                              
+
                             </div>
                         </div>
                     </div>
@@ -259,9 +259,9 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtroRegistro()">Filtrar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- modal filtro para conocer datos de los servicios a cobrar -->
@@ -277,22 +277,22 @@
             <div class="modal-body">
                 <form id="formulario-reportepago">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                             <div class="form-group">
                                     <label style="color:#191818">Motorista identificador</label>
                                     <br>
-                                    <div>  
+                                    <div>
 
-                                        <select class="form-control selectpicker" id="motoid-reportepago" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
+                                        <select class="form-control selectpicker" id="motoid-reportepago" data-live-search="true" required>
+                                            @foreach($moto as $item)
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
+                                            @endforeach
                                         </select>
-                                    </div> 
-                                </div> 
- 
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Fecha desde</label>
                                     <input type="date" class="form-control" id="fechadesde-reportepago">
@@ -303,7 +303,7 @@
                                     <input type="date" class="form-control" id="fechahasta-reportepago">
                                 </div>
 
-                              
+
                             </div>
                         </div>
                     </div>
@@ -312,9 +312,9 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtroReportePago()">Generar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- modal filtro para conocer datos de los servicios a cobrar -->
@@ -330,21 +330,21 @@
             <div class="modal-body">
                 <form id="formulario-reportepago-encargos">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
 
                             <div class="form-group">
                                     <label style="color:#191818">Motorista identificador</label>
                                     <br>
-                                    <div>  
+                                    <div>
 
-                                        <select class="form-control selectpicker" id="motoid-reportepago-encargos" data-live-search="true" required>   
-                                            @foreach($moto as $item)                                                
+                                        <select class="form-control selectpicker" id="motoid-reportepago-encargos" data-live-search="true" required>
+                                            @foreach($moto as $item)
                                                 <option value="{{$item->id}}">{{$item->identificador}}</option>
-                                            @endforeach                                         
+                                            @endforeach
                                         </select>
-                                    </div> 
-                                </div> 
+                                    </div>
+                                </div>
 
                                 <div class="form-group">
                                     <label>Fecha desde</label>
@@ -356,7 +356,7 @@
                                     <input type="date" class="form-control" id="fechahasta-reportepago-encargos">
                                 </div>
 
-                              
+
                             </div>
                         </div>
                     </div>
@@ -365,9 +365,9 @@
             <div class="modal-footer justify-content-between">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" onclick="filtroReportePagoEncargos()">Generar</button>
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- modal cancelar -->
@@ -375,7 +375,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Cancelar orden</h4>
+                <h4 class="modal-title">Cancelar orden (solo si motorista inicio la orden)</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
                 </button>
@@ -383,15 +383,25 @@
             <div class="modal-body">
                 <form id="formulario-cancelar">
                     <div class="card-body">
-                        <div class="row">  
+                        <div class="row">
                             <div class="col-md-12">
-                                
+
                                 <div class="form-group">
                                     <label>Mensaje</label>
                                     <input type="hidden" id="idcancelar">
                                     <input type="text" class="form-control" maxLength="200" id="mensajecancelar">
                                 </div>
-                              
+
+                                <div class="form-group">
+                                    <label>Título notificación</label>
+                                    <input type="text" class="form-control" maxLength="75" id="titulo">
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Mensaje notificación</label>
+                                    <input type="text" class="form-control" maxLength="100" id="mensaje">
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -399,24 +409,24 @@
             </div>
             <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-            
+
             <button type="button" class="btn btn-primary" onclick="cancelarOrden()">Cancelar</button>
 
-            </div>          
-        </div>        
-    </div>      
+            </div>
+        </div>
+    </div>
 </div>
 
  @extends('backend.menus.inferior')
- 
+
  @section('content-admin-js')
- 
+
      <script src="{{ asset('js/backend/jquery.dataTables.js') }}" type="text/javascript"></script>
      <script src="{{ asset('js/backend/dataTables.bootstrap4.js') }}" type="text/javascript"></script>
      <script src="{{ asset('js/frontend/toastr.min.js') }}" type="text/javascript"></script>
      <script src="{{ asset('js/frontend/axios.min.js') }}" type="text/javascript"></script>
      <script src="{{ asset('js/frontend/loadingOverlay.js') }}" type="text/javascript"></script>
- 
+
    <script>
 
     function modalBuscar(){
@@ -429,15 +439,15 @@
         $('#idcancelar').val(id);
         $('#modalCancelar').modal('show');
     }
- 
+
     function buscar(){
         var idmoto = document.getElementById('motoid').value;
         var fechadesde = document.getElementById('fechadesde').value;
-        var fechahasta = document.getElementById('fechahasta').value;            
-        
+        var fechahasta = document.getElementById('fechahasta').value;
+
         var retorno = validarNuevo(fechadesde, fechahasta);
 
-        if(retorno){ 
+        if(retorno){
 
             var ruta = "{{ url('/admin/buscar/moor') }}/"+idmoto+"/"+fechadesde+"/"+fechahasta;
             $('#tablaDatatable').load(ruta);
@@ -468,25 +478,25 @@
         document.getElementById("formulario-reportepago-encargos").reset();
         $('#modalReportePagoEncargos').modal('show');
     }
- 
+
     function filtro(){
         var id = document.getElementById('motoid-filtro').value;
         var fechadesde = document.getElementById('fechadesde-filtro').value;
-        var fechahasta = document.getElementById('fechahasta-filtro').value;            
-        
+        var fechahasta = document.getElementById('fechahasta-filtro').value;
+
         var retorno = validarNuevo(fechadesde, fechahasta);
 
-        if(retorno){ 
+        if(retorno){
 
             spinHandle = loadingOverlay().activate();
- 
+
             var formData = new FormData();
             formData.append('id', id);
             formData.append('fecha1', fechadesde);
             formData.append('fecha2', fechahasta);
-                  
+
             axios.post('/admin/buscar/orden/filtraje',formData,{
-                }) 
+                })
                 .then((response) => {
                     loadingOverlay().cancel(spinHandle);
 
@@ -494,31 +504,31 @@
                     $('#modalDato').modal('show');
                     $('#totalagarradas').val(response.data.totalagarradas);
                     $('#totalcompletadas').val(response.data.totalcompletada);
-                    $('#totalcanceladas').val(response.data.totalcancelada);                  
-                   
+                    $('#totalcanceladas').val(response.data.totalcancelada);
+
                     $('#totalganancia').val(response.data.totalganancia);
-                   
-              
+
+
                 }else{
-                    toastr.error('ID no encontrado'); 
+                    toastr.error('ID no encontrado');
                 }
             })
             .catch((error) => {
-                loadingOverlay().cancel(spinHandle); 
-                toastr.error('Error del servidor');    
+                loadingOverlay().cancel(spinHandle);
+                toastr.error('Error del servidor');
         });
         }
     }
 
-   
-  
+
+
 
     function validarNuevo(fechadesde, fechahasta){
 
         if(fechadesde === ''){
             toastr.error("fecha desde es requerido");
             return;
-        } 
+        }
 
         if(fechahasta === ''){
             toastr.error("fecha hasta desde es requerido");
@@ -531,13 +541,13 @@
     function informacion(id){
         document.getElementById("formulario-info").reset();
         spinHandle = loadingOverlay().activate();
-       
+
         axios.post('/admin/buscar/orden/informacion',{
-        'id': id 
+        'id': id
             })
             .then((response) => {
                 loadingOverlay().cancel(spinHandle);
-             
+
                 if(response.data.success == 1){
                     $('#modalInfo').modal('show');
                     $('#nombreservicio').val(response.data.orden.nombreServicio);
@@ -552,7 +562,7 @@
                     $('#precioenvio').val(response.data.orden.precio_envio);
                     $('#fechaorden').val(response.data.orden.fecha_orden);
                     $('#cambiovuelto').val(response.data.orden.cambio);
-                   
+
                     if(response.data.orden.estado_2 == 0){
                         $("#estado2").prop("checked", false);
                     }else{
@@ -618,28 +628,28 @@
                         $("#visible").prop("checked", true);
                     }
 
-                    
+
                     if(response.data.orden.visible_p == 0){
                         $("#visiblep").prop("checked", false);
                     }else{
                         $("#visiblep").prop("checked", true);
                     }
 
-                    
+
                     if(response.data.orden.visible_p2 == 0){
                         $("#visiblep2").prop("checked", false);
                     }else{
                         $("#visiblep2").prop("checked", true);
                     }
 
-                    
+
                     if(response.data.orden.visible_p3 == 0){
                         $("#visiblep3").prop("checked", false);
                     }else{
                         $("#visiblep3").prop("checked", true);
                     }
 
-                  
+
                     if(response.data.orden.cancelado_cliente == 0){
                         $("#canceladocliente").prop("checked", false);
                     }else{
@@ -652,8 +662,8 @@
                     }else{
                         $("#canceladopropietario").prop("checked", true);
                     }
-                
-                    
+
+
                     if(response.data.orden.visible_m == 0){
                         $("#productovisible").prop("checked", false);
                     }else{
@@ -661,15 +671,15 @@
                     }
 
                     $('#gananciamotorista').val(response.data.orden.ganancia_motorista);
-                    
+
 
                 }else{
-                    toastr.error('publicidad o promo no encontrada'); 
+                    toastr.error('publicidad o promo no encontrada');
                 }
             })
             .catch((error) => {
-                loadingOverlay().cancel(spinHandle); 
-                toastr.error('Error del servidor');    
+                loadingOverlay().cancel(spinHandle);
+                toastr.error('Error del servidor');
         });
     }
 
@@ -681,26 +691,42 @@
         var fecha2 = document.getElementById("fecha2-cobro").value;
 
         window.open("{{ URL::to('admin/generar/reporte1') }}/" + idmoto + "/" + select + "/" + fecha1 + "/" + fecha2);
-    }  
+    }
 
     function cancelarOrden(){
         var id = document.getElementById('idcancelar').value;
         var mensajecancelar = document.getElementById("mensajecancelar").value;
-        
+
+        var titulo = document.getElementById("titulo").value;
+        var mensaje = document.getElementById("mensaje").value;
+
         if(mensajecancelar === ''){
-            toastr.error('Mensaje es requerido'); 
+            toastr.error('Mensaje es requerido');
             return;
         }
 
         if(id === ''){
-            toastr.error('ID no encontrado'); 
+            toastr.error('ID no encontrado');
             return;
         }
 
-        var spinHandle = loadingOverlay().activate();             
+        if(titulo === ''){
+            toastr.error('titulo es requerido');
+            return;
+        }
+
+        if(mensaje === ''){
+            toastr.error('mensaje es requerido');
+            return;
+        }
+
+        var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
         formData.append('id', id);
         formData.append('mensaje', mensajecancelar);
+
+        formData.append('titulo', titulo);
+        formData.append('mensaje2', mensaje);
 
         axios.post('/admin/cancelarorden/panel', formData, {
         })
@@ -711,7 +737,7 @@
                 toastr.error('Validacion incorrecta');
             } else if (response.data.success == 1) {
                 toastr.success('Cancelado');
-                
+
                 $('#modalCancelar').modal('hide');
             } else if(response.data.success == 2){
                 // orden no puede ser cancelada
@@ -722,24 +748,24 @@
             }
             else {
                 toastr.error('Error desconocido');
-            } 
-                            
+            }
+
         })
         .catch((error) => {
             loadingOverlay().cancel(spinHandle);
             toastr.error('Error');
         });
-        
+
     }
 
-      
-    
-    
+
+
+
     function filtroReportePago(){
         var idmoto = document.getElementById('motoid-reportepago').value;
         var fechadesde = document.getElementById('fechadesde-reportepago').value;
-        var fechahasta = document.getElementById('fechahasta-reportepago').value;            
-       
+        var fechahasta = document.getElementById('fechahasta-reportepago').value;
+
         var retorno = validarNuevo(fechadesde, fechahasta);
 
         if(retorno){
@@ -751,17 +777,17 @@
     function filtroReportePagoEncargos(){
         var idmoto = document.getElementById('motoid-reportepago-encargos').value;
         var fechadesde = document.getElementById('fechadesde-reportepago-encargos').value;
-        var fechahasta = document.getElementById('fechahasta-reportepago-encargos').value;            
-       
+        var fechahasta = document.getElementById('fechahasta-reportepago-encargos').value;
+
         var retorno = validarNuevo(fechadesde, fechahasta);
 
         if(retorno){
             window.open("{{ URL::to('admin/generar/reporte-motorista-encargo') }}/" + idmoto + "/" + fechadesde + "/" + fechahasta);
         }
     }
- 
+
    </script>
-  
- 
- 
+
+
+
  @stop

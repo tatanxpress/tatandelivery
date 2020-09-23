@@ -17,19 +17,19 @@ use App\CarritoExtraModelo;
 use App\CarritoEncargo;
 use App\CarritoEncargoProducto;
 use App\AreasPermitidas;
-use Log; 
+use Log;
 
 class PerfilController extends Controller
 {
     // cambiar contraseña con correo
     public function nuevaPassword(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'telefono' => 'required',
                 'password' => 'required|min:8|max:16',
-            );    
+            );
 
-            $messages = array(                                      
+            $messages = array(
                 'telefono.required' => 'El telefono es requerido',
                 'password.required' => 'La contraseña es requerida',
                 'password.min' => 'Mínimo 8 caracteres',
@@ -38,48 +38,48 @@ class PerfilController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $messages);
 
-            if ($validator->fails()) 
+            if ($validator->fails())
                 {
                     return [
-                        'success' => 0, 
+                        'success' => 0,
                         'message' => $validator->errors()->all()
                     ];
                 }
 
                 $unido = "+503" . $request->telefono;
-            
+
             if(User::where('phone', $unido)->first()){
                 User::where('phone', $unido)->update(['password' => Hash::make($request->password)]);
-                return ['success' => 1]; 
+                return ['success' => 1];
             }
-            return ['success' => 2];            
+            return ['success' => 2];
         }
     }
 
     // informacion del usuario
     public function infoPerfil(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'userid' => 'required'               
-            );    
+        if($request->isMethod('post')){
+            $rules = array(
+                'userid' => 'required'
+            );
 
-            $messages = array(                                      
-                'userid.required' => 'El id es requerido'               
+            $messages = array(
+                'userid.required' => 'El id es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages);
 
-            if ($validator->fails()) 
+            if ($validator->fails())
                 {
                     return [
-                        'success' => 0, 
+                        'success' => 0,
                         'message' => $validator->errors()->all()
                     ];
                 }
-            
+
             if(User::where('id', $request->userid)->first()){
                 $datos = User::where('id', $request->userid)->select('name AS nombre', 'email AS correo')->first();
-                $nombre = $datos->nombre;                    
+                $nombre = $datos->nombre;
                 $correo = $datos->correo;
 
                 return ['success' => 1, 'nombre' => $nombre, 'correo' => $correo];
@@ -90,16 +90,16 @@ class PerfilController extends Controller
     }
 
     // cambiar contraseña con id
-    
+
     public function cambiarPassword(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'id' => 'required',
                 'password' => 'required|min:8|max:16',
-            );    
+            );
 
-            $messages = array(                                      
-                'id.required' => 'El correo es requerido',  
+            $messages = array(
+                'id.required' => 'El correo es requerido',
                 'password.required' => 'La contraseña es requerida',
                 'password.min' => 'Mínimo 8 caracteres',
                 'password.max' => 'Máximo 16 caracteres',
@@ -107,10 +107,10 @@ class PerfilController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $messages);
 
-            if ($validator->fails()) 
+            if ($validator->fails())
                 {
                     return [
-                        'success' => 0, 
+                        'success' => 0,
                         'message' => $validator->errors()->all()
                     ];
                 }
@@ -119,35 +119,35 @@ class PerfilController extends Controller
                 User::where('id', $request->id)->update(['password' => Hash::make($request->password)]);
                 return ['success' => 1];
             }
-            return ['success' => 2];            
+            return ['success' => 2];
         }
     }
 
     // cambiar datos del perfil
     public function editarPerfil(Request $request){
-        if($request->isMethod('post')){  
+        if($request->isMethod('post')){
 
-            // validar datos en general sin fotografia       
-             $reglaDatos = array(                
+            // validar datos en general sin fotografia
+             $reglaDatos = array(
                 'userid' => 'required',
                 'nombre' => 'required|max:50',
                 'correo' => 'required|max:100',
-            );    
-     
-            $mensajeDatos = array(                                      
+            );
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.',
                 'nombre.required' => 'El nombre es requerido',
                 'nombre.max' => 'El nombre necesita 50 caracteres máximo',
-                'correo.required' => 'El correo electrónico es requerido',                                
+                'correo.required' => 'El correo electrónico es requerido',
                 'correo.max' => 'El correo necesita 100 caracteres máximo',
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if ( $validarDatos->fails()) 
+            if ( $validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -160,8 +160,8 @@ class PerfilController extends Controller
             }
 
             // buscar usuario quien editara perfil
-            if($usuario = User::where('id', $request->userid)->first()){   
-                
+            if($usuario = User::where('id', $request->userid)->first()){
+
                 $usuario->name = $request->nombre;
                 $usuario->email = $request->correo;
 
@@ -171,48 +171,49 @@ class PerfilController extends Controller
                         'success' => 2 //datos guardados correctamente
                     ];
                 }
-               
+
             }else{
                 return [
-                    'success' => 0 //usuario no encontrado                    
+                    'success' => 0 //usuario no encontrado
                 ];
-            }   
+            }
         }
     }
 
     // lista de direcciones del usuario
     public function verDirecciones(Request $request){
-        if($request->isMethod('post')){  
+        if($request->isMethod('post')){
 
-            $rules = array(                
-                'userid' => 'required'                
-            );    
-     
-            $messages = array(                                      
-                'userid.required' => 'El id del usuario es requerido.',               
+            $rules = array(
+                'userid' => 'required'
+            );
+
+            $messages = array(
+                'userid.required' => 'El id del usuario es requerido.',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
 
             if(User::where('id', $request->userid)->first()){
 
-                $direccion = DB::table('direccion_usuario AS dir')            
+                $direccion = DB::table('direccion_usuario AS dir')
             ->join('zonas AS z', 'z.id', '=', 'dir.zonas_id')
-            ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa', 'dir.punto_referencia', 'dir.seleccionado', 'z.nombre AS nombreZona')
+            ->select('dir.id', 'dir.nombre', 'dir.direccion', 'dir.numero_casa',
+            'dir.punto_referencia', 'dir.seleccionado', 'z.nombre AS nombreZona')
             ->where('dir.user_id', $request->userid)
             ->get();
 
                 return [
                     'success' => 1,
-                    'direcciones' => $direccion,                
+                    'direcciones' => $direccion,
                 ];
             }else{
                 return ['succcess'=> 2];
@@ -220,10 +221,10 @@ class PerfilController extends Controller
         }
     }
 
-    // guardara las direcciones de los usuarios 
+    // guardara las direcciones de los usuarios
     public function guardarDireccion(Request $request){
-        if($request->isMethod('post')){ 
-            
+        if($request->isMethod('post')){
+
             $reglaDatos = array(
                 'userid' => 'required',
                 'nombre' => 'required|max:100',
@@ -231,9 +232,9 @@ class PerfilController extends Controller
                 'numero_casa' => 'max:30',
                 'punto_referencia' => 'max:400',
                 'zona_id' => 'required',
-            );    
-    
-            $mensajeDatos = array(                                      
+            );
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.',
                 'nombre.required' => 'el nombre es requerida.',
                 'nombre.max' => 'Máximo 75 caracteres.',
@@ -241,31 +242,31 @@ class PerfilController extends Controller
                 'direccion.max' => '400 caracteres máximo direccion',
                 'numero_casa.max' => 'Máximo 30 caracteres.',
                 'punto_referencia.max' => 'Máximo 400 caracteres.',
-                'zona_id.required' => 'El id de la zona es requerido.'             
-               
+                'zona_id.required' => 'El id de la zona es requerido.'
+
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if ( $validarDatos->fails()) 
+            if ( $validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             if(User::where('id', $request->userid)->first()){
-        
+
                 DB::beginTransaction();
-            
+
                 try {
                     $direccion = new Direccion();
                     $direccion->user_id = $request->userid;
                     $direccion->nombre = $request->nombre;
                     $direccion->direccion = $request->direccion;
                     if($request->numero_casa == null){
-                        $direccion->numero_casa = "";    
+                        $direccion->numero_casa = "";
                     }else{
                     $direccion->numero_casa = $request->numero_casa;
                     }
@@ -275,8 +276,8 @@ class PerfilController extends Controller
                     }else{
                         $direccion->punto_referencia = $request->punto_referencia;
                     }
-                                       
-                    $direccion->zonas_id = $request->zona_id;                
+
+                    $direccion->zonas_id = $request->zona_id;
                     $direccion->seleccionado = 1;
                     if($request->latitud == null){
                         $direccion->latitud = "";
@@ -312,8 +313,12 @@ class PerfilController extends Controller
                     $direccion->estado = 0;
                     $direccion->precio_envio = 0;
 
+                    // UTILIZADO PARA HORARIOS EXTRANJEROS
+                    $direccion->hora_inicio = "07:30:00";
+                    $direccion->hora_fin = "17:00:00";
+
                     // precio_envio   y  mensaje_rechazo  son  null
-                    
+
                     if($direccion->save()){
 
                         // id de direccion que acaba de ser insertada
@@ -345,19 +350,19 @@ class PerfilController extends Controller
                             }  catch (\Exception $ex) {
                                 DB::rollback();
                                 return [
-                                    'success' => 2 // error                                    
+                                    'success' => 2 // error
                                 ];
-                            }                    
+                            }
                     }else{
                         DB::rollback();
                         return [
-                            'success' => 2 // error                            
+                            'success' => 2 // error
                         ];
                     }
                 } catch(\Throwable $e){
                     DB::rollback();
                     return [
-                        'success' => 2 // error                        
+                        'success' => 2 // error
                     ];
                 }
             }else{
@@ -365,37 +370,37 @@ class PerfilController extends Controller
             }
         }
     }
-   
+
 
     // guardar direccion seleccionada
     public function seleccionarDireccion(Request $request){
-        if($request->isMethod('post')){              
-            
-             $reglaDatos = array(                
+        if($request->isMethod('post')){
+
+             $reglaDatos = array(
                 'dirid' => 'required',
-                'userid' => 'required', 
-            );    
-      
-            $mensajeDatos = array(                                      
+                'userid' => 'required',
+            );
+
+            $mensajeDatos = array(
                 'dirid.required' => 'El id de la direccion es requerido.',
-                'userid.required' => 'El id del usuario es requerido.',                
+                'userid.required' => 'El id del usuario es requerido.',
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if ( $validarDatos->fails()) 
+            if ( $validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }                      
-               
+            }
+
             if(User::where('id', $request->userid)->first()){
 
                 if(Direccion::where('id', $request->dirid)->first()){
                     DB::beginTransaction();
-                    
+
                     try {
 
                         // setear a 0
@@ -416,7 +421,7 @@ class PerfilController extends Controller
                             CarritoExtraModelo::where('carrito_temporal_id', $tabla1->id)->delete();
                             CarritoTemporalModelo::where('users_id', $request->userid)->delete();
                         }
-                        
+
                         // BORRAR CARRITO DE ENCARGOS, SI CAMBIO CAMBIO DIRECCION
                         if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
                             CarritoEncargoProducto::where('carrito_encargo_id', $carrito->id)->delete();
@@ -432,12 +437,12 @@ class PerfilController extends Controller
                     }catch(Error $e) {
                         DB::rollback();
                         return [
-                            'success' => 2 // error                                
+                            'success' => 2 // error
                         ];
                     }catch(\Throwable $e){
                         DB::rollback();
                         return [
-                            'success' => 0 // error                                
+                            'success' => 0 // error
                         ];
                     }
 
@@ -447,32 +452,32 @@ class PerfilController extends Controller
 
             }else{
                 return ['success' => 2];
-            }           
+            }
         }
     }
 
     // eliminar direccion del usuario
     public function eliminarDireccion(Request $request){
-        if($request->isMethod('post')){  
-            $reglaDatos = array(    
-                'userid' => 'required',            
-                'dirid' => 'required',                
-            );    
-     
-            $mensajeDatos = array( 
-                'userid.required' => 'id del usuario es requerido',                                     
-                'dirid.required' => 'El id de la direccion es requerido.',                
+        if($request->isMethod('post')){
+            $reglaDatos = array(
+                'userid' => 'required',
+                'dirid' => 'required',
+            );
+
+            $mensajeDatos = array(
+                'userid.required' => 'id del usuario es requerido',
+                'dirid.required' => 'El id de la direccion es requerido.',
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if ( $validarDatos->fails()) 
+            if ( $validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }     
+            }
 
             // encontro la direccion a borrar
             if(Direccion::where('id', $request->dirid)->first()){
@@ -482,7 +487,7 @@ class PerfilController extends Controller
                 try {
 
                     $total = Direccion::where('user_id', $request->userid)->count();
-              
+
                     if($total > 1){
 
                         // verificar si esta direccion era la que estaba seleccionada, para poner una aleatoria
@@ -492,11 +497,11 @@ class PerfilController extends Controller
                         Direccion::where('id', $request->dirid)->delete();
 
                         // si era la seleccionada poner aleatoria, sino no hacer nada
-                        if($info->seleccionado == 1){                           
+                        if($info->seleccionado == 1){
 
                             // volver a buscar la primera linea y poner seleccionado
-                            $datos = Direccion::where('user_id', $request->userid)->first();                            
-                            Direccion::where('id', $datos->id)->update(['seleccionado' => 1]); 
+                            $datos = Direccion::where('user_id', $request->userid)->first();
+                            Direccion::where('id', $datos->id)->update(['seleccionado' => 1]);
                         }
 
                         DB::commit();
@@ -513,43 +518,43 @@ class PerfilController extends Controller
 
             }else{
                 return ['success' => 3];
-            }            
+            }
         }
     }
 
 
     // SECCION PARA DIRECCIONES DE VARIAS AREAS
     public function verDireccionesAreas(Request $request){
-        if($request->isMethod('post')){  
+        if($request->isMethod('post')){
 
-            $rules = array(                
-                'userid' => 'required'                
-            );    
-     
-            $messages = array(                                      
-                'userid.required' => 'El id del usuario es requerido.',               
+            $rules = array(
+                'userid' => 'required'
+            );
+
+            $messages = array(
+                'userid.required' => 'El id del usuario es requerido.',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
 
             if($u = User::where('id', $request->userid)->first()){
-                
-                $direccion = DB::table('direccion_usuario AS d')            
+
+                $direccion = DB::table('direccion_usuario AS d')
                 ->join('zonas AS z', 'z.id', '=', 'd.zonas_id')
-                ->select('d.id', 'd.nombre', 'd.direccion', 'd.numero_casa', 
+                ->select('d.id', 'd.nombre', 'd.direccion', 'd.numero_casa',
                 'd.punto_referencia', 'd.seleccionado', 'z.nombre AS nombreZona',
-                'd.estado', 'd.precio_envio', 'd.mensaje_rechazo')
+                'd.estado', 'd.precio_envio', 'd.mensaje_rechazo', 'd.hora_inicio', 'd.hora_fin')
                 ->where('d.user_id', $request->userid)
                 ->get();
- 
+
                 // verificar que area es para poder mostrar pantalla
                 // * punto gps
                 // * solo direccion
@@ -559,9 +564,17 @@ class PerfilController extends Controller
                 }
 
                 foreach($direccion as $d){
-                     $d->precio_envio = number_format((float)$d->precio_envio, 2, '.', '');
+                    $envio = number_format((float)$d->precio_envio, 2, '.', '');
+                    $d->precio_envio = $envio;
+
+                    $horainicio = date("h:i A", strtotime($d->hora_inicio));
+                    $horafin = date("h:i A", strtotime($d->hora_fin));
+
+                    $mensaje = "Verificada, cargo de envío es de: $" . $envio . " Y su horario a domicilio es de " . $horainicio . " A las " . $horafin;
+
+                    $d->mensaje = $mensaje;
                 }
- 
+
                 return ['success' => 1, 'direcciones' => $direccion, 'tipo' => $tipo];
             }else{
                 return ['succcess'=> 2];
@@ -570,7 +583,7 @@ class PerfilController extends Controller
     }
 
 
-   
+
 
 
 

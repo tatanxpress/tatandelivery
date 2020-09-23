@@ -148,7 +148,7 @@ class TarjetaController extends Controller
                     }else{
                         // no hay direccion
                         return ['success' => 2];
-                    } 
+                    }
 
                      // todo el producto del carrito de compras
                      $producto = DB::table('producto AS p')
@@ -156,9 +156,9 @@ class TarjetaController extends Controller
                      ->select('p.precio', 'c.cantidad')
                      ->where('c.carrito_temporal_id', $cart->id)
                      ->get();
- 
+
                      $pila = array();
- 
+
                      // multiplicar precio x cantidad
                      foreach($producto as $p){
                          $cantidad = $p->cantidad;
@@ -166,7 +166,7 @@ class TarjetaController extends Controller
                          $multi = $cantidad * $precio;
                          array_push($pila, $multi);
                      }
- 
+
                      // sumar todo los sub totales de cada producto multiplicado
                      foreach ($pila as $valor){
                          $resultado=$resultado+$valor;
@@ -209,7 +209,7 @@ class TarjetaController extends Controller
                         ->where('servicios_id', $servicioidC)
                         ->first();
 
-                       
+
 
                         // PRIORIDAD 4
                         // esta zona tiene un minimo de $$ para aplicar nuevo tipo de cargo
@@ -239,7 +239,7 @@ class TarjetaController extends Controller
                         }
                     }
 
-                   
+
 
                     // total de carrito de compras
                     $total = $resultado;
@@ -289,7 +289,7 @@ class TarjetaController extends Controller
         }
     }
 
- 
+
 
      // enviar la primer orden, version 2
      public function procesarOrdenEstado1V2(Request $request){
@@ -569,6 +569,32 @@ class TarjetaController extends Controller
                         $horaDelivery = 0; // cerrado
                     }
 
+                    // PARA EXTRANJEROS LIMITAR HORARIO SEGUN DIRECCION
+
+                    // verificar si es direccion extranjero, para evitar que ordene por horario tarde
+                    $area = User::where('id', $dataUser->id)->pluck('area')->first();
+                    if(AreasPermitidas::where('areas', $area)->first()){
+                        // no hacer nada
+                    }else{
+                        // obtener direccion seleccionada
+
+                        $data1 = DB::table('direccion_usuario')
+                            ->where('user_id', $dataUser->id)
+                            ->where('seleccionado', 1)
+                            ->where('hora_inicio', '<=', $hora)
+                            ->where('hora_fin', '>=', $hora)
+                            ->get();
+
+                        // verificar
+
+                        if(count($data1) >= 1){
+                            $horaDelivery = 1; // abierto
+                        }else{
+                            $horaDelivery = 0; // cerrado
+                        }
+                    }
+
+
                     // saver si el usuario esta activo
                     $usuarioActivo = $dataUser->activo;
 
@@ -820,7 +846,7 @@ class TarjetaController extends Controller
 
                     // PRIORIDAD 4
                     // variable para saver si sub total supero min requerido para nuevo cargo
- 
+
                     // esta zona tiene un minimo de $$ para aplicar nuevo cargo
                     if($datosInfo->min_envio_gratis == 1){
                         $costo = $datosInfo->costo_envio_gratis;
@@ -850,11 +876,11 @@ class TarjetaController extends Controller
                     //****** HOY VERIFICAR SI NO ES UN AREA PERMITIDA, PARA APLICAR CARGO DE ENVIO     ***********/
                     if(!AreasPermitidas::where('areas', $dataUser->area)->first()){
                         $dataDir = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
-                       
+
                         $tipocargo = 5; // compro un extranjero
                         $envioPrecio = $dataDir->precio_envio;
                         $gananciamotorista = $dataDir->ganancia_motorista;
-                        
+
                     }
 
                     //****** CUPONES *********/
@@ -1525,9 +1551,9 @@ class TarjetaController extends Controller
             }
         }
     }
-    
+
     public function verInfoCrediPuntos(Request $request){
-        
+
         if($request->isMethod('post')){
             $reglaDatos = array(
                 'userid' => 'required',
@@ -1564,13 +1590,13 @@ class TarjetaController extends Controller
                 // verificar a que horas agrego un registro, se puede comprar cada 24 horas
                 //verificar que este cliente tenga un registro
                 if($cp = CrediPuntos::where('usuario_id', $uu->id)->latest('fecha')->first()){
-                    
+
                     // si tiene registro, asi que comparar si ya pago 24 horas para que pueda volver a comprar
                     $hastafecha = "Puede volver agregar Credi Puntos hasta el: ";
                     $time1 = Carbon::parse($cp->fecha);
-                    $horaEstimada = $time1->addHour(24)->format('Y-m-d H:i:s');         
+                    $horaEstimada = $time1->addHour(24)->format('Y-m-d H:i:s');
                     $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
-                  
+
                     $d1 = new DateTime($horaEstimada); // sumado 24 horas
                     $d2 = new DateTime($today); // tiempo actual
                     if ($d1 >= $d2){
@@ -1589,7 +1615,7 @@ class TarjetaController extends Controller
 
     // INGRESO DE CREDI PUNTOS
     public function ingresarCrediPuntosCliente(Request $request){
-      
+
        if($request->isMethod('post')){
             $reglaDatos = array(
                 'userid' => 'required',
@@ -1620,17 +1646,17 @@ class TarjetaController extends Controller
             }
 
             if($uu = User::where('id', $request->userid)->first()){
-              
+
 
                 $dataversion = VersionesApp::where('id', 1)->first();
 
-                $time1 = Carbon::parse($dataversion->fecha_token);                         
-                $horaEstimada = $time1->addMinute(50)->format('Y-m-d H:i:s'); // agregar 50 minutos             
+                $time1 = Carbon::parse($dataversion->fecha_token);
+                $horaEstimada = $time1->addMinute(50)->format('Y-m-d H:i:s'); // agregar 50 minutos
                 $today = Carbon::now('America/El_Salvador')->format('Y-m-d H:i:s');
-                
+
                 $d1 = new DateTime($horaEstimada);
                 $d2 = new DateTime($today);
-                
+
                 $comision = $dataversion->comision;
 
                 $resultado = ($comision * $request->comprar) / 100;
@@ -1648,7 +1674,7 @@ class TarjetaController extends Controller
                     'emailCliente' => $uu->email,
                     'nombreCliente' => $request->nombre,
                 );
-         
+
                 $convertido = json_encode($data);
 
                 $tokenactual = $dataversion->token_wompi;
@@ -1670,13 +1696,13 @@ class TarjetaController extends Controller
                         CURLOPT_TIMEOUT => 30,
                         CURLOPT_POSTFIELDS => $convertido,
                         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                        CURLOPT_CUSTOMREQUEST => "POST",                      
+                        CURLOPT_CUSTOMREQUEST => "POST",
                         CURLOPT_HTTPHEADER => array(
                             "authorization: Bearer $tokenactual",
                             "content-type: application/json"
                         ),
                         ));
-                 
+
                         $response = curl_exec($curl);
                         $err = curl_error($curl);
                         $code = curl_getinfo($curl);
@@ -1690,7 +1716,7 @@ class TarjetaController extends Controller
 
                             if($code["http_code"] == 200){ // peticion correcta
                                 $arrayjson = json_decode($response,true);
-                               
+
                                 $idtransaccion = $arrayjson["idTransaccion"]; // guardar, string
                                 $esreal = $arrayjson["esReal"]; // guardar, bool
                                 $esaprobada = $arrayjson["esAprobada"]; // guardar, bool
@@ -1703,7 +1729,7 @@ class TarjetaController extends Controller
 
                                 $fechahoy = Carbon::now('America/El_Salvador');
 
-                                // guardar datos                                
+                                // guardar datos
                                 $reg = new CrediPuntos;
                                 $reg->usuario_id = $uu->id;
                                 $reg->credi_puntos = $request->comprar;
@@ -1716,18 +1742,18 @@ class TarjetaController extends Controller
                                 $reg->esaprobada = (int)$esaprobada;
                                 $reg->comision = $comision;
                                 $reg->revisada = 0;
-                                $reg->save();     
-                                DB::commit();     
-                                
+                                $reg->save();
+                                DB::commit();
+
                                 return ['success' => 3]; // compra exitosa
                             }else{
                                 // revisar los datos de su tarjeta
                                 return ['success' => 4];
                             }
                         }
-                       
+
                     }else{
-                     
+
                         // supero tiempo
                         // generar token nuevo
                         $curl = curl_init();
@@ -1779,7 +1805,7 @@ class TarjetaController extends Controller
                                 "content-type: application/json"
                             ),
                             ));
-                           
+
                             $response = curl_exec($curl);
                             $err = curl_error($curl);
                             $code = curl_getinfo($curl);
@@ -1790,10 +1816,10 @@ class TarjetaController extends Controller
                                 if(empty($response)){
                                     return ['success' => 2]; // problemas
                                 }
-    
+
                                 if($code["http_code"] == 200){ // peticion correcta
                                     $arrayjson = json_decode($response,true);
-                                   
+
                                     $idtransaccion = $arrayjson["idTransaccion"]; // guardar, string
                                     $codigo = $arrayjson["codigoAutorizacion"];
                                     $esreal = $arrayjson["esReal"]; // guardar, bool
@@ -1803,10 +1829,10 @@ class TarjetaController extends Controller
                                     if($esaprobada == false){
                                         return ['success' => 5]; // reprobada, no pudo ser efectuada
                                     }
-    
+
                                     $fechahoy = Carbon::now('America/El_Salvador');
 
-                                    // guardar datos                                
+                                    // guardar datos
                                     $reg = new CrediPuntos;
                                     $reg->usuario_id = $uu->id;
                                     $reg->credi_puntos = $request->comprar;
@@ -1819,9 +1845,9 @@ class TarjetaController extends Controller
                                     $reg->esaprobada = (int)$esaprobada;
                                     $reg->comision = $comision;
                                     $reg->revisada = 0;
-                                    $reg->save();     
-                                    DB::commit(); 
-                                     
+                                    $reg->save();
+                                    DB::commit();
+
                                     return ['success' => 3]; // compra exitosa
                                 }else{
                                     // revisar los datos de su tarjeta
@@ -1831,20 +1857,20 @@ class TarjetaController extends Controller
 
                         }
                     }
-                    
+
                 } catch(\Throwable $e){
                     DB::rollback();
 
+                    // error
                     return [
-                        'success' => 5,
-                        'message' => "e".  $e
+                        'success' => 5
                     ];
                 }
             }
         }
     }
 
-   
+
 
 
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){

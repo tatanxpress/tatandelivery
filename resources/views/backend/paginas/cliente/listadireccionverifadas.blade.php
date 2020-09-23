@@ -53,68 +53,50 @@
                               <label style="color:#191818">Nombre</label>
                               <br>
                               <input type="hidden" id="id-editar">
-                              <input type="text" maxlength="100" id="nombre" disabled  class="form-control"/></label>
+                              <input type="text" maxlength="100" id="nombre" disabled  class="form-control"/>
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Dirección</label>
                               <br>
-                              <input type="text" maxlength="400" id="direccion" disabled  class="form-control"></label>
+                              <input type="text" maxlength="400" id="direccion"  class="form-control">
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818"># Casa</label>
                               <br>
-                              <input type="text" maxlength="30" id="numero" disabled  class="form-control"></label>
+                              <input type="text" maxlength="30" id="numero"  class="form-control">
                           </div>
                           <div class="form-group">
                               <label style="color:#191818">Punto de referencia</label>
                               <br>
-                              <input type="text" maxlength="400" id="referencia" disabled  class="form-control"></label>
+                              <input type="text" maxlength="400" id="referencia"  class="form-control">
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Latitud</label>
                               <br>
-                              <input type="text" maxlength="50" id="latitud" disabled class="form-control"></label>
+                              <input type="text" maxlength="50" id="latitud" class="form-control">
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Longitud </label>
                               <br>
-                              <input type="text" maxlength="50" id="longitud" disabled class="form-control"></label>
+                              <input type="text" maxlength="50" id="longitud" class="form-control">
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Latitud Real</label>
                               <br>
-                              <input type="text" maxlength="50" id="latitud-real" disabled class="form-control"></label>
+                              <input type="text" maxlength="50" id="latitud-real" class="form-control">
                           </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Longitud Real</label>
                               <br>
-                              <input type="text" maxlength="50" id="longitud-real" disabled class="form-control"></label>
+                              <input type="text" maxlength="50" id="longitud-real" class="form-control">
                           </div>
 
-                          <div class="form-group">
-                                <label style="color:#191818">Estado (Direccion extranjero)</label>
-                                <br>
-                                <div>
-                                    <select class="form-control" id="select-estado">
-                                        <option value="0" selected>No Verificado</option>
-                                        <option value="1">Verificado</option>
-                                        <option value="2">Rechazada</option>
-                                    </select>
-                                </div>
-                          </div>
-
-
-                          <div class="form-group">
-                              <label style="color:#191818">Mensaje rechazo de direccion</label>
-                              <br>
-                              <input type="text" maxlength="200" id="mensaje-rechazo" class="form-control">
-                          </div>
 
                           <div class="form-group">
                               <label style="color:#191818">Cargo Envio</label>
@@ -165,8 +147,7 @@
   <script type="text/javascript">
     $(document).ready(function(){
 
-        var id = {{ $id }}
-        var ruta = "{{ URL::to('admin/extranjero/tabla/todas/direcciones') }}/"+id;
+        var ruta = "{{ URL::to('admin/ver/toda/tabla/direccion-extranjero') }}";
         $('#tablaDatatable').load(ruta);
     });
 
@@ -201,21 +182,11 @@
                 $('#latitud-real').val(response.data.direccion.latitud_real);
                 $('#longitud-real').val(response.data.direccion.longitud_real);
 
-                if(response.data.direccion.estado == 0){
-                    $('#select-estado option')[0].selected = true;
-                }else  if(response.data.direccion.estado == 1){
-                    $('#select-estado option')[1].selected = true;
-                }else  if(response.data.direccion.estado == 2){
-                    $('#select-estado option')[2].selected = true;
-                }
-
                 $('#horainicio-nuevo').val(response.data.direccion.hora_inicio);
                 $('#horafin-nuevo').val(response.data.direccion.hora_fin);
 
                 $('#cargo-envio').val(response.data.direccion.precio_envio);
                 $('#ganancia-motorista').val(response.data.direccion.ganancia_motorista);
-
-                $('#mensaje-rechazo').val(response.data.direccion.mensaje_rechazo);
 
 
             }else{
@@ -234,21 +205,21 @@
 
         var id = document.getElementById('id-editar').value;
 
+        var direccion = document.getElementById('direccion').value;
+        var numero = document.getElementById('numero').value;
+        var referencia = document.getElementById('referencia').value;
+
+        var latitud = document.getElementById('latitud').value;
+        var longitud = document.getElementById('longitud').value;
+        var latitudreal = document.getElementById('latitud-real').value;
+        var longitudreal = document.getElementById('longitud-real').value;
+
         // verificando la direccion del extranjero
         var cargo = document.getElementById('cargo-envio').value;
         var ganamotorista = document.getElementById('ganancia-motorista').value;
-        var mensaje = document.getElementById('mensaje-rechazo').value;
-        var estado = document.getElementById('select-estado').value;
 
         var horainicio = document.getElementById('horainicio-nuevo').value;
         var horafin = document.getElementById('horafin-nuevo').value;
-
-        if(estado == 2){
-            if(mensaje === ''){
-                toastr.error("Mensaje es requerido");
-                return;
-            }
-        }
 
         if(horainicio === ''){
             toastr.error("hora inicio es requerido");
@@ -270,19 +241,40 @@
             return;
         }
 
+        if(direccion === ''){
+            toastr.error("direccion es requerido");
+            return;
+        }
+
+        if(latitud === ''){
+            toastr.error("latitud es requerido");
+            return;
+        }
+
+        if(longitud === ''){
+            toastr.error("longitud es requerido");
+            return;
+        }
+
+
         var spinHandle = loadingOverlay().activate();
         var formData = new FormData();
 
         formData.append('id', id);
 
-        formData.append('estado', estado);
+        formData.append('direccion', direccion);
+        formData.append('numero', numero);
+        formData.append('referencia', referencia);
+        formData.append('latitud', latitud);
+        formData.append('longitud', longitud);
+        formData.append('latitudreal', latitudreal);
+        formData.append('longitudreal', longitudreal);
         formData.append('ganmotorista', ganamotorista);
         formData.append('cargoenvio', cargo);
-        formData.append('mensaje', mensaje);
         formData.append('horainicio', horainicio);
         formData.append('horafin', horafin);
 
-        axios.post('/admin/cliente/actualizar/extranjero/direccion', formData, {
+        axios.post('/admin/cliente/actualizar/extranjero/direccionv2', formData, {
                 })
                 .then((response) => {
                     loadingOverlay().cancel(spinHandle);
