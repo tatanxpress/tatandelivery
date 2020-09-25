@@ -562,6 +562,11 @@ Route::post('/admin', 'Auth\AdminLoginController@login')->name('admin.login.subm
   Route::get('/control/tabla/ordeneshoy', 'ControlOrdenesController@tablaHoy');
   Route::post('/control/total/de/ventas-hoy', 'ControlOrdenesController@totalVentasHoy');
 
+  // obtener el credito gastado
+  Route::post('/orden/credito-gastado-info', 'ControlOrdenesController@infoCreditoGastado');
+  // devolver credito rapido cuando una orden es cancelada
+  Route::post('/orden/credito-gastado-guardar', 'ControlOrdenesController@devolverCreditoRapido');
+
   // productos de orden nueva
   Route::get('/productos/orden/nueva/{id}', 'ControlOrdenesController@indexProductosHoy');
   Route::get('/productos/tabla/orden/nueva/{id}', 'ControlOrdenesController@tablaProductosHoy');

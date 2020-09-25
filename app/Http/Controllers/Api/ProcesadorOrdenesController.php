@@ -8,12 +8,12 @@ use App\Direccion;
 use App\HorarioServicio;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\MotoristaOrdenes; 
+use App\MotoristaOrdenes;
 use App\OrdenesDirecciones;
 use App\Ordenes;
 use App\OrdenesDescripcion;
 use App\Producto;
-use App\Servicios; 
+use App\Servicios;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\User;
@@ -46,39 +46,39 @@ class ProcesadorOrdenesController extends Controller
 {
     // enviar la primer orden
     public function procesarOrdenEstado1(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'userid' => 'required',
                 'aplicacupon' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.',
                 'aplicacupon.required' => 'Aplica cupon es requerido.',
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
-            { 
+            if($validarDatos->fails())
+            {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             DB::beginTransaction();
-           
+
             try {
                 // verificar si tengo carrito
                 if($cart = CarritoTemporalModelo::where('users_id', $request->userid)->first()){
-                    
+
                     // agarrar todos los productos del carrito
                     $producto = DB::table('producto AS p')
-                    ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
-                    ->select('p.id AS productoID', 'c.cantidad', 'p.precio', 'p.unidades', 
+                    ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
+                    ->select('p.id AS productoID', 'c.cantidad', 'p.precio', 'p.unidades',
                     'p.activo', 'p.disponibilidad', 'c.id AS carritoid', 'p.limite_orden', 'p.cantidad_por_orden')
                     ->where('c.carrito_temporal_id', $cart->id)
                     ->get();
@@ -101,7 +101,7 @@ class ProcesadorOrdenesController extends Controller
                     // sacar id zona del usuario
                     if($datoZona = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first()){
 
-                        $zonaiduser = $datoZona->zonas_id; // zona idzona donde esta el usuario                        
+                        $zonaiduser = $datoZona->zonas_id; // zona idzona donde esta el usuario
                         $idzonacarrito = $cart->zonas_id; // sacar idzona del carrito temporal
 
                         // comparar zona del carrito
@@ -110,7 +110,7 @@ class ProcesadorOrdenesController extends Controller
                             $coincideZona = 1;
                         }
                     }
-                    
+
                     // buscar si el servicio brinda adomicilio a esa zona
                     if(DB::table('zonas_servicios')
                     ->where('zonas_id', $zonaiduser)
@@ -119,14 +119,14 @@ class ProcesadorOrdenesController extends Controller
                     ->first()){
                         $hayEnvio = 1; // el servicio adomicilio a esa zona esta activo
                     }
-                   
+
                     $pilaSub = array(); // para saver si subtotal supera el minimo consumible
-                 
+
                     // recorrer cada producto
-                    foreach ($producto as $pro) {     
-                    
+                    foreach ($producto as $pro) {
+
                         // buscar si el producto ocupa cantidad
-                        $uni = Producto::where('id', $pro->productoID)->first();              
+                        $uni = Producto::where('id', $pro->productoID)->first();
                         // obtener todo el producto igual del carrito y sumar sus cantidades
                         $obtenido = CarritoExtraModelo::where('carrito_temporal_id', $cart->id)
                         ->where('producto_id', $pro->productoID)->get();
@@ -135,27 +135,27 @@ class ProcesadorOrdenesController extends Controller
 
                         // sumar todo el producto igual, y ver si excedio o no
                         if($uni->utiliza_cantidad){
-                                                  
+
                             // preguntar si excedio la cantidades con las unidades del producto
                             if($cantidadCarrito > $pro->unidades){
                                 $excedido = 1; // un producto ha superado las unidades disponibles
                             }
-                        
+
                             if($pro->limite_orden){
                                 if($cantidadCarrito > $pro->cantidad_por_orden){
                                     // limite por orden excedida
                                     $limitePromocion = 1;
                                 }
-                            }                         
+                            }
 
                         }else{
-                           
+
                             if($pro->limite_orden){
                                 if($cantidadCarrito > $pro->cantidad_por_orden){
                                     // limite por orden excedida
                                     $limitePromocion = 1;
                                 }
-                            }                          
+                            }
                         }
 
                         // un producto no esta disponible o activo
@@ -167,14 +167,14 @@ class ProcesadorOrdenesController extends Controller
                         $cantidad = $pro->cantidad;
                         $precio = $pro->precio;
                         $multi = $cantidad * $precio;
-                        array_push($pilaSub, $multi); 
+                        array_push($pilaSub, $multi);
                     }
 
                     $consumido=0;
                     foreach ($pilaSub as $valor){
                         $consumido=$consumido+$valor;
                     }
-                   
+
                     // saver si lo consumible es mayor al minimo
                     $servicioConsumo = Servicios::where('id', $cart->servicios_id)->first();
 
@@ -184,7 +184,7 @@ class ProcesadorOrdenesController extends Controller
 
                     // con esto se sabe si se paga al propietario del servicio o no
                     $pagoPropi = $servicioConsumo->pago_a_ordenes;
-                  
+
                     $minimoConsumido = 0;
 
                     if($utilizaMinimo == 1){
@@ -195,7 +195,7 @@ class ProcesadorOrdenesController extends Controller
 
                     $minimoString = (string) $minimo;
 
-                    // validacion de horarios para este servicio    
+                    // validacion de horarios para este servicio
                     $numSemana = [
                         0 => 1, // domingo
                         1 => 2, // lunes
@@ -208,8 +208,8 @@ class ProcesadorOrdenesController extends Controller
 
                     // hora y fecha
                     $getValores = Carbon::now('America/El_Salvador');
-                    $getDiaHora = $getValores->dayOfWeek;            
-                    $diaSemana = $numSemana[$getDiaHora];        
+                    $getDiaHora = $getValores->dayOfWeek;
+                    $diaSemana = $numSemana[$getDiaHora];
                     $hora = $getValores->format('H:i:s');
 
                     $horarioLocal = 0; // saver si esta cerrado por su horario
@@ -221,10 +221,10 @@ class ProcesadorOrdenesController extends Controller
                     ->where('h.servicios_id', $servicioidC) // id servicio
                     ->where('h.dia', $diaSemana) // dia
                     ->get();
-                   
+
                     // si verificar con la segunda hora
                     if(count($dato) >= 1){
-            
+
                         $horario = DB::table('horario_servicio AS h')
                         ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                         ->where('h.segunda_hora', '1') // segunda hora habilitada
@@ -235,7 +235,7 @@ class ProcesadorOrdenesController extends Controller
                                 ->where('h.hora2', '>=' , $hora)
                                 ->orWhere('h.hora3', '<=', $hora)
                                 ->where('h.hora4', '>=' , $hora);
-                        }) 
+                        })
                     ->get();
 
                         if(count($horario) >= 1){ // abierto
@@ -245,15 +245,15 @@ class ProcesadorOrdenesController extends Controller
                         }
 
                     }else{
-                    
+
                         // verificar sin la segunda hora
                         $horario = DB::table('horario_servicio AS h')
-                        ->join('servicios AS s', 's.id', '=', 'h.servicios_id')                        
+                        ->join('servicios AS s', 's.id', '=', 'h.servicios_id')
                         ->where('h.segunda_hora', 0) // segunda hora habilitada
                         ->where('h.servicios_id', $servicioidC) // id servicio
-                        ->where('h.dia', $diaSemana)                                                     
-                        ->where('h.hora1', '<=', $hora) 
-                        ->where('h.hora2', '>=', $hora) 
+                        ->where('h.dia', $diaSemana)
+                        ->where('h.hora1', '<=', $hora)
+                        ->where('h.hora2', '>=', $hora)
                         ->get();
 
                         if(count($horario) >= 1){
@@ -261,12 +261,12 @@ class ProcesadorOrdenesController extends Controller
                         }else{
                             $horarioLocal = 1; //cerrado
                         }
-                    } 
-                    
+                    }
+
                     // preguntar si este dia esta cerrado
                     $cerradoHoy = HorarioServicio::where('servicios_id', $servicioidC)
                     ->where('dia', $diaSemana)->first();
-                
+
                     $cerrado = 0; // saver si esta cerrado hoy normalmente
 
                     if($cerradoHoy->cerrado == 1){
@@ -274,10 +274,10 @@ class ProcesadorOrdenesController extends Controller
                     }else{
                         $cerrado = 0; // no cerrado
                     }
-                   
+
                     // sacar id de zona del carrito
                     $zon = DB::table('zonas')->where('id', $zonaidd)->first();
-                
+
                     // zona saturacion
                     $zonaSaturacion = $zon->saturacion;
                     $mensajeZona = $zon->mensaje;
@@ -293,14 +293,14 @@ class ProcesadorOrdenesController extends Controller
                     // servicio no activo
                     $servicionoactivo = 0;
                     $servicionoactivo = $emergencia->activo;
-                    
+
                     // horario delivery para esa zona
                     $horaD = DB::table('zonas')
                     ->where('id', $zonaidd)
                     ->where('hora_abierto_delivery', '<=', $hora)
                     ->where('hora_cerrado_delivery', '>=', $hora)
                     ->get();
-                   
+
                     $horarioDelivery = DB::table('zonas')
                     ->where('id', $zonaidd)   // id de la zona
                     ->first();
@@ -311,18 +311,18 @@ class ProcesadorOrdenesController extends Controller
 
                     $hora1 = date("h:i A", strtotime($horarioDelivery->hora_abierto_delivery));
                     $hora2 = date("h:i A", strtotime($horarioDelivery->hora_cerrado_delivery));
-                            
+
                     $horaDelivery = 0; // abierto
                     if(count($horaD) >= 1){
                         $horaDelivery = 1; // abierto
                     }else{
                         $horaDelivery = 0; // cerrado
-                    } 
+                    }
 
                     // saver si el usuario esta activo
                     $usuarioActivo = User::where('id', $request->userid)->pluck('activo')->first();
 
-                    // solo disponible para servicios que sean privados. 
+                    // solo disponible para servicios que sean privados.
 
                     // estos datos son para saver si el servicio privado dara adomicilio hasta una determinada
                     // horario, si la zona da de 7 am a 10 pm, el servicio privado es libre de decidir
@@ -330,7 +330,7 @@ class ProcesadorOrdenesController extends Controller
 
                     $datos_info = DB::table('zonas_servicios')
                     ->where('zonas_id', $zonaiduser)
-                    ->where('servicios_id', $servicioidC)                    
+                    ->where('servicios_id', $servicioidC)
                     ->first();
 
                     $tiempo_limite = $datos_info->tiempo_limite;
@@ -341,24 +341,24 @@ class ProcesadorOrdenesController extends Controller
                     $hora1limite = date("h:i A", strtotime($horainicio));
                     $hora2limite = date("h:i A", strtotime($horafinal));
 
-                    // sacar dinero limite por orden 
+                    // sacar dinero limite por orden
                     $limitedineroorden = DB::table('servicios')->where('id', $servicioidC)->pluck('compra_limite')->first();
-                    
+
                     if($tiempo_limite == 1){
 
                         // revisado de tiempo
                         if (($horainicio < $hora) && ($hora < $horafinal)) {
-                            $limiteentrega = 0; // abierto                        
+                            $limiteentrega = 0; // abierto
                         }else{
                             $limiteentrega = 1; // cerrado
                         }
-                    
+
                     }else{
                         // este dato no es tomado en cuenta si $tiempolimite == 0
                         $limiteentrega = 1; // cerrado
-                    }     
+                    }
 
-                
+
                     //**** VALIDACIONES *****//
 
                     if($excedido == 1){ // producto excedido en cantidad*
@@ -369,10 +369,10 @@ class ProcesadorOrdenesController extends Controller
                         return ['success' => 2];
                     }
 
-                    if($coincideZona == 0){ //l a zona de envio no coincide de donde solicito este servicio 
-                        return ['success' => 3]; 
+                    if($coincideZona == 0){ //l a zona de envio no coincide de donde solicito este servicio
+                        return ['success' => 3];
                     }                 // direccion siempre tiene que haber, sino se dispara success 3
-                    
+
                     // solo servicios publicos
                     if($privado == 0){
                         if($zonaSaturacion == 1 ){ // no hay entregas para esta zona por el momento*
@@ -390,7 +390,7 @@ class ProcesadorOrdenesController extends Controller
                             return ['success' => 7, 'hora1' => $hora1, 'hora2' => $hora2];
                         }
                     }
-                   
+
                     if($cerrado == 1){ // cerrado normalmente este dia*
                         return ['success' => 8];
                     }
@@ -402,8 +402,8 @@ class ProcesadorOrdenesController extends Controller
                     }
                     if($usuarioActivo == 0){ // usuario no activo
                         return ['success' => 11];
-                    }      
-                    
+                    }
+
                     if($privado == 1){
                         if($utilizaMinimo == 1){ // utiliza minimo de ventas
                             if($minimoConsumido == 0){ //lo consumible no supera el minimo de venta
@@ -426,7 +426,7 @@ class ProcesadorOrdenesController extends Controller
                         return ['success' => 18];
                     }
 
-                    // solo para servicios privados, que quieren poner su horario de entrega a la zona 
+                    // solo para servicios privados, que quieren poner su horario de entrega a la zona
                     // que dan servicio
                     if($privado == 1){
                         if($tiempo_limite == 1){
@@ -440,11 +440,11 @@ class ProcesadorOrdenesController extends Controller
                     if($consumido > $limitedineroorden){
                         $l = number_format((float)$limitedineroorden, 2, '.', '');
                         return ['success' => 21, 'limite' => $l];
-                    }                   
+                    }
 
                     // Verificar validez del cupon
                     if($request->aplicacupon == 1){
-                        // verificar que exista                  
+                        // verificar que exista
 
                         if($ccs = Cupones::where('texto_cupon', $request->cupon)->first()){
 
@@ -452,24 +452,24 @@ class ProcesadorOrdenesController extends Controller
                             $usolimite = $ccs->uso_limite;
                             $contador = $ccs->contador;
                             $activo = $ccs->activo;
-                                    
+
                             if($ccs->ilimitado == 0){
                                 // verificar si aun es valido este cupon
                                 if($contador >= $usolimite || $activo == 0){
                                     return ['success' => 22]; // cupon ya no es valido
                                 }
-                            }                                
-        
+                            }
+
                         }else{
                             // cupon no encontrado
                             return ['success' => 23];
                         }
                     }
 
-                   
+
 
                     //INGRESAR DATOS
-                
+
                     // obtener todos los productos de la orden
                     $producto = CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->get();
 
@@ -495,20 +495,20 @@ class ProcesadorOrdenesController extends Controller
                     $zona_envio_gratis = 0;
                     $copiaenvio = 0;
                     $copiamingratis = 0;
-                    
+
                     // precio de la zona, aqui ya verificamos que si existe y esta activo
                     if($zz = DB::table('zonas_servicios')
                     ->where('zonas_id', $cart->zonas_id)
                     ->where('servicios_id', $servicioid)
-                    ->first()){       
-                        // PRIORIDAD 1                
+                    ->first()){
+                        // PRIORIDAD 1
                         $envioPrecio = $zz->precio_envio;
                         $tipocargo = 1;
                         $copiaenvio = $zz->precio_envio;
                         $copiamingratis = $zz->costo_envio_gratis;
-                        
-                        $gananciamotorista = $zz->ganancia_motorista;                        
-                        $mitadprecio = $zz->mitad_precio; 
+
+                        $gananciamotorista = $zz->ganancia_motorista;
+                        $mitadprecio = $zz->mitad_precio;
                         $zona_envio_gratis = $zz->zona_envio_gratis;
                     }
 
@@ -519,7 +519,7 @@ class ProcesadorOrdenesController extends Controller
                             $dividir = $envioPrecio;
                             $envioPrecio = $dividir / 2;
                             $tipocargo = 2;
-                        }                       
+                        }
                     }
 
                     // PRIORIDAD 3
@@ -527,8 +527,8 @@ class ProcesadorOrdenesController extends Controller
                     if($zona_envio_gratis == 1){
                         $envioPrecio = 0;
                         $tipocargo = 3;
-                    }                    
-                   
+                    }
+
                     // array
                     $pila = array();
 
@@ -550,20 +550,20 @@ class ProcesadorOrdenesController extends Controller
                             }
                         }
                     }
-                    
+
                     // sumar el array de precios $ subtotales
                     $resultado=0;
                     foreach ($pila as $valor){
                         $resultado=$resultado+$valor;
                     }
-                    
+
                     // convertir subtotal a decimal y tipo string
                     $convertir = number_format((float)$resultado, 2, '.', '');
                     $precio_orden = (string) $convertir;
-                    
+
                     // fecha hoy dia
                     $fecha = Carbon::now('America/El_Salvador');
-                                      
+
                     // sacar minimo de compra para envio gratis, sino pagara el envio
                     $datosInfo = DB::table('zonas_servicios')
                     ->where('zonas_id', $zonaiduser)
@@ -572,7 +572,7 @@ class ProcesadorOrdenesController extends Controller
 
                     // PRIORIDAD 4
                     // variable para saver si sub total supero min requerido para nuevo cargo
-                   
+
                     // esta zona tiene un minimo de $$ para aplicar nuevo cargo
                     if($datosInfo->min_envio_gratis == 1){
                         $costo = $datosInfo->costo_envio_gratis;
@@ -583,13 +583,13 @@ class ProcesadorOrdenesController extends Controller
                             $envioPrecio = $datosInfo->nuevo_cargo;  // aplicar el nuevo tipo de cargo
                             $tipocargo = 4;
                         }
-                    }                  
-                    
+                    }
+
                     $notaOrden = $request->nota_orden;
                     if(empty($notaOrden) || $notaOrden == null){
                         $notaOrden = "";
                     }
-                   
+
                     $cambio = $request->cambio;
                     if(empty($cambio) || $cambio == null){
                         $cambio = "";
@@ -604,13 +604,13 @@ class ProcesadorOrdenesController extends Controller
                     // ya verificado que cupon es valido y exista, ingresar registros
 
                     // setear precio envio si es cupon envio gratis, o el de descuento dinero
-                    
-                                        
+
+
                     if($request->aplicacupon == 1){
                         if($ccs = Cupones::where('texto_cupon', $request->cupon)->first()){
-                            
-                            if($ccs->tipo_cupon_id == 1){                                
-                                $envioPrecio = 0;                               
+
+                            if($ccs->tipo_cupon_id == 1){
+                                $envioPrecio = 0;
                             }
                             else if($ccs->tipo_cupon_id == 2){
                                  if($cdd = CuponDescuentoDinero::where('cupones_id', $ccs->id)->first()){
@@ -621,7 +621,7 @@ class ProcesadorOrdenesController extends Controller
                             }
                         }
                     }
-                   
+
                     // orden crear normalmente, saver el tiempo automatico o no, depende del estado_2
                     // crear la orden
                     $idOrden = DB::table('ordenes')->insertGetId(
@@ -631,7 +631,7 @@ class ProcesadorOrdenesController extends Controller
                         'cambio' => $cambio,
                         'fecha_orden' => $fecha,
                         'precio_total' => $precio_orden,
-                        'precio_envio' => $envioPrecio,                       
+                        'precio_envio' => $envioPrecio,
                         'mensaje_8' => "",
                         'visible_p' => 1,
                         'visible' => 1,
@@ -644,24 +644,24 @@ class ProcesadorOrdenesController extends Controller
                         'estado_7' => 0,
                         'estado_8' => 0,
                         'visible_p2' => 0,
-                        'visible_p3' => 0,                      
+                        'visible_p3' => 0,
                         'cancelado_cliente' => 0,
                         'cancelado_propietario' => 0,
                         'visible_m' => $productovisible, // si es 1, puede ver los productos el motorista
                         'ganancia_motorista' => $gananciamotorista ,
                         'tipo_cargo' => $tipocargo, // hay 4 tipos,
-                        'pago_a_propi' => $pagoPropi  
+                        'pago_a_propi' => $pagoPropi
                         ]
                     );
- 
+
 
                     // guardar registro de los cupones
                     // YA VERIFICADO que cupon esta activo y hay aun uso.
                     if($request->aplicacupon == 1){
-                        if($ccs = Cupones::where('texto_cupon', $request->cupon)->first()){                          
-                           
+                        if($ccs = Cupones::where('texto_cupon', $request->cupon)->first()){
+
                             if($ccs->tipo_cupon_id == 1){
-                                                               
+
                                 //  minimo a comprar para aplicar envio gratis
                                 $ced = CuponEnvioDinero::where('cupones_id', $ccs->id)->first();
 
@@ -671,8 +671,8 @@ class ProcesadorOrdenesController extends Controller
                                     // verificar servicio es valido
                                     if(CuponEnvioServicios::where('cupones_id', $ccs->id)->where('servicios_id', $servicioid)->first()){
 
-                                        $idzona = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->pluck('zonas_id')->first();              
-                                        
+                                        $idzona = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->pluck('zonas_id')->first();
+
                                         // verificar zona es valido
                                         if(CuponEnvioZonas::where('cupones_id', $ccs->id)->where('zonas_id', $idzona)->first()){
 
@@ -692,23 +692,23 @@ class ProcesadorOrdenesController extends Controller
                                                 $uno = new AplicaCuponUno;
                                                 $uno->ordenes_id = $idOrden;
                                                 $uno->dinero = $ced->dinero;
-                
+
                                                 $uno->save();
                                         }else{
                                             return ['success' => 23]; // cupon no valido
                                         }
                                     }else{
                                         return ['success' => 23]; // cupon no valido
-                                    }                       
+                                    }
                                 }else{
                                     return ['success' => 23]; // cupon no valido
-                                }                                
+                                }
                             }
                             else if($ccs->tipo_cupon_id == 2){
 
                                 // verificar que da para este servicio
                                 if(CuponDescuentoDineroServicios::where('cupones_id', $ccs->id)->where('servicios_id', $servicioid)->first()){
-                                    
+
                                     // ingresar registro
                                     $reg = new OrdenesCupones;
                                     $reg->ordenes_id = $idOrden;
@@ -726,16 +726,16 @@ class ProcesadorOrdenesController extends Controller
                                     $dos = new AplicaCuponDos;
                                     $dos->ordenes_id = $idOrden;
                                     $dos->dinero = $cdd->dinero;
-                                    $dos->aplico_envio_gratis = $cdd->aplica_envio_gratis; 
-    
+                                    $dos->aplico_envio_gratis = $cdd->aplica_envio_gratis;
+
                                     $dos->save();
 
                                 }else{
                                     return ['success' => 23]; // cupon no valido
-                                }                                
+                                }
                             }
                             else if($ccs->tipo_cupon_id == 3){
-                             
+
                                 // verificar minimo
                                 // minimo a comprar para aplicar descuento
                                 $cdp = CuponDescuentoPorcentaje::where('cupones_id', $ccs->id)->first();
@@ -745,7 +745,7 @@ class ProcesadorOrdenesController extends Controller
 
                                     // verificar servicio si aplica
                                     if(CuponDescuentoPorcentajeServicios::where('cupones_id', $ccs->id)->where('servicios_id', $servicioid)->first()){
-                                        
+
                                         // ingresar registro
                                         $reg = new OrdenesCupones;
                                         $reg->ordenes_id = $idOrden;
@@ -757,17 +757,17 @@ class ProcesadorOrdenesController extends Controller
 
                                         // sumas +1 el contador
                                         Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
-                                        
+
                                         $tres = new AplicaCuponTres;
                                         $tres->ordenes_id = $idOrden;
                                         $tres->dinero = $cdp->dinero;
-                                        $tres->porcentaje = $cdp->porcentaje; 
+                                        $tres->porcentaje = $cdp->porcentaje;
 
                                         $tres->save();
 
                                     }else{
                                         return ['success' => 23]; // cupon no valido
-                                    }                                  
+                                    }
                                 }else{
                                     return ['success' => 23]; // cupon no valido
                                 }
@@ -789,35 +789,35 @@ class ProcesadorOrdenesController extends Controller
                                 // verifica minimo
                                 if($resultado >= $cpg->dinero_carrito){
 
-                                    
+
                                     // verificar servicio si aplica
                                     if(CuponProductoGratis::where('cupones_id', $ccs->id)->where('servicios_id', $servicioid)->first()){
-                                       
+
                                         // ingresar registro
                                         $reg = new OrdenesCupones;
                                         $reg->ordenes_id = $idOrden;
                                         $reg->cupones_id = $ccs->id;
                                         $reg->save();
-                                      
+
                                         $contador = $ccs->contador;
                                         $contador = $contador + 1;
 
                                         // sumas +1 el contador
                                         Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
-                                       
+
                                         $cuatro = new AplicaCuponCuatro;
                                         $cuatro->ordenes_id = $idOrden;
                                         $cuatro->dinero_carrito = $cpg->dinero_carrito;
                                         $cuatro->producto = $cpg->nombre;
-        
+
                                         $cuatro->save();
-                                        
+
                                     }else{
                                         return ['success' => 23]; // cupon no valido
-                                    }                                  
+                                    }
                                 }else{
                                     return ['success' => 23]; // cupon no valido
-                                }                               
+                                }
                             }
                             else if($ccs->tipo_cupon_id == 5){ // cupon donacion
 
@@ -826,7 +826,7 @@ class ProcesadorOrdenesController extends Controller
 
                                 // sumas +1 el contador
                                 Cupones::where('id', $ccs->id)->update(['contador' => $contador]);
-                                $cd = CuponDonacion::where('cupones_id', $ccs->id)->first();       
+                                $cd = CuponDonacion::where('cupones_id', $ccs->id)->first();
 
 
                                 // ingresar registro
@@ -845,10 +845,10 @@ class ProcesadorOrdenesController extends Controller
                                 $cinco->ordenes_id = $idOrden;
                                 $cinco->instituciones_id = $cd->instituciones_id;
                                 $cinco->dinero = $cd->dinero;
- 
-                                $cinco->save();               
+
+                                $cinco->save();
                             }
-                            
+
                             else{
                                 return ['success' => 23]; // cupon no valido
                             }
@@ -856,11 +856,11 @@ class ProcesadorOrdenesController extends Controller
                             return ['success' => 23]; // cupon no encontrado
                         }
                     }
-                     
+
                         // guadar todos los productos de esa orden
                         foreach($producto as $p){
 
-                            // multiplicar cantidad por precio                                        
+                            // multiplicar cantidad por precio
                             $productos = DB::table('producto AS p')->where('p.id', $p->producto_id)->first();
 
                             $notaP = $p->nota_producto;
@@ -875,7 +875,7 @@ class ProcesadorOrdenesController extends Controller
                                         'nota' => $notaP);
                             OrdenesDescripcion::insert($data);
                         }
-                       
+
                     // guardar direccion del usuario
                     $datoDir = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
                     $dNombre = $datoDir->nombre;
@@ -918,7 +918,7 @@ class ProcesadorOrdenesController extends Controller
                     if($request->dispositivo != null){
                         $dispositivo = $request->dispositivo;
                     }
-                    
+
                     $nuevaDir = new OrdenesDirecciones;
                     $nuevaDir->users_id = $dUser;
                     $nuevaDir->ordenes_id = $idOrden;
@@ -928,7 +928,7 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->numero_casa = $dNumero;
                     $nuevaDir->punto_referencia = $dPunto;
                     $nuevaDir->latitud = $dLati;
-                    $nuevaDir->longitud = $dLong;                   
+                    $nuevaDir->longitud = $dLong;
                     $nuevaDir->latitud_real = $dLatiReal;
                     $nuevaDir->longitud_real = $dLongiReal;
                     $nuevaDir->copia_envio = $copiaenvio;
@@ -936,7 +936,7 @@ class ProcesadorOrdenesController extends Controller
                     $nuevaDir->copia_tiempo_orden = $copiaTiempoOrden;
                     $nuevaDir->movil_ordeno = $dispositivo; // si es 1, es ios, sino android
                     $nuevaDir->revisado = $revisado;
-                    
+
                     $nuevaDir->save();
 
                     // guardar notificacion id, solo utilizado para iphone
@@ -945,48 +945,48 @@ class ProcesadorOrdenesController extends Controller
                             User::where('id', $request->userid)->update(['device_id' => $request->onesignalid]);
                         }
                     }*/
-                    
-                   
+
+
                     // BORRAR CARRITO TEMPORAL DEL USUARIO
-                    
+
                     //CarritoExtraModelo::where('carrito_temporal_id', $cart->id)->delete();
                     //CarritoTemporalModelo::where('users_id', $request->userid)->delete();
-                    
+
                     // NOTIFICACIONES AL PROPIETARIO
                     // obtener todos los propietarios registrado al servicio
                     $propietarios = DB::table('propietarios')
                     ->where('servicios_id', $cart->servicios_id)
                     ->where('disponibilidad', 1)
                     ->where('activo', 1)
-                    ->get(); 
-                  
+                    ->get();
+
                     // unir todos los identificadores para el envio de notificaciones
                     $pilaPropietarios = array();
                         foreach($propietarios as $m){
                             if(!empty($m->device_id)){
                                 //EVITAR LOS NUEVOS REGISTRADOS
-                                if($m->device_id != "0000"){                                   
-                                    array_push($pilaPropietarios, $m->device_id); 
+                                if($m->device_id != "0000"){
+                                    array_push($pilaPropietarios, $m->device_id);
                                 }
                             }
-                        }  
+                        }
 
                     // NOTIFICACIONES A PROPIETARIOS, DISPONIBLES
                     if(!empty($pilaPropietarios)){
                         $titulo = "Nueva Orden #".$idOrden;
                         $mensaje = "Ver orden nueva!";
-                                             
+
                         if(!empty($pilaPropietarios)){
                             try {
-                                $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);                               
-                            } catch (Exception $e) {                              
-                            }                                                        
+                                $this->envioNoticacionPropietario($titulo, $mensaje, $pilaPropietarios);
+                            } catch (Exception $e) {
+                            }
                         }
 
-                    }else{               
+                    }else{
 
                         // GUARDAR REGISTROS SINO HAY PROPIETARIO DISPONIBLE
-                        
+
                         /**TIPO
 
                             1- orden nueva, y no hay propietario disponible
@@ -1001,8 +1001,8 @@ class ProcesadorOrdenesController extends Controller
                         $osp->fecha = $fecha;
                         $osp->activo = 1;
                         $osp->tipo = 1;
-                        $osp->save();  
-                        
+                        $osp->save();
+
                         // ENVIAR NOTIFICACIONES SOBRE LA ORDEN QUE NO HAY NINGUN PROPIETARIO DISPONIBLE
                         $administradores = DB::table('administradores')
                         ->where('activo', 1)
@@ -1012,13 +1012,13 @@ class ProcesadorOrdenesController extends Controller
                         $pilaAdministradores = array();
                         foreach($administradores as $p){
                             if(!empty($p->device_id)){
-                               
+
                                 if($p->device_id != "0000"){
                                     array_push($pilaAdministradores, $p->device_id);
                                 }
                             }
-                        }  
- 
+                        }
+
                         //si no esta vacio
                         if(!empty($pilaAdministradores)){
                             $titulo = "Orden sin Propietario";
@@ -1026,56 +1026,56 @@ class ProcesadorOrdenesController extends Controller
                             try {
                                 $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
                             } catch (Exception $e) {
-                                
+
                             }
-                            
+
                         }
-                    }   
+                    }
 
                         // SINO HAY MOTORISTA DISPONIBLE A ESE SERVICIO, MANDAR AVISO A ADMINISTRADORES
-                        
+
                         $mototabla = DB::table('motoristas_asignados AS ms')
                         ->join('motoristas AS m', 'm.id', '=', 'ms.motoristas_id')
                         ->where('m.activo', 1)
                         ->where('m.disponible', 1)
                         ->where('ms.servicios_id', $servicioid)
                         ->get();
- 
+
                         $pilamoto = array();
-                        foreach($mototabla as $p){  
+                        foreach($mototabla as $p){
                             if(!empty($p->device_id)){
                                 if($p->device_id != "0000"){
-                                    array_push($pilamoto, $p->device_id); 
-                                }                        
+                                    array_push($pilamoto, $p->device_id);
+                                }
                             }
                         }
 
                         // SINO HAY MOTORISTA, GUARDAR REGISTRO Y ENVIAR LA NOTIFICACION
                         if(empty($pilamoto)){
-   
+
                             $osp = new OrdenesPendiente;
-                            $osp->ordenes_id = $idOrden; 
+                            $osp->ordenes_id = $idOrden;
                             $osp->fecha = $fecha;
                             $osp->activo = 1;
                             $osp->tipo = 2;
                             $osp->save();
-                            
+
                             // ENVIAR NOTIFICACIONES SOBRE LA ORDEN QUE NO HAY NINGUN MOTORISTA DISPONIBLE
                             $administradores = DB::table('administradores')
                             ->where('activo', 1)
                             ->where('disponible', 1)
                             ->get();
-    
+
                             $pilaAdministradores = array();
                             foreach($administradores as $p){
                                 if(!empty($p->device_id)){
-                                   
+
                                     if($p->device_id != "0000"){
                                         array_push($pilaAdministradores, $p->device_id);
                                     }
                                 }
-                            } 
-    
+                            }
+
                             //si no esta vacio
                             if(!empty($pilaAdministradores)){
                                 $titulo = "Orden sin Motorista Disponible";
@@ -1083,13 +1083,13 @@ class ProcesadorOrdenesController extends Controller
                                 try {
                                     $this->envioNoticacionAdministrador($titulo, $mensaje, $pilaAdministradores);
                                 } catch (Exception $e) {
-                                    
+
                                 }
-                                                                
+
                             }
                         }
 
-                    
+
                         DB::commit();
 
                     return ['success' => 14];
@@ -1099,7 +1099,7 @@ class ProcesadorOrdenesController extends Controller
                         'success' => 20 // carrito de compras no encontrado
                     ];
                 }
- 
+
             } catch(\Throwable $e){
                 DB::rollback();
                 return [
@@ -1111,26 +1111,26 @@ class ProcesadorOrdenesController extends Controller
     }
 
     public function verificarCupon(Request $request){
-       
-        if($request->isMethod('post')){ 
+
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'userid' => 'required',
-                'cupon' => 'required'              
+                'cupon' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.',
-                'cupon.required' => 'cupon es requerido'            
+                'cupon.required' => 'cupon es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -1163,8 +1163,8 @@ class ProcesadorOrdenesController extends Controller
                         if($contador >= $usolimite || $activo == 0){
                             return ['success' => 2]; // cupon ya no es valido
                         }
-                    }  
- 
+                    }
+
                     if($tipocupon == 1){// tipo: envio gratis
 
                         // buscar si este cupon aplica a esta zona
@@ -1175,28 +1175,28 @@ class ProcesadorOrdenesController extends Controller
 
                                 // buscar el cupon para encontrar el monto minimo aplicable
                                 if($ced = CuponEnvioDinero::where('cupones_id', $cupon->id)->first()){
-                                    
+
                                     $dinerominimo = $ced->dinero; // minimo $ para aplicar envio gratis
- 
+
                                     // obtener el total del carrito de compras
                                     $producto = DB::table('producto AS p')
-                                    ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                                    ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                                     ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
                                     ->where('c.carrito_temporal_id', $cart->id)
                                     ->get();
 
                                     $pilaSub = array(); // para obtener el sub total
-                
+
                                     // recorrer cada producto
-                                    foreach ($producto as $pro) { 
-                
+                                    foreach ($producto as $pro) {
+
                                         // saver el precio multiplicado por la cantidad
                                         $cantidad = $pro->cantidad;
                                         $precio = $pro->precio;
                                         $multi = $cantidad * $precio;
-                                        array_push($pilaSub, $multi); 
+                                        array_push($pilaSub, $multi);
                                     }
-                
+
                                     $consumido=0;
                                     foreach ($pilaSub as $valor){
                                         $consumido=$consumido+$valor;
@@ -1244,33 +1244,33 @@ class ProcesadorOrdenesController extends Controller
                             ->where('servicios_id', $serviciocarrito)->first()){
 
                                 $producto = DB::table('producto AS p')
-                                ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                                ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                                 ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
                                 ->where('c.carrito_temporal_id', $cart->id)
                                 ->get();
 
                                 $pilaSub = array(); // para obtener el sub total
-                 
+
                                 // recorrer cada producto
-                                foreach ($producto as $pro) { 
-            
+                                foreach ($producto as $pro) {
+
                                     // saver el precio multiplicado por la cantidad
                                     $cantidad = $pro->cantidad;
                                     $precio = $pro->precio;
                                     $multi = $cantidad * $precio;
-                                    array_push($pilaSub, $multi); 
+                                    array_push($pilaSub, $multi);
                                 }
-            
+
                                 $consumido=0;
                                 foreach ($pilaSub as $valor){
                                     $consumido=$consumido+$valor;
-                                }     
+                                }
 
                                 // descontar dinero a la orden
                                 $subtotal = $consumido - $dinerodescuento;
                                 if($subtotal <= 0){
                                     $subtotal = 0;
-                                } 
+                                }
 
                                 //** conocer el envio, tipo de cargo */
                                 $zonaiduser = 0;
@@ -1278,27 +1278,27 @@ class ProcesadorOrdenesController extends Controller
                                 if($user = Direccion::where('user_id', $request->userid)
                                 ->where('seleccionado', 1)->first()){
                                     $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
-                                } 
-                                $envioPrecio = 0;                                            
-                                     
+                                }
+                                $envioPrecio = 0;
+
                                 // precio de la zona
                                 // aqui no importa si esta activo o inactivo, solo obtendra el precio
                                 // para ver el proceso debe existir en zonas_servicios
-                                $zz = DB::table('zonas_servicios')                                   
+                                $zz = DB::table('zonas_servicios')
                                 ->where('zonas_id', $zonaiduser)
                                 ->where('servicios_id', $cart->servicios_id)
                                 ->first();
 
                                 // obtiene precio envio de la zona
                                 // PRIORIDAD 1
-                                $envioPrecio = $zz->precio_envio;                   
+                                $envioPrecio = $zz->precio_envio;
 
                                 // PRIORIDAD 2
                                 // mitad de precio al envio, solo servicios publicos
                                 if($zz->mitad_precio == 1){
                                     if($envioPrecio != 0){
                                         $envioPrecio = $envioPrecio / 2;
-                                    }                        
+                                    }
                                 }
 
                                 // PRIORIDAD 3
@@ -1308,7 +1308,7 @@ class ProcesadorOrdenesController extends Controller
                                 }
 
                                 $datosInfo = DB::table('zonas_servicios AS z')
-                                ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                                ->select('z.min_envio_gratis', 'costo_envio_gratis')
                                 ->where('z.zonas_id', $zonaiduser)
                                 ->where('z.servicios_id', $cart->servicios_id)
                                 ->first();
@@ -1321,9 +1321,9 @@ class ProcesadorOrdenesController extends Controller
                                     if($subtotal >= $datosInfo->costo_envio_gratis){
                                         $envioPrecio = 0;
                                     }
-                                }       
+                                }
 
-                              
+
 
                                 // ver si este cupon aplica envio gratis
                                 if($aplicaenviogratis == 1){
@@ -1345,10 +1345,10 @@ class ProcesadorOrdenesController extends Controller
 
                                 // si aplica el descuento en dinero para este servicio
                                 //dinero: es el sub total
-                                return ['success' => 8, 
-                                'dinero' => $subtotal, 
-                                'cargo' => $envioPrecio, 
-                                'aplica' => $aplicaenviogratis, 
+                                return ['success' => 8,
+                                'dinero' => $subtotal,
+                                'cargo' => $envioPrecio,
+                                'aplica' => $aplicaenviogratis,
                                 'total' => $totalsumado,
                                 'descuento' => $cdd->dinero,
                                 'faltacredito' => $faltacredito];
@@ -1356,10 +1356,10 @@ class ProcesadorOrdenesController extends Controller
                             }else{
                                 return ['success' => 9];
                                 // para este servicio no aplica el descuento en dinero
-                            } 
+                            }
 
                         }else{
-                            return ['success' => 10]; 
+                            return ['success' => 10];
                             // cupon no encontrado, aunque fuera raro,
                             // ya que este se ingresa al crear un cupo tipo descuento dinero
                         }
@@ -1378,33 +1378,33 @@ class ProcesadorOrdenesController extends Controller
                                 // si aplica el descuento en porcentaje para este servicio
                                 // obtener el total del carrito de compras
                                 $producto = DB::table('producto AS p')
-                                ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                                ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                                 ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
                                 ->where('c.carrito_temporal_id', $cart->id)
                                 ->get();
 
                                 $pilaSub = array(); // para obtener el sub total
-                 
+
                                 // recorrer cada producto
-                                foreach ($producto as $pro) { 
-            
+                                foreach ($producto as $pro) {
+
                                     // saver el precio multiplicado por la cantidad
                                     $cantidad = $pro->cantidad;
                                     $precio = $pro->precio;
                                     $multi = $cantidad * $precio;
-                                    array_push($pilaSub, $multi); 
+                                    array_push($pilaSub, $multi);
                                 }
-            
+
                                 $consumido=0;
                                 foreach ($pilaSub as $valor){
                                     $consumido=$consumido+$valor;
-                                }      
-                                
-                                
+                                }
+
+
                                 // verificar si supera el minimo a comprar para que aplique este
                                 // descuento en %
                                 if($consumido >= $minimo){
-                                    // PORCENTAJE APLICADO                              
+                                    // PORCENTAJE APLICADO
                                     $resta = $consumido * ($porcentaje / 100);
                                     $total = $consumido - $resta;
 
@@ -1419,27 +1419,27 @@ class ProcesadorOrdenesController extends Controller
                                     ->where('seleccionado', 1)->first())
                                     {
                                         $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
-                                    } 
-                                    $envioPrecio = 0;                                            
-                                            
+                                    }
+                                    $envioPrecio = 0;
+
                                     // precio de la zona
                                     // aqui no importa si esta activo o inactivo, solo obtendra el precio
                                     // para ver el proceso debe existir en zonas_servicios
-                                    $zz = DB::table('zonas_servicios')                                   
+                                    $zz = DB::table('zonas_servicios')
                                     ->where('zonas_id', $zonaiduser)
                                     ->where('servicios_id', $cart->servicios_id)
                                     ->first();
 
                                     // obtiene precio envio de la zona
                                     // PRIORIDAD 1
-                                    $envioPrecio = $zz->precio_envio;                   
+                                    $envioPrecio = $zz->precio_envio;
 
                                     // PRIORIDAD 2
                                     // mitad de precio al envio, solo servicios publicos
                                     if($zz->mitad_precio == 1){
                                         if($envioPrecio != 0){
                                             $envioPrecio = $envioPrecio / 2;
-                                        }                        
+                                        }
                                     }
 
                                     // PRIORIDAD 3
@@ -1449,7 +1449,7 @@ class ProcesadorOrdenesController extends Controller
                                     }
 
                                     $datosInfo = DB::table('zonas_servicios AS z')
-                                    ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                                    ->select('z.min_envio_gratis', 'costo_envio_gratis')
                                     ->where('z.zonas_id', $zonaiduser)
                                     ->where('z.servicios_id', $cart->servicios_id)
                                     ->first();
@@ -1462,11 +1462,11 @@ class ProcesadorOrdenesController extends Controller
                                         if($total > $datosInfo->costo_envio_gratis){
                                             $envioPrecio = 0;
                                         }
-                                    }       
-                                   
+                                    }
+
                                     // sumar sub total + cargo de envio
                                     $totalsumado = $total + $envioPrecio;
-                                    
+
                                     if($micredito >= $totalsumado){
                                         $faltacredito = 0;
                                     }
@@ -1475,12 +1475,12 @@ class ProcesadorOrdenesController extends Controller
                                     $envioPrecio = number_format((float)$envioPrecio, 2, '.', '');
                                     // sub total, cargo envio, total, porcentaje
                                     return ['success' => 11, 'dinero' => $total,
-                                     'cargo' => $envioPrecio, 'total' => $totalsumado, 
+                                     'cargo' => $envioPrecio, 'total' => $totalsumado,
                                      'aplica' => $porcentaje, 'faltacredito' => $faltacredito];
                                 }else{
-                                    // consumible no alcanza el minimo para aplicar este cupon de 
+                                    // consumible no alcanza el minimo para aplicar este cupon de
                                     // descuento
-                                    $minimo = number_format((float)$minimo, 2, '.', '');                                   
+                                    $minimo = number_format((float)$minimo, 2, '.', '');
 
                                     return ['success' => 12, 'dinero' => $minimo];
                                 }
@@ -1491,7 +1491,7 @@ class ProcesadorOrdenesController extends Controller
                             }
 
                         }else{
-                            return ['success' => 14]; 
+                            return ['success' => 14];
                             // cupon no encontrado, aunque fuera raro,
                             // ya que este se ingresa al crear un cupo tipo descuento dinero
                         }
@@ -1502,32 +1502,32 @@ class ProcesadorOrdenesController extends Controller
                         if($cdg = CuponProductoGratis::where('cupones_id', $cupon->id)
                         ->where('servicios_id', $serviciocarrito)->first()){
 
-                            //comprobar si el minimo de compra supera el monto minimo para 
+                            //comprobar si el minimo de compra supera el monto minimo para
                             // producto gratis
                             $dinerominimo = $cdg->dinero_carrito;
 
                             $producto = DB::table('producto AS p')
-                            ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                            ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                             ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
                             ->where('c.carrito_temporal_id', $cart->id)
                             ->get();
 
                             $pilaSub = array(); // para obtener el sub total
-             
+
                             // recorrer cada producto
-                            foreach ($producto as $pro) { 
-        
+                            foreach ($producto as $pro) {
+
                                 // saver el precio multiplicado por la cantidad
                                 $cantidad = $pro->cantidad;
                                 $precio = $pro->precio;
                                 $multi = $cantidad * $precio;
-                                array_push($pilaSub, $multi); 
+                                array_push($pilaSub, $multi);
                             }
-        
+
                             $consumido=0;
                             foreach ($pilaSub as $valor){
                                 $consumido=$consumido+$valor;
-                            }  
+                            }
 
                             // comprobar que supera el minimo o igual para producto gratis
                             if($consumido >= $dinerominimo){
@@ -1551,37 +1551,37 @@ class ProcesadorOrdenesController extends Controller
                         if($cd = CuponDonacion::where('cupones_id', $cupon->id)->first()){
 
                             $institucion = $cd->instituciones_id;
-                            $donacion = $cd->dinero;   
-                            
+                            $donacion = $cd->dinero;
+
 
                             // si aplica el cupon
                             // obtener el total del carrito de compras
                             $producto = DB::table('producto AS p')
-                            ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')          
+                            ->join('carrito_extra AS c', 'c.producto_id', '=', 'p.id')
                             ->select('p.id AS productoID', 'c.cantidad', 'p.precio')
                             ->where('c.carrito_temporal_id', $cart->id)
                             ->get();
 
                             $pilaSub = array(); // para obtener el sub total
-                
+
                             // recorrer cada producto
-                            foreach ($producto as $pro) { 
-        
+                            foreach ($producto as $pro) {
+
                                 // saver el precio multiplicado por la cantidad
                                 $cantidad = $pro->cantidad;
                                 $precio = $pro->precio;
                                 $multi = $cantidad * $precio;
-                                array_push($pilaSub, $multi); 
+                                array_push($pilaSub, $multi);
                             }
-        
+
                             $consumido=0;
                             foreach ($pilaSub as $valor){
                                 $consumido=$consumido+$valor;
-                            }                                                                      
-                            
-                            // DONACION                              
+                            }
+
+                            // DONACION
                             $total = $consumido + $donacion;
-                           
+
 
                             //** conocer el envio, tipo de cargo */
                             $zonaiduser = 0;
@@ -1590,27 +1590,27 @@ class ProcesadorOrdenesController extends Controller
                             ->where('seleccionado', 1)->first())
                             {
                                 $zonaiduser = $user->zonas_id; // zona id donde esta el usuario
-                            } 
-                            $envioPrecio = 0;                                            
-                                    
+                            }
+                            $envioPrecio = 0;
+
                             // precio de la zona
                             // aqui no importa si esta activo o inactivo, solo obtendra el precio
                             // para ver el proceso debe existir en zonas_servicios
-                            $zz = DB::table('zonas_servicios')                                   
+                            $zz = DB::table('zonas_servicios')
                             ->where('zonas_id', $zonaiduser)
                             ->where('servicios_id', $cart->servicios_id)
                             ->first();
 
                             // obtiene precio envio de la zona
                             // PRIORIDAD 1
-                            $envioPrecio = $zz->precio_envio;                   
+                            $envioPrecio = $zz->precio_envio;
 
                             // PRIORIDAD 2
                             // mitad de precio al envio, solo servicios publicos
                             if($zz->mitad_precio == 1){
                                 if($envioPrecio != 0){
                                     $envioPrecio = $envioPrecio / 2;
-                                }                        
+                                }
                             }
 
                             // PRIORIDAD 3
@@ -1620,7 +1620,7 @@ class ProcesadorOrdenesController extends Controller
                             }
 
                             $datosInfo = DB::table('zonas_servicios AS z')
-                            ->select('z.min_envio_gratis', 'costo_envio_gratis')                       
+                            ->select('z.min_envio_gratis', 'costo_envio_gratis')
                             ->where('z.zonas_id', $zonaiduser)
                             ->where('z.servicios_id', $cart->servicios_id)
                             ->first();
@@ -1633,8 +1633,8 @@ class ProcesadorOrdenesController extends Controller
                                 if($total > $datosInfo->costo_envio_gratis){
                                     $envioPrecio = 0;
                                 }
-                            }       
-                            
+                            }
+
                             // sumar sub total + cargo de envio
                             $totalsumado = $total + $envioPrecio;
 
@@ -1645,12 +1645,12 @@ class ProcesadorOrdenesController extends Controller
                             $totalsumado = number_format((float)$totalsumado, 2, '.', '');
                             $envioPrecio = number_format((float)$envioPrecio, 2, '.', '');
                             // sub total, cargo envio, total, donacion, descripcion
-                            return ['success' => 22, 
-                            'dinero' => $total, 
-                            'cargo' => $envioPrecio, 
-                            'total' => $totalsumado,                            
+                            return ['success' => 22,
+                            'dinero' => $total,
+                            'cargo' => $envioPrecio,
+                            'total' => $totalsumado,
                             'descripcion' => $cd->descripcion,
-                            'faltacredito' => $faltacredito];   
+                            'faltacredito' => $faltacredito];
 
                         }else{
                             return ['success' => 21]; // cupon no encontrado
@@ -1669,37 +1669,37 @@ class ProcesadorOrdenesController extends Controller
 
     // ver ordenes por usuario
     public function verOrdenes(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'userid' => 'required'               
+                'userid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'userid.required' => 'El id del usuario es requerido.'            
+
+            $mensajeDatos = array(
+                'userid.required' => 'El id del usuario es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
+            }
+
             if(User::where('id', $request->userid)->first()){
                 $orden = DB::table('ordenes AS o')
-                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')              
+                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                     ->select('o.id', 's.nombre', 'o.precio_total',
                     'o.nota_orden', 'o.fecha_orden', 'o.precio_envio')
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible', 1)
                     ->get();
-                 
-                foreach($orden as $o){                    
+
+                foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
 
@@ -1772,20 +1772,20 @@ class ProcesadorOrdenesController extends Controller
                         else{
                             // dado error, extrano
                             $o->tipocupon = 0;
-                            
-                          
+
+
                             $total = $o->precio_total + $o->precio_envio;
                             $total = number_format((float)$total, 2, '.', '');
-        
+
                             $o->precio_total = $total;
                         }
 
                     }else{
                         $o->aplicacupon = 0;
-                      
+
                         $total = $o->precio_total + $o->precio_envio;
                         $total = number_format((float)$total, 2, '.', '');
-    
+
                         $o->precio_total = $total;
                     }
                 }
@@ -1797,45 +1797,45 @@ class ProcesadorOrdenesController extends Controller
                 return ['success' => 1, 'ordenes' => $orden, 'mensaje' => $mensaje];
             }else{
                 return ['success' => 2];
-            }            
+            }
         }
     }
 
      // ver ordenes por usuario, version mejorada para ver que tipo de cupon se ha aplicado
      // version 1.18 android
      public function verOrdenesMejorado(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'userid' => 'required'               
+                'userid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'userid.required' => 'El id del usuario es requerido.'            
+
+            $mensajeDatos = array(
+                'userid.required' => 'El id del usuario es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
+            }
+
             if(User::where('id', $request->userid)->first()){
                 $orden = DB::table('ordenes AS o')
-                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')              
+                    ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                     ->select('o.id', 's.nombre', 'o.precio_total',
                     'o.nota_orden', 'o.fecha_orden', 'o.precio_envio', 'o.tipo_pago')
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible', 1)
                     ->orderBy('o.id', 'DESC')
                     ->get();
-                 
-                foreach($orden as $o){                    
+
+                foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
 
@@ -1848,18 +1848,18 @@ class ProcesadorOrdenesController extends Controller
 
                     // buscar si aplico cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                       
+
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                           
+
                             $cupon = "Envío Gratis";
 
                         }else if($tipo->tipo_cupon_id == 2){
-                           
+
                             // modificar precio
                             $data = AplicaCuponDos::where('ordenes_id', $o->id)->first();
 
@@ -1878,7 +1878,7 @@ class ProcesadorOrdenesController extends Controller
                             $o->precio_total = number_format((float)$t, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 3){
-                          
+
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
                             $total = $o->precio_total - $resta;
@@ -1894,7 +1894,7 @@ class ProcesadorOrdenesController extends Controller
                             $o->precio_total = number_format((float)$t, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                            
+
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $o->producto = $producto;
@@ -1906,12 +1906,12 @@ class ProcesadorOrdenesController extends Controller
                             $o->precio_total = number_format((float)$total, 2, '.', '');
                         }
                         else if($tipo->tipo_cupon_id == 5){
-                           
+
                             // sumar sub total + envio + donacion
                             $data = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
                             $ins = Instituciones::where('id', $data->instituciones_id)->pluck('nombre')->first();
- 
-                            $cupon = "Donación de: $" . $data->dinero . " A: " . $ins; 
+
+                            $cupon = "Donación de: $" . $data->dinero . " A: " . $ins;
 
                             $total = $o->precio_total + $o->precio_envio;
                             $total = $total + $data->dinero;
@@ -1919,21 +1919,21 @@ class ProcesadorOrdenesController extends Controller
                         }
                         else{
                             // dado error, extrano
-                                 
+
                             $total = $o->precio_total + $o->precio_envio;
                             $total = number_format((float)$total, 2, '.', '');
-        
+
                             $o->precio_total = $total;
                         }
 
                     }else{
-                        
+
                         $total = $o->precio_total + $o->precio_envio;
                         $total = number_format((float)$total, 2, '.', '');
-    
+
                         $o->precio_total = $total;
-                    }  
-                    
+                    }
+
                     $o->cupon = $cupon;
                 }
 
@@ -1944,43 +1944,43 @@ class ProcesadorOrdenesController extends Controller
                 return ['success' => 1, 'ordenes' => $orden, 'mensaje' => $mensaje];
             }else{
                 return ['success' => 2];
-            }            
+            }
         }
     }
 
     // ver ordenes por usuario
     public function verOrdenPorID(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenid' => 'required'               
+                'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id del la orden es requerido.'            
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id del la orden es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(Ordenes::where('id', $request->ordenid)->first()){
-            
-                $orden = DB::table('ordenes')                  
+
+                $orden = DB::table('ordenes')
                     ->select('id', 'fecha_orden', 'estado_2', 'fecha_2',
                     'hora_2', 'estado_3', 'fecha_3', 'estado_4', 'fecha_4',
                     'estado_5', 'fecha_5', 'estado_6', 'fecha_6', 'estado_7',
                     'fecha_7', 'estado_8', 'fecha_8', 'mensaje_8')
-                    ->where('id', $request->ordenid)                
-                    ->get();                
-                      
+                    ->where('id', $request->ordenid)
+                    ->get();
+
                 // CLIENTE MIRA EL TIEMPO DEL PROPIETARIO MAS COPIA DEL TIEMPO DE ZONA
                 $tiempo = OrdenesDirecciones::where('ordenes_id', $request->ordenid)->first();
 
@@ -1992,28 +1992,28 @@ class ProcesadorOrdenesController extends Controller
 
                     // ver si fue cancelado desde panel de control
                     $o->canceladoextra = $tiempo->cancelado_extra;
-                     
-                    if($o->estado_2 == 1){ // propietario da el tiempo de espera                        
-                        $o->fecha_2 = date("h:i A d-m-Y", strtotime($o->fecha_2));                    
+
+                    if($o->estado_2 == 1){ // propietario da el tiempo de espera
+                        $o->fecha_2 = date("h:i A d-m-Y", strtotime($o->fecha_2));
                     }
 
-                    if($o->estado_3 == 1){ 
-                        $o->fecha_3 =date("h:i A d-m-Y", strtotime($o->fecha_3));  
+                    if($o->estado_3 == 1){
+                        $o->fecha_3 =date("h:i A d-m-Y", strtotime($o->fecha_3));
                     }
-                
+
                     if($o->estado_4 == 1){ // orden en preparacion
                         $time1 = Carbon::parse($o->fecha_4);
-                        
+
                         // ya va sumado el tiempo extra de la zona, aqui arriba
                         $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                         $o->horaEstimada = $horaEstimada;
                     }
-                    
-                    if($o->estado_5 == 1){                             
+
+                    if($o->estado_5 == 1){
                         $o->fecha_5 = date("h:i A d-m-Y", strtotime($o->fecha_5));
                     }
 
-                    if($o->estado_6 == 1){                     
+                    if($o->estado_6 == 1){
                         $o->fecha_6 = date("h:i A d-m-Y", strtotime($o->fecha_6));
                     }
 
@@ -2027,7 +2027,7 @@ class ProcesadorOrdenesController extends Controller
 
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                 }
-            
+
                 return ['success' => 1, 'ordenes' => $orden];
             }else{
                 return ['success' => 2];
@@ -2048,13 +2048,13 @@ class ProcesadorOrdenesController extends Controller
 
         $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-        if($validarDatos->fails()) 
+        if($validarDatos->fails())
         {
             return [
-                'success' => 0, 
+                'success' => 0,
                 'message' => $validarDatos->errors()->all()
             ];
-        }  
+        }
 
         if(Ordenes::where('id', $request->ordenid)->first()){
             $producto = DB::table('ordenes AS o')
@@ -2063,7 +2063,7 @@ class ProcesadorOrdenesController extends Controller
                         ->select('od.id AS productoID', 'p.nombre', 'p.utiliza_imagen', 'p.imagen', 'od.precio', 'od.cantidad')
                         ->where('o.id', $request->ordenid)
                         ->get();
-            
+
                         foreach($producto as $p){
                             $cantidad = $p->cantidad;
                             $precio = $p->precio;
@@ -2079,30 +2079,30 @@ class ProcesadorOrdenesController extends Controller
 
      // ver producto individual de la orden
      public function ordenProductosIndividual(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenesid' => 'required' // id tabla orden_descripcion               
+                'ordenesid' => 'required' // id tabla orden_descripcion
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenesid.required' => 'El id de orden descripcion es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
 
             if(OrdenesDescripcion::where('id', $request->ordenesid)->first()){
-               
+
                 $producto = DB::table('ordenes_descripcion AS o')
                     ->join('producto AS p', 'p.id', '=', 'o.producto_id')
                     ->select('p.imagen', 'p.nombre', 'p.descripcion', 'p.utiliza_imagen', 'o.precio', 'o.cantidad', 'o.nota')
@@ -2115,7 +2115,7 @@ class ProcesadorOrdenesController extends Controller
                         $multi = $cantidad * $precio;
                         $p->multiplicado = number_format((float)$multi, 2, '.', '');
                     }
-            
+
                 return ['success' => 1, 'producto' => $producto];
             }else{
                 return ['success' => 2];
@@ -2123,42 +2123,42 @@ class ProcesadorOrdenesController extends Controller
         }
     }
 
-  
-     // cancelar una orden por el cliente 
+
+     // cancelar una orden por el cliente
      public function cancelarOrden(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenid' => 'required' 
+                'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenid.required' => 'El id de orden es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($o = Ordenes::where('id', $request->ordenid)->first()){
-               
+
                 if($o->estado_8 == 0){
 
                     // seguro para evitar cancelar cuando servicio inicia a preparar orden
-                    if($o->estado_4 == 1){ 
+                    if($o->estado_4 == 1){
                         return ['success' => 3];
                     }
 
                     $fecha = Carbon::now('America/El_Salvador');
                     Ordenes::where('id', $request->ordenid)->update(['estado_8' => 1, 'cancelado_cliente' => 1, 'visible' => 0, 'fecha_8' => $fecha]);
-                  
+
                     // notificar a los propietario de la orden cancelada
                     $propietarios = DB::table('propietarios AS p')
                     ->select('p.device_id')
@@ -2167,10 +2167,10 @@ class ProcesadorOrdenesController extends Controller
                     ->get();
 
                     $pilaUsuarios = array();
-                        foreach($propietarios as $m){ 
+                        foreach($propietarios as $m){
                             if(!empty($m->device_id)){
                                 if($m->device_id != "0000"){
-                                    array_push($pilaUsuarios, $m->device_id); 
+                                    array_push($pilaUsuarios, $m->device_id);
                                 }
                             }
                         }
@@ -2178,15 +2178,51 @@ class ProcesadorOrdenesController extends Controller
                     // enviar notificaciones a todos los propietarios asignados
                     $titulo = "Orden #".$o->id . " Cancelada";
                     $mensaje = "Orden cancelada por el cliente.";
-        
+
                     if(!empty($pilaUsuarios)){
                         try {
                             $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
                         } catch (Exception $e) {
-                            
+
                         }
-                        
                     }
+
+                    $data = Ordenes::where('id', $request->ordenid)->first();
+
+                    if($data->tipo_pago == 1){
+
+                        //*** NOTIFICAR ADMINISTRADOR SI ESTA ORDEN FUE PAGADA CON CREDI PUNTOS
+
+                        $administradores = DB::table('administradores')
+                            ->where('activo', 1)
+                            ->where('disponible', 1)
+                            ->get();
+
+                        $pilaAdministradores = array();
+                        foreach($administradores as $p){
+                            if(!empty($p->device_id)){
+
+                                if($p->device_id != "0000"){
+                                    array_push($pilaAdministradores, $p->device_id);
+                                }
+                            }
+                        }
+
+                        //si no esta vacio
+                        if(!empty($pilaAdministradores)){
+                            $tituloa = "ORDEN CANCELADA POR CLIENTE";
+                            $mensajea = "Se pago con Credi Puntos";
+                            try {
+                                $this->envioNoticacionAdministrador2($tituloa, $mensajea, $pilaAdministradores);
+                            } catch (Exception $e) {
+
+                            }
+                        }
+
+                    }
+
+
+
                     return ['success' => 1]; // cancelado
 
                 }else{
@@ -2200,33 +2236,33 @@ class ProcesadorOrdenesController extends Controller
 
     // borrar vista de la orden al cliente
     public function borrarVistaOrden(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenid' => 'required' 
+                'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenid.required' => 'El id de orden es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
+            }
+
             // oculta la orden al cliente
-            if(Ordenes::where('id', $request->ordenid)->first()){               
-                
-                    Ordenes::where('id', $request->ordenid)->update(['visible' => 0]);                  
-                    return ['success' => 1]; 
-                
+            if(Ordenes::where('id', $request->ordenid)->first()){
+
+                    Ordenes::where('id', $request->ordenid)->update(['visible' => 0]);
+                    return ['success' => 1];
+
             }else{
                 return ['success' => 2]; // no encontrada
             }
@@ -2235,20 +2271,20 @@ class ProcesadorOrdenesController extends Controller
 
      // el usuario acepta el tiempo de espera *
      public function procesarOrdenEstado3(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenid.required' => 'El id de la orden es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
                     'success' => 0,
@@ -2263,7 +2299,7 @@ class ProcesadorOrdenesController extends Controller
                     $fecha = Carbon::now('America/El_Salvador');
                     Ordenes::where('id', $request->ordenid)->update(['estado_3' => 1,
                     'fecha_3' => $fecha]);
- 
+
                     // mandar notificacion al propietario
                     $propietarios = DB::table('propietarios')
                     ->where('servicios_id', $or->servicios_id)
@@ -2271,26 +2307,26 @@ class ProcesadorOrdenesController extends Controller
                     ->where('activo', 1)
                     ->get();
 
-                    // enviar notificaciones  
+                    // enviar notificaciones
                     $pilaUsuarios = array();
-                    foreach($propietarios as $p){     
-                        if(!empty($p->device_id)){ 
+                    foreach($propietarios as $p){
+                        if(!empty($p->device_id)){
                             if($p->device_id != "0000"){
-                                array_push($pilaUsuarios, $p->device_id); 
+                                array_push($pilaUsuarios, $p->device_id);
                             }
                         }
                     }
 
                     $titulo = "Cliente acepto tiempo";
                     $mensaje = "El cliente desea esperar la orden";
-            
+
                     if(!empty($pilaUsuarios)){
                         try {
                             $this->envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios);
                         } catch (Exception $e) {
-                            
+
                         }
-                       
+
                     }
 
                     $orden = DB::table('ordenes AS o')
@@ -2304,7 +2340,7 @@ class ProcesadorOrdenesController extends Controller
                     ->get();
 
                     foreach($orden as $o){
-                        
+
                         if($o->estado_3 == 1){ // orden en preparacion
                             $fechaE3 = $o->fecha_3;
                             $hora3 = date("h:i A", strtotime($fechaE3));
@@ -2312,7 +2348,7 @@ class ProcesadorOrdenesController extends Controller
                             $o->fecha_3 = $hora3 . " " . $fecha3;
                         }
                     }
-                    
+
                     return ['success' => 1, 'ordenes' => $orden];
                 }else{
                     return ['success' => 2];
@@ -2325,29 +2361,29 @@ class ProcesadorOrdenesController extends Controller
 
      // ver motorista asignado a la orden
      public function motoristaAsignado(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenid.required' => 'El ordenid de la orden es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
                     'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
- 
+
             if($or = Ordenes::where('id', $request->ordenid)->first()){
-                
+
                 if($motoAsignado = DB::table('motorista_ordenes AS mo')
                 ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                 ->select('m.imagen', 'm.nombre', 'm.telefono', 'm.tipo_vehiculo AS vehiculo', 'm.numero_vehiculo AS placa')
@@ -2372,22 +2408,22 @@ class ProcesadorOrdenesController extends Controller
 
     // calificar motorista
     public function calificarMotorista(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'ordenid' => 'required',
                 'valor' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenid.required' => 'El id de la orden es requerido',
                 'valor.required' => 'La valoracion es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
                     'success' => 0,
@@ -2396,8 +2432,8 @@ class ProcesadorOrdenesController extends Controller
             }
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){
-                
-                if($or->estado_6 == 0){                    
+
+                if($or->estado_6 == 0){
                     return ['success' => 1]; // motorista no asignado aun
                 }
 
@@ -2409,10 +2445,10 @@ class ProcesadorOrdenesController extends Controller
                 }
 
                 // sacar id del motorista de la orden
-                $motoristaDato = DB::table('motorista_ordenes AS m')           
+                $motoristaDato = DB::table('motorista_ordenes AS m')
                 ->where('m.ordenes_id', $or->id)
                 ->first();
-                
+
                 $idMotorista = $motoristaDato->motoristas_id;
                 $fecha = Carbon::now('America/El_Salvador');
 
@@ -2428,17 +2464,17 @@ class ProcesadorOrdenesController extends Controller
                 $nueva->mensaje = $men;
                 $nueva->fecha = $fecha;
                 $nueva->save();
-                
+
                 // ocultar orden al usuario
                 Ordenes::where('id', $or->id)->update(['visible' => 0]);
 
-                return ['success' => 3];                
+                return ['success' => 3];
             }else{
                 return ['success' => 4];
-            } 
+            }
         }
     }
- 
+
     public function envioNoticacionCliente($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionCliente($titulo, $mensaje, $pilaUsuarios);
     }
@@ -2449,5 +2485,9 @@ class ProcesadorOrdenesController extends Controller
 
     public function envioNoticacionAdministrador($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionAdministrador($titulo, $mensaje, $pilaUsuarios);
-    } 
+    }
+
+    public function envioNoticacionAdministrador2($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionAdministrador2($titulo, $mensaje, $pilaUsuarios);
+    }
 }

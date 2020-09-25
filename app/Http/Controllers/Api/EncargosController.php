@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use App\User;
 use Carbon\Carbon;
 use DateTime;
-use Exception; 
+use Exception;
 use App\ProductoCategoriaNegocio;
 use App\CarritoEncargo;
 use App\CarritoEncargoProducto;
@@ -28,52 +28,53 @@ use App\CategoriasNegocio;
 use App\EncargoAsignadoServicio;
 use App\Servicios;
 use App\AreasPermitidas;
+use OneSignal;
 
 class EncargosController extends Controller
 {
-    // tarjetas de encargos por zona servicio 
+    // tarjetas de encargos por zona servicio
 
     public function encargosPorZona(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
-            $reglaDatos = array(                
-                'userid' => 'required',               
+            $reglaDatos = array(
+                'userid' => 'required',
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
- 
+
             // obtener zona segun id del usuario
             $idzona = User::where('id', $request->userid)->pluck('zonas_id')->first();
-                             
+
             $encargos = DB::table('encargos AS e')
             ->join('encargos_zona AS ez', 'ez.encargos_id', '=', 'e.id')
-            ->select('e.id', 'e.nombre', 'e.descripcion', 'e.tipo_vista', 
+            ->select('e.id', 'e.nombre', 'e.descripcion', 'e.tipo_vista',
             'e.imagen', 'e.fecha_finaliza', 'e.fecha_entrega', 'e.fecha_estimada')
             ->where('ez.zonas_id', $idzona)
             ->where('e.activo', '1') // encargo activo en general
             ->where('e.vista_cliente', '1')  // cuando encargo termina, se oculta al cliente, porque tenemos todas las opciones
                                              // en la ventana activos, asi revisar sin mostrar el encargo finalizado
-            ->orderBy('ez.posicion', 'ASC')     
+            ->orderBy('ez.posicion', 'ASC')
             ->get();
 
             $tiempoHoy = Carbon::now('America/El_Salvador');
- 
+
             $tiempoReal = new DateTime($tiempoHoy);
 
-            
+
 
             $daysSpanish = [
                 0 => 'lunes',
@@ -84,10 +85,10 @@ class EncargosController extends Controller
                 5 => 'sábado',
                 6 => 'domingo',
             ];
-            
+
 
             foreach($encargos as $e){
-             
+
                 // verificar si no ha finalizado
                 $finaliza = new DateTime($e->fecha_finaliza);
 
@@ -95,54 +96,54 @@ class EncargosController extends Controller
                 $packTiempo = 0;
                 if($tiempoReal >= $finaliza){
                     $estado = 1;
-                }else{                                                      
+                }else{
                     $to = Carbon::createFromFormat('Y-m-d H:i:s', $tiempoHoy);
                     $from = Carbon::createFromFormat('Y-m-d H:i:s', $e->fecha_finaliza); // mayor
 
                     $packTiempo = $to->diffInMilliseconds($from);
-                    $e->fecha_finaliza = date("d-m-Y h:i A", strtotime($e->fecha_finaliza));                  
+                    $e->fecha_finaliza = date("d-m-Y h:i A", strtotime($e->fecha_finaliza));
                 }
 
                 // obtener el mes
                 /*setlocale(LC_ALL, 'es_ES');
                 $mesfecha = date("d-m-Y", strtotime($e->fecha_entrega));
                 $fecha = Carbon::parse('03-04-2018');
-                $fecha->format("F"); 
+                $fecha->format("F");
                 $mes = $fecha->formatLocalized('%B');*/
 
                 // FECHA ENTREGA
                 $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
                 $fecha = Carbon::parse($e->fecha_finaliza);
                 $mes = $meses[($fecha->format('n')) - 1];
-                
-                //$dianumero = date("d", strtotime($e->fecha_entrega));
-                //$hora = date("h:i A", strtotime($e->fecha_entrega));               
 
-                // MENSAJE PERSONALIZADO PARA FECHA ESTIMADA 
+                //$dianumero = date("d", strtotime($e->fecha_entrega));
+                //$hora = date("h:i A", strtotime($e->fecha_entrega));
+
+                // MENSAJE PERSONALIZADO PARA FECHA ESTIMADA
                 //$fechaNombre = $dianumero . " de " . $mes . " a las " . $hora;
-                $e->fecha_entrega = $e->fecha_estimada; // mejor un texto para decirle fecha de entrega 
-  
+                $e->fecha_entrega = $e->fecha_estimada; // mejor un texto para decirle fecha de entrega
+
                 // fecha estatica para iphone
 
                /* setlocale(LC_ALL, 'es_ES');
                 $mesfechaf = date("d-m-Y", strtotime($e->fecha_finaliza));
                 $fechaf = Carbon::parse($mesfechaf);
-                $fechaf->format("F"); 
+                $fechaf->format("F");
                 $mesf = $fechaf->formatLocalized('%B');*/
 
                 //$fechar = Carbon::parse($e->fecha_finaliza);
                 //$mesf = $meses[($fechar->format('n')) - 1];
-                
+
                 // FECHA IPHONE
                 $dianumerof = date("d", strtotime($e->fecha_finaliza));
-                $horaf = date("h:i A", strtotime($e->fecha_finaliza));               
+                $horaf = date("h:i A", strtotime($e->fecha_finaliza));
 
                 $fechaiphone = $dianumerof . " de " . $mes . " a las " . $horaf;
                 $e->fechaiphone = $fechaiphone;
 
                 $e->estado = $estado; // si es 1, esto ha finalizado
                 $e->packTiempo = $packTiempo;
-            } 
+            }
 
             return ['success' => 1, 'encargos' => $encargos];
         }
@@ -151,49 +152,49 @@ class EncargosController extends Controller
     // ver lista de categorias y productos
 
     public function listaDeCategorias(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
-            $reglaDatos = array(                
-                'encargoid' => 'required'           
-            ); 
-        
-            $mensajeDatos = array(                                      
+            $reglaDatos = array(
+                'encargoid' => 'required'
+            );
+
+            $mensajeDatos = array(
                 'encargoid.required' => 'El encargoid es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
-            $producto = DB::table('lista_encargo AS le')    
+            $producto = DB::table('lista_encargo AS le')
                 ->join('categorias_negocios AS cn', 'cn.id', '=', 'le.categorias_negocios_id')
-                ->select('le.id', 'cn.nombre') // 
+                ->select('le.id', 'cn.nombre') //
                 ->where('le.encargos_id', $request->encargoid) // bueno
                 ->where('le.activo', 1) // categoria activa
                 ->orderBy('le.posicion', 'ASC') // bueno
-                ->get(); 
- 
+                ->get();
+
                 $resultsBloque = array();
                 $index = 0;
 
                 foreach($producto as $secciones){
-                    array_push($resultsBloque, $secciones);          
-                
-                    $subSecciones = DB::table('lista_producto_encargo AS lp')  
+                    array_push($resultsBloque, $secciones);
+
+                    $subSecciones = DB::table('lista_producto_encargo AS lp')
                     ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'lp.producto_cate_nego_id')
                     ->select('lp.id', 'pc.nombre', 'pc.imagen', 'pc.descripcion', 'pc.precio')
-                    ->where('lp.lista_encargo_id', $secciones->id)         
+                    ->where('lp.lista_encargo_id', $secciones->id)
                     ->where('lp.activo', 1) // producto activo
                     ->orderBy('lp.posicion', 'ASC')
-                    ->get(); 
-                   
+                    ->get();
+
                     $resultsBloque[$index]->productos = $subSecciones; //agregar los productos en la sub seccion
                     $index++;
                 }
@@ -205,30 +206,30 @@ class EncargosController extends Controller
 
     public function listaDeCategoriasHorizontal(Request $request){
 
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(                
-                'encargoid' => 'required'           
+        if($request->isMethod('post')){
+            $reglaDatos = array(
+                'encargoid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'encargoid.required' => 'El encargoid es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }   
- 
-                $tipo = DB::table('lista_encargo AS le')    
+            }
+
+                $tipo = DB::table('lista_encargo AS le')
                 ->join('categorias_negocios AS cn', 'cn.id', '=', 'le.categorias_negocios_id')
                 ->select('le.id', 'cn.id AS cnc', 'cn.nombre')
                 ->where('le.encargos_id', $request->encargoid)
-                ->where('le.activo', 1)      
+                ->where('le.activo', 1)
                 ->orderBy('le.posicion', 'ASC')
                 ->get();
 
@@ -238,7 +239,7 @@ class EncargosController extends Controller
                 foreach ($tipo as $user){
 
                     $t = $t + 1;
-    
+
                     // contar cada seccion
                     $producto = DB::table('lista_encargo AS le')
                     ->join('lista_producto_encargo AS lp', 'lp.lista_encargo_id', '=', 'le.id')
@@ -246,32 +247,32 @@ class EncargosController extends Controller
                     ->where('le.activo', 1) // categoria activa
                     ->where('lp.activo', 1) // producto activo
                     ->where('le.id', $user->id)
-                    ->get(); 
-    
+                    ->get();
+
                     $contador = count($producto);
-                    $user->total = $contador;    
+                    $user->total = $contador;
                 }
-    
-                $resultsBloque = array();        
+
+                $resultsBloque = array();
                 $index = 0;
 
 
                 foreach($tipo  as $secciones){
-                    array_push($resultsBloque,$secciones);                          
-                 
-                    $subSecciones = DB::table('lista_producto_encargo AS lp') 
+                    array_push($resultsBloque,$secciones);
+
+                    $subSecciones = DB::table('lista_producto_encargo AS lp')
                     ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'lp.producto_cate_nego_id')
                     ->select('lp.id', 'pc.nombre', 'pc.imagen', 'pc.descripcion', 'pc.precio')
-                    ->where('lp.lista_encargo_id', $secciones->id)      
+                    ->where('lp.lista_encargo_id', $secciones->id)
                     ->take(5) //maximo 5 productos por seccion
                     ->where('lp.activo', 1) // producto activo
                     ->get();
-                     
-                   
+
+
                     $resultsBloque[$index]->productos = $subSecciones;
                     $index++;
                 }
-        
+
             return ['success' => 1, 'producto' => $tipo];
         }
     }
@@ -279,12 +280,12 @@ class EncargosController extends Controller
 
     public function listaDeCategoriasHorizontalSeccion(Request $request){
 
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(               
+        if($request->isMethod('post')){
+            $reglaDatos = array(
                 'seccionid' => 'required'
-            );    
-                  
-            $mensajeDatos = array(   
+            );
+
+            $mensajeDatos = array(
                 'seccionid.required' => 'El id de la seccion es requerido'
                 );
 
@@ -292,11 +293,11 @@ class EncargosController extends Controller
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-        
+            }
+
             if($ll = ListaEncargo::where('id', $request->seccionid)->first()){
 
                 // si pudo ver esta pantalla, porque categoria estaba activa
@@ -304,7 +305,7 @@ class EncargosController extends Controller
                 ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'l.producto_cate_nego_id')
                 ->select('l.id', 'pc.nombre', 'pc.precio', 'pc.imagen')
                 ->where('l.activo', 1) // producto unicamente activo
-                ->where('l.lista_encargo_id', $request->seccionid)            
+                ->where('l.lista_encargo_id', $request->seccionid)
                 ->get();
 
                 $categoria = CategoriasNegocio::where('id', $ll->categorias_negocios_id)->pluck('nombre')->first();
@@ -312,33 +313,33 @@ class EncargosController extends Controller
                 return ['success' => 1, 'productos' => $productos, 'categoria' => $categoria];
             }else{
                 return ['success' => 2];
-            }                                 
+            }
         }
     }
 
 
     public function productoIndividual(Request $request){
-        if($request->isMethod('post')){ 
- 
+        if($request->isMethod('post')){
+
             // validaciones para los datos
-            $reglaDatos = array(                
+            $reglaDatos = array(
                 'productoid' => 'required',
-            );    
-        
-            $mensajeDatos = array(                                      
+            );
+
+            $mensajeDatos = array(
                 'productoid.required' => 'El id del producto es requerido.',
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
- 
+
             if(ListaProductoEncargo::where('id', $request->productoid)->first()){
 
                 $producto = DB::table('lista_producto_encargo AS l')
@@ -353,7 +354,7 @@ class EncargosController extends Controller
                     $datacate = CategoriasNegocio::where('id', $data->categorias_negocio_id)->first();
                     $p->categoria = $datacate->nombre;
                 }
-                              
+
                 return ['success' => 1, 'producto' => $producto];
 
             }else{
@@ -365,37 +366,37 @@ class EncargosController extends Controller
 
     // agregar productos al carrito de compras para encargos
     public function agregarProductoEncargo(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             // validaciones para los datos
-            $reglaDatos = array(                
-                'userid' => 'required',                
+            $reglaDatos = array(
+                'userid' => 'required',
                 'productoid' => 'required', // id de la lista: lista_producto_encargo
                 'mismoservicio' => 'required' // para preguntar si borra contenido anterior y crear nuevo carrito
-            );    
-                    
-            $mensajeDatos = array(  
+            );
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.',
                 'productoid.required' => 'El id del producto es requerido.',
-                'mismoservicio.required' => 'El ID del mismo servicio requerido.', 
+                'mismoservicio.required' => 'El ID del mismo servicio requerido.',
                 );
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            } 
- 
+            }
+
             // verificar primero si el encargo finalizo
 
             $tiempoHoy = Carbon::now('America/El_Salvador');
             $tiempoReal = new DateTime($tiempoHoy);
 
             DB::beginTransaction();
-        
-            try {                   
+
+            try {
                     // sacar id del encargo a cual esta asignado este producto
                     $datos = DB::table('lista_encargo AS s')
                     ->join('lista_producto_encargo AS st', 'st.lista_encargo_id', '=', 's.id')
@@ -407,20 +408,20 @@ class EncargosController extends Controller
 
                     // obtener el id del producto de la fila lista_producto
                     $idproducto = $datos->producto_cate_nego_id;
-                   
-                    
+
+
                     $fecha_finaliza = Encargos::where('id', $idencargo)->pluck('fecha_finaliza')->first();
 
                     // verificar si no ha finalizado
                     $finaliza = new DateTime($fecha_finaliza);
-                  
+
                     if($tiempoReal >= $finaliza){
                         return [ // este encargo a finalizado
                             'success' => 4
-                        ]; 
+                        ];
                     }
 
-                   
+
                 // verificar si el usuario va a borrar la tabla de carrito de compras
                 if($request->mismoservicio == 1){ // borrar tablas
                     $tabla1 = CarritoEncargo::where('users_id', $request->userid)->first();
@@ -431,7 +432,7 @@ class EncargosController extends Controller
                 // preguntar si usuario ya tiene un carrito de compras
                 if($cart = CarritoEncargo::where('users_id', $request->userid)->first()){
 
-                       
+
                         // ver limite de unidades del producto que quiere agregar y comparar si esta el mismo producto en carrito
                         // no esta agregando del mismo servicio
                         if($cart->encargos_id != $idencargo){
@@ -455,14 +456,14 @@ class EncargosController extends Controller
 
                         return [ //producto guardado
                             'success' => 2
-                        ];                                    
+                        ];
                 }else{
-                   
+
                     // crear carrito encargo nuevo
 
                     // obtener zona del usuario donde pide
                     $di = Direccion::where('user_id', $request->userid)->where('seleccionado', 1)->first();
-                   
+
                     $carrito = new CarritoEncargo();
                     $carrito->users_id = $request->userid;
                     $carrito->encargos_id = $idencargo;
@@ -471,21 +472,21 @@ class EncargosController extends Controller
 
                     // guardar producto
                     $idcarrito = $carrito->id;
- 
+
                     $extra = new CarritoEncargoProducto();
                     $extra->carrito_encargo_id = $idcarrito;
                     $extra->producto_cate_nego_id = $idproducto;
                     $extra->cantidad = $request->cantidad; // siempre sera 1 el minimo
                     $extra->nota_producto = $request->notaproducto;
                     $extra->save();
-                  
+
                     DB::commit();
-                    
+
                     return [
                         'success' => 2 // producto agregado
                     ];
-                }  
-                       
+                }
+
             }catch(\Error $e){
                 DB::rollback();
 
@@ -493,7 +494,7 @@ class EncargosController extends Controller
                     'success' => 5
                 ];
             }
-        } 
+        }
     }
 
 
@@ -504,15 +505,15 @@ class EncargosController extends Controller
             $reglaDatos = array(
                 'userid' => 'required',
             );
-                  
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.'
                 );
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -521,19 +522,19 @@ class EncargosController extends Controller
 
                 DB::beginTransaction();
                 try {
- 
+
                     // preguntar si usuario ya tiene un carrito de compras
                     if($cart = CarritoEncargo::where('users_id', $request->userid)->first()){
 
-                        
+
                         $producto = DB::table('producto_categoria_negocio AS p')
-                        ->join('carrito_encargo_pro AS c', 'c.producto_cate_nego_id', '=', 'p.id')          
+                        ->join('carrito_encargo_pro AS c', 'c.producto_cate_nego_id', '=', 'p.id')
                         ->select('p.id AS productoID', 'p.nombre', 'p.imagen', 'c.cantidad', 'p.precio', 'c.id AS idFila')
                         ->where('c.carrito_encargo_id', $cart->id)
                         ->get();
-  
+
                         // sub total de la orden
- 
+
                         foreach($producto as $p){
                             $cantidad = $p->cantidad;
                             $precio = $p->precio;
@@ -542,11 +543,11 @@ class EncargosController extends Controller
                         }
 
                         // verificar unidades de cada producto
-                        foreach ($producto as $pro) {                            
+                        foreach ($producto as $pro) {
                             $pro->precio = number_format((float)$pro->precio, 2, '.', '');
-                        } 
+                        }
 
-                        $subTotal = collect($producto)->sum('multiplicado'); 
+                        $subTotal = collect($producto)->sum('multiplicado');
                         $subTotal = number_format((float)$subTotal, 2, '.', '');
 
                         $data = Encargos::where('id', $cart->encargos_id)->first();
@@ -577,7 +578,7 @@ class EncargosController extends Controller
                             'boton' => $botonTexto,
                             'requiere_nota' => $requiereNota,
                             'nota_encargo' => $notaEncargo,
-                            'verificado' => $verificado           
+                            'verificado' => $verificado
                         ];
 
                     }else{
@@ -599,14 +600,14 @@ class EncargosController extends Controller
 
     // eliminar producto individual del encargo
     public function eliminarProductoEncargo(Request $request){
-        
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(                
+
+        if($request->isMethod('post')){
+            $reglaDatos = array(
                 'userid' => 'required',
                 'carritoid' => 'required'
             );
-                  
-            $mensajeDatos = array(                              
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido',
                 'carritoid.required' => 'El id del carrito es requerido'
                 );
@@ -616,15 +617,15 @@ class EncargosController extends Controller
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
 
             // verificar si tenemos carrito
             if($ctm = CarritoEncargo::where('users_id', $request->userid)->first()){
-                
+
                 // encontrar el producto a borrar
                 if(CarritoEncargoProducto::where('id', $request->carritoid)->first()){
                     CarritoEncargoProducto::where('id', $request->carritoid)->delete();
@@ -645,7 +646,7 @@ class EncargosController extends Controller
                         'success' => 3
                     ];
                 }
-            }else{              
+            }else{
                 return [
                     'success' => 4   // sin carrito
                 ];
@@ -657,22 +658,22 @@ class EncargosController extends Controller
     // eliminar carrito de encargo
     public function eliminarCarritoEncargo(Request $request){
 
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(                
-                'userid' => 'required',                
-            );    
-                  
-            $mensajeDatos = array(                                      
+        if($request->isMethod('post')){
+            $reglaDatos = array(
+                'userid' => 'required',
+            );
+
+            $mensajeDatos = array(
                 'userid.required' => 'El id del usuario es requerido.'
                 );
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }   
+            }
             if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
                 CarritoEncargoProducto::where('carrito_encargo_id', $carrito->id)->delete();
                 CarritoEncargo::where('users_id', $request->userid)->delete();
@@ -684,30 +685,30 @@ class EncargosController extends Controller
                     'success' => 2 // el carrito esta vacio
                 ];
             }
-        } 
+        }
     }
 
 
     // guardar encargos temporales, esto no se borraran, solo se ocultan
     public function guadarEncargoModoEspera(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'userid' => 'required'              
+                'userid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'userid.required' => 'El id del usuario es requerido.'               
+
+            $mensajeDatos = array(
+                'userid.required' => 'El id del usuario es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
-            { 
+            if($validarDatos->fails())
+            {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -715,8 +716,8 @@ class EncargosController extends Controller
             $tiempoHoy = Carbon::now('America/El_Salvador');
             $tiempoReal = new DateTime($tiempoHoy);
             DB::beginTransaction();
-           
-            try { 
+
+            try {
 
                  // verificar si tengo carrito
                 if($cart = CarritoEncargo::where('users_id', $request->userid)->first()){
@@ -729,13 +730,13 @@ class EncargosController extends Controller
 
                     if($tiempoReal >= $finaliza){
                          // este encargo a finalizado
-                        return ['success' => 3]; 
+                        return ['success' => 3];
                     }
 
                     $producto = DB::table('carrito_encargo_pro AS cp')
                     ->where('cp.carrito_encargo_id', $cart->id)
                     ->get();
-                  
+
                     $pila = array();
 
                      // recorrer cada producto para saver cantidad y precio
@@ -744,14 +745,14 @@ class EncargosController extends Controller
 
                         $dato = ProductoCategoriaNegocio::where('id', $p->producto_cate_nego_id)->first(); // info de ese producto
                         $multi = $cantidad * $dato->precio; //multiplicar cantidad por precio
-                        array_push($pila, $multi); // unir para subtotal $                        
-                    } 
+                        array_push($pila, $multi); // unir para subtotal $
+                    }
 
                     $resultado = 0;
                     foreach ($pila as $valor){
                         $resultado = $resultado+$valor;
                     }
-                 
+
                     $convertir = number_format((float)$resultado, 2, '.', '');
                     $precioTotal = (string) $convertir;
 
@@ -789,7 +790,7 @@ class EncargosController extends Controller
                             User::where('id', $request->userid)->update(['monedero' => $descontado]);
                         }
                     }
-                    
+
                     $orden = new OrdenesEncargo();
                     $orden->encargos_id = $cart->encargos_id;
                     $orden->users_id = $request->userid;
@@ -804,7 +805,7 @@ class EncargosController extends Controller
                     $orden->cancelado_por = 0;
                     $orden->calificacion = 0;
                     $orden->fecha_cancelado = null;
-                    $orden->estado_0 = 0; 
+                    $orden->estado_0 = 0;
                     $orden->fecha_0 = null;
                     $orden->estado_1 = 0;
                     $orden->fecha_1 = null;
@@ -847,10 +848,10 @@ class EncargosController extends Controller
                     $dir->revisado = $d->revisado;
 
                     $dir->save();
- 
+
                      // guardar todos los productos de esa orden
                      foreach($producto as $p){
- 
+
                         // obtener nombre de ese producto y descripcion para tener registro
                         $ppd = ProductoCategoriaNegocio::where('id', $p->producto_cate_nego_id)->first();
 
@@ -862,7 +863,7 @@ class EncargosController extends Controller
                                     'nombre' => $ppd->nombre,
                                     'descripcion' => $ppd->descripcion);
                             OrdenesEncargoProducto::insert($data);
-                    }  
+                    }
 
                     // hoy borrar el carrito de encargos
                     /*if($carrito = CarritoEncargo::where('users_id', $request->userid)->first()){
@@ -871,13 +872,13 @@ class EncargosController extends Controller
                     }*/
 
                     DB::commit();
-                    
+
                     return ['success' => 1];
 
                 }else{
                     return ['success' => 2];
                 }
-            
+
             }catch(\Error $e){
                 DB::rollback();
                 return ['success' => 5];
@@ -889,49 +890,49 @@ class EncargosController extends Controller
     // ver lista de encargos
     public function verListaDeEncargos(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'userid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'userid.required' => 'El id del usuario es requerido.'  
+
+            $mensajeDatos = array(
+                'userid.required' => 'El id del usuario es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
+            }
+
             if(User::where('id', $request->userid)->first()){
                 $orden = DB::table('ordenes_encargo AS o')
                     ->join('encargos AS e', 'e.id', '=', 'o.encargos_id')
                     ->select('o.id', 'e.nombre',
-                    'e.fecha_finaliza', 'o.precio_envio', 
-                    'o.revisado', 'o.precio_subtotal', 'o.fecha_orden', 
-                    'e.fecha_entrega', 'o.nota_encargo', 'e.fecha_estimada', 'o.tipo_pago') 
+                    'e.fecha_finaliza', 'o.precio_envio',
+                    'o.revisado', 'o.precio_subtotal', 'o.fecha_orden',
+                    'e.fecha_entrega', 'o.nota_encargo', 'e.fecha_estimada', 'o.tipo_pago')
                     ->where('o.users_id', $request->userid)
                     ->where('o.visible_cliente', 1)
                     ->orderBy('o.id', 'DESC')
                     ->get();
-                  
-                foreach($orden as $o){                    
-                    // fecha estimada de entrega al cliente
-                    $o->fecha_finaliza = date("h:i A d-m-Y", strtotime($o->fecha_entrega)); 
 
-                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden)); 
+                foreach($orden as $o){
+                    // fecha estimada de entrega al cliente
+                    $o->fecha_finaliza = date("h:i A d-m-Y", strtotime($o->fecha_entrega));
+
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
                     $total = $o->precio_subtotal + $o->precio_envio;
 
                     $o->precio_envio = number_format((float)$o->precio_envio, 2, '.', '');
-                    
+
                     $o->precio_total = number_format((float)$total, 2, '.', '');
 
                     // tipos de estado
@@ -947,27 +948,27 @@ class EncargosController extends Controller
                         $o->tipoestado = "Cancelado";
                     }else{
                         $o->tipoestado = "Pendiente";
-                    }   
-                    
+                    }
+
                     // cambiar formato a fecha de entrega
 
-                    
+
                     /*setlocale(LC_ALL, 'es_ES');
                     $mesfechaf = date("d-m-Y", strtotime($o->fecha_entrega));
                     $fechaf = Carbon::parse($mesfechaf);
-                    $fechaf->format("F"); 
+                    $fechaf->format("F");
                     $mesf = $fechaf->formatLocalized('%B');*/
 
                     //$meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
                     //$fechaf = Carbon::parse($o->fecha_entrega);
                     //$mesf = $meses[($fechaf->format('n')) - 1];
-                    
+
                    // $dianumerof = date("d", strtotime($o->fecha_entrega));
-                    //$horaf = date("h:i A", strtotime($o->fecha_entrega));               
+                    //$horaf = date("h:i A", strtotime($o->fecha_entrega));
 
                     //$o->fecha_entrega = $dianumerof . " de " . $mesf . " a las " . $horaf;
                       $o->fecha_entrega = $o->fecha_estimada; // un texto para poner la fecha
-                                         
+
                     $o->direccion = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->pluck('direccion')->first();
                 }
 
@@ -977,38 +978,38 @@ class EncargosController extends Controller
             }
         }
     }
-  
+
     public function buscadorProductoPorEncargo(Request $request){
 
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(                
-                'encargoid' => 'required',   
-                'nombre' => 'required',             
-            );    
-                  
-            $mensajeDatos = array(                                      
-                'encargoid.required' => 'El id del encargo es requerido', 
+        if($request->isMethod('post')){
+            $reglaDatos = array(
+                'encargoid' => 'required',
+                'nombre' => 'required',
+            );
+
+            $mensajeDatos = array(
+                'encargoid.required' => 'El id del encargo es requerido',
                 'nombre.required' => 'El nombre del producto es requerido'
                 );
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             $a = $request->nombre;
- 
-          
+
+
 
             $producto = DB::table('lista_encargo AS le')
             ->join('lista_producto_encargo AS lp', 'lp.lista_encargo_id', '=', 'le.id')
-            ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'lp.producto_cate_nego_id')        
+            ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'lp.producto_cate_nego_id')
             ->select('lp.id', 'pc.id AS idproducto', 'pc.nombre', 'pc.descripcion', 'pc.imagen', 'pc.precio')
             ->where('le.encargos_id', $request->encargoid)
-            //->where('pc.nombre', 'like', '%' . $request->nombre . '%')     
+            //->where('pc.nombre', 'like', '%' . $request->nombre . '%')
             ->where('le.activo', 1) // categoria activar
             ->where('lp.activo', 1) // producto activo
             ->where(function ($query) use ($a) {
@@ -1016,8 +1017,8 @@ class EncargosController extends Controller
                       ->orWhere('pc.descripcion', 'like', '%' . $a . '%');
             })
             ->orderBy('le.posicion', 'ASC')
-            ->get(); 
-             
+            ->get();
+
             foreach($producto as $p){
 
                 // buscar categoria
@@ -1037,42 +1038,42 @@ class EncargosController extends Controller
             return ['success' => 1, 'productos' => $producto];
         }
     }
-   
+
 
     // ver lista de productos del encargo
     public function verListaProductosDeEncargo(Request $request){
-        
-        if($request->isMethod('post')){ 
+
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'orden_encargoid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'orden_encargoid.required' => 'El id de la orden del encargo es requerido.'  
+
+            $mensajeDatos = array(
+                'orden_encargoid.required' => 'El id de la orden del encargo es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
 
-            $producto = DB::table('ordenes_encargo AS le')    
+            $producto = DB::table('ordenes_encargo AS le')
                 ->join('ordenes_encargo_producto AS op', 'op.ordenes_encargo_id', '=', 'le.id')
                 ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'op.producto_cate_nego_id')
                 ->select('op.id', 'pc.nombre', 'pc.imagen', 'pc.precio', 'op.cantidad')
-                ->where('le.id', $request->orden_encargoid)                
+                ->where('le.id', $request->orden_encargoid)
                 ->orderBy('op.id', 'ASC')
                 ->get();
 
-                                
+
                 foreach($producto as $p){
                     $cantidad = $p->cantidad;
                     $precio = $p->precio;
@@ -1087,26 +1088,26 @@ class EncargosController extends Controller
     // ver producto individual del encagado
     public function verProductoDelEncargoIndividual(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'productoid' => 'required' // es el id de la fila de ese producto
             );
-        
-            $mensajeDatos = array(                                      
-                'productoid.required' => 'El id del producto es requerido.'   
+
+            $mensajeDatos = array(
+                'productoid.required' => 'El id del producto es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             $producto = DB::table('ordenes_encargo_producto AS op')
             ->join('producto_categoria_negocio AS pc', 'pc.id', '=', 'op.producto_cate_nego_id')
@@ -1128,28 +1129,28 @@ class EncargosController extends Controller
 
     // actualizar producto del encargo
     public function actualizarProductoDelEncargo(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'productoid' => 'required', // es el id de la fila de ese producto
                 'cantidad' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'productoid.required' => 'El id del producto es requerido.',
-                'cantidad.required' => 'cantidad es requerida' 
+                'cantidad.required' => 'cantidad es requerida'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargoProducto::where('id', $request->productoid)->first()){
 
@@ -1164,7 +1165,7 @@ class EncargosController extends Controller
 
             }else{
                 return ['success' => 2];
-            }          
+            }
         }
     }
 
@@ -1172,32 +1173,65 @@ class EncargosController extends Controller
     // cancelar el encargo
     public function cancelarEncargo(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'encargoid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'encargoid.required' => 'El id del encargoid es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($oe = OrdenesEncargo::where('id', $request->encargoid)->first()){
-                   
+
                 if($oe->revisado == 1){ // puede cancelar
-                    OrdenesEncargo::where('id', $request->encargoid)->update(['revisado' => 5, 
+                    OrdenesEncargo::where('id', $request->encargoid)->update(['revisado' => 5,
                     'visible_cliente' => 0, 'visible_propietario' => 0, 'visible_motorista' => 0, 'cancelado_por' => 1]);
+
+                    if($oe->tipo_pago == 1) { // solo por credi puntos
+
+                        //*** NOTIFICAR ADMINISTRADOR SI ESTA ORDEN FUE PAGADA CON CREDI PUNTOS
+
+                        $administradores = DB::table('administradores')
+                            ->where('activo', 1)
+                            ->where('disponible', 1)
+                            ->get();
+
+                        $pilaAdministradores = array();
+                        foreach ($administradores as $p) {
+                            if (!empty($p->device_id)) {
+
+                                if ($p->device_id != "0000") {
+                                    array_push($pilaAdministradores, $p->device_id);
+                                }
+                            }
+                        }
+
+                        //si no esta vacio
+                        if (!empty($pilaAdministradores)) {
+                            $tituloa = "ORDEN CANCELADA POR CLIENTE";
+                            $mensajea = "Se pago con Credi Puntos";
+                            try {
+                                $this->envioNoticacionAdministrador2($tituloa, $mensajea, $pilaAdministradores);
+                            } catch (Exception $e) {
+
+                            }
+                        }
+
+                    }
+
 
                     return ['success' => 1];
                 }else if($oe->revisado == 5){
@@ -1211,42 +1245,42 @@ class EncargosController extends Controller
                     // no puede ser cancelada
                     return ['success' => 2];
                 }
-               
+
 
             }else{
                 return ['success' => 3];
-            }          
+            }
         }
     }
 
     // completar encargo
     public function completarEncargo(Request $request){
-        
-        if($request->isMethod('post')){ 
+
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'encargoid' => 'required',
                 'calificacion' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'encargoid.required' => 'El id del encargoid es requerido.',
                 'calificacion.required' => 'La calificacion es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             if($oo = OrdenesEncargo::where('id', $request->encargoid)->first()){
-                   
+
                 OrdenesEncargo::where('id', $request->encargoid)->update(['visible_cliente' => 0]);
 
                 if($oo->calificacion == 0){
@@ -1257,19 +1291,19 @@ class EncargosController extends Controller
 
             }else{
                 return ['success' => 0];
-            }          
+            }
         }
     }
 
 
     public function verProductoDeCarrito(Request $request){
-       
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(                
+
+        if($request->isMethod('post')){
+            $reglaDatos = array(
                 'id' => 'required', // id de la fila de ese producto del carrito
             );
-                  
-            $mensajeDatos = array(                              
+
+            $mensajeDatos = array(
                 'id.required' => 'El id es requerido',
                 );
 
@@ -1278,11 +1312,11 @@ class EncargosController extends Controller
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
-           
+
             // buscar si tiene carrito
             if($data = CarritoEncargoProducto::where('id', $request->id)->first()){
 
@@ -1292,7 +1326,7 @@ class EncargosController extends Controller
                 ->select('o.id', 'o.cantidad', 'o.nota_producto', 'p.imagen', 'p.utiliza_nota', 'p.nota', 'p.precio', 'p.nombre', 'p.descripcion')
                 ->where('o.id', $request->id)
                 ->get();
-               
+
                 // obtener nombre de la categoria
                 $dd = ProductoCategoriaNegocio::where('id', $data->producto_cate_nego_id)->first();
                 $categoria = CategoriasNegocio::where('id', $dd->categorias_negocio_id)->pluck('nombre')->first();
@@ -1303,7 +1337,7 @@ class EncargosController extends Controller
                     'categoria' => $categoria
                 ];
 
-                
+
             }else{
                 return [
                     'success' => 2 // producto no encontrado
@@ -1314,8 +1348,8 @@ class EncargosController extends Controller
 
 
     public function verProductoDeCarritoActualizar(Request $request){
-        if($request->isMethod('post')){ 
-           
+        if($request->isMethod('post')){
+
             $reglaDatos = array(
                 'id' => 'required', // id fila de ese producto
                 'cantidad' => 'required'
@@ -1328,27 +1362,33 @@ class EncargosController extends Controller
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
-            
-            if(CarritoEncargoProducto::where('id', $request->id)->first()){                
-                
+
+            if(CarritoEncargoProducto::where('id', $request->id)->first()){
+
                 CarritoEncargoProducto::where('id', $request->id)->update(['cantidad' => $request->cantidad,
                 'nota_producto' => $request->nota]);
 
                 return [
                     'success' => 1 // cantidad actualizada
                 ];
-                
-            }else{                    
+
+            }else{
                 return [
                     'success' => 2 //producto no encontrado
                 ];
             }
-              
-        }    
+
+        }
     }
+
+
+    public function envioNoticacionAdministrador2($titulo, $mensaje, $pilaUsuarios){
+        OneSignal::notificacionAdministrador2($titulo, $mensaje, $pilaUsuarios);
+    }
+
 
 }

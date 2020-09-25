@@ -24,21 +24,15 @@
   <component name="ChangeListManager">
     <list default="true" id="2f4e7f2a-7f35-4252-8519-b0e118214d8c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/LoginController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/RegisterController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/CarritoTemporalController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/CarritoTemporalController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/PerfilController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/PerfilController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/TarjetaController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/TarjetaController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/EncargosController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/EncargosController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/ProcesadorOrdenesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/ProcesadorOrdenesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/PropietarioController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/PropietarioController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/AdminLoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/AdminLoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ConfiguracionesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ConfiguracionesController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ControlOrdenesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ControlOrdenesController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OrdenesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OrdenesController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/backend/menus/sidebar.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/menus/sidebar.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/cliente/listaclientedireccion.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/cliente/listaclientedireccion.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/cliente/listadireccionextranjero.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/cliente/listadireccionextranjero.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/listabuscarmotoorden.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/listabuscarmotoorden.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/configuracion/listadinerolimite.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/configuracion/listadinerolimite.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/listaordenhoy.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/listaordenhoy.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/tablas/tablaordenhoy.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/ordenes/tablas/tablaordenhoy.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/backend/paginas/servicios/listaproductos.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/backend/paginas/servicios/listaproductos.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -194,7 +188,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/resources/views/backend/paginas/cliente/tablas" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../tiendamaritza" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -227,7 +221,9 @@
       <workItem from="1599578599428" duration="5793000" />
       <workItem from="1599600797171" duration="13000" />
       <workItem from="1600823879402" duration="11799000" />
-      <workItem from="1600874372255" duration="9441000" />
+      <workItem from="1600874372255" duration="10481000" />
+      <workItem from="1600975888235" duration="5634000" />
+      <workItem from="1600985743170" duration="15874000" />
     </task>
     <servers />
   </component>
@@ -247,10 +243,14 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1599600807693">
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1601008420634">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1599600807693" />
+    <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1601008420634" />
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1600993296487">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1600993296487" />
     <state width="254" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1600828593290">
       <screen x="0" y="0" width="1536" height="824" />
     </state>

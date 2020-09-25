@@ -4,14 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Auth; 
+use Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AdminLoginController extends Controller
 {
   // constructor
-  public function __construct()
-  {
+  public function __construct() {
     $this->middleware('guest:admin', ['except' => ['logout']]);
   }
 
@@ -22,14 +21,14 @@ class AdminLoginController extends Controller
 
   // inicio de sesion
   public function login(Request $request){
-    
-    $rules = array(                
+
+    $rules = array(
       'correo' => 'required',
       'password' => 'required|max:16',
-    );    
+    );
 
-    $messages = array(                                      
-      'correo.required' => 'El correo es requerido.',      
+    $messages = array(
+      'correo.required' => 'El correo es requerido.',
       'password.required' => 'La contraseña es requerida.',
       'password.max' => '16 caracteres máximo para contraseña',
       );
@@ -39,19 +38,19 @@ class AdminLoginController extends Controller
       if ( $validator->fails())
       {
           return [
-              'success' => 0, 
+              'success' => 0,
               'message' => $validator->errors()->all()
           ];
       }
-    
+
     if (Auth::guard('admin')->attempt(['email' => $request->correo, 'password' => $request->password])) {
-     
+
       return [
-        'success'=> 1,           
+        'success'=> 1,
         'message'=> route('admin.dashboard')
-         ];     
+         ];
     }
-    
+
     return ['success' => 2]; // datos incorrectos
   }
 

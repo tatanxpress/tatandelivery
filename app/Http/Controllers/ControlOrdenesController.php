@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CrediPuntos;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Ordenes;
@@ -30,6 +31,7 @@ use App\Admin;
 use Auth;
 use App\Administradores;
 use App\Producto;
+
 
 class ControlOrdenesController extends Controller
 {
@@ -92,7 +94,7 @@ class ControlOrdenesController extends Controller
         ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
         ->select('o.id', 's.identificador', 'o.fecha_orden', 's.nombre', 'o.precio_total',
             'o.estado_2', 'o.estado_3', 'o.estado_4', 'o.estado_5', 'o.estado_6',
-            'o.estado_7', 'o.estado_8', 'o.users_id', 'o.tipo_pago', 'o.nota_orden')
+            'o.estado_7', 'o.estado_8', 'o.users_id', 'o.tipo_pago', 'o.nota_orden', 'o.precio_envio')
         ->whereDate('o.fecha_orden', $fecha)
         ->get();
 
@@ -104,7 +106,6 @@ class ControlOrdenesController extends Controller
             $o->zonaidenti = Zonas::where('id', $od->zonas_id)->pluck('identificador')->first();
 
             $verificado = "No. ";
-            $metodopago = "";
 
             if($o->tipo_pago == 1){ // credi puntos
                 $metodopago = " | Pagar con Credi Puntos";
@@ -167,10 +168,165 @@ class ControlOrdenesController extends Controller
             }
 
             $o->estado = $estado;
+
+
+            // CUPONES
+            $cupon = "";
+            // buscar si aplico cupon
+            if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+
+                // buscar tipo de cupon
+                $tipo = Cupones::where('id', $oc->cupones_id)->first();
+
+                // ver que tipo se aplico
+                // el precio envio ya esta modificado
+                if($tipo->tipo_cupon_id == 1){
+
+                    $cupon = $tipo->texto_cupon . "| Envío Gratis";
+
+                }else if($tipo->tipo_cupon_id == 2){
+
+                    // modificar precio
+                    $data = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+
+                    if($data->aplico_envio_gratis == 1){
+                        $cupon = $tipo->texto_cupon . " | Descuento de: $" . $data->dinero . " Con Envío Gratis";
+                    }else{
+                        $cupon = $tipo->texto_cupon . " | Descuento de: $" . $data->dinero;
+                    }
+
+
+                }else if($tipo->tipo_cupon_id == 3){
+
+                    $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
+
+                    $cupon = $tipo->texto_cupon . " | Rebaja de: " . $porcentaje . "%";
+
+
+                }else if($tipo->tipo_cupon_id == 4){
+
+                    $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+
+                    $o->producto = $producto;
+
+                    $cupon = $tipo->texto_cupon . " | Producto Gratis: " . $producto;
+
+                }
+                else if($tipo->tipo_cupon_id == 5){
+
+                    // sumar sub total + envio + donacion
+                    $data = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
+                    $ins = Instituciones::where('id', $data->instituciones_id)->pluck('nombre')->first();
+
+                    $cupon = $tipo->texto_cupon . " | Donación de: $" . $data->dinero . " A: " . $ins;
+
+                }
+
+            }
+
+            $o->cupon = $cupon;
         }
 
         return view('backend.paginas.ordenes.tablas.tablaordenhoy', compact('orden'));
     }
+
+    // INFORMACION DEL CREDITO QUE GASTO, SI UTILIZO CUPON O NO
+    public function infoCreditoGastado(Request $request){
+
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'id.required' => 'Device id es requerido.'
+            );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            // verificar si utilizo cupon
+
+            if($datos = Ordenes::where('id', $request->id)->first()){
+
+                $final = $datos->precio_total + $datos->precio_envio;
+
+                // buscar si aplico cupon
+                if($oc = OrdenesCupones::where('ordenes_id', $request->id)->first()){
+    
+                    // buscar tipo de cupon
+                    $tipo = Cupones::where('id', $oc->cupones_id)->first();
+    
+                    // ver que tipo se aplico
+                    // el precio envio ya esta modificado
+                    if($tipo->tipo_cupon_id == 1){
+    
+                        // NO HACER NADA
+    
+                    }else if($tipo->tipo_cupon_id == 2){
+    
+                        // modificar precio
+                        $data = AplicaCuponDos::where('ordenes_id', $request->id)->first();
+
+                        $total = $datos->precio_total - $data->dinero;
+                        if($total <= 0){
+                            $total = 0;
+                        }
+
+                        $final = $total + $datos->precio_envio; // si aplico envio gratis, este sera $0.00
+    
+                    }else if($tipo->tipo_cupon_id == 3){
+    
+                        $porcentaje = AplicaCuponTres::where('ordenes_id', $request->id)->pluck('porcentaje')->first();
+                        $resta = $datos->precio_total * ($porcentaje / 100);
+                        $total = $datos->precio_total - $resta;
+    
+                        if($total <= 0){
+                            $total = 0;
+                        }
+    
+                        $final = $total + $datos->precio_envio;       
+    
+                    }else if($tipo->tipo_cupon_id == 4){
+    
+                       // NO HACER NADA                       
+    
+                    }
+                    else if($tipo->tipo_cupon_id == 5){
+    
+                        // sumar sub total + envio + donacion
+                        $data = AplicaCuponCinco::where('ordenes_id', $request->id)->first();
+                        $ins = Instituciones::where('id', $data->instituciones_id)->pluck('nombre')->first();
+    
+                      
+    
+                        $total = $datos->precio_total + $datos->precio_envio;
+                        $final = $total + $data->dinero;                        
+    
+                    }
+    
+                }
+
+                $final = number_format((float)$final, 2, '.', '');
+                return ['success' => 1, 'credito' => $final];
+
+            }else{
+                return ['success' => 2];
+            }
+
+        }
+    }
+
+
 
     // ver las ventas de hoy fecha
     public function totalVentasHoy(Request $request){

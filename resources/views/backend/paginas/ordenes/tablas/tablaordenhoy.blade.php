@@ -12,8 +12,10 @@
                     <th style="width: 15%">Identi</th>
                     <th style="width: 15%">Hora</th>
                     <th style="width: 15%">Nota</th>
-                    <th style="width: 15%">Sub Total</th>
+                    <th style="width: 15%">Sub Total</th>\
+                    <th style="width: 15%">Envío</th>
                     <th style="width: 15%">Zona</th>
+                    <th style="width: 15%">Cupón</th>
                     <th style="width: 15%">Verificado</th>
                     <th style="width: 15%">Motorista</th>
                     <th style="width: 15%">Estado</th>
@@ -29,7 +31,9 @@
                     <td>{{ $dato->fecha_orden }}</td>
                     <td>{{ $dato->nota_orden }}</td>
                     <td>{{ $dato->precio_total }}</td>
+                    <td>{{ $dato->precio_envio }}</td>
                     <td>{{ $dato->zonaidenti }}</td>
+                    <td>{{ $dato->cupon }}</td>
                     <td>{{ $dato->verificado }}</td>
                     <td>{{ $dato->motorista }}</td>
                     <td> {{ $dato->estado }}
@@ -52,6 +56,13 @@
                             <i class="fas fa-eye" title="Informacion Orden"></i>&nbsp; Info Orden
                         </button>
 
+                        <!-- Devolver los credi puntos a orden cancelada rapidamente -->
+                        @if($dato->tipo_pago == 1 && $dato->estado_8 == 1)
+                        </br></br>
+                            <button type="button" class="btn btn-success btn-xs" onclick="modalCredito({{ $dato->id }})">
+                                <i class="fas fa-eye" title="Devolver Credito"></i>&nbsp;Credito
+                            </button>
+                        @endif
 
                     </td>
                     </tr>
