@@ -1601,7 +1601,7 @@ class TarjetaController extends Controller
                     $d2 = new DateTime($today); // tiempo actual
                     if ($d1 >= $d2){
                         // no puede comprar credi puntos
-                        $permitido = 1;
+                        //$permitido = 1;
                         $hastafecha = $hastafecha . date("d-m-Y h:i A", strtotime($horaEstimada));;
                     }
                 }
