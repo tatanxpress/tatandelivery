@@ -816,6 +816,7 @@ class ClientesController extends Controller
                     $reg->esaprobada = 1;
                     $reg->comision = 0;
                     $reg->revisada = 1;
+                    $reg->estado = 0; // por ingreso manual
 
                     if($reg->save()){
 
@@ -891,6 +892,7 @@ class ClientesController extends Controller
                     $reg->esaprobada = 1;
                     $reg->comision = 0;
                     $reg->revisada = 1;
+                    $reg->estado = 0; // por ingreso manual
 
                     if($reg->save()){
 
@@ -1137,12 +1139,12 @@ class ClientesController extends Controller
 
         foreach($cliente as $c){
             $c->fecha = date("d-m-Y h:i A", strtotime($c->fecha));
-            $c->fecha_revisada = date("d-m-Y h:i A", strtotime($c->fecha_revisada));
+            if($c->fecha_revisada != null){
+                $c->fecha_revisada = date("d-m-Y h:i A", strtotime($c->fecha_revisada));
+            }
         }
 
-        return view('backend.paginas.credipuntos.tablas.tablacredipuntosverificados', compact('cliente'));
-
-        return view('backend.paginas.credipuntos.tablas.tablaregistrotodos', compact('datos'));
+        return view('backend.paginas.credipuntos.tablas.tablacredipuntosverificados', compact('cliente'));      
     }
 
 

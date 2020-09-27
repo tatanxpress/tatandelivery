@@ -1589,7 +1589,8 @@ class TarjetaController extends Controller
                 $hastafecha = "";
                 // verificar a que horas agrego un registro, se puede comprar cada 24 horas
                 //verificar que este cliente tenga un registro
-                if($cp = CrediPuntos::where('usuario_id', $uu->id)->latest('fecha')->first()){
+                //TOMAR UNICAMENTE EL ESTADO 1, ES CUANDO SE COMPRA CREDITO DESDE LA API
+                if($cp = CrediPuntos::where('usuario_id', $uu->id)->where('estado', 1)->latest('fecha')->first()){
 
                     // si tiene registro, asi que comparar si ya pago 24 horas para que pueda volver a comprar
                     $hastafecha = "Puede volver agregar Credi Puntos hasta el: ";
@@ -1601,7 +1602,7 @@ class TarjetaController extends Controller
                     $d2 = new DateTime($today); // tiempo actual
                     if ($d1 >= $d2){
                         // no puede comprar credi puntos
-                        //$permitido = 1;
+                        $permitido = 1;
                         $hastafecha = $hastafecha . date("d-m-Y h:i A", strtotime($horaEstimada));;
                     }
                 }
@@ -1742,6 +1743,7 @@ class TarjetaController extends Controller
                                 $reg->esaprobada = (int)$esaprobada;
                                 $reg->comision = $comision;
                                 $reg->revisada = 0;
+                                //$reg->estado = 1; // por ingreso api
                                 $reg->save();
                                 DB::commit();
 
@@ -1845,6 +1847,7 @@ class TarjetaController extends Controller
                                     $reg->esaprobada = (int)$esaprobada;
                                     $reg->comision = $comision;
                                     $reg->revisada = 0;
+                                    //$reg->estado = 1; // por ingreso api
                                     $reg->save();
                                     DB::commit();
 
