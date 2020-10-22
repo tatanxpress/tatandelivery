@@ -1648,7 +1648,6 @@ class TarjetaController extends Controller
 
             if($uu = User::where('id', $request->userid)->first()){
 
-
                 $dataversion = VersionesApp::where('id', 1)->first();
 
                 $time1 = Carbon::parse($dataversion->fecha_token);
@@ -1674,6 +1673,7 @@ class TarjetaController extends Controller
                     'monto' => $pagara,
                     'emailCliente' => $uu->email,
                     'nombreCliente' => $request->nombre,
+                    "formaPago" => "PagoNormal",
                 );
 
                 $convertido = json_encode($data);

@@ -62,10 +62,8 @@ class LoginController extends Controller
                 }
 
                 $codigo = '';
-                $pattern = '1234567890';
-                $max = strlen($pattern)-1;
-                for($i=0;$i <6; $i++){
-                    $codigo .= $pattern{mt_rand(0,$max)};
+                for($i = 0; $i < 6; $i++) {
+                    $codigo .= mt_rand(0, 9);
                 }
 
                 DB::beginTransaction();
@@ -253,11 +251,8 @@ class LoginController extends Controller
             if($datos = User::where('phone', $unido)->first()){
 
                 $codigo = '';
-                $pattern = '1234567890';
-                $max = strlen($pattern)-1;
-                for($i=0;$i <6; $i++)
-                {
-                    $codigo .= $pattern{mt_rand(0,$max)};
+                for($i = 0; $i < 6; $i++) {
+                    $codigo .= mt_rand(0, 9);
                 }
 
                 // cambiar el codigo del correo
@@ -366,11 +361,8 @@ class LoginController extends Controller
             // el numero en el panel de control  29/08/2020
 
             $codigo = '';
-            $pattern = '1234567890';
-            $max = strlen($pattern)-1;
-            for($i=0;$i <6; $i++)
-            {
-                $codigo .= $pattern{mt_rand(0,$max)};
+            for($i = 0; $i < 6; $i++) {
+                $codigo .= mt_rand(0, 9);
             }
 
             // si no encuentra el registro se enviara el codigo sms, verificar su contador
@@ -554,11 +546,8 @@ class LoginController extends Controller
             if($datos = User::where('phone', $unido)->first()){
 
                     $codigo = '';
-                    $pattern = '1234567890';
-                    $max = strlen($pattern)-1;
-                    for($i=0;$i <6; $i++)
-                    {
-                        $codigo .= $pattern{mt_rand(0,$max)};
+                    for($i = 0; $i < 6; $i++) {
+                        $codigo .= mt_rand(0, 9);
                     }
 
                     // cambiar el codigo del correo

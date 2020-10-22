@@ -23,9 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2f4e7f2a-7f35-4252-8519-b0e118214d8c" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/Auth/LoginController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Api/TarjetaController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Api/TarjetaController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ClientesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ClientesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2019_12_07_003108_create_ordenes_revisadas_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2019_12_07_003108_create_ordenes_revisadas_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/storage/logs/laravel-2020-09-27.log" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -219,6 +222,14 @@
       <workItem from="1601048043895" duration="5149000" />
       <workItem from="1601173047124" duration="1427000" />
       <workItem from="1601174539900" duration="1304000" />
+      <workItem from="1601400601091" duration="1383000" />
+      <workItem from="1601402421084" duration="13000" />
+      <workItem from="1601499596341" duration="22000" />
+      <workItem from="1601504563152" duration="47000" />
+      <workItem from="1601569815175" duration="1544000" />
+      <workItem from="1601571692609" duration="2438000" />
+      <workItem from="1602637975037" duration="630000" />
+      <workItem from="1603391080899" duration="1679000" />
     </task>
     <servers />
   </component>
@@ -242,10 +253,10 @@
       <screen x="0" y="0" width="1536" height="824" />
     </state>
     <state x="499" y="167" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1536.824@0.0.1536.824" timestamp="1601008420634" />
-    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1601174470016">
+    <state x="549" y="167" key="FileChooserDialogImpl" timestamp="1602638849432">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
-    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1601174470016" />
+    <state x="549" y="167" key="FileChooserDialogImpl/0.0.1536.824@0.0.1536.824" timestamp="1602638849432" />
     <state width="254" height="198" key="ShowFilterAction_Filter_Popup" timestamp="1600828593290">
       <screen x="0" y="0" width="1536" height="824" />
     </state>
