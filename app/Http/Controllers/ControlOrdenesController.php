@@ -169,7 +169,6 @@ class ControlOrdenesController extends Controller
 
             $o->estado = $estado;
 
-
             // CUPONES
             $cupon = "";
             // buscar si aplico cupon
@@ -262,18 +261,18 @@ class ControlOrdenesController extends Controller
 
                 // buscar si aplico cupon
                 if($oc = OrdenesCupones::where('ordenes_id', $request->id)->first()){
-    
+
                     // buscar tipo de cupon
                     $tipo = Cupones::where('id', $oc->cupones_id)->first();
-    
+
                     // ver que tipo se aplico
                     // el precio envio ya esta modificado
                     if($tipo->tipo_cupon_id == 1){
-    
+
                         // NO HACER NADA
-    
+
                     }else if($tipo->tipo_cupon_id == 2){
-    
+
                         // modificar precio
                         $data = AplicaCuponDos::where('ordenes_id', $request->id)->first();
 
@@ -283,37 +282,36 @@ class ControlOrdenesController extends Controller
                         }
 
                         $final = $total + $datos->precio_envio; // si aplico envio gratis, este sera $0.00
-    
+
                     }else if($tipo->tipo_cupon_id == 3){
-    
+
                         $porcentaje = AplicaCuponTres::where('ordenes_id', $request->id)->pluck('porcentaje')->first();
                         $resta = $datos->precio_total * ($porcentaje / 100);
                         $total = $datos->precio_total - $resta;
-    
+
                         if($total <= 0){
                             $total = 0;
                         }
-    
-                        $final = $total + $datos->precio_envio;       
-    
+
+                        $final = $total + $datos->precio_envio;
+
                     }else if($tipo->tipo_cupon_id == 4){
-    
-                       // NO HACER NADA                       
-    
+
+                       // NO HACER NADA
+
                     }
                     else if($tipo->tipo_cupon_id == 5){
-    
+
                         // sumar sub total + envio + donacion
                         $data = AplicaCuponCinco::where('ordenes_id', $request->id)->first();
                         $ins = Instituciones::where('id', $data->instituciones_id)->pluck('nombre')->first();
-    
-                      
-    
+
+
                         $total = $datos->precio_total + $datos->precio_envio;
-                        $final = $total + $data->dinero;                        
-    
+                        $final = $total + $data->dinero;
+
                     }
-    
+
                 }
 
                 $final = number_format((float)$final, 2, '.', '');

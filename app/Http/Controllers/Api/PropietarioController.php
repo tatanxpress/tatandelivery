@@ -161,13 +161,9 @@ class PropietarioController extends Controller
                 if($p->activo == 0){
                     return ['success' => 1];
                 }
-
                 $codigo = '';
-                $pattern = '1234567890';
-                $max = strlen($pattern)-1;
-                for($i=0;$i <6; $i++)
-                {
-                    $codigo .= $pattern{mt_rand(0,$max)};
+                for($i = 0; $i < 6; $i++) {
+                    $codigo .= mt_rand(0, 9);
                 }
 
                 // cambiar el codigo del correo
@@ -270,7 +266,7 @@ class PropietarioController extends Controller
         }
     }
 
-    // ver nuevas ordenes
+    // VER NUEVAS ORDENES PROPIETARIO
     public function nuevaOrdenes(Request $request){
         if($request->isMethod('post')){
             $rules = array(
@@ -296,58 +292,30 @@ class PropietarioController extends Controller
                     return ['success'=> 1];
                 }
 
+                // obtener comision
+                $data = Servicios::where('id', $p->servicios_id)->first();
+
                 $orden = DB::table('ordenes')
                 ->select('id', 'precio_total', 'nota_orden', 'fecha_orden')
                 ->where('servicios_id', $p->servicios_id)
                 ->where('visible_p', 1)
                 ->get();
 
-
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
-                    // cupones
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+                    $comision = ($o->precio_total * $data->comision) / 100;
 
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
-                        }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
 
-                            $o->producto = $producto;
-                        }else if($tipo->tipo_cupon_id == 5){
-                            $o->tipocupon = 5;
-
-                        }else{
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;
-                    }
+                    $o->comision = $data->comision;
+                    $o->total = $total;
                 }
-
-                // actualizar id, cada vez
-               /* if($request->deviceid != null){
-                    if($request->deviceid != "0000"){
-                        Propietarios::where('id', $request->id)->update(['device_id' => $request->deviceid]);
-                    }
-                }*/
 
                 return ['success' => 2, 'ordenes' => $orden];
             }else{
-                return ['success' => 3]; // propietario no encontrado
+                return ['success' => 3];
             }
         }
     }
@@ -2016,7 +1984,12 @@ class PropietarioController extends Controller
                 ];
             }
 
+
             if($p = Propietarios::where('id', $request->id)->first()){
+
+                // obtener comision
+                $data = Servicios::where('id', $p->servicios_id)->first();
+
                 $orden = DB::table('ordenes')
                 ->select('id', 'precio_total', 'estado_8', 'nota_orden',
                 'fecha_4', 'hora_2')
@@ -2030,41 +2003,19 @@ class PropietarioController extends Controller
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_4));
 
-                    $o->total = number_format((float)$o->precio_total, 2, '.', '');
-
                     // ESTA ES LA HORA2 PARA LA VISTA UNICAMENTE PROPIETARIO
 
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEstimada = $horaEstimada;
 
-                    // cupones
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+                    $comision = ($o->precio_total * $data->comision) / 100;
 
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
-                        }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
 
-                            $o->producto = $producto;
-                        }else{
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;
-                    }
+                    $o->comision = $data->comision;
+                    $o->total = $total;
                 }
 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -2107,7 +2058,7 @@ class PropietarioController extends Controller
                 foreach($orden as $o){
 
                     $inicio = Carbon::parse($o->fecha_4);
-                 
+
                     $tiempo = VersionesApp::where('id', 1)->pluck('tiempo')->first();
 
                     $sumado = $inicio->addMinute($tiempo)->format('Y-m-d H:i:s');
@@ -2525,7 +2476,10 @@ class PropietarioController extends Controller
                 ];
             }
 
+
+
             if($p = Propietarios::where('id', $request->id)->first()){
+                $data = Servicios::where('id', $p->servicios_id)->first();
 
                 $orden = DB::table('ordenes')
                 ->select('id', 'precio_total', 'fecha_orden', 'precio_envio',
@@ -2539,36 +2493,14 @@ class PropietarioController extends Controller
                     $o->fecha_orden = date("h:i A ", strtotime($o->fecha_orden));
 
                     $o->horacompletada = date("h:i A ", strtotime($o->fecha_5));
-                    $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
+                    $comision = ($o->precio_total * $data->comision) / 100;
 
-                    // cupones
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
 
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $o->tipocupon = 1;
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $o->tipocupon = 2;
-                        }else if($tipo->tipo_cupon_id == 3){
-                            $o->tipocupon = 3;
-                        }else if($tipo->tipo_cupon_id == 4){
-                            $o->tipocupon = 4;
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $o->producto = $producto;
-                        }else{
-                            $o->tipocupon = 0;
-                        }
-
-                    }else{
-                        $o->aplicacupon = 0;
-                    }
+                    $o->comision = $data->comision;
+                    $o->total = $total;
                 }
 
                 return ['success' => 1, 'orden' => $orden];

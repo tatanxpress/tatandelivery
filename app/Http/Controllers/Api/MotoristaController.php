@@ -43,38 +43,38 @@ class MotoristaController extends Controller
 {
      // login para motorista
      public function loginMotorista(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'phone' => 'required',
                 'password' => 'required|max:16',
-            );    
+            );
 
-            $messages = array(                                      
+            $messages = array(
                 'phone.required' => 'El telefono es requerido.',
-                
+
                 'password.required' => 'La contraseña es requerida.',
                 'password.max' => '16 caracteres máximo para contraseña',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
-         
+
             if($p = Motoristas::where('telefono', $request->phone)->first()){
- 
+
                 if($p->activo == 0){
                     return ['success' => 1]; // motorista no activo
                 }
 
                 if (Hash::check($request->password, $p->password)) {
 
-                    $id = $p->id;   
+                    $id = $p->id;
                     if($request->device_id != null){
                         Motoristas::where('id', $p->id)->update(['device_id' => $request->device_id]);
                     }
@@ -94,21 +94,21 @@ class MotoristaController extends Controller
 
     // verificar si existe el telefono
     public function buscarTelefono(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'telefono' => 'required'
-            );    
+            );
 
-            $messages = array(                                      
-                'telefono.required' => 'El telefono es requerido'             
+            $messages = array(
+                'telefono.required' => 'El telefono es requerido'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
@@ -121,29 +121,29 @@ class MotoristaController extends Controller
                 return ['success'=>2]; // telefono encontrado
             }else{
                 return ['success'=>3]; // numero no encontrado
-            }            
+            }
         }
     }
 
     // recuperacion de contraseña por correo electronico
     public function codigoCorreo(Request $request){
-        
-        if($request->isMethod('post')){   
-            $rules = array(                
+
+        if($request->isMethod('post')){
+            $rules = array(
                 'telefono' => 'required|max:20'
-            );    
-     
-            $messages = array(                                      
+            );
+
+            $messages = array(
                 'telefono.required' => 'El telefono es requerido',
                 'telefono.max' => '20 caracteres máximo para el telefono'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails()) 
+            if ( $validator->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
@@ -154,23 +154,20 @@ class MotoristaController extends Controller
                 if($p->activo == 0){
                     return ['success' => 1];
                 }
-                
+
                 $codigo = '';
-                $pattern = '1234567890';
-                $max = strlen($pattern)-1; 
-                for($i=0;$i <6; $i++)           
-                {
-                    $codigo .= $pattern{mt_rand(0,$max)};
+                for($i = 0; $i < 6; $i++) {
+                    $codigo .= mt_rand(0, 9);
                 }
 
                 // cambiar el codigo del correo
                 Motoristas::where('telefono', $request->telefono)->update(['codigo_correo' => $codigo]);
-                
+
                 // enviar correo, aunque no este validado
-                
+
                 $nombre = $p->nombre;
-                $correo = $p->correo;              
-                              
+                $correo = $p->correo;
+
                try{
                 // envio de correo
                 Mail::to($correo)->send(new RecuperarPasswordEmail($nombre, $codigo));
@@ -178,39 +175,39 @@ class MotoristaController extends Controller
                 return [
                     'success' => 2,
                     'message' => 'Correo enviado'
-                ]; 
+                ];
                 }   catch(Exception $e){
                     return [
-                        'success' => 3 // correo error                        
-                    ];       
+                        'success' => 3 // correo error
+                    ];
                 }
             }else{
                 return [
                     'success' => 3 // telefono no encontrado
                 ];
-            }                   
-        }  
+            }
+        }
     }
-    
+
     // revisar codigo recibido del correo
     public function revisarCodigoCorreo(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'telefono' => 'required',
                 'codigo' => 'required',
-            );    
+            );
 
-            $messages = array(                                      
-                'telefono.required' => 'El telefono es requerido',                
+            $messages = array(
+                'telefono.required' => 'El telefono es requerido',
                 'codigo.required' => 'El codigo es requerido',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
@@ -218,7 +215,7 @@ class MotoristaController extends Controller
             // buscar correo y codigo
             if($p = Motoristas::where('telefono', $request->telefono)
             ->where('codigo_correo', $request->codigo)->first()){
-                
+
                 return ['success' => 1]; // coincide, pasar a cambiar contraseña
             }else{
                 return ['success' => 2]; // codigo incorrecto
@@ -228,14 +225,14 @@ class MotoristaController extends Controller
 
     // cambio de contraseña
     public function nuevaPassword(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'telefono' => 'required',
                 'password' => 'required|min:8|max:16',
             );
 
-            $messages = array(                                      
-                'telefono.required' => 'El correo es requerido',  
+            $messages = array(
+                'telefono.required' => 'El correo es requerido',
                 'password.required' => 'La contraseña es requerida',
                 'password.min' => 'Mínimo 8 caracteres',
                 'password.max' => 'Máximo 16 caracteres',
@@ -243,18 +240,18 @@ class MotoristaController extends Controller
 
             $validator = Validator::make($request->all(), $rules, $messages);
 
-            if ($validator->fails()) 
+            if ($validator->fails())
                 {
                     return [
-                        'success' => 0, 
+                        'success' => 0,
                         'message' => $validator->errors()->all()
                     ];
                 }
 
             if($p = Motoristas::where('telefono', $request->telefono)->first()){
-        
+
                 Motoristas::where('telefono', $request->telefono)->update(['password' => Hash::make($request->password)]);
-            
+
                 return ['success' => 1];  // contraseña cambiada
             }else{
                 return ['success' => 2];  // telefono no encontrado
@@ -264,12 +261,12 @@ class MotoristaController extends Controller
 
     // ver nuevas ordenes, cuando inicia la preparacion
     public function nuevaOrdenes(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array( 
+        if($request->isMethod('post')){
+            $rules = array(
                 'id' => 'required',
             );
 
-            $messages = array(                                      
+            $messages = array(
                 'id.required' => 'El id motorista es requerido',
                 );
 
@@ -277,10 +274,10 @@ class MotoristaController extends Controller
 
             if ($validator->fails()){
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            }            
+            }
 
             if($m = Motoristas::where('id', $request->id)->first()){
 
@@ -305,11 +302,11 @@ class MotoristaController extends Controller
                 foreach($moto as $p){
                     array_push($pilaUsuarios, $p->servicios_id);
                 }
-               
+
                 $orden = DB::table('ordenes AS o')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-                ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4', 
-                'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4', 
+                ->select('o.id', 'o.servicios_id', 's.nombre', 'o.estado_4',
+                'o.estado_8', 'o.precio_total', 'o.precio_envio', 'o.fecha_4',
                 'o.hora_2', 'o.estado_6', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
                 ->where('o.estado_6', 0) // nadie a seteado este
                 ->where('o.estado_4', 1) // inicia la orden
@@ -319,119 +316,39 @@ class MotoristaController extends Controller
                 ->get();
 
                 foreach($orden as $o){
-                    
+
                     $datadir = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->direccion = $datadir->direccion;
-                    $pagarPropi = "";  // para decile si paga a propietario o no                 
-                    $cupon = ""; // texto para decir que tipo de cupon aplico
-                    
-                    if($o->pago_a_propi == 1){
-                        // pagar a propietario
-                        $pagarPropi = "Pagar a Propietario $" . $o->precio_total; // sub total
-                    }
-
-                    $o->tipo = $pagarPropi;
 
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->horaEntrega = $horaEstimada;
 
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                       
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+                    // DATOS PARA PAGAR A PROPIETARIO
+                    $data = Servicios::where('id', $o->servicios_id)->first();
 
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $cupon = "Envío Gratis";
-                            
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis 
-                            // cobrar a cliente                          
-                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
+                    $comision = ($o->precio_total * $data->comision) / 100;
 
-                        }else if($tipo->tipo_cupon_id == 2){
-                           
-                            // modificar precio
-                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
 
-                            $total = $o->precio_total - $dd->dinero;
-                            if($total <= 0){
-                                $total = 0;
-                            }
+                    // total que se pagara a propietario
+                    $o->total = $total;
 
-                            // si aplico envio gratis
-                            if($dd->aplico_envio_gratis == 1){
-                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
-                                
-                            }else{
-                                $cupon = "Descuento dinero: $" . $dd->dinero;
-                            }
+                    // DATOS QUE SE COBRARA AL CLIENTE
 
-                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio; 
- 
-                            // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
+                    $suma = $o->precio_total + $o->precio_envio;
 
-                        }else if($tipo->tipo_cupon_id == 3){                          
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            $cupon = "Descuento de: " . $porcentaje . "%";
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 4){
-                          
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $cupon = "Producto Gratis: " . $producto;
-    
-                            $o->precio_total = $sumado;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){ // donacion
-                           
-                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
-                            $cupon = "Donación de: $" . $donacion;
-
-                            // sumar
-                            $suma = $o->precio_total + $o->precio_envio + $donacion;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }else{
-                            $total = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$total, 2, '.', '');     
-                        }
-
-                    }else{
-                        $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');                        
+                    // credi puntos
+                    if($o->tipo_pago == 1){
+                        $suma = 0;
                     }
 
-                    $o->cupon = $cupon;
-
+                    $o->precio_total = number_format((float)$suma, 2, '.', '');
                 } //end foreach
 
 
-                
-             
-                return ['success' => 2, 'ordenes' => $orden]; 
+                return ['success' => 2, 'ordenes' => $orden];
             }else{
                 return ['success' => 3];
             }
@@ -440,26 +357,26 @@ class MotoristaController extends Controller
 
     // ver orden por id
     public function verOrdenPorID(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenid' => 'required'               
+                'ordenid' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id orden es requerido.'            
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id orden es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($or = Ordenes::where('id', $request->ordenid)->first()){
 
@@ -480,10 +397,10 @@ class MotoristaController extends Controller
                 ->first();
 
                 $time1 = Carbon::parse($or->fecha_4);
-                
+
                 $horaEstimada = $time1->addMinute($or->hora_2)->format('h:i A d-m-Y');
-                $horaEstimada = $horaEstimada;              
-                
+                $horaEstimada = $horaEstimada;
+
                 return ['success' => 1, 'ordenes' => $orden, 'servicio' => $servicio, 'hora' => $horaEstimada];
             }else{
                 return ['success' => 2];
@@ -495,19 +412,19 @@ class MotoristaController extends Controller
      public function verProductosOrden(Request $request){
         // validaciones para los datos
         $reglaDatos = array(
-            'ordenid' => 'required'               
+            'ordenid' => 'required'
         );
 
-        $mensajeDatos = array(                                      
+        $mensajeDatos = array(
             'ordenid.required' => 'El id de la orden es requerido.'
             );
 
         $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-        if($validarDatos->fails()) 
+        if($validarDatos->fails())
         {
             return [
-                'success' => 0, 
+                'success' => 0,
                 'message' => $validarDatos->errors()->all()
             ];
         }
@@ -528,7 +445,7 @@ class MotoristaController extends Controller
                         ->select('od.id AS productoID', 'p.nombre', 'od.nota', 'p.imagen', 'p.utiliza_imagen', 'od.precio', 'od.cantidad')
                         ->where('o.id', $request->ordenid)
                         ->get();
-            
+
                         foreach($producto as $p){
                             $cantidad = $p->cantidad;
                             $precio = $p->precio;
@@ -536,28 +453,28 @@ class MotoristaController extends Controller
                             $p->multiplicado = number_format((float)$multi, 2, '.', '');
                         }
 
-            return ['success' => 2, 'productos' => $producto];                  
+            return ['success' => 2, 'productos' => $producto];
         }else{
             return ['success' => 3];
         }
     }
 
-    // saver coordenadas del servicio 
+    // saver coordenadas del servicio
     public function coordenadas(Request $request){
         $reglaDatos = array(
-            'ordenid' => 'required'               
+            'ordenid' => 'required'
         );
 
-        $mensajeDatos = array(                                      
+        $mensajeDatos = array(
             'ordenid.required' => 'El id de la orden es requerido.'
             );
 
         $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-        if($validarDatos->fails()) 
+        if($validarDatos->fails())
         {
             return [
-                'success' => 0, 
+                'success' => 0,
                 'message' => $validarDatos->errors()->all()
             ];
         }
@@ -565,29 +482,29 @@ class MotoristaController extends Controller
         if($or = Ordenes::where('id', $request->ordenid)->first()){
 
             $datos = Servicios::where('id', $or->servicios_id)->first();
-            
-            return ['success' => 1, 'latitud' => $datos->latitud, 'longitud' => $datos->longitud, 'nombre' => $datos->nombre];                  
+
+            return ['success' => 1, 'latitud' => $datos->latitud, 'longitud' => $datos->longitud, 'nombre' => $datos->nombre];
         }else{
             return ['success' => 2];
         }
     }
 
-    // saver coordenadas del cliente 
+    // saver coordenadas del cliente
     public function coordenadascliente(Request $request){
         $reglaDatos = array(
-            'ordenid' => 'required'               
+            'ordenid' => 'required'
         );
 
-        $mensajeDatos = array(                                      
+        $mensajeDatos = array(
             'ordenid.required' => 'El id de la orden es requerido.'
             );
 
         $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-        if($validarDatos->fails()) 
+        if($validarDatos->fails())
         {
             return [
-                'success' => 0, 
+                'success' => 0,
                 'message' => $validarDatos->errors()->all()
             ];
         }
@@ -595,8 +512,8 @@ class MotoristaController extends Controller
         if($or = Ordenes::where('id', $request->ordenid)->first()){
 
             $datos = OrdenesDirecciones::where('ordenes_id', $or->id)->first();
-            
-            return ['success' => 1, 'latitud' => $datos->latitud, 'longitud' => $datos->longitud, 'nombre' => $datos->nombre];                  
+
+            return ['success' => 1, 'latitud' => $datos->latitud, 'longitud' => $datos->longitud, 'nombre' => $datos->nombre];
         }else{
             return ['success' => 2];
         }
@@ -604,30 +521,30 @@ class MotoristaController extends Controller
 
      // ver producto individual de la orden
     public function ordenProductosIndividual(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'ordenesid' => 'required' // id tabla orden_descripcion               
+                'ordenesid' => 'required' // id tabla orden_descripcion
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'ordenesid.required' => 'El id de orden descripcion es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-            
+            }
+
             // producto descripcion
             if(OrdenesDescripcion::where('id', $request->ordenesid)->first()){
-            
+
                 $producto = DB::table('ordenes_descripcion AS o')
                     ->join('producto AS p', 'p.id', '=', 'o.producto_id')
                     ->select('p.imagen', 'p.nombre', 'p.descripcion', 'o.precio', 'o.cantidad', 'o.nota')
@@ -640,7 +557,7 @@ class MotoristaController extends Controller
                         $multi = $cantidad * $precio;
                         $p->multiplicado = number_format((float)$multi, 2, '.', '');
                     }
-            
+
                 return ['success' => 1, 'producto' => $producto];
             }else{
                 return ['success' => 2];
@@ -648,17 +565,17 @@ class MotoristaController extends Controller
         }
     }
 
-    // el motorista recoge la orden 
+    // el motorista recoge la orden
     public function obtenerOrden(Request $request){
-        
-        if($request->isMethod('post')){ 
+
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'ordenid' => 'required',
-                'id' => 'required'         
-            ); 
-        
+                'id' => 'required'
+            );
+
             $mensajeDatos = array(
                 'ordenid.required' => 'El id de la orden es requerido',
                 'id.required' => 'El id del motorista es requerido'
@@ -666,16 +583,16 @@ class MotoristaController extends Controller
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
-                return [ 
+                return [
                     'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             if($mo = Motoristas::where('id', $request->id)->first()){
-                
+
                 if($or = Ordenes::where('id', $request->ordenid)->first()){
 
                     // VERIFICARA LIMITE DE DINERO SOLO SI ES MOTORISTA PUBLICO
@@ -689,32 +606,32 @@ class MotoristaController extends Controller
                         foreach($revisada as $p){
                             array_push($pilaOrdenid, $p->ordenes_id);
                         }
-                            
+
                         $ordenid = DB::table('motorista_ordenes AS mo')
                         ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                         ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                         ->select('mo.motoristas_id', 'mo.ordenes_id', 'mo.fecha_agarrada',
-                        'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio', 
+                        'o.estado_5', 'm.identificador', 'o.precio_total', 'o.precio_envio',
                         'mo.fecha_agarrada')
                         ->where('mo.motoristas_id', $mo->id)
-                        ->where('o.estado_5', 1) // orden preparada                   
+                        ->where('o.estado_5', 1) // orden preparada
                         ->whereNotIn('mo.ordenes_id', $pilaOrdenid)
-                        ->get(); 
-                        
+                        ->get();
+
                         $sum = 0.0;
                         foreach($ordenid as $o){
-                        
+
                             // sumar precio
                             $precio = $o->precio_total + $o->precio_envio;
                             $o->total = number_format((float)$precio, 2, '.', '');
                             $sum = $sum + $precio;
-                        }   
+                        }
 
-                        
+
 
                         // LIMITAR ORDEN POR TOTAL DE DINERO
                         // UNICAMENTE SERVICIOS
-                                             
+
 
                         if($sum >= $mo->limite_dinero){
                             return ['success' => 1];
@@ -733,14 +650,14 @@ class MotoristaController extends Controller
                         try {
                             // evitar orden con motorista ya asignado
                             if(MotoristaOrdenes::where('ordenes_id', $request->ordenid)->first()){
-                                return ['success' => 3];    
-                            } 
+                                return ['success' => 3];
+                            }
 
-                            // ACTUALIZAR 
+                            // ACTUALIZAR
                             Ordenes::where('id', $request->ordenid)->update(['visible_m' => 1]);
 
                             $fecha = Carbon::now('America/El_Salvador');
-                            
+
                             $nueva = new MotoristaOrdenes;
                             $nueva->ordenes_id = $or->id;
                             $nueva->motoristas_id = $request->id;
@@ -749,9 +666,9 @@ class MotoristaController extends Controller
                             $nueva->save();
 
                             DB::commit();
-                            
+
                             return ['success' => 4]; // guardado
-                            
+
                         } catch(\Throwable $e){
                             DB::rollback();
                                 return [
@@ -772,37 +689,38 @@ class MotoristaController extends Controller
 
     // ordenes en proceso
     public function verProcesoOrdenes(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(Motoristas::where('id', $request->id)->first()){
-                
+
                 // mostrar si fue cancelada para despues setear visible_m
 
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
                 ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-                ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
-                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
+                ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2',
+                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre',
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi',
+                    'o.nota_orden', 'o.tipo_pago', 'o.servicios_id')
                 ->where('o.estado_7', 0) // aun sin entregar al cliente
                 ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
                 ->where('o.estado_6', 0) // aun no han salido a entregarse
@@ -816,33 +734,606 @@ class MotoristaController extends Controller
                     $horaEstimadaEntrega = $fechaOrden->addMinute($o->hora_2)->format('h:i A d-m-Y');
                     $o->fecharecoger = $horaEstimadaEntrega;
 
-                    $pagarPropi = "";  // para decile si paga a propietario o no                 
-                    $cupon = ""; // texto para decir que tipo de cupon aplico
+                    // DATOS PARA PAGAR A PROPIETARIO
+                    $data = Servicios::where('id', $o->servicios_id)->first();
 
-                    if($o->pago_a_propi == 1){
-                        // pagar a propietario
-                        $pagarPropi = "Pagar a Propietario $" . $o->precio_total; // sub total
+                    $comision = ($o->precio_total * $data->comision) / 100;
+
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
+
+                    // total que se pagara a propietario
+                    $o->total = $total;
+
+                    // DATOS QUE SE COBRARA AL CLIENTE
+
+                    $suma = $o->precio_total + $o->precio_envio;
+
+                    // credi puntos
+                    if($o->tipo_pago == 1){
+                        $suma = 0;
                     }
 
-                    $o->tipo = $pagarPropi;
+                    $o->precio_total = number_format((float)$suma, 2, '.', '');
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    public function verProcesoOrdenesEntrega(Request $request){
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'id' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'id.required' => 'El id del motorista es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if(Motoristas::where('id', $request->id)->first()){
+
+                // mostrar si fue cancelada para despues setear visible_m
+
+                $orden = DB::table('motorista_ordenes AS mo')
+                ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
+                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
+                ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2',
+                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre',
+                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi',
+                    'o.nota_orden', 'o.tipo_pago', 'o.servicios_id')
+                ->where('o.estado_7', 0) // aun sin entregar al cliente
+                ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
+                ->where('o.estado_6', 1) // van a entregarse
+                ->where('mo.motoristas_id', $request->id)
+                ->get();
+
+                // sumar mas envio
+                foreach($orden as $o){
+
+                    // Tiempo dado por propietario + tiempo de zona extra
+                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+
+                    $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
+                    $fechaOrden = Carbon::parse($o->fecha_4);
+                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');
+                    $o->fecharecoger = $horaEstimadaEntrega;
+
+                    // DATOS PARA PAGAR A PROPIETARIO
+                    $data = Servicios::where('id', $o->servicios_id)->first();
+
+                    $comision = ($o->precio_total * $data->comision) / 100;
+
+                    $total = $o->precio_total - $comision;
+                    $total = number_format((float)$total, 2, '.', '');
+
+                    // total que se pagara a propietario
+                    $o->total = $total;
+
+                    // DATOS QUE SE COBRARA AL CLIENTE
+
+                    $suma = $o->precio_total + $o->precio_envio;
+
+                    // credi puntos
+                    if($o->tipo_pago == 1){
+                        $suma = 0;
+                    }
+
+                    $o->precio_total = number_format((float)$suma, 2, '.', '');
+                }
+
+                return ['success' => 1, 'ordenes' => $orden];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+     // ver orden proceso por id
+     public function verOrdenProcesoPorID(Request $request){
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'ordenid' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id orden es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($or = Ordenes::where('id', $request->ordenid)->first()){
+
+                //sacar direccion de la orden
+
+                $orden = DB::table('ordenes_direcciones AS o')
+                ->select('o.nombre', 'o.direccion',
+                        'o.numero_casa', 'o.punto_referencia',
+                        'o.latitud', 'o.longitud')
+                ->where('o.ordenes_id', $request->ordenid)
+                ->first();
+
+                $servicioid = $or->servicios_id;
+
+                $servicio = DB::table('servicios AS s')
+                ->select('s.nombre', 's.telefono', 's.direccion', 's.latitud', 's.longitud', 's.producto_visible')
+                ->where('s.id', $servicioid)
+                ->first();
+
+                $time1 = Carbon::parse($or->fecha_4);
+
+                $horaEstimada = $time1->addMinute($or->hora_2)->format('h:i A');
+                $horaEstimada = $horaEstimada;
 
 
-                     // buscar si aplico cupon
-                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        $o->aplicacupon = 1;
+                // titulo que dira la notificacion, cuando se alerte al cliente que esta llegando su pedido.
+                $mensaje = "Su orden #" . $request->ordenid . " esta llegando";
+
+                return ['success' => 1, 'ordenes' => $orden,
+                 'servicio' => $servicio, 'hora' => $horaEstimada,
+                 'estado' => $or->estado_6, 'cancelado' => $or->estado_8, 'mensaje' => $mensaje];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    // iniciar entrega de la orden
+    public function iniciarEntrega(Request $request){
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'ordenid' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id de la orden es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($or = Ordenes::where('id', $request->ordenid)->first()){
+
+                if($or->estado_8 == 1){
+                    return ['success' => 3];
+                }
+                // orden ya fue preparada por el propietario
+                if($or->estado_5 == 1 && $or->estado_6 == 0){
+
+                    $fecha = Carbon::now('America/El_Salvador');
+                    Ordenes::where('id', $request->ordenid)->update(['estado_6' => 1,
+                    'fecha_6' => $fecha]);
+
+                    // notificacion al cliente
+                    $usuario = User::where('id', $or->users_id)->first();
+                    $device = $usuario->device_id;
+
+                    $titulo = "Orden #". $or->id ." Preparada";
+                    $mensaje = "El motorista va encamino";
+
+                    if(!empty($device)){
+                        if($device != "0000"){ // evitar id malos
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $device);
+                            } catch (Exception $e) {
+
+                            }
+                        }
+                    }
+
+                    return ['success' => 1]; //orden va en camino
+                }else{
+                    return ['success' => 2]; // la orden aun no ha sido preparada
+                }
+            }else{
+                return ['success' => 4];
+            }
+        }
+    }
+
+    // finalizar entrega
+    public function finalizarEntrega(Request $request){
+
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'ordenid' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id de la orden es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($or = Ordenes::where('id', $request->ordenid)->first()){
+
+                if($or->estado_7 == 0){
+
+                    $fecha = Carbon::now('America/El_Salvador');
+                    Ordenes::where('id', $request->ordenid)->update(['estado_7' => 1,
+                    'fecha_7' => $fecha, 'visible_m' => 0]);
+
+                    // notificacion al cliente
+                    $usuario = User::where('id', $or->users_id)->first();
+                    $device = $usuario->device_id;
+
+                    $titulo = "Orden Completada";
+                    $mensaje = "Muchas gracias por su compra";
+
+                    if(!empty($device)){
+                        if($device != "0000"){
+                            try {
+                                $this->envioNoticacionCliente($titulo, $mensaje, $device);
+                            } catch (Exception $e) {
+
+                            }
+                        }
+                    }
+
+                    return ['success' => 1]; // orden completada
+                }else{
+                    return ['success' => 2]; // ya habia seteado el campo
+                }
+            }else{
+                return ['success' => 3];
+            }
+        }
+    }
+
+    // borrar orden, cuando fue cancelada extraordinariamente, y el motorista la acepto antes de los 5 minutos
+    public function borrarOrdenCancelada(Request $request){
+        if($request->isMethod('post')){
+
+            // validaciones para los datos
+            $reglaDatos = array(
+                'ordenid' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'ordenid.required' => 'El id de la orden es requerido'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            // ocultar visibilidad
+            if(Ordenes::where('id', $request->ordenid)->first()){
+                Ordenes::where('id', $request->ordenid)->update(['visible_m' => 0]);
+
+                return ['success' => 1];
+            }else{
+                return ['success' => 2];
+            }
+        }
+    }
+
+    // informacion de la cuenta
+    public function informacionCuenta(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required',
+            );
+
+            $messages = array(
+                'id.required' => 'El id motorista es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails())
+                {
+                    return [
+                        'success' => 0,
+                        'message' => $validator->errors()->all()
+                    ];
+                }
+
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+                $nombre = $p->nombre;
+                $correo = $p->correo;
+
+                return ['success'=> 1, 'nombre' => $nombre,
+                'correo'=> $correo];
+            }else{
+                return ['success'=> 2];
+            }
+        }
+    }
+
+       // informacion de disponibilidad
+       public function informacionDisponibilidad(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required',
+            );
+
+            $messages = array(
+                'id.required' => 'El id motorista es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails())
+                {
+                    return [
+                        'success' => 0,
+                        'message' => $validator->errors()->all()
+                    ];
+                }
+
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+
+
+                $pro = DB::table('motoristas AS m')
+                ->select('m.disponible')
+                ->where('m.id', $request->id)
+                ->first();
+
+                $disponibilidad = $pro->disponible;
+                return ['success'=> 1, 'disponibilidad' => $disponibilidad]; //1: esta disponible
+
+            }else{
+                return ['success'=> 2];
+            }
+        }
+    }
+
+     // cambiar el correo al motorista
+     public function cambiarCorreo(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required',
+                'correo' => 'required'
+            );
+
+            $messages = array(
+                'id.required' => 'El id motorista es requerido',
+                'correo.required' => 'El correo es requerido'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails())
+                {
+                    return [
+                        'success' => 0,
+                        'message' => $validator->errors()->all()
+                    ];
+                }
+
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+                // verificar si existe el correo
+                if(Motoristas::where('correo', $request->correo)->where('id', '!=', $request->id)->first()){
+                    return [
+                        'success' => 1
+                    ];
+                }
+
+                // actualizar correo
+                Motoristas::where('id', $request->id)->update(['correo' => $request->correo]);
+
+                return ['success'=> 2];
+            }else{
+                return ['success'=> 3];
+            }
+        }
+    }
+
+     // disponibilidad del servicio
+     public function modificarDisponibilidad(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required',
+                'valor1' => 'required'
+            );
+
+            $messages = array(
+                'id.required' => 'El id motorista es requerido',
+                'valor1.required' => 'El estado 1 es requerido'
+            );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            if(Motoristas::where('id', $request->id)->first()){
+
+                Motoristas::where('id', $request->id)->update(['disponible' => $request->valor1]);
+
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 2]; // motorista no encontrado
+            }
+        }
+    }
+
+     // cambia la contraseña el motorista
+     public function actualizarPassword(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required',
+                'password' => 'required'
+            );
+
+            $messages = array(
+                'id.required' => 'El id motorista es requerido',
+                'password.required' => 'El password es requerida'
+                );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()){
+                return [
+                    'success' => 0,
+                    'message' => $validator->errors()->all()
+                ];
+            }
+
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+                Motoristas::where('id', $request->id)->update(['password' => Hash::make($request->password)]);
+
+                return ['success'=> 1];
+            }else{
+                return ['success'=> 2];
+            }
+        }
+    }
+
+    // ver historial
+    public function verHistorial(Request $request){
+        if($request->isMethod('post')){
+            $reglaDatos = array(
+                'id' => 'required',
+                'fecha1' => 'required',
+                'fecha2' => 'required'
+            );
+
+            $mensajeDatos = array(
+                'id.required' => 'El id motorista es requerido.',
+                'fecha1.required' => 'La fecha1 es requerido.',
+                'fecha2.required' => 'La fecha2 es requerido.'
+                );
+
+            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
+
+            if($validarDatos->fails())
+            {
+                return [
+                    'success' => 0,
+                    'message' => $validarDatos->errors()->all()
+                ];
+            }
+
+            if($p = Motoristas::where('id', $request->id)->first()){
+
+                $start = Carbon::parse($request->fecha1)->startOfDay();
+                $end = Carbon::parse($request->fecha2)->endOfDay();
+
+
+
+                if($request->filtro == 1){ // solo ordenes donde se le pago a propietario
+                    $orden = DB::table('motorista_ordenes AS m')
+                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden',
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id',
+                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
+                    ->where('o.estado_7', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->where('o.pago_a_propi', 1)
+                    ->whereBetween('o.fecha_orden', [$start, $end])
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }else{
+                    $orden = DB::table('motorista_ordenes AS m')
+                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden',
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id',
+                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
+                    ->where('o.estado_7', 1) // solo completadas
+                    ->where('m.motoristas_id', $request->id) // del motorista
+                    ->whereBetween('o.fecha_orden', [$start, $end])
+                    ->orderBy('o.id', 'DESC')
+                    ->get();
+                }
+
+                foreach($orden as $o){
+
+                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
+
+                    // nombre servicio
+                    $o->servicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
+
+                    // sacar direccion guardada de la orden
+                    $datadir = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
+
+                    $o->direccion = $datadir->direccion;
+
+                    $cupon = "";
+                    $tipo = "";
+
+                    if($o->pago_a_propi == 1){
+                        $tipo = "Se pago a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
+                    }
+                    $o->tipo = $tipo;
+
+                    // buscar si aplico cupon
+                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+
                         // buscar tipo de cupon
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
 
                         // ver que tipo se aplico
                         // el precio envio ya esta modificado
                         if($tipo->tipo_cupon_id == 1){
-                           
+
                             $cupon = "Envío Gratis";
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
+                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
                             $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
 
+
                         }else if($tipo->tipo_cupon_id == 2){
-                           
+
                             $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
 
                             $total = $o->precio_total - $dd->dinero;
@@ -866,7 +1357,7 @@ class MotoristaController extends Controller
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 3){
-                            
+
                             $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
                             $resta = $o->precio_total * ($porcentaje / 100);
                             $total = $o->precio_total - $resta;
@@ -883,18 +1374,18 @@ class MotoristaController extends Controller
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
 
                         }else if($tipo->tipo_cupon_id == 4){
-                           
+
                             $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
 
                             $sumado = $o->precio_total + $o->precio_envio;
                             $sumado = number_format((float)$sumado, 2, '.', '');
 
                             $cupon = "Producto Gratis: " . $producto;
-    
-                            $o->precio_total = $sumado;                          
+
+                            $o->precio_total = $sumado;
                         }
-                        else if($tipo->tipo_cupon_id == 5){
-                            
+                        else if($tipo->tipo_cupon_id == 5){ // donacion
+
                             $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
 
                             $cupon = "Donación de: $" . $donacion;
@@ -904,748 +1395,18 @@ class MotoristaController extends Controller
 
                             $o->precio_total = number_format((float)$suma, 2, '.', '');
                         }else{
-                            $total = $o->precio_total + $o->precio_envio;                       
+                            $total = $o->precio_total + $o->precio_envio;
                             $o->precio_total = number_format((float)$total, 2, '.', '');
                         }
+
                     }else{
-                        
-                        $total = $o->precio_total + $o->precio_envio;                       
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
-                    }
 
-                    $o->cupon = $cupon;
-                }
-                
-                return ['success' => 1, 'ordenes' => $orden];
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }
-
-    public function verProcesoOrdenesEntrega(Request $request){
-        if($request->isMethod('post')){ 
-
-            // validaciones para los datos
-            $reglaDatos = array(
-                'id' => 'required'                
-            );
-        
-            $mensajeDatos = array(                                      
-                'id.required' => 'El id del motorista es requerido.'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }  
-
-            if(Motoristas::where('id', $request->id)->first()){
-                
-                // mostrar si fue cancelada para despues setear visible_m
-
-                $orden = DB::table('motorista_ordenes AS mo')
-                ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
-                ->select('o.id', 'o.precio_total', 'o.fecha_4', 'o.hora_2', 
-                'o.estado_5', 'o.estado_6', 'o.precio_envio', 's.nombre', 
-                's.id AS servicioid', 'o.estado_8', 'o.visible_m', 'o.pago_a_propi', 'o.nota_orden', 'o.tipo_pago')
-                ->where('o.estado_7', 0) // aun sin entregar al cliente
-                ->where('o.visible_m', 1) // para ver si una orden fue cancelada a los 10 minutos, y el motorista la agarro, asi ver el estado
-                ->where('o.estado_6', 1) // van a entregarse
-                ->where('mo.motoristas_id', $request->id)
-                ->get();
-
-               
-                // sumar mas envio
-                foreach($orden as $o){
-
-                    // Tiempo dado por propietario + tiempo de zona extra
-                    $tiempo = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-                   
-                    $tiempoorden = $tiempo->copia_tiempo_orden + $o->hora_2;
-                    $fechaOrden = Carbon::parse($o->fecha_4);
-                    $horaEstimadaEntrega = $fechaOrden->addMinute($tiempoorden)->format('h:i A');                   
-                    $o->fecharecoger = $horaEstimadaEntrega;
-
-                    $cupon = "";
-                    $tipo = "";
-
-                    if($o->pago_a_propi == 1){
-                        $tipo = "Pagar a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
-                    } 
-
-                    $o->tipo = $tipo;
-                    
-                    // ver si fue cancelado desde panel de control
-                    $o->canceladoextra = $tiempo->cancelado_extra;
-                  
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                                        
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
-
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                            $cupon = "Envío Gratis";
-                            
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis 
-                            // cobrar a cliente                          
-                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 2){
-                        
-                            // modificar precio
-                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
-
-                            $total = $o->precio_total - $dd->dinero;
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            // si aplico envio gratis
-                            if($dd->aplico_envio_gratis == 1){
-                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
-                                
-                            }else{
-                                $cupon = "Descuento dinero: $" . $dd->dinero;
-                            }
-
-                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio; 
-
-                            // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 3){                          
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            $cupon = "Descuento de: " . $porcentaje . "%";
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 4){
-                        
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $cupon = "Producto Gratis: " . $producto;
-
-                            $o->precio_total = $sumado;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){ // donacion
-                        
-                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
-                            $cupon = "Donación de: $" . $donacion;
-
-                            // sumar
-                            $suma = $o->precio_total + $o->precio_envio + $donacion;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }else{
-                            $total = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$total, 2, '.', '');     
-                        }
-
-                    }else{                                            
                         $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');                        
-                    }
-
-                    $o->cupon = $cupon;
-                }
-                
-                return ['success' => 1, 'ordenes' => $orden];
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }
-
-     // ver orden proceso por id
-     public function verOrdenProcesoPorID(Request $request){
-        if($request->isMethod('post')){ 
-
-            // validaciones para los datos
-            $reglaDatos = array(
-                'ordenid' => 'required'               
-            );
-        
-            $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id orden es requerido.'            
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            if($or = Ordenes::where('id', $request->ordenid)->first()){
-
-                //sacar direccion de la orden
-
-                $orden = DB::table('ordenes_direcciones AS o')
-                ->select('o.nombre', 'o.direccion',
-                        'o.numero_casa', 'o.punto_referencia',
-                        'o.latitud', 'o.longitud')
-                ->where('o.ordenes_id', $request->ordenid)
-                ->first();
-
-                $servicioid = $or->servicios_id;
-
-                $servicio = DB::table('servicios AS s')
-                ->select('s.nombre', 's.telefono', 's.direccion', 's.latitud', 's.longitud', 's.producto_visible')
-                ->where('s.id', $servicioid)
-                ->first();
-
-                $time1 = Carbon::parse($or->fecha_4);
-               
-                $horaEstimada = $time1->addMinute($or->hora_2)->format('h:i A');
-                $horaEstimada = $horaEstimada;              
-
-
-                // titulo que dira la notificacion, cuando se alerte al cliente que esta llegando su pedido.
-                $mensaje = "Su orden #" . $request->ordenid . " esta llegando";
-                
-                return ['success' => 1, 'ordenes' => $orden,
-                 'servicio' => $servicio, 'hora' => $horaEstimada, 
-                 'estado' => $or->estado_6, 'cancelado' => $or->estado_8, 'mensaje' => $mensaje];
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }
-
-    // iniciar entrega de la orden 
-    public function iniciarEntrega(Request $request){
-        if($request->isMethod('post')){ 
-
-            // validaciones para los datos
-            $reglaDatos = array(
-                'ordenid' => 'required'               
-            );
-        
-            $mensajeDatos = array(                                       
-                'ordenid.required' => 'El id de la orden es requerido'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0,
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            if($or = Ordenes::where('id', $request->ordenid)->first()){
-
-                if($or->estado_8 == 1){
-                    return ['success' => 3]; 
-                }
-                // orden ya fue preparada por el propietario
-                if($or->estado_5 == 1 && $or->estado_6 == 0){
- 
-                    $fecha = Carbon::now('America/El_Salvador');
-                    Ordenes::where('id', $request->ordenid)->update(['estado_6' => 1,
-                    'fecha_6' => $fecha]);
-                    
-                    // notificacion al cliente
-                    $usuario = User::where('id', $or->users_id)->first();
-                    $device = $usuario->device_id;
-
-                    $titulo = "Orden #". $or->id ." Preparada";
-                    $mensaje = "El motorista va encamino";
-                     
-                    if(!empty($device)){
-                        if($device != "0000"){ // evitar id malos
-                            try {
-                                $this->envioNoticacionCliente($titulo, $mensaje, $device); 
-                            } catch (Exception $e) {
-                                
-                            }
-                        }                        
-                    }
-
-                    return ['success' => 1]; //orden va en camino
-                }else{
-                    return ['success' => 2]; // la orden aun no ha sido preparada
-                }
-            }else{
-                return ['success' => 4];
-            }
-        } 
-    }
-
-    // finalizar entrega 
-    public function finalizarEntrega(Request $request){
-        
-        if($request->isMethod('post')){ 
-
-            // validaciones para los datos
-            $reglaDatos = array(
-                'ordenid' => 'required'               
-            );
-        
-            $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id de la orden es requerido'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0,
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            if($or = Ordenes::where('id', $request->ordenid)->first()){
-
-                if($or->estado_7 == 0){ 
-
-                    $fecha = Carbon::now('America/El_Salvador');
-                    Ordenes::where('id', $request->ordenid)->update(['estado_7' => 1,
-                    'fecha_7' => $fecha, 'visible_m' => 0]);    
-                    
-                    // notificacion al cliente
-                    $usuario = User::where('id', $or->users_id)->first();
-                    $device = $usuario->device_id;
-
-                    $titulo = "Orden Completada";
-                    $mensaje = "Muchas gracias por su compra";
-                  
-                    if(!empty($device)){
-                        if($device != "0000"){
-                            try {
-                                $this->envioNoticacionCliente($titulo, $mensaje, $device); 
-                            } catch (Exception $e) {
-                                
-                            }                            
-                        }                        
-                    } 
-
-                    return ['success' => 1]; // orden completada
-                }else{ 
-                    return ['success' => 2]; // ya habia seteado el campo
-                }
-            }else{
-                return ['success' => 3];
-            }
-        }
-    }
-
-    // borrar orden, cuando fue cancelada extraordinariamente, y el motorista la acepto antes de los 5 minutos
-    public function borrarOrdenCancelada(Request $request){
-        if($request->isMethod('post')){ 
-
-            // validaciones para los datos
-            $reglaDatos = array(
-                'ordenid' => 'required'
-            );
-        
-            $mensajeDatos = array(                                      
-                'ordenid.required' => 'El id de la orden es requerido'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0,
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
-
-            // ocultar visibilidad
-            if(Ordenes::where('id', $request->ordenid)->first()){
-                Ordenes::where('id', $request->ordenid)->update(['visible_m' => 0]);
-
-                return ['success' => 1];
-            }else{
-                return ['success' => 2];
-            }
-        }
-    }
-
-    // informacion de la cuenta
-    public function informacionCuenta(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required',
-            );
-
-            $messages = array(                                      
-                'id.required' => 'El id motorista es requerido'
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-
-            if ($validator->fails()) 
-                {
-                    return [
-                        'success' => 0, 
-                        'message' => $validator->errors()->all()
-                    ];
-                }
-
-            if($p = Motoristas::where('id', $request->id)->first()){
-
-                $nombre = $p->nombre;
-                $correo = $p->correo;
-
-                return ['success'=> 1, 'nombre' => $nombre,
-                'correo'=> $correo];
-            }else{
-                return ['success'=> 2];
-            }
-        }
-    }
-
-       // informacion de disponibilidad
-       public function informacionDisponibilidad(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required',
-            );
-
-            $messages = array(                                      
-                'id.required' => 'El id motorista es requerido'
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-
-            if ($validator->fails()) 
-                {
-                    return [
-                        'success' => 0, 
-                        'message' => $validator->errors()->all()
-                    ];
-                }
-
-            if($p = Motoristas::where('id', $request->id)->first()){
-
-               
-
-                $pro = DB::table('motoristas AS m')
-                ->select('m.disponible')
-                ->where('m.id', $request->id)
-                ->first();
-
-                $disponibilidad = $pro->disponible;
-                return ['success'=> 1, 'disponibilidad' => $disponibilidad]; //1: esta disponible
-
-            }else{
-                return ['success'=> 2];
-            }
-        }
-    }
-
-     // cambiar el correo al motorista
-     public function cambiarCorreo(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required',
-                'correo' => 'required'
-            );
-
-            $messages = array(                                      
-                'id.required' => 'El id motorista es requerido',
-                'correo.required' => 'El correo es requerido'
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-
-            if ($validator->fails()) 
-                {
-                    return [
-                        'success' => 0, 
-                        'message' => $validator->errors()->all()
-                    ];
-                }
-
-            if($p = Motoristas::where('id', $request->id)->first()){
-
-                // verificar si existe el correo
-                if(Motoristas::where('correo', $request->correo)->where('id', '!=', $request->id)->first()){                
-                    return [
-                        'success' => 1              
-                    ];
-                }
-
-                // actualizar correo
-                Motoristas::where('id', $request->id)->update(['correo' => $request->correo]);
-                
-                return ['success'=> 2];
-            }else{
-                return ['success'=> 3];
-            }
-        }
-    }
-
-     // disponibilidad del servicio
-     public function modificarDisponibilidad(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required',
-                'valor1' => 'required'               
-            );
-
-            $messages = array(                                      
-                'id.required' => 'El id motorista es requerido',
-                'valor1.required' => 'El estado 1 es requerido'
-            );
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-
-            if ($validator->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validator->errors()->all()
-                ];
-            }
-          
-            if(Motoristas::where('id', $request->id)->first()){
-
-                Motoristas::where('id', $request->id)->update(['disponible' => $request->valor1]);
-               
-                return ['success'=> 1];                
-            }else{
-                return ['success'=> 2]; // motorista no encontrado
-            }
-        }
-    }
-
-     // cambia la contraseña el motorista
-     public function actualizarPassword(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required',
-                'password' => 'required'
-            );
-
-            $messages = array(                                      
-                'id.required' => 'El id motorista es requerido',
-                'password.required' => 'El password es requerida'
-                );
-
-            $validator = Validator::make($request->all(), $rules, $messages);
-
-            if ($validator->fails()){
-                return [
-                    'success' => 0, 
-                    'message' => $validator->errors()->all()
-                ];
-            }
-            
-            if($p = Motoristas::where('id', $request->id)->first()){
-                
-                Motoristas::where('id', $request->id)->update(['password' => Hash::make($request->password)]);
-                                
-                return ['success'=> 1];
-            }else{
-                return ['success'=> 2];
-            }
-        }
-    }
-
-    // ver historial
-    public function verHistorial(Request $request){
-        if($request->isMethod('post')){ 
-            $reglaDatos = array(
-                'id' => 'required', 
-                'fecha1' => 'required',
-                'fecha2' => 'required'
-            );
-
-            $mensajeDatos = array(                                      
-                'id.required' => 'El id motorista es requerido.',
-                'fecha1.required' => 'La fecha1 es requerido.',
-                'fecha2.required' => 'La fecha2 es requerido.'
-                );
-
-            $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
-
-            if($validarDatos->fails()) 
-            {
-                return [
-                    'success' => 0, 
-                    'message' => $validarDatos->errors()->all()
-                ];
-            }
- 
-            if($p = Motoristas::where('id', $request->id)->first()){
-
-                $start = Carbon::parse($request->fecha1)->startOfDay(); 
-                $end = Carbon::parse($request->fecha2)->endOfDay();
-
-                $orden;
-
-                if($request->filtro == 1){ // solo ordenes donde se le pago a propietario
-                    $orden = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 
-                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->where('o.pago_a_propi', 1)
-                    ->whereBetween('o.fecha_orden', [$start, $end]) 
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-                }else{
-                    $orden = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id', 
-                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->whereBetween('o.fecha_orden', [$start, $end]) 
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-                }
-
-                foreach($orden as $o){
-                   
-                    $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
-                    
-                    // nombre servicio
-                    $o->servicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
-
-                    // sacar direccion guardada de la orden
-                    $datadir = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
-
-                    $o->direccion = $datadir->direccion;
-                    
-                    $cupon = "";
-                    $tipo = "";
-
-                    if($o->pago_a_propi == 1){
-                        $tipo = "Se pago a Propietario: $" . number_format((float)$o->precio_total, 2, '.', '');
-                    }
-                    $o->tipo = $tipo;
-
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-                        
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
-
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                             
-                            $cupon = "Envío Gratis";
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis                           
-                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
-                      
-
-                        }else if($tipo->tipo_cupon_id == 2){                           
-
-                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
-
-                            $total = $o->precio_total - $dd->dinero;
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            // si aplico envio gratis
-                            if($dd->aplico_envio_gratis == 1){
-                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
-                            }else{
-                                $cupon = "Descuento dinero: $" . $dd->dinero;
-                            }
-
-                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 3){                          
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            $cupon = "Descuento de: " . $porcentaje . "%";
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 4){
-                          
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $cupon = "Producto Gratis: " . $producto;
-    
-                            $o->precio_total = $sumado;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){ // donacion
-                           
-                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
-                            $cupon = "Donación de: $" . $donacion;
-
-                            // sumar
-                            $suma = $o->precio_total + $o->precio_envio + $donacion;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }else{
-                            $total = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$total, 2, '.', '');     
-                        }
-
-                    }else{
-                        
-                        $total = $o->precio_total + $o->precio_envio;                       
                         $o->precio_total = number_format((float)$total, 2, '.', '');
                     }
 
                     // ** LA APP SOLO VERIFICA SI PAGO CON CREDI PUNTOS Y SETEA A $0.00
-                    
+
 
                     $o->cupon = $cupon;
                 }
@@ -1663,12 +1424,12 @@ class MotoristaController extends Controller
 
     // ver zonas de pago
     public function verZonaPago(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             $reglaDatos = array(
                 'id' => 'required'
             );
 
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(
                 'id.required' => 'El id motorista es requerido.'
                 );
 
@@ -1677,7 +1438,7 @@ class MotoristaController extends Controller
             if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -1686,7 +1447,7 @@ class MotoristaController extends Controller
 
                 // si puede ver las zonas de pago
                 if($m->zona_pago == 1){
-                    
+
                     $zona = DB::table('revisador')
                     ->where('activo', 1)
                     ->where('disponible', 1)
@@ -1701,24 +1462,24 @@ class MotoristaController extends Controller
             }
         }
     }
- 
+
        // ordene pediente de pago
        public function pendientePago(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             $reglaDatos = array(
                 'id' => 'required'
             );
 
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(
                 'id.required' => 'El id motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
@@ -1726,26 +1487,26 @@ class MotoristaController extends Controller
             if(Motoristas::where('id', $request->id)->first()){
 
                 // estas ordenes ya fueron revisadas
-                $noquiero = DB::table('ordenes_revisadas AS r')                
+                $noquiero = DB::table('ordenes_revisadas AS r')
                 ->get();
- 
+
                 $pilaOrden = array();
                 foreach($noquiero as $p){
                     array_push($pilaOrden, $p->ordenes_id);
                 }
- 
+
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'mo.fecha_agarrada', 
+                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'mo.fecha_agarrada',
                 'o.servicios_id', 'o.estado_8')
-                ->where('mo.motoristas_id', $request->id)               
+                ->where('mo.motoristas_id', $request->id)
                 ->where('o.estado_8', 0)
                 ->whereNotIn('o.id', $pilaOrden)
                 ->get();
 
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_agarrada));
-                    
+
                     // nombre servicio
                     $nombreservicio = Servicios::where('id', $o->servicios_id)->pluck('nombre')->first();
                     $o->servicio = $nombreservicio;
@@ -1765,41 +1526,41 @@ class MotoristaController extends Controller
                 return ['success' => 1, 'orden' => $orden, 'debe' => $debe];
             }
         }
-    } 
+    }
 
 
     // notificar al cliente su orden esta cerca
     public function notificarClienteOrden(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             $reglaDatos = array(
                 'ordenid' => 'required'
             );
 
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(
                 'ordenid.required' => 'El orden id es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
 
             // obtener usuario de la orden
             if($o = Ordenes::where('id', $request->ordenid)->first()){
-                
+
                 $datos = User::where('id', $o->users_id)->first();
-                
+
                 if($datos->device_id != "0000"){
 
                     $titulo = "El motorista se encuentra cerca de tu ubicación";
                     $message = "Su orden esta cerca";
 
-                        // ver tipo de notiificacion, 
+                        // ver tipo de notiificacion,
                         // completado   .mp3 .wav
                         // mensaje   .mp3  .wav
 
@@ -1808,74 +1569,74 @@ class MotoristaController extends Controller
                         if($odd->movil_orden == "3"){
                             // cliente no tiene el nuevo sonido
                             try {
-                                $this->envioNoticacionCliente($titulo, $message, $datos->device_id); 
+                                $this->envioNoticacionCliente($titulo, $message, $datos->device_id);
                             } catch (Exception $e) {
-                                
+
                             }
                         }else{
                             // cliente ya tiene el nuevo sonido
                             try {
-                                $this->envioNoticacionClienteAlerta($titulo, $message, $datos->device_id); 
+                                $this->envioNoticacionClienteAlerta($titulo, $message, $datos->device_id);
                             } catch (Exception $e) {
-                                
+
                             }
 
                             $mensaje = "Notificación enviada";
-                    
+
                             return ['success' => 1, 'mensaje' => $mensaje];
                         }
-                       
+
 
                     $mensaje = "Notificación enviada";
-                    
+
                     return ['success' => 1, 'mensaje' => $mensaje];
                 }else{
 
                     $mensaje = "Notificación no se pudo enviar";
 
                     return ['success' => 2, 'mensaje' => $mensaje];
-                }    
+                }
             }
         }
     }
 
 
     public function verNuevosOrdenesEncargos(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
-            { 
+            if($validarDatos->fails())
+            {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
-           
+            }
+
             if(Motoristas::where('id', $request->id)->first()){
-                                
+
 
                 $noquiero = MotoristaOrdenEncargo::all();
 
                 $pilaOrden = array();
                 foreach($noquiero as $p){
                     array_push($pilaOrden, $p->ordenes_encargo_id);
-                } 
+                }
 
                 // una vez el ordenes_encargo tenga permiso para motorista,
                 // lo podra agarrar, pero solo iniciara si ya fue completada,
                 // por un propietario
-               
+
                 $orden = DB::table('ordenes_encargo AS oe')
                 ->join('encargos AS e', 'e.id', '=', 'oe.encargos_id')
                 ->join('motorista_encargo_asignado AS m', 'm.encargos_id', '=', 'e.id')
@@ -1883,22 +1644,22 @@ class MotoristaController extends Controller
                  'oe.precio_subtotal', 'oe.precio_envio', 'oe.pago_a_propi', 'oe.nota_encargo', 'oe.tipo_pago')
                 ->where('e.permiso_motorista', 1) // ya tiene permiso de ver todas las ordenes de ese encargo
                 ->where('oe.visible_motorista', 1) // visible a motorista
-                ->where('m.motoristas_id', $request->id) 
-                ->where('oe.revisado', 2) // solo ordenes en proceso 
+                ->where('m.motoristas_id', $request->id)
+                ->where('oe.revisado', 2) // solo ordenes en proceso
                 ->whereNotIn('oe.id', $pilaOrden) // no ver las ordenes ya tomadas
                 ->get();
 
                 // # orden, nombre encargo, direccion, total, ver gps, fecha estimada de entrega al cliente
-          
+
                 foreach($orden as $o){
-                  
+
                     $o->fecha_entrega = date("h:i A d-m-Y", strtotime($o->fecha_entrega));
                     $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
-               
+
                     $o->direccion = $dd->direccion;
                     $o->latitud = $dd->latitud;
                     $o->longitud = $dd->longitud;
-                    
+
                     $tipo = "";
                     if($o->pago_a_propi == 1){
                         // pagar a propietario
@@ -1916,9 +1677,9 @@ class MotoristaController extends Controller
                     }
 
                     $o->servicio = $servicio;
-               
+
                 }
-                
+
                 return ['success' => 1, 'ordenes' => $orden];
             }else{
                 return ['success' => 2];
@@ -1928,26 +1689,26 @@ class MotoristaController extends Controller
 
 
     public function verListaDeProductosDeEncargo(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargo::where('id', $request->id)->first()){
 
@@ -1968,32 +1729,32 @@ class MotoristaController extends Controller
             }else{
                 return ['success' => 2];
             }
-        }        
+        }
     }
 
 
     public function verListaDeProductosDeEncargoIndividual(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargoProducto::where('id', $request->id)->first()){
 
@@ -2014,40 +1775,40 @@ class MotoristaController extends Controller
             }else{
                 return ['success' => 2];
             }
-        }    
+        }
     }
 
     public function aceptarOrdenEncargo(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
                 'id' => 'required',
-                'idencargo' => 'required'             
+                'idencargo' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id  es requerido.',
                 'idencargo.required' => 'el id del encargo es requerido'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(MotoristaOrdenEncargo::where('ordenes_encargo_id', $request->idencargo)->first()){
                 return ['success' => 1];
             }
-            
+
             if($dd = MotoristaOrdenEncargo::where('ordenes_encargo_id', $request->idencargo)->first()){
-                
+
                 if($dd->revisado == 5){ // orden cancelada
                     return ['success' => 2];
                 }
@@ -2059,49 +1820,49 @@ class MotoristaController extends Controller
             $nueva->ordenes_encargo_id = $request->idencargo;
             $nueva->motoristas_id = $request->id;
             $nueva->fecha_agarrada = $fecha;
-            
+
             if($nueva->save()){
                 return ['success' => 3];
             }else{
                 return ['success' => 4];
             }
-        }  
+        }
     }
 
     public function verNuevosOrdenesEncargosProceso(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
-            ); 
-        
-            $mensajeDatos = array(                                      
+                'id' => 'required'
+            );
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(Motoristas::where('id', $request->id)->first()){
-                
+
                 // mostrar si fue cancelada para despues setear visible_m
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio',
                 'o.estado_1', 'o.encargos_id', 'o.revisado',
                  'o.pago_a_propi', 'o.nota_encargo', 'o.tipo_pago')
                 ->where('o.visible_motorista', 1)
-                ->where('o.estado_2', 0) // aun no han salido a entregarse 
+                ->where('o.estado_2', 0) // aun no han salido a entregarse
                 ->where('mo.motoristas_id', $request->id)
                 ->get();
 
@@ -2138,34 +1899,34 @@ class MotoristaController extends Controller
 
     public function verNuevosOrdenesEncargosProcesoEstado(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargo::where('id', $request->id)->first()){
-                
+
                 // mostrar si fue cancelada para despues setear visible_m
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.estado_1', 
+                ->select('o.id', 'o.estado_1',
                 'o.encargos_id', 'o.revisado')
                 ->where('o.estado_3', 0) // aun sin entregar al cliente
                 //->where('o.visible_motorista', 1) // no es necesario aqui
@@ -2180,14 +1941,14 @@ class MotoristaController extends Controller
                     $latiservicio = "";
                     $longiservicio = "";
 
-                   
+
                     if($dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first()){
                         $info = Servicios::where('id', $dd->servicios_id)->first();
-                        
+
                         $servicio = $info->nombre;
                         $ubicacion = $info->direccion;
                         $latiservicio = $info->latitud;
-                        $longiservicio = $info->longitud;                      
+                        $longiservicio = $info->longitud;
                     }
 
                     $o->ubicacion = $ubicacion;
@@ -2200,7 +1961,7 @@ class MotoristaController extends Controller
                     $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
 
                     $o->servicio = $servicio;
- 
+
                     $dd = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
 
                     $o->nombrecliente = $dd->nombre;
@@ -2220,26 +1981,26 @@ class MotoristaController extends Controller
 
 
     public function iniciarEntregaEncargo(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($oo = OrdenesEncargo::where('id', $request->id)->first()){
 
@@ -2257,7 +2018,7 @@ class MotoristaController extends Controller
 
                 if($oo->estado_2 == 0){
                      // actualizar estado, motorista va en camino
-                    OrdenesEncargo::where('id', $request->id)->update(['estado_2' => 1, 
+                    OrdenesEncargo::where('id', $request->id)->update(['estado_2' => 1,
                     'fecha_2' => $fecha, 'revisado' => 3]);
 
                     // envio de notificacion al cliente
@@ -2268,9 +2029,9 @@ class MotoristaController extends Controller
                         $mensaje = "Su encargo va en camino";
 
                         try {
-                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id); 
+                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id);
                         } catch (Exception $e) {
-                            
+
                         }
                     }
 
@@ -2286,26 +2047,26 @@ class MotoristaController extends Controller
 
 
     public function ocultarOrdenEncargoMotorista(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($oo = OrdenesEncargo::where('id', $request->id)->first()){
 
@@ -2327,29 +2088,29 @@ class MotoristaController extends Controller
 
     public function listaEncargosEnEntrega(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'idmoto' => 'required'                
+                'idmoto' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'idmoto.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(Motoristas::where('id', $request->idmoto)->first()){
-                
+
                 // mostrar si fue cancelada para despues setear visible_m
 
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
@@ -2368,7 +2129,7 @@ class MotoristaController extends Controller
                     $tipo = "";
                     $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
                     $o->servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
-                    
+
                     if($o->pago_a_propi == 1){
                         $tipo = "Se Paga a Propietario $" . number_format((float)$o->precio_subtotal, 2, '.', '');
                     }
@@ -2381,8 +2142,8 @@ class MotoristaController extends Controller
                     $o->fechaentrega = date("h:i A d-m-Y", strtotime($ee->fecha_entrega));
 
                     $suma = $o->precio_envio + $o->precio_subtotal;
-                    $o->total = number_format((float)$suma, 2, '.', ''); 
- 
+                    $o->total = number_format((float)$suma, 2, '.', '');
+
                 }
 
                 return ['success' => 1, 'ordenes' => $orden];
@@ -2392,35 +2153,35 @@ class MotoristaController extends Controller
         }
     }
 
-    // ver estado del encargo a finalizar. 
+    // ver estado del encargo a finalizar.
     public function verEstadoOrdenEncargoAFinalizar(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargo::where('id', $request->id)->first()){
-                
+
                 $orden = DB::table('motorista_ordenes_encargo AS mo')
                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1', 
+                ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.estado_1',
                 'o.encargos_id', 'o.revisado')
                 ->where('o.id', $request->id)
                 ->get();
@@ -2434,11 +2195,11 @@ class MotoristaController extends Controller
 
                     $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
                     $info = Servicios::where('id', $dd->servicios_id)->first();
-                    
+
                     $servicio = $info->nombre;
                     $ubicacion = $info->direccion;
                     $latiservicio = $info->latitud;
-                    $longiservicio = $info->longitud;                    
+                    $longiservicio = $info->longitud;
 
                     $o->ubicacion = $ubicacion;
                     $o->latiservicio = $latiservicio;
@@ -2471,34 +2232,34 @@ class MotoristaController extends Controller
 
     // finalizar entrega del encargo
     public function finalizarEntregaEncargo(Request $request){
-      
-        if($request->isMethod('post')){ 
+
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del encargo es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
-            if($oo = OrdenesEncargo::where('id', $request->id)->first()){     
+            if($oo = OrdenesEncargo::where('id', $request->id)->first()){
 
                 $fecha = Carbon::now('America/El_Salvador');
 
                 if($oo->estado_3 == 0){
-                    OrdenesEncargo::where('id', $request->id)->update(['estado_3' => 1, 
+                    OrdenesEncargo::where('id', $request->id)->update(['estado_3' => 1,
                     'fecha_3' => $fecha, 'visible_motorista' => 0, 'revisado' => 4]);
                     // notificar al cliente que su encargo a sido entregado
 
@@ -2510,9 +2271,9 @@ class MotoristaController extends Controller
                         $mensaje = "Muchas Gracias por su Compra";
 
                         try {
-                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id); 
+                            $this->envioNoticacionCliente($titulo, $mensaje, $dd->device_id);
                         } catch (Exception $e) {
-                            
+
                         }
                     }
                 }
@@ -2527,44 +2288,44 @@ class MotoristaController extends Controller
 
     // mandar notificacion al cliente del encargo
     public function notificarClienteDelEncargo(Request $request){
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del encargo es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
-            if($o = OrdenesEncargo::where('id', $request->id)->first()){     
+            if($o = OrdenesEncargo::where('id', $request->id)->first()){
 
                 $datos = User::where('id', $o->users_id)->first();
-                
+
                 if($datos->device_id != "0000"){
 
                     $titulo = "El Motorista se encuentra cerca de tu ubicación";
                     $message = "Su orden esta cerca";
 
                         try {
-                            $this->envioNoticacionCliente($titulo, $message, $datos->device_id); 
+                            $this->envioNoticacionCliente($titulo, $message, $datos->device_id);
                         } catch (Exception $e) {
-                            
+
                         }
 
                     $mensaje = "Notificación enviada";
-            
+
                     return ['success' => 1, 'mensaje' => $mensaje];
 
                 }else{
@@ -2572,7 +2333,7 @@ class MotoristaController extends Controller
                     $mensaje = "Notificación no se pudo enviar";
 
                     return ['success' => 2, 'mensaje' => $mensaje];
-                }  
+                }
 
 
                 return ['success' => 1];
@@ -2586,14 +2347,14 @@ class MotoristaController extends Controller
     // historial de encargos completados
     public function verHistorialEncargosCompletados(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             $reglaDatos = array(
-                'id' => 'required', 
+                'id' => 'required',
                 'fecha1' => 'required',
                 'fecha2' => 'required'
             );
 
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(
                 'id.required' => 'El id motorista es requerido.',
                 'fecha1.required' => 'La fecha1 es requerido.',
                 'fecha2.required' => 'La fecha2 es requerido.'
@@ -2601,31 +2362,30 @@ class MotoristaController extends Controller
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
             }
- 
+
             if($p = Motoristas::where('id', $request->id)->first()){
 
-                $start = Carbon::parse($request->fecha1)->startOfDay(); 
+                $start = Carbon::parse($request->fecha1)->startOfDay();
                 $end = Carbon::parse($request->fecha2)->endOfDay();
 
-                $orden;
 
                 if($request->filtro == 1){ // ordenes encargo que motorista pago a propietario
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
-                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
+                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3',
                     'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi',
                      'o.nota_encargo', 'o.tipo_pago')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
                     ->where('o.pago_a_propi', 1)
-                    ->whereBetween('o.fecha_3', [$start, $end]) 
+                    ->whereBetween('o.fecha_3', [$start, $end])
                     ->orderBy('o.id', 'DESC')
                     ->get();
                 }else{
@@ -2633,30 +2393,30 @@ class MotoristaController extends Controller
                     // revueltos, pagado a propietario y no
                     $orden = DB::table('motorista_ordenes_encargo AS m')
                     ->join('ordenes_encargo AS o', 'o.id', '=', 'm.ordenes_encargo_id')
-                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3', 
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi', 
+                    ->select('o.id', 'o.precio_subtotal', 'o.precio_envio', 'o.fecha_3',
+                    'm.motoristas_id', 'o.ganancia_motorista', 'o.encargos_id', 'o.pago_a_propi',
                     'o.nota_encargo', 'o.tipo_pago')
                     ->where('o.estado_3', 1) // solo completadas
                     ->where('m.motoristas_id', $request->id) // del motorista
-                    ->whereBetween('o.fecha_3', [$start, $end]) 
+                    ->whereBetween('o.fecha_3', [$start, $end])
                     ->orderBy('o.id', 'DESC')
                     ->get();
                 }
 
                 foreach($orden as $o){
-                   
+
                     $o->fecha_3 = date("h:i A d-m-Y", strtotime($o->fecha_3));
-                    
+
                     $servicio = "Encargo Privado";
                     $dd = EncargoAsignadoServicio::where('encargos_id', $o->encargos_id)->first();
                     $o->servicio = Servicios::where('id', $dd->servicios_id)->pluck('nombre')->first();
-                    
+
                     $tipo = "";
                     if($o->pago_a_propi == 1){
                         $tipo = "Se Pago a Propietario $" . number_format((float)$o->precio_subtotal, 2, '.', '');
-                    }                    
+                    }
                     $o->tipo = $tipo;
-                    
+
                     if($o->tipo_pago == 1){ // credi puntos
                         $o->total = number_format((float)0, 2, '.', '');
                     }else{
@@ -2682,25 +2442,25 @@ class MotoristaController extends Controller
 
     public function verMotoristaEnCaja(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
             $reglaDatos = array(
                 'motoristaid' => 'required'
             );
 
-            $mensajeDatos = array(                                      
+            $mensajeDatos = array(
                 'motoristaid.required' => 'El motorista id es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            } 
-            
+            }
+
             if(Motoristas::where('id', $request->motoristaid)->first()){
 
                 // estas ordenes ya fueron revisadas
@@ -2713,274 +2473,46 @@ class MotoristaController extends Controller
 
                 $orden = DB::table('motorista_ordenes AS mo')
                 ->join('ordenes AS o', 'o.id', '=', 'mo.ordenes_id')
-                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5', 
-                'o.servicios_id', 'o.estado_8', 'o.fecha_7', 'o.pago_a_propi', 'o.tipo_pago')
-                ->where('mo.motoristas_id', $request->motoristaid)               
-                ->where('o.estado_6', 1) // ordenes que motorista inicio la entrega 
+                ->select('o.id', 'mo.motoristas_id', 'o.precio_total', 'o.precio_envio', 'o.fecha_5',
+                'o.servicios_id', 'o.estado_8', 'o.fecha_7', 'o.pago_a_propi', 'o.tipo_pago', 'o.servicios_id')
+                ->where('mo.motoristas_id', $request->motoristaid)
+                ->where('o.estado_6', 1) // ordenes que motorista inicio la entrega
                 ->where('o.estado_8', 0) // no canceladas
                 ->whereNotIn('o.id', $pilaOrden) // filtro para no ver ordenes revisadas
                 ->get();
 
                 $totalcobro = 0;
+                $conteo = 0;
+                $dinero = 0;
 
                 foreach($orden as $o){
+                    $conteo = $conteo + 1;
 
+                    // Obtener lo que se pagara a PROPIETARIO
 
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
+                    $data = Servicios::where('id', $o->servicios_id)->first();
 
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
+                    $comision = ($o->precio_total * $data->comision) / 100;
 
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-                           
+                    $propi = $o->precio_total - $comision;
 
-                            if($o->pago_a_propi == 1){
-                                // se paga a propietario
-                               
-                                // NO SUMAR SI PAGO CON CREDI PUNTOS
-                                if($o->tipo_pago == 0){
-                                   // $totalcobro = $totalcobro + $o->precio_total; 
-                                   // MENOS LO QUE SE PAGARA A PROPIETARIO
-                                   // MAS LO QUE CANCELARA CLIENTE
-                                   // envio es siempre 0
-                                   $info = -$o->precio_total + $o->precio_total;
-                                   $totalcobro = $totalcobro + $info;
-                                }else{
-                                    // credi puntos
-                                    $totalcobro = $totalcobro - $o->precio_total;
-                                }
-                               // $o->precio_total = number_format((float), 2, '.', '');  
-                             
-                            }else{
-                                // no se paga a propietario
-                                // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
-                                // NO SUMAR SI PAGO CON CREDI PUNTOS
-                                if($o->tipo_pago == 0){
-                                    $totalcobro = $totalcobro + $o->precio_total;   
-                                }
-                                
-                             
-                            }
-                            //
-                         
-                           
-                        }else if($tipo->tipo_cupon_id == 2){
-                            
-                            // modificar precio
-                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
-                            $descuento = $dd->dinero;
+                    // OBTENER LO QUE SE COBRO AL CLIENTE
 
-                            $total = $o->precio_total - $descuento;
-                            if($total <= 0){
-                                $total = 0;
-                            }
+                    $cliente = $o->precio_total + $o->precio_envio;
 
+                    // credi puntos
+                    if($o->tipo_pago == 1){
+                        $cliente = 0;
+                    }
 
-                            if($o->pago_a_propi == 1){
-                               
-                                if($o->tipo_pago == 0){ // efectivo
-                                    $info = -$o->precio_total + ($total + $o->precio_envio);
-                                    $totalcobro = $totalcobro + $info;
-                                                               
-                                }else{
-                                    // credi puntos
-                                
-                                    $totalcobro = $totalcobro - $o->precio_total;
-                                }
-
-                                $afectado = $o->precio_envio + $total;
-                              
-
-                            }else{ 
-                                // no se le paga a propietario
-
-                                // sumar el precio de envio
-                                $suma = $total + $o->precio_envio;
-
-                              
-                                // NO SUMAR SI PAGO CON CREDI PUNTOS
-                                if($o->tipo_pago == 0){
-                                    $totalcobro = $totalcobro + $suma; 
-                                }
-                            }
-
-                        }else if($tipo->tipo_cupon_id == 3){
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            if($o->pago_a_propi == 1){
-                               
-                                if($o->tipo_pago == 0){ // efectivo
-                                    $info = -$o->precio_total + ($total + $o->precio_envio);
-                                    $totalcobro = $totalcobro + $info;
-                                                               
-                                }else{
-                                    // credi puntos
-                                
-                                    $totalcobro = $totalcobro - $o->precio_total;
-                                }
-
-                                $afectado = $o->precio_envio + $total;
-                              
-
-                            }else{ 
-                                // no se le paga a propietario
-
-                                // sumar el precio de envio
-                                $suma = $total + $o->precio_envio;
-
-                              
-                                // NO SUMAR SI PAGO CON CREDI PUNTOS
-                                if($o->tipo_pago == 0){
-                                    $totalcobro = $totalcobro + $suma; 
-                                }
-                            }
-
-                        }else if($tipo->tipo_cupon_id == 4){
-                           
-                            if($o->pago_a_propi == 1){
-                           
-                                if($o->tipo_pago == 0){
-                                    $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
-                                    $totalcobro = $totalcobro + $info;                                
-                                }else{
-                                    // CREDI PUNTOS
-                                    $totalcobro = $totalcobro - $o->precio_total;
-    
-                                }
-                               
-                            }else{
-                                // no se le paga a servicio 
-    
-                                $cobro = $o->precio_total + $o->precio_envio;
-                                // NO SUMAR SI PAGO CON CREDI PUNTOS
-                                if($o->tipo_pago == 0){
-                                    $totalcobro = $totalcobro + $cobro; 
-                                }
-                            }
-
-
-                        }
-                        else if($tipo->tipo_cupon_id == 5){
-                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-                            
-                            $total = $donacion + $o->precio_total;
-                            
-                            if($o->pago_a_propi == 1){
-                           
-                                if($o->tipo_pago == 0){
-                                    $info = -$o->precio_total + ($total + $o->precio_envio);
-                                    $totalcobro = $totalcobro + $info;                                
-                                }else{
-                                    // CREDI PUNTOS
-                                    $totalcobro = $totalcobro - $o->precio_total;    
-                                }
-                               
-                            }else{
-                                // no se le paga a servicio 
-    
-                                $cobro = $total + $o->precio_envio;
-                                
-                                if($o->tipo_pago == 0){
-                                    $totalcobro = $totalcobro + $cobro; 
-                                }
-                            }
-                          
-                        }
-                        
-                    }else{              
-
-                        if($o->pago_a_propi == 1){
-                           
-                            if($o->tipo_pago == 0){
-                                $info = -$o->precio_total + ($o->precio_total + $o->precio_envio);
-                                $totalcobro = $totalcobro + $info;                                
-                                $o->precio_total = number_format((float)$o->precio_total + $o->precio_envio, 2, '.', '');
-                            }else{
-                                // CREDI PUNTOS
-                                $totalcobro = $totalcobro - $o->precio_total;
-
-                                $o->precio_total = number_format((float)0, 2, '.', '');
-                            }
-                           
-                        }else{
-                            // no se le paga a servicio 
-
-                            $cobro = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$cobro, 2, '.', '');
-                            // NO SUMAR SI PAGO CON CREDI PUNTOS
-                            if($o->tipo_pago == 0){
-                                $totalcobro = $totalcobro + $cobro; 
-                            }
-                        }
-
-                        
-                    }                  
+                    // RESTAR PARA OBTENER LA DIFERENCIA
+                    $dinero = $dinero + ($cliente - $propi);
                 }
 
-                // Encargos
-
-                 // estas ordenes ya fueron revisadas
-                 $noquiero2 = DB::table('ordenes_encargo_revisadas')->get();
-
-                 $pilaOrden2 = array();
-                 foreach($noquiero2 as $p){
-                     array_push($pilaOrden2, $p->ordenes_encargo_id);
-                 }
- 
-                 $orden2 = DB::table('motorista_ordenes_encargo AS mo')
-                 ->join('ordenes_encargo AS o', 'o.id', '=', 'mo.ordenes_encargo_id')
-                 ->select('o.id', 'o.fecha_3', 'mo.motoristas_id', 'o.precio_subtotal', 
-                 'o.precio_envio', 'o.pago_a_propi', 'o.estado_3', 'o.tipo_pago')
-                 ->where('mo.motoristas_id', $request->motoristaid)               
-                 ->where('o.estado_2', 1) // ordenes que motorista inicio la entrega
-                 ->whereNotIn('o.id', $pilaOrden2) // filtro para no ver ordenes encargo revisadas
-                 ->get(); 
- 
-                 $totalcobro2 = 0;
- 
-                 foreach($orden2 as $o){   
-                     if($o->pago_a_propi == 1){
-                            
-                         if($o->tipo_pago == 0){
-
-                            $info = -$o->precio_subtotal + ($o->precio_subtotal + $o->precio_envio);
-                            $totalcobro2 = $totalcobro2 + $info;  
-                         }else{
-                             // CREDI PUNTOS
-                             $totalcobro2 = $totalcobro2 - $o->precio_subtotal; 
-                         }
-                        
-                     }else{
-                         // no se le paga a servicio 
- 
-                         $cobro2 = $o->precio_subtotal + $o->precio_envio;
-                        
-                         if($o->tipo_pago == 0){
-                             $totalcobro2 = $totalcobro2 + $cobro2; 
-                         } else{
-                             $totalcobro2 = $totalcobro2 + 0; 
-                         }
-                     } 
-                 }
-
                 // Ordenes
-                $totalcobro = number_format((float)$totalcobro, 2, '.', '');
-                // Encargos
-                $totalcobro2 = number_format((float)$totalcobro2, 2, '.', '');
+                $dinero = number_format((float)$dinero, 2, '.', '');
 
-                
-                return ['success' => 1, 'caja1' => $totalcobro, 'caja2' => $totalcobro2];
+                return ['success' => 1, 'caja1' => $dinero, 'conteo' => $conteo];
             }
         }
 
@@ -2994,4 +2526,4 @@ class MotoristaController extends Controller
     public function envioNoticacionClienteAlerta($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionClienteAlerta($titulo, $mensaje, $pilaUsuarios);
     }
-} 
+}

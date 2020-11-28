@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\CreditoDevuelto;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Propietarios;
@@ -35,36 +36,36 @@ use App\Cupones;
 use OneSignal;
 use App\AplicaCuponCuatro;
 use App\AplicaCuponTres;
-use App\AplicaCuponDos; 
+use App\AplicaCuponDos;
 use App\AplicaCuponCinco;
 
 class AdminAppController extends Controller
 {
     // login
     public function loginRevisador(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
+        if($request->isMethod('post')){
+            $rules = array(
                 'phone' => 'required',
                 'password' => 'required|max:16',
             );
 
-            $messages = array(                                      
+            $messages = array(
                 'phone.required' => 'El telefono es requerido.',
-                
+
                 'password.required' => 'La contraseña es requerida.',
                 'password.max' => '16 caracteres máximo para contraseña',
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
             }
-         
+
             if($p = Administradores::where('telefono', $request->phone)->first()){
 
                 if($p->activo == 0){
@@ -73,7 +74,7 @@ class AdminAppController extends Controller
 
                 if (Hash::check($request->password, $p->password)) {
 
-                    $id = $p->id;   
+                    $id = $p->id;
                     if($request->device_id != null){
                         Administradores::where('id', $p->id)->update(['device_id' => $request->device_id]);
                     }
@@ -90,8 +91,8 @@ class AdminAppController extends Controller
 
     // reseteo de password
     public function reseteo(Request $request){
-        if($request->isMethod('post')){   
-            
+        if($request->isMethod('post')){
+
             $regla = array(
                 'id' => 'required',
                 'password' => 'required'
@@ -101,81 +102,82 @@ class AdminAppController extends Controller
                 'id.required' => 'id es requerido',
                 'password.required' => 'password es requerida'
                 );
-                
+
             $validar = Validator::make($request->all(), $regla, $mensaje );
 
-            if ($validar->fails()) 
+            if ($validar->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validar->errors()->all()
                 ];
-            }  
+            }
 
             if(Administradores::where('id', $request->id)->first()){
-               
+
                 Administradores::where('id', $request->id)->update([
                         'password' => bcrypt($request->password)
                     ]);
 
                         return ['success' => 1];
-            
+
             }else{
-                return ['success' => 2];  
+                return ['success' => 2];
             }
-        }  
+        }
     }
 
-    
+
     //*** VERSION 1 */
 
     public function ordenesHoy(Request $request){
 
         if($request->isMethod('post')){
-            $rules = array(                
-                'id' => 'required' 
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
+            }
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
                 if($aa->activo == 0){
                     return ['success' => 1]; // desactivado
                 }
-             
+
                 $fecha = Carbon::now('America/El_Salvador');
 
                 $orden = DB::table('ordenes AS o')
-                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')       
+                ->join('servicios AS s', 's.id', '=', 'o.servicios_id')
                 ->select('o.id', 's.identificador', 'o.fecha_orden', 's.nombre',
-                    'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4', 
+                    'o.estado_2', 'o.hora_2', 'o.estado_3', 'o.estado_4', 'o.fecha_4',
                     'o.estado_5', 'o.estado_6', 'o.estado_7', 'o.estado_8', 'o.users_id',
                     'o.mensaje_8', 'o.cancelado_cliente', 'o.cancelado_propietario',
-                    'o.fecha_8', 'o.pago_a_propi', 'o.precio_envio', 'o.precio_total', 'o.tipo_pago')
+                    'o.fecha_8', 'o.pago_a_propi', 'o.precio_envio', 'o.precio_total', 'o.tipo_pago',
+                    'o.nota_orden')
                 ->whereDate('o.fecha_orden', $fecha)
                 ->orderBy('o.id', 'DESC')
                 ->get();
-      
+
                 $estado = "";
-                foreach($orden as $o){        
+                foreach($orden as $o){
                     $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
-    
+
                     $od = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->zonanombre = Zonas::where('id', $od->zonas_id)->pluck('nombre')->first();
-    
+
                     $estado4 = 0;
                     if($o->estado_4 == 1){
                         $estado4 = 1;
@@ -183,7 +185,7 @@ class AdminAppController extends Controller
                         $time2 = Carbon::parse($o->fecha_4);
                         $suma = $o->hora_2 + $od->copia_tiempo_orden;
                         $tiempoCliente = $time2->addMinute($suma)->format('h:i A d-m-Y');
-                        $o->horaestimadacliente = $tiempoCliente;  
+                        $o->horaestimadacliente = $tiempoCliente;
                     }
 
                     $cupon = "";
@@ -195,9 +197,8 @@ class AdminAppController extends Controller
 
                     $o->pagaapropi = $pagaapropi;
 
-                    $envio = $o->precio_envio; 
+                    $envio = $o->precio_envio;
 
-                    $metodo = "";
                     if($o->tipo_pago == 0){
                         $metodo = " | Efectivo";
                     }else{
@@ -205,7 +206,7 @@ class AdminAppController extends Controller
                     }
 
                     $o->subtotal = number_format((float)$o->precio_total, 2, '.', '') . $metodo;
-                    
+
                     // verificar si utilizo algun cupon
                     if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
                         $tipo = Cupones::where('id', $oc->cupones_id)->first();
@@ -213,40 +214,9 @@ class AdminAppController extends Controller
                         if($tipo->tipo_cupon_id == 1){
                             $cupon = "Envio Gratis (si aplicado al envio)";
                             $envio = 0;
-                        }else if($tipo->tipo_cupon_id == 2){
-                            $ac = AplicaCuponDos::where('ordenes_id', $o->id)->first();
-                            $descuento = $ac->dinero;                            
-
-                            if($ac->aplico_envio_gratis == 1){
-                                $envio = 0;
-                                $cupon = "Descuento Dinero de: $" . $descuento . " (no aplicado a sub total) + envio gratis (si aplicado al envio)";
-                            }else{
-                                $cupon = "Descuento Dinero de: $" . $descuento . " (no aplicado a sub total)";
-                            }
-
-                        }else if($tipo->tipo_cupon_id == 3){
-
-                            $ac = AplicaCuponTres::where('ordenes_id', $o->id)->first();
-                            $porcentaje = $ac->porcentaje;
-
-                            $cupon = "Descuento Porcentaje de: " . $porcentaje . "% (no aplicado a subtotal)";
                         }
-                        else if($tipo->tipo_cupon_id == 4){
-                            $ac = AplicaCuponCuatro::where('ordenes_id', $o->id)->first();
-                            $producto = $ac->producto;
+                    }
 
-                            $cupon = "Producto Gratis: " . $producto;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){
-
-                            $ac = AplicaCuponCinco::where('ordenes_id', $o->id)->first();
-                            $dinero = $ac->dinero;
-
-                            $cupon = "Donación de: $".$dinero . " (no sumado a subtotal)";
-                        }
-                    } 
-
-                  
                     $o->envio = number_format((float)$envio, 2, '.', '');
 
                     $o->cupon = $cupon;
@@ -254,54 +224,54 @@ class AdminAppController extends Controller
                     $o->estado4 = $estado4;
 
                     $nombremotorista = "";
-    
+
                     if($motorista = MotoristaOrdenes::where('ordenes_id', $o->id)->first()){
-    
+
                         $n = Motoristas::where('id', $motorista->motoristas_id)->first();
                         $nombremotorista = $n->nombre;
                     }
-    
+
                     $o->motorista = $nombremotorista;
-                    
+
                     if($o->estado_2 == 0){
                         $estado = "Orden sin contestacion del propietario";
                     }
-    
+
                     if($o->estado_2 == 1){
                         $estado = "Orden contestada, esperando contestacion del cliente";
                     }
-    
+
                     if($o->estado_3 == 1){
                         $estado = "Orden contestada por cliente, esperando iniciar orden";
                     }
-    
+
                     $horaestimada = ""; // a esta hora estara la orden preparada
-    
+
                     if($o->estado_4 == 1){
                         $estado = "Orden inicio preparacion";
-    
-                        $time1 = Carbon::parse($o->fecha_4);                                 
-                        $horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');                
+
+                        $time1 = Carbon::parse($o->fecha_4);
+                        $horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');
                     }
-    
+
                     $o->horaestimada = $horaestimada;
-    
+
                     if($o->estado_5 == 1){
                         $estado = "Orden termino prepararse";
                     }
-    
+
                     if($o->estado_6 == 1){
                         $estado = "Motorista va en camino";
                     }
-    
+
                     if($o->estado_7 == 1){
                         $estado = "Motorista completo la orden";
                     }
-    
+
                     if($o->estado_8 == 1){
                         $estado = "Orden cancelada";
                     }
-    
+
                     $o->estado = $estado;
 
                     $phone = User::where('id', $o->users_id)->pluck('phone')->first();
@@ -319,7 +289,27 @@ class AdminAppController extends Controller
                     $o->longitudreal = $od->longitud_real;
 
 
-                    $comentario = "";
+                    // MOSTRAR BOTON PARA INICIAR ORDEN PARA EL CLIENTE.
+                    $botoniniciar = 0;
+                    if($o->estado_2 == 1 && $o->estado_3 == 0 && $o->estado_8 == 0){
+                        $botoniniciar = 1;
+                    }
+
+                    $o->botoniniciar = $botoniniciar;
+
+                    // MOSTRAR BOTON PARA DEVOLVER CREDITO
+                    $botoniniciar = 0;
+                    if($o->tipo_pago == 1 && $o->estado_8 == 1){
+
+                        if(CreditoDevuelto::where('ordenes_id', $o->id)->first()){
+
+                        }else{
+                            $botoniniciar = 1;
+                        }
+                    }
+
+                    $o->botoncredito = $botoniniciar;
+
 
                     if($m = MotoristaExperiencia::where('ordenes_id', $o->id)->first()){
                         $mensaje = "";
@@ -328,13 +318,13 @@ class AdminAppController extends Controller
                         }
 
                         $comentario = "Calificó con: " . $m->experiencia . " Puntos y mensaje es: " . $mensaje;
-                        
+
                     }else{
                         $comentario = "Sin calificar";
                     }
 
                     $o->comentario = $comentario;
-                    
+
                     // quien cancelo
                     $mensajeCancelado = "";
 
@@ -342,67 +332,136 @@ class AdminAppController extends Controller
 
                         $hora = date("h:i A", strtotime($o->fecha_8));
 
-                        if($o->cancelado_cliente == 1){                            
-                            $mensajeCancelado = "Cancelo Cliente a: " . $hora; 
+                        if($o->cancelado_cliente == 1){
+                            $mensajeCancelado = "Cancelo Cliente a: " . $hora;
                         }
 
                         if($o->cancelado_propietario == 1){
-                            $mensajeCancelado = "Cancelo Propietario a: " . $hora . " - Mensaje: " . $o->mensaje_8; 
-                        } 
+                            $mensajeCancelado = "Cancelo Propietario a: " . $hora . " - Mensaje: " . $o->mensaje_8;
+                        }
                     }
 
                     $o->mensajeCancelado = $mensajeCancelado;
                 }
-    
+
                 return ['success' => 2, 'ordenes' => $orden];
-                
+
             }else{
                 return ['success' => 1];
-            }          
+            }
         }
     }
+
+
+
+    public function cambioDePropietario(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $rules = array(
+                'id' => 'required'
+            );
+
+            $messages = array(
+                'id.required' => 'El id es requerido.'
+            );
+
+            $validator = Validator::make($request->all(), $rules, $messages);
+
+            if ($validator->fails()) {
+                return ['success' => 0];
+            }
+
+            Propietarios::where('id', 6)->update(['servicios_id' => $request->id]);
+
+            return ['success' => 1];
+        }
+    }
+
+    public function devolverCreditoAdmin(Request $request){
+        if($request->isMethod('post')){
+            $rules = array(
+                'ordenid' => 'required'
+            );
+
+            $messages = array(
+                'ordenid.required' => 'El numero es requerido.'
+            );
+
+            $validator = Validator::make($request->all(), $rules, $messages );
+
+            if($validator->fails()){
+                return ['success' => 0];
+            }
+
+            if($oo = Ordenes::where('id', $request->ordenid)->first()){
+
+                if(CreditoDevuelto::where('ordenes_id', $request->ordenid)->first()){
+                    // no hacer nada
+                }else{
+                    // crear registro
+                    $n = new CreditoDevuelto();
+                    $n->ordenes_id = $request->ordenid;
+                    $n->save();
+
+                    // obtener usuario
+                    $data = User::where('id', $oo->users_id)->first();
+
+                    $gastado = $oo->precio_total + $oo->precio_envio;
+
+                    $suma = $data->monedero + $gastado;
+                    User::where('id', $oo->users_id)->update(['monedero' => $suma]);
+                }
+
+                return ['success'=>1];
+
+            }else{
+                return ['success'=>2];
+            }
+        }
+    }
+
 
 
     // ordenes encargos hoy
     public function ordenesEncargoHoy(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
+            }
 
             if($aa = Administradores::where('id', $request->id)->first()){
 
                 $fecha = Carbon::now('America/El_Salvador');
- 
+
                 $orden = DB::table('encargos AS e')
-                ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')       
+                ->join('ordenes_encargo AS o', 'o.encargos_id', '=', 'e.id')
                 ->select('e.id AS idencargo', 'o.id', 'e.fecha_entrega', 'o.revisado', 'o.estado_0', 'o.fecha_0',
                             'o.estado_1', 'o.fecha_1', 'o.estado_2', 'o.fecha_2', 'o.estado_3', 'o.fecha_3',
                             'o.users_id', 'o.calificacion', 'o.mensaje', 'o.pago_a_propi', 'o.precio_subtotal',
                             'o.precio_envio', 'o.tipo_pago')
-              
+
                 ->whereNotIn('o.revisado', [5]) // no ver cancelados
-                ->whereDate('e.fecha_entrega', $fecha)                 
-                ->orderBy('o.id', 'DESC') 
+                ->whereDate('e.fecha_entrega', $fecha)
+                ->orderBy('o.id', 'DESC')
                 ->get();
-      
+
                 // no iniciado, iniciado, terminado, motorista en camino, orden entregada.
-                foreach($orden as $o){        
+                foreach($orden as $o){
                     $o->fecha_entrega = date("h:i A", strtotime($o->fecha_entrega));
 
                     $pagar = "";
@@ -410,21 +469,21 @@ class AdminAppController extends Controller
                     $suma = $o->precio_subtotal + $o->precio_envio;
                     $suma = number_format((float)$suma, 2, '.', '');
                     if($o->pago_a_propi == 1){
-                        
+
                         $pagar = "Pagar a Propietario: $" . $p1 . " Y cobrar al cliente (con envio) $" . $suma;
                     }else{
                         $pagar = "Cobrar al cliente: (Sub total + envio) $" . $suma;
-                    } 
+                    }
 
                     $o->pagar = $pagar;
 
                     $estado = "";
                     if($o->revisado == 1){
                         $estado = "Pendiente";
-                    } 
+                    }
                     else if($o->revisado == 2){ // en proceso
                         $estado = "En proceso";
-                        
+
                         if($o->estado_0 == 0){
                             $estado = "En proceso, propi no inicia la orden";
                         }else{
@@ -438,20 +497,20 @@ class AdminAppController extends Controller
                         }
                     }
                     else if($o->revisado == 3){
-                       
+
                         $f2 = date("h:i A", strtotime($o->fecha_2));
-                        $estado = "Motorista en camino: " . $f2;                      
-                                               
+                        $estado = "Motorista en camino: " . $f2;
+
                     }
                     else if($o->revisado == 4){
                         $f3 = date("h:i A", strtotime($o->fecha_3));
-                        $estado = "Motorista completo: " . $f3; 
+                        $estado = "Motorista completo: " . $f3;
                     }else{
                         $estado = "Encargo Cancelado";
                     }
 
                     $o->estado = $estado;
-                    
+
                     $servicio = "Ninguno";
                     if($ss = EncargoAsignadoServicio::where('encargos_id', $o->idencargo)->first()){
                         $servicio = Servicios::where('id', $ss->servicios_id)->pluck('nombre')->first();
@@ -465,9 +524,9 @@ class AdminAppController extends Controller
                     }
 
                     $o->motorista = $motorista;
-                                        
+
                     $data = OrdenesEncargoDireccion::where('ordenes_encargo_id', $o->id)->first();
-                    $o->zona = Zonas::where('id', $data->zonas_id)->pluck('nombre')->first();                    
+                    $o->zona = Zonas::where('id', $data->zonas_id)->pluck('nombre')->first();
 
                     $o->cliente = $data->nombre;
                     $o->telefono = User::where('id', $o->users_id)->pluck('phone')->first();
@@ -478,96 +537,96 @@ class AdminAppController extends Controller
                     $o->longitud = $data->longitud;
                     $o->latitudreal = $data->latitud_real;
                     $o->longitudreal = $data->longitud_real;
-                    
+
                     $comentario = "";
                     if($o->calificacion != 0){
                         $comentario = "Califico con: " . $o->calificacion . " | mensaje es: " . $o->mensaje;
-                    } 
+                    }
 
-                    $o->comentario = $comentario; 
+                    $o->comentario = $comentario;
                 }
-    
+
                 return ['success' => 1, 'ordenes' => $orden];
-                
+
             }else{
                 return ['success' => 2];
-            }          
+            }
         }
     }
 
- 
+
     //*** ordenes_urgentes */
 
-    // oordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el propietario + 2 min extra. 
+    // oordenes completadas, aun no sale motorista, ya paso la hora estimada de entrega que dio el propietario + 2 min extra.
     public function verOrdenesUrgenteUno(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-          
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 if($p->activo == 0){
                     return ['success' => 1]; // revisador no activo
                 }
 
                 $orden = DB::table('ordenes_urgentes AS ou')
-                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
                 ->where('ou.activo', 1)
                 ->orderBy('ou.id', 'ASC')
                 ->get();
- 
+
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                     $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
-                                      
+
                     $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
 
                     // siempre tendra estado_4
                     $time1 = Carbon::parse($o->fecha_4);
                     $horaEstimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
-                    $o->horaestimada = $horaEstimada;  
-                    
+                    $o->horaestimada = $horaEstimada;
+
                     // estimada entrega cliente
                     $time2 = Carbon::parse($o->fecha_4);
                     $suma = $o->hora_2 + $dato->copia_tiempo_orden;
                     $tiempoCliente = $time2->addMinute($suma)->format('h:i A d-m-Y');
-                    $o->horaestimadacliente = $tiempoCliente;  
-                                        
+                    $o->horaestimadacliente = $tiempoCliente;
+
                     $o->fechatermino = date("h:i A d-m-Y", strtotime($o->fecha_5));
-                    
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
                     $o->identificador = $datos->identificador;
                     $o->privado = $datos->privado;
 
-                    // info de la direccion                   
+                    // info de la direccion
                     $o->direccion = $dato->direccion;
                     $zona = Zonas::where('id', $dato->zonas_id)->pluck('nombre')->first();
                     $o->zonanombre = $zona;
 
                     // buscar si hay motorista asignado ya esta orden
                     $dato = DB::table('motorista_ordenes AS mo')
-                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
                     ->where('mo.ordenes_id', $o->id)
                     ->first();
@@ -588,28 +647,28 @@ class AdminAppController extends Controller
             }
         }
     }
-    
+
     // ocultar de tabla ordenes_urgentes
     public function ocultarUrgenteUno(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if(OrdenesUrgentes::where('ordenes_id', $request->id)->first()){
 
                 OrdenesUrgentes::where('ordenes_id', $request->id)->update(['activo' => 0]);
@@ -627,39 +686,39 @@ class AdminAppController extends Controller
     // tabla: ordenes_urgentes_dos
     public function verOrdenesSinContestacion(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-        
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 $orden = DB::table('orden_pendiente_contestar AS p')
-                ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'p.ordenes_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.estado_2', 'o.estado_8')
                 ->where('p.activo', 1)
                 ->orderBy('o.id', 'DESC')
                 ->get();
- 
+
                 foreach($orden as $o){
 
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
-                          
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
@@ -682,29 +741,29 @@ class AdminAppController extends Controller
 
     // ocultar ordenes pendiente de contestacion
     public function ocultarOrdenSinContestacion(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if(OrdenesPendienteContestar::where('ordenes_id', $request->id)->first()){
 
                 OrdenesPendienteContestar::where('ordenes_id', $request->id)->update(['activo' => 0]);
- 
+
                 return ['success' => 1];
             }else{
                 return ['success' => 2];
@@ -716,36 +775,36 @@ class AdminAppController extends Controller
     //*** ordenes_urgentes_dos */
 
     // propietario termino de preparar la orden y ningun motorista agarro la orden
-    // tabla: ordenes_urgentes_dos    
+    // tabla: ordenes_urgentes_dos
     public function verOrdenesUrgenteDos(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 if($p->activo == 0){
                     return ['success' => 1]; // revisador no activo
                 }
 
                 $orden = DB::table('ordenes_urgentes_dos AS ou')
-                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
@@ -756,14 +815,14 @@ class AdminAppController extends Controller
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A", strtotime($o->fecha_orden));
                     $o->fecha = date("h:i A", strtotime($o->fecha));
-        
+
                     // hora que termino de preparar la orden
                     $o->fechatermino = date("h:i A", strtotime($o->fecha_5));
 
                     // hora estimada de entrega
-                    $time1 = Carbon::parse($o->fecha_4);                                
-                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A'); 
-                                        
+                    $time1 = Carbon::parse($o->fecha_4);
+                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
@@ -771,7 +830,7 @@ class AdminAppController extends Controller
                     $o->privado = $datos->privado;
 
                     // info de la direccion
-                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();                    
+                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->direccion = $dato->direccion;
 
                     $zona = Zonas::where('id', $dato->zonas_id)->pluck('nombre')->first();
@@ -779,7 +838,7 @@ class AdminAppController extends Controller
 
                     // buscar si hay motorista asignado ya esta orden
                     $dato = DB::table('motorista_ordenes AS mo')
-                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
                     ->where('mo.ordenes_id', $o->id)
                     ->first();
@@ -803,25 +862,25 @@ class AdminAppController extends Controller
 
     // ocultar ordenes_urgentes_dos
     public function ocultarUrgenteDos(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-            
+            }
+
             if(OrdenesUrgentesDos::where('ordenes_id', $request->id)->first()){
 
                 OrdenesUrgentesDos::where('ordenes_id', $request->id)->update(['activo' => 0]);
@@ -832,40 +891,40 @@ class AdminAppController extends Controller
             }
         }
     }
- 
+
     //*** ordenes_urgentes_tres */
 
     // pasaron 5+ de hora entrega al cliente (hora_2 + zona + 5+) y no se ha entregado su orden
-    // tabla ordenes_urgentes_tres 
+    // tabla ordenes_urgentes_tres
     public function verOrdenesUrgenteTres(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 if($p->activo == 0){
                     return ['success' => 1]; // revisador no activo
                 }
 
                 $orden = DB::table('ordenes_urgentes_tres AS ou')
-                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
@@ -877,10 +936,10 @@ class AdminAppController extends Controller
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
 
                     $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
-        
+
                     // hora que termino de preparar la orden
                     $o->fechatermino = date("h:i A d-m-Y", strtotime($o->fecha_5));
-                    
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
@@ -888,25 +947,25 @@ class AdminAppController extends Controller
                     $o->privado = $datos->privado;
 
                     // info de la direccion
-                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();                    
+                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->direccion = $dato->direccion;
 
                     // hora estimada de entrega
-                    $time1 = Carbon::parse($o->fecha_4);                                
-                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y'); 
+                    $time1 = Carbon::parse($o->fecha_4);
+                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A d-m-Y');
 
                     // estimada entrega cliente
                     $time2 = Carbon::parse($o->fecha_4);
                     $suma = $o->hora_2 + $dato->copia_tiempo_orden;
                     $tiempoCliente = $time2->addMinute($suma)->format('h:i A d-m-Y');
-                    $o->horaestimadacliente = $tiempoCliente;  
+                    $o->horaestimadacliente = $tiempoCliente;
 
                     $zona = Zonas::where('id', $dato->zonas_id)->pluck('nombre')->first();
                     $o->zonanombre = $zona;
 
                     // buscar si hay motorista asignado ya esta orden
                     $dato = DB::table('motorista_ordenes AS mo')
-                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
                     ->where('mo.ordenes_id', $o->id)
                     ->first();
@@ -930,25 +989,25 @@ class AdminAppController extends Controller
 
     // ocultar ordenes_urgentes_tres
     public function ocultarUrgenteTres(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-            
+            }
+
             if(OrdenesUrgentesTres::where('ordenes_id', $request->id)->first()){
 
                 OrdenesUrgentesTres::where('ordenes_id', $request->id)->update(['activo' => 0]);
@@ -966,33 +1025,33 @@ class AdminAppController extends Controller
     // ningun motorista agarro la orden
     public function verOrdenesUrgenteCuatro(Request $request){
 
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 if($p->activo == 0){
                     return ['success' => 1]; // revisador no activo
                 }
 
                 $orden = DB::table('ordenes_urgentes_cuatro AS ou')
-                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')
                 ->select('o.id', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'o.estado_8', 'ou.fecha')
@@ -1005,9 +1064,9 @@ class AdminAppController extends Controller
                     $o->fecha = date("h:i A", strtotime($o->fecha));
 
                     // hora estimada de entrega
-                    $time1 = Carbon::parse($o->fecha_4);                                
-                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');   
-                                                            
+                    $time1 = Carbon::parse($o->fecha_4);
+                    $o->horaestimada = $time1->addMinute($o->hora_2)->format('h:i A');
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
                     $o->nombre = $datos->nombre;
                     $o->telefono = $datos->telefono;
@@ -1015,7 +1074,7 @@ class AdminAppController extends Controller
                     $o->privado = $datos->privado;
 
                     // info de la direccion
-                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();                    
+                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $o->direccion = $dato->direccion;
 
                     $zona = Zonas::where('id', $dato->zonas_id)->pluck('nombre')->first();
@@ -1023,7 +1082,7 @@ class AdminAppController extends Controller
 
                     // buscar si hay motorista asignado ya esta orden
                     $dato = DB::table('motorista_ordenes AS mo')
-                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')             
+                    ->join('motoristas AS m', 'm.id', '=', 'mo.motoristas_id')
                     ->select('m.nombre', 'm.telefono', 'mo.ordenes_id')
                     ->where('mo.ordenes_id', $o->id)
                     ->first();
@@ -1047,25 +1106,25 @@ class AdminAppController extends Controller
 
     // ocultar ordenes_urgentes_cuatro
     public function ocultarOrdenesCuatro(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
-                return [ 
-                    'success' => 0, 
+                return [
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-            
+            }
+
             if(OrdenesUrgentesCuatro::where('ordenes_id', $request->id)->first()){
 
                 OrdenesUrgentesCuatro::where('ordenes_id', $request->id)->update(['activo' => 0]);
@@ -1080,33 +1139,33 @@ class AdminAppController extends Controller
 
     // ver estado de problema de la orden
     public function verEstados(Request $request){
-        if($request->isMethod('post')){   
-            $rules = array(                
-                'id' => 'required'                
+        if($request->isMethod('post')){
+            $rules = array(
+                'id' => 'required'
             );
 
-            $messages = array(                                      
-                'id.required' => 'El id es requerido.'                
+            $messages = array(
+                'id.required' => 'El id es requerido.'
                 );
 
             $validator = Validator::make($request->all(), $rules, $messages );
 
-            if ( $validator->fails() ) 
+            if ( $validator->fails() )
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validator->errors()->all()
                 ];
-            } 
-         
+            }
+
             if($p = Administradores::where('id', $request->id)->first()){
-                
+
                 if($p->activo == 0){
                     return ['success' => 1]; // revisador no activo
-                } 
+                }
 
                 $orden = DB::table('ordenes_problemas AS ou')
-                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')             
+                ->join('ordenes AS o', 'o.id', '=', 'ou.ordenes_id')
                 ->select('o.id', 'ou.id AS idproblema', 'o.users_id', 'o.servicios_id', 'o.precio_total',
                         'o.fecha_orden', 'o.hora_2', 'o.estado_4', 'o.fecha_4',
                         'o.estado_5', 'o.fecha_5', 'ou.activo', 'ou.tipo', 'o.estado_8', 'ou.fecha')
@@ -1117,16 +1176,16 @@ class AdminAppController extends Controller
                 foreach($orden as $o){
                     $o->fecha_orden = date("h:i A d-m-Y", strtotime($o->fecha_orden));
                     $o->fecha = date("h:i A d-m-Y", strtotime($o->fecha));
-                                                                               
+
                     $datos = Servicios::where('id', $o->servicios_id)->first();
-                    $o->nombre = $datos->nombre;                   
+                    $o->nombre = $datos->nombre;
                     $o->identificador = $datos->identificador;
                     $o->privado = $datos->privado;
 
                     // info de la direccion
-                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();    
+                    $dato = OrdenesDirecciones::where('ordenes_id', $o->id)->first();
                     $zona = Zonas::where('id', $dato->zonas_id)->pluck('nombre')->first();
-                    $o->zonanombre = $zona;                    
+                    $o->zonanombre = $zona;
                 }
 
                 return ['success' => 1, 'orden' => $orden];
@@ -1141,19 +1200,19 @@ class AdminAppController extends Controller
     public function verProductosOrden(Request $request){
         // validaciones para los datos
         $reglaDatos = array(
-            'ordenid' => 'required'               
+            'ordenid' => 'required'
         );
 
-        $mensajeDatos = array(                                      
+        $mensajeDatos = array(
             'ordenid.required' => 'El id de la orden es requerido.'
             );
 
         $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos );
 
-        if($validarDatos->fails()) 
+        if($validarDatos->fails())
         {
             return [
-                'success' => 0, 
+                'success' => 0,
                 'message' => $validarDatos->errors()->all()
             ];
         }
@@ -1168,7 +1227,7 @@ class AdminAppController extends Controller
                         ->select('od.id AS productoID', 'p.nombre', 'od.nota', 'p.imagen', 'p.utiliza_imagen', 'od.precio', 'od.cantidad')
                         ->where('o.id', $request->ordenid)
                         ->get();
-            
+
                         foreach($producto as $p){
                             $cantidad = $p->cantidad;
                             $precio = $p->precio;
@@ -1176,7 +1235,7 @@ class AdminAppController extends Controller
                             $p->multiplicado = number_format((float)$multi, 2, '.', '');
                         }
 
-            return ['success' => 1, 'productos' => $producto];                  
+            return ['success' => 1, 'productos' => $producto];
         }else{
             return ['success' => 3];
         }
@@ -1185,26 +1244,26 @@ class AdminAppController extends Controller
     // ver productos del encargo
     public function verProductosOrdenEncargo(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if(OrdenesEncargo::where('id', $request->id)->first()){
 
@@ -1231,9 +1290,22 @@ class AdminAppController extends Controller
 
     public function verListaServicios(Request $request){
 
-        $lista = Servicios::select('id', 'nombre')->orderBy('nombre')->get();
+        $lista = Servicios::orderBy('nombre')->where('activo', 1)->get();
+
+        foreach ($lista as $l){
+            if($l->cerrado_emergencia == 0){
+                $estado = "Abierto";
+            }else{
+                $estado = "Cerrado";
+            }
+
+            $nombre = $l->nombre . " | " . $estado;
+
+            $l->nombre = $nombre;
+        }
+
         return ['success' => 1, 'servicios' => $lista];
-    } 
+    }
 
     public function verListaMotoristas(Request $request){
 
@@ -1243,105 +1315,105 @@ class AdminAppController extends Controller
         ->get();
 
         return ['success' => 1, 'servicios' => $lista];
-    } 
+    }
 
     public function verListaServiciosPropietarios(Request $request){
 
         $lista = Propietarios::where('servicios_id', $request->id)
-        ->select('id', 'nombre')      
+        ->select('id', 'nombre')
         ->orderBy('nombre')
         ->get();
- 
+
         return ['success' => 1, 'servicios' => $lista];
     }
 
     public function enviarNotificacionPropietario(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($pp = Propietarios::where('id', $request->id)->first()){
 
                 if($pp->device_id == "0000"){
                    return ['success' => 1];
                 }
- 
+
                 $titulo = "Hola";
                 $mensaje = "Porfavor revisa tu aplicación";
 
                 try {
                     $this->envioNoticacionPropietario($titulo, $mensaje, $pp->device_id);
-                    } catch (Exception $e) {                              
-                } 
-                
+                    } catch (Exception $e) {
+                }
+
                 return ['success' => 2];
             }else{
                 return ['success' => 3];
             }
         }
-    } 
+    }
 
     public function enviarNotificacionMotorista(Request $request){
 
-        if($request->isMethod('post')){ 
+        if($request->isMethod('post')){
 
             // validaciones para los datos
             $reglaDatos = array(
-                'id' => 'required'                
+                'id' => 'required'
             );
-        
-            $mensajeDatos = array(                                      
+
+            $mensajeDatos = array(
                 'id.required' => 'El id del motorista es requerido.'
                 );
 
             $validarDatos = Validator::make($request->all(), $reglaDatos, $mensajeDatos);
 
-            if($validarDatos->fails()) 
+            if($validarDatos->fails())
             {
                 return [
-                    'success' => 0, 
+                    'success' => 0,
                     'message' => $validarDatos->errors()->all()
                 ];
-            }  
+            }
 
             if($pp = Motoristas::where('id', $request->id)->first()){
 
                 if($pp->device_id == "0000"){
                    return ['success' => 1];
                 }
- 
+
                 $titulo = "Solicitud Nueva";
                 $mensaje = "Se necesita motorista";
 
                 try {
                     $this->envioNoticacionMotorista($titulo, $mensaje, $pp->device_id);
-                    } catch (Exception $e) {                              
-                } 
-                
+                    } catch (Exception $e) {
+                }
+
                 return ['success' => 2];
             }else{
                 return ['success' => 3];
             }
         }
-    } 
+    }
 
     public function envioNoticacionMotorista($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionMotorista($titulo, $mensaje, $pilaUsuarios);
@@ -1350,5 +1422,5 @@ class AdminAppController extends Controller
     public function envioNoticacionPropietario($titulo, $mensaje, $pilaUsuarios){
         OneSignal::notificacionPropietario($titulo, $mensaje, $pilaUsuarios);
     }
-    
+
 }

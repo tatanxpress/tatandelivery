@@ -126,11 +126,8 @@ class ClientesController extends Controller
             }
 
             $codigo = '';
-            $pattern = '1234567890';
-            $max = strlen($pattern)-1;
-            for($i=0;$i <6; $i++)
-            {
-                $codigo .= $pattern{mt_rand(0,$max)};
+            for($i = 0; $i < 6; $i++) {
+                $codigo .= mt_rand(0, 9);
             }
 
             $fecha = Carbon::now('America/El_Salvador');
@@ -1144,7 +1141,7 @@ class ClientesController extends Controller
             }
         }
 
-        return view('backend.paginas.credipuntos.tablas.tablacredipuntosverificados', compact('cliente'));      
+        return view('backend.paginas.credipuntos.tablas.tablacredipuntosverificados', compact('cliente'));
     }
 
 

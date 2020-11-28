@@ -102,7 +102,6 @@ class LoginController extends Controller
                 }
                 DB::commit();
 
-
                 // envio del mensaje
                 $sid = "ACc68bf246c0d9be071f2367e81b686201";
                 $token = "01990626f6e7fb813eb7317c06db6a47";

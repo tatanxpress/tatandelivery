@@ -14,9 +14,9 @@
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
-        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="true">
 
-        @can('completo')
+
         <li class="nav-item has-treeview">
             <a href="#" class="nav-link">
               <i class="nav-icon fa fa fa-globe"></i>
@@ -69,7 +69,7 @@
 
             </ul>
           </li>
-        @endcan
+
 
 
           <li class="nav-item has-treeview">
@@ -197,94 +197,6 @@
 
             </ul>
           </li>
-
-
-
-          @can('completo')
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Publicidad
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ url('/admin/publicidad/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Publicidad Activa</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/publicidad/lista-inactivo') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Publicidad Inactiva</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/zonapublicidad/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Zona publicidad</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/publicidad/pos') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Posición Publi. Global</p>
-                </a>
-              </li>
-
-            </ul>
-          </li>
-          @endcan
-
-
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Encargos
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ url('/admin/encargos/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Activos</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/encargos/lista-finalizo') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Finalizados</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/encargos/lista-negocios') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Negocios</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/encargos/buscar/numero/orden-encargo') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Buscar # Encargo</p>
-                </a>
-              </li>
-
-
-            </ul>
-          </li>
-
-
 
 
             <li class="nav-item has-treeview">
@@ -441,70 +353,12 @@
           </li>
 
 
-          <li class="nav-item has-treeview">
-            <a href="#" class="nav-link">
-              <i class="nav-icon fa fa fa-globe"></i>
-              <p>
-                Cupones
-                <i class="right fas fa-angle-left"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/tipo/lista') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Tipo de cupones</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
+            <li class="nav-item">
                 <a href="{{ url('/admin/cupones/lista/enviogratis') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Envio gratis</p>
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>Cupón Envío Gratis</p>
                 </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/lista/descuentod') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Descuento dinero</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/lista/descuentop') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Descuento porcentaje</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/lista/productos') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Producto gratis</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/lista/donacion') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Donaciones</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="{{ url('/admin/cupones/lista/instituciones') }}" target="frameprincipal" class="nav-link">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Instituciones</p>
-                </a>
-              </li>
-
-
-            </ul>
-          </li>
-
-
-
+            </li>
 
         </ul>
       </nav>
