@@ -1270,32 +1270,16 @@ class MotoristaController extends Controller
                 $start = Carbon::parse($request->fecha1)->startOfDay();
                 $end = Carbon::parse($request->fecha2)->endOfDay();
 
-
-
-                if($request->filtro == 1){ // solo ordenes donde se le pago a propietario
-                    $orden = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden',
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id',
-                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->where('o.pago_a_propi', 1)
-                    ->whereBetween('o.fecha_orden', [$start, $end])
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-                }else{
-                    $orden = DB::table('motorista_ordenes AS m')
-                    ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
-                    ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden',
-                    'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id',
-                    'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
-                    ->where('o.estado_7', 1) // solo completadas
-                    ->where('m.motoristas_id', $request->id) // del motorista
-                    ->whereBetween('o.fecha_orden', [$start, $end])
-                    ->orderBy('o.id', 'DESC')
-                    ->get();
-                }
+                $orden = DB::table('motorista_ordenes AS m')
+                ->join('ordenes AS o', 'o.id', '=', 'm.ordenes_id')
+                ->select('o.id', 'o.precio_total', 'o.precio_envio', 'o.fecha_orden',
+                'm.motoristas_id', 'o.ganancia_motorista', 'o.estado_7', 'o.servicios_id',
+                'o.pago_a_propi', 'o.tipo_pago', 'o.tipo_cargo')
+                ->where('o.estado_7', 1) // solo completadas
+                ->where('m.motoristas_id', $request->id) // del motorista
+                ->whereBetween('o.fecha_orden', [$start, $end])
+                ->orderBy('o.id', 'DESC')
+                ->get();
 
                 foreach($orden as $o){
 
@@ -1309,7 +1293,6 @@ class MotoristaController extends Controller
 
                     $o->direccion = $datadir->direccion;
 
-                    $cupon = "";
                     $tipo = "";
 
                     if($o->pago_a_propi == 1){
@@ -1317,102 +1300,10 @@ class MotoristaController extends Controller
                     }
                     $o->tipo = $tipo;
 
-                    // buscar si aplico cupon
-                    if($oc = OrdenesCupones::where('ordenes_id', $o->id)->first()){
-
-                        // buscar tipo de cupon
-                        $tipo = Cupones::where('id', $oc->cupones_id)->first();
-
-                        // ver que tipo se aplico
-                        // el precio envio ya esta modificado
-                        if($tipo->tipo_cupon_id == 1){
-
-                            $cupon = "Envío Gratis";
-                            // no sumara precio envio, ya que esta seteado a $0.00 por cupon envio gratis
-                            $o->precio_total = number_format((float)$o->precio_total, 2, '.', '');
-
-
-                        }else if($tipo->tipo_cupon_id == 2){
-
-                            $dd = AplicaCuponDos::where('ordenes_id', $o->id)->first();
-
-                            $total = $o->precio_total - $dd->dinero;
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            // si aplico envio gratis
-                            if($dd->aplico_envio_gratis == 1){
-                                $cupon = "Descuento dinero: $" . $dd->dinero . " + Envío Gratis";
-                            }else{
-                                $cupon = "Descuento dinero: $" . $dd->dinero;
-                            }
-
-                            //** NO importa sumar el envio, ya que si aplico envio gratis, el precio_envio sera $0.00 */
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            // precio modificado con el descuento dinero
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 3){
-
-                            $porcentaje = AplicaCuponTres::where('ordenes_id', $o->id)->pluck('porcentaje')->first();
-                            $resta = $o->precio_total * ($porcentaje / 100);
-                            $total = $o->precio_total - $resta;
-
-                            if($total <= 0){
-                                $total = 0;
-                            }
-
-                            $cupon = "Descuento de: " . $porcentaje . "%";
-
-                            // sumar el precio de envio
-                            $suma = $total + $o->precio_envio;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-
-                        }else if($tipo->tipo_cupon_id == 4){
-
-                            $producto = AplicaCuponCuatro::where('ordenes_id', $o->id)->pluck('producto')->first();
-
-                            $sumado = $o->precio_total + $o->precio_envio;
-                            $sumado = number_format((float)$sumado, 2, '.', '');
-
-                            $cupon = "Producto Gratis: " . $producto;
-
-                            $o->precio_total = $sumado;
-                        }
-                        else if($tipo->tipo_cupon_id == 5){ // donacion
-
-                            $donacion = AplicaCuponCinco::where('ordenes_id', $o->id)->pluck('dinero')->first();
-
-                            $cupon = "Donación de: $" . $donacion;
-
-                            // sumar
-                            $suma = $o->precio_total + $o->precio_envio + $donacion;
-
-                            $o->precio_total = number_format((float)$suma, 2, '.', '');
-                        }else{
-                            $total = $o->precio_total + $o->precio_envio;
-                            $o->precio_total = number_format((float)$total, 2, '.', '');
-                        }
-
-                    }else{
-
-                        $total = $o->precio_total + $o->precio_envio;
-                        $o->precio_total = number_format((float)$total, 2, '.', '');
-                    }
-
-                    // ** LA APP SOLO VERIFICA SI PAGO CON CREDI PUNTOS Y SETEA A $0.00
-
-
-                    $o->cupon = $cupon;
+                    $total = $o->precio_total + $o->precio_envio;
+                    $o->precio_total = number_format((float)$total, 2, '.', '');
                 }
 
-                //** LA GANANCIA MOTORISTA PARA EXTRANJEROS YA FUE AGREGADA AL ORDENAR */
-                // sumar ganancia de motorista de esta fecha
                 $suma = collect($orden)->sum('ganancia_motorista');
                 $ganado = number_format((float)$suma, 2, '.', '');
                 return ['success' => 1, 'histoorden' => $orden, 'ganado' => $ganado];
